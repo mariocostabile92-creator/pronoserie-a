@@ -53,6 +53,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
   <a href="#pronostici" id="nav-pronostici">Pronostici</a>
   <a href="#calendario" id="nav-calendario">Calendario</a>
   <a href="#classifica" id="nav-classifica">Classifica</a>
+  <a href="#squadre" id="nav-squadre">Squadre</a>
   <a href="#pricing" id="nav-pricing">Pricing</a>
 </nav>
 
@@ -209,18 +210,74 @@ async function pageClassifica() {
   let html = '<div class="container"><h1>Classifica Serie A 2025-2026</h1><p class="sub">Giornata 30</p>';
   const data = await fetchAPI("/api/classifica");
   if (!data) return html + '<div class="card" style="color:var(--red)">Errore caricamento</div></div>';
-  html += '<div class="grid2"><div class="card" style="overflow-x:auto"><table><thead><tr><th>#</th><th>Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th><th>GF</th><th>GS</th><th>DR</th><th>Pt</th></tr></thead><tbody>';
+  html += '<div class="card" style="overflow-x:auto"><table><thead><tr><th>#</th><th>Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th><th>GF</th><th>GS</th><th>DR</th><th>Pt</th></tr></thead><tbody>';
   data.classifica.forEach((r, i) => {
     const cls = i < 4 ? 'ucl' : i < 6 ? 'uel' : i >= 17 ? 'rel' : '';
     html += `<tr class="${cls}"><td>${i+1}</td><td style="text-align:left;font-weight:700">${r.Squadra}</td><td>${r.G}</td><td>${r.V}</td><td>${r.N}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GS}</td><td style="color:${r.DR>0?'var(--green)':r.DR<0?'var(--red)':'var(--muted)'}">${r.DR>0?'+':''}${r.DR}</td><td style="font-weight:800">${r.Punti}</td></tr>`;
   });
   html += '</tbody></table><div style="margin-top:12px;display:flex;gap:16px;justify-content:center"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
-  html += '<div class="card"><h2>Top Marcatori</h2>';
-  data.marcatori.forEach(m => {
-    html += `<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><span style="width:30px;font-weight:700;color:${m.pos<=3?'var(--green)':'var(--muted)'}">${m.pos}</span><div style="flex:1"><strong>${m.giocatore}</strong><br><span style="color:var(--muted);font-size:.85rem">${m.squadra}</span></div><span style="font-weight:800;color:var(--green)">${m.gol}</span></div>`;
-  });
-  html += '</div></div></div>';
+  html += '<div class="card" style="text-align:center;padding:20px"><h3>🥅 Classifica Marcatori</h3><p style="color:var(--muted);margin:8px 0">Disponibile per utenti Pro</p><a href="#pricing" class="btn btn-green" style="font-size:.9rem">Sblocca con Pro — 9.99€/mese</a></div>';
+  html += '</div>';
   return html;
+}
+
+async function pageSquadre() {
+  const opts = SQ.map(s => `<option value="${s}">${s}</option>`).join("");
+  let html = `<div class="container">
+    <h1>Squadre Serie A 2025-2026</h1>
+    <p class="sub">Rose, probabili formazioni e infortunati</p>
+    <div style="margin-bottom:16px">
+      <select id="sel-squadra" onchange="loadSquadra(this.value)">${opts}</select>
+    </div>
+    <div id="squadra-detail"><div class="spinner"></div></div>
+  </div>`;
+  return html;
+}
+
+async function loadSquadra(nome) {
+  const det = $("squadra-detail");
+  det.innerHTML = '<div class="spinner"></div>';
+  const d = await fetchAPI(`/api/squadra/${nome}`);
+  if (!d) { det.innerHTML = '<div class="card" style="color:var(--red)">Errore caricamento</div>'; return; }
+  let html = `<div class="grid2">`;
+  
+  // Colonna sinistra: formazione + infortunati
+  html += '<div>';
+  html += `<div class="card"><h2>${d.nome}</h2><p style="color:var(--muted)">Allenatore: <strong>${d.allenatore}</strong></p></div>`;
+  if (d.formazione) {
+    html += `<div class="card"><h3>Probabile Formazione (${d.formazione.modulo})</h3><div style="margin-top:12px">`;
+    d.formazione.titolari.forEach(g => {
+      html += `<span class="tag tag-blue" style="margin:2px">${g}</span>`;
+    });
+    html += '</div></div>';
+  }
+  if (d.infortunati && d.infortunati.length > 0) {
+    html += '<div class="card" style="border-color:var(--red)"><h3 style="color:var(--red)">🏥 Indisponibili</h3>';
+    d.infortunati.forEach(inj => {
+      const col = inj.tipo === "infortunio" ? "var(--red)" : "var(--yellow)";
+      html += `<div style="padding:4px 0;border-bottom:1px solid #1f3460"><span style="color:${col};font-weight:700">${inj.tipo === "infortunio" ? "✕" : "?"} ${inj.nome}</span><br><span style="color:var(--muted);font-size:.85rem">${inj.dettaglio}</span></div>`;
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  
+  // Colonna destra: rosa
+  html += '<div>';
+  if (d.rosa) {
+    const ruoli = {P:"Portieri",D:"Difensori",C:"Centrocampisti",A:"Attaccanti"};
+    const colR = {P:"var(--yellow)",D:"var(--accent)",C:"var(--green)",A:"var(--red)"};
+    for (const [r, label] of Object.entries(ruoli)) {
+      const giocatori = d.rosa.filter(g => g.ruolo === r);
+      if (giocatori.length === 0) continue;
+      html += `<div class="card" style="padding:12px"><h3 style="color:${colR[r]}">${label}</h3>`;
+      giocatori.forEach(g => {
+        html += `<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1f3460"><span style="width:30px;font-weight:700;color:${colR[r]}">${g.numero}</span><span>${g.nome}</span></div>`;
+      });
+      html += '</div>';
+    }
+  }
+  html += '</div></div>';
+  det.innerHTML = html;
 }
 
 function pagePricing() {
@@ -253,13 +310,13 @@ const routes = {
   pronostici: pagePronostici,
   calendario: pageCalendario,
   classifica: pageClassifica,
+  squadre: pageSquadre,
   pricing: pagePricing
 };
 
 async function navigate() {
   const hash = (location.hash || "#home").replace("#","");
   const page = routes[hash] || routes.home;
-  // Update nav
   document.querySelectorAll(".nav a").forEach(a => {
     a.classList.toggle("active", a.getAttribute("href") === "#" + hash);
   });
@@ -270,6 +327,10 @@ async function navigate() {
     app.innerHTML = await result;
   } else {
     app.innerHTML = result;
+  }
+  // Auto-load prima squadra nella pagina squadre
+  if (hash === "squadre") {
+    setTimeout(() => loadSquadra("Inter"), 100);
   }
 }
 

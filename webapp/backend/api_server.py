@@ -219,50 +219,75 @@ def _filtra_pronostico(raw: dict, utente: Optional[dict], home: str, away: str) 
 
 def _genera_pronostico(home: str, away: str) -> dict:
     """
-    Chiama il motore predittivo e ritorna il dizionario grezzo del pronostico.
-    Lancia HTTPException se i dati non sono disponibili o le squadre non esistono.
+    Chiama il motore predittivo. Se i CSV non sono disponibili,
+    usa i dati hardcoded (xG, classifica) come fallback.
     """
-    if not MOTORE_DISPONIBILE:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Motore predittivo non disponibile. Controlla i dati CSV."
-        )
-
-    if _df_storico is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Dati storici non caricati. Riprova tra qualche secondo."
-        )
-
-    # Normalizza i nomi delle squadre
     home_norm = home.strip().title()
     away_norm = away.strip().title()
 
-    try:
-        home_stats = get_team_stats(_df_storico, home_norm, opponent=away_norm)
-        away_stats = get_team_stats(_df_storico, away_norm, opponent=home_norm)
+    # Prova col motore completo (CSV disponibili)
+    if MOTORE_DISPONIBILE and _df_storico is not None:
+        try:
+            home_stats = get_team_stats(_df_storico, home_norm, opponent=away_norm)
+            away_stats = get_team_stats(_df_storico, away_norm, opponent=home_norm)
+            raw = get_prediction(home_stats, away_stats, df=_df_storico)
+            return raw
+        except Exception:
+            pass
 
-        if home_stats["n_partite"] == 0:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Squadra '{home_norm}' non trovata nei dati storici."
-            )
-        if away_stats["n_partite"] == 0:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Squadra '{away_norm}' non trovata nei dati storici."
-            )
+    # Fallback: calcola dai dati hardcoded (xG + classifica)
+    if not MOTORE_DISPONIBILE:
+        # Importa solo quello che serve
+        try:
+            from season_2526 import get_xg, get_xg_media_campionato, XG_2526
+            from predictor import calcola_probabilita, calcola_mercati_extra, DIXON_COLES_RHO
+        except ImportError:
+            raise HTTPException(status_code=503, detail="Motore non disponibile")
 
-        raw = get_prediction(home_stats, away_stats, df=_df_storico)
-        return raw
+    xg_h = get_xg(home_norm)
+    xg_a = get_xg(away_norm)
+    if not xg_h or not xg_a:
+        raise HTTPException(status_code=404, detail=f"Squadra non trovata: {home_norm} o {away_norm}")
 
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Errore nel calcolo del pronostico: {e}"
-        )
+    medie = get_xg_media_campionato()
+    lambda_h = xg_h["xG_pg"] * (xg_a["xGA_pg"] / medie["xGA_pg_medio"])
+    lambda_a = xg_a["xG_pg"] * (xg_h["xGA_pg"] / medie["xGA_pg_medio"])
+    lambda_h = max(0.3, min(lambda_h, 5.0))
+    lambda_a = max(0.3, min(lambda_a, 5.0))
+
+    probs = calcola_probabilita(lambda_h, lambda_a)
+    extra = calcola_mercati_extra(lambda_h, lambda_a)
+
+    max_p = max(probs["prob_1"], probs["prob_x"], probs["prob_2"])
+    if max_p == probs["prob_1"]:
+        sugg, sugg_l = "1", "Vittoria Casa"
+    elif max_p == probs["prob_x"]:
+        sugg, sugg_l = "X", "Pareggio"
+    else:
+        sugg, sugg_l = "2", "Vittoria Ospite"
+
+    spread = sorted([probs["prob_1"], probs["prob_x"], probs["prob_2"]], reverse=True)
+    conf = min((spread[0] - spread[1]) / 0.40, 1.0) * 0.7 + 0.3
+    conf_label = "Alta" if conf >= 0.65 else ("Media" if conf >= 0.40 else "Bassa")
+
+    return {
+        "prob_1": round(probs["prob_1"] * 100, 1),
+        "prob_x": round(probs["prob_x"] * 100, 1),
+        "prob_2": round(probs["prob_2"] * 100, 1),
+        "quota_1": round(1.05 / probs["prob_1"], 2) if probs["prob_1"] > 0 else 99,
+        "quota_x": round(1.05 / probs["prob_x"], 2) if probs["prob_x"] > 0 else 99,
+        "quota_2": round(1.05 / probs["prob_2"], 2) if probs["prob_2"] > 0 else 99,
+        "suggerimento": sugg, "sugg_label": sugg_l,
+        "confidence": round(conf, 3), "confidence_label": conf_label,
+        "confidence_color": "#2ecc71" if conf >= 0.65 else ("#f39c12" if conf >= 0.40 else "#e74c3c"),
+        "xg_applied": True, "xg_home": xg_h["xG_pg"], "xg_away": xg_a["xG_pg"],
+        "lambda_home": round(lambda_h, 3), "lambda_away": round(lambda_a, 3),
+        "h2h_applied": False, "h2h_n": 0, "inj_home": 0, "inj_away": 0,
+        **extra,
+    }
+
+
+# ── Endpoint: Pronostico singola partita ───────────────────────────────────
 
 
 # ── ENDPOINT AUTENTICAZIONE ─────────────────────────────────────────────────
