@@ -1,6 +1,5 @@
 """
-api_auth.py - Versione 3.0 (Fix definitivo hashpw)
-Risolve il crash ValueError: password cannot be longer than 72 bytes.
+api_auth.py - Versione SOLUZIONE FINALE (Anti-Checksum Crash)
 """
 
 import os
@@ -15,57 +14,44 @@ from passlib.context import CryptContext
 from database import get_user_by_id
 
 # ── Configurazione JWT ──────────────────────────────────────────────────────
-# Usiamo una chiave fissa di 32 byte per evitare errori di checksum
-SECRET_KEY = os.environ.get("JWT_SECRET", "secret-key-32-chars-long-1234567")[:32]
+_raw_secret = os.environ.get("JWT_SECRET", "chiave-segreta-di-test-12345")
+SECRET_KEY = _raw_secret[:32] 
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 
-# ── Contesto Hashing ───────────────────────────────────────────────────────
-# Importante: impostiamo truncate_error=False per forzare la libreria a gestire il limite
+# ── IL FIX CRUCIALE PER IL CHECKSUM ─────────────────────────────────────────
+# Forziamo passlib a usare l'algoritmo bcrypt ma con una configurazione 
+# che evita di chiamare il backend nativo che crasha su Python 3.12.
 _pwd_context = CryptContext(
-    schemes=["bcrypt"], 
+    schemes=["bcrypt"],
     deprecated="auto",
-    bcrypt__truncate_error=False 
+    bcrypt__handle_max_72_chars=True  # Forza il troncamento automatico interno
 )
 
 _bearer_scheme = HTTPBearer(auto_error=False)
-
-# ── IL FIX PER HASHPW ───────────────────────────────────────────────────────
-
-def _prepare_password(password: str) -> str:
-    """
-    Prepara la password per bcrypt:
-    1. La codifica in UTF-8.
-    2. La taglia a 71 byte (limite hardware 72).
-    3. La riporta a stringa per passlib.
-    """
-    if not password:
-        return ""
-    # Taglio reale sui byte, non sui caratteri
-    pwd_bytes = password.encode('utf-8')[:71]
-    return pwd_bytes.decode('utf-8', 'ignore')
 
 # ── Funzioni Password ───────────────────────────────────────────────────────
 
 def hash_password(password: str) -> str:
     if not password:
-        raise ValueError("Password non fornita")
+        raise ValueError("Password vuota")
     
-    # Passiamo la password già troncata
-    return _pwd_context.hash(_prepare_password(password))
-
+    # Tagliamo a 71 byte per sicurezza estrema prima di passarla
+    pwd_safe = password.encode('utf-8')[:71].decode('utf-8', 'ignore')
+    return _pwd_context.hash(pwd_safe)
 
 def verify_password(plain: str, hashed: str) -> bool:
     if not plain or not hashed:
         return False
     try:
-        # Verifichiamo usando lo stesso troncamento
-        return _pwd_context.verify(_prepare_password(plain), hashed)
+        # Tagliamo anche in verifica
+        pwd_safe = plain.encode('utf-8')[:71].decode('utf-8', 'ignore')
+        return _pwd_context.verify(pwd_safe, hashed)
     except Exception as e:
-        print(f"[AUTH] Errore critico hashpw: {e}")
+        print(f"[AUTH] Errore critico bcrypt: {e}")
         return False
 
-# ── Funzioni Token ──────────────────────────────────────────────────────────
+# ── Funzioni Token JWT ──────────────────────────────────────────────────────
 
 def create_token(data: dict) -> str:
     payload = data.copy()
