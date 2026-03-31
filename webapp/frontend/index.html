@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PronoSerie A - Pronostici Serie A con IA</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0f1a;--card:#162447;--accent:#3498db;--green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;--text:#e8eaf6;--muted:#8892b0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+.nav{background:#0d1b2a;padding:12px 24px;display:flex;align-items:center;gap:24px;position:sticky;top:0;z-index:100;border-bottom:1px solid #1f3460}
+.nav .logo{font-size:1.3rem;font-weight:800;color:var(--green)}
+.nav a{color:var(--muted);font-size:.95rem;padding:6px 12px;border-radius:8px;transition:.2s}
+.nav a:hover,.nav a.active{color:var(--text);background:#1f3460}
+.container{max-width:1100px;margin:0 auto;padding:24px 16px}
+.card{background:var(--card);border-radius:12px;padding:24px;margin-bottom:16px;border:1px solid #1f3460}
+.btn{display:inline-block;padding:12px 28px;border-radius:20px;border:none;cursor:pointer;font-weight:700;font-size:1rem;transition:.2s}
+.btn-green{background:var(--green);color:#000}.btn-green:hover{background:#27ae60}
+.btn-blue{background:var(--accent);color:#fff}.btn-blue:hover{background:#2980b9}
+h1{font-size:2rem;margin-bottom:8px}h2{font-size:1.4rem;margin-bottom:12px}
+.sub{color:var(--muted);margin-bottom:20px}
+select{background:#0d1b2a;color:var(--text);border:1px solid #1f3460;padding:10px 16px;border-radius:8px;font-size:1rem;min-width:180px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:768px){.grid2,.grid3,.grid6{grid-template-columns:1fr}.nav{flex-wrap:wrap;gap:8px}}
+.box1x2{text-align:center;padding:16px;border-radius:12px;background:#0d1b2a;border:2px solid #1f3460}
+.box1x2.best{border-color:var(--green);box-shadow:0 0 20px rgba(46,204,113,.2)}
+.box1x2 .pct{font-size:2rem;font-weight:800}
+.box1x2 .quota{color:var(--muted);font-size:.85rem}
+.tag{display:inline-block;padding:4px 12px;border-radius:12px;font-size:.8rem;font-weight:700}
+.tag-green{background:var(--green);color:#000}.tag-red{background:var(--red);color:#fff}.tag-yellow{background:var(--yellow);color:#000}.tag-blue{background:var(--accent);color:#fff}
+table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:center;border-bottom:1px solid #1f3460}th{color:var(--muted);font-size:.85rem}
+.ucl{border-left:3px solid var(--green)}.uel{border-left:3px solid var(--yellow)}.rel{border-left:3px solid var(--red)}
+.spinner{width:32px;height:32px;border:3px solid #1f3460;border-top:3px solid var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:40px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.match-btn{width:100%;text-align:left;padding:12px 16px;background:var(--card);border:1px solid #1f3460;border-radius:8px;color:var(--text);cursor:pointer;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;transition:.2s}
+.match-btn:hover{background:#1a2d52;border-color:var(--accent)}
+.hero{text-align:center;padding:60px 20px;background:linear-gradient(135deg,#0d1b2a,#162447)}
+.hero h1{font-size:2.5rem;margin-bottom:12px}
+.stat-box{text-align:center;padding:20px}.stat-box .num{font-size:2.2rem;font-weight:800;color:var(--green)}.stat-box .lbl{color:var(--muted);font-size:.85rem}
+.price-card{text-align:center;padding:32px;border-radius:16px;background:var(--card);border:2px solid #1f3460}
+.price-card.pro{border-color:var(--green)}.price-card .price{font-size:2.5rem;font-weight:800;color:var(--green)}
+.bar{height:8px;border-radius:4px;background:#1f3460;overflow:hidden;margin:8px 0}.bar-fill{height:100%;border-radius:4px;transition:.3s}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">PronoSerie A</div>
+  <a href="#home" id="nav-home">Home</a>
+  <a href="#pronostici" id="nav-pronostici">Pronostici</a>
+  <a href="#calendario" id="nav-calendario">Calendario</a>
+  <a href="#classifica" id="nav-classifica">Classifica</a>
+  <a href="#pricing" id="nav-pricing">Pricing</a>
+</nav>
+
+<div id="app"><div class="spinner"></div></div>
+
+<script>
+const API = window.location.origin;
+const SQ = ["Inter","Milan","Napoli","Como","Juventus","Roma","Atalanta","Lazio","Bologna","Sassuolo","Udinese","Parma","Genoa","Torino","Cagliari","Fiorentina","Cremonese","Lecce","Verona","Pisa"];
+
+async function fetchAPI(ep) {
+  try {
+    const r = await fetch(API + ep);
+    if (!r.ok) throw new Error(r.status);
+    return await r.json();
+  } catch(e) { console.error("API:", ep, e); return null; }
+}
+
+function $(id) { return document.getElementById(id); }
+
+// ── PAGES ──
+
+function pageHome() {
+  return `
+  <div class="hero">
+    <h1>Pronostici Serie A con Intelligenza Artificiale</h1>
+    <p class="sub" style="font-size:1.1rem;max-width:600px;margin:0 auto 24px">56% di accuratezza sulle giocate ad alta confidenza<br>Basato su 26 anni di dati storici + xG + Dixon-Coles</p>
+    <a href="#pronostici" class="btn btn-green" style="font-size:1.1rem;padding:16px 40px">Calcola Pronostico</a>
+  </div>
+  <div class="container">
+    <h2 style="text-align:center;margin:32px 0 16px">Come funziona</h2>
+    <div class="grid6">
+      <div class="card" style="text-align:center"><div style="font-size:2rem">📊</div><strong>26 anni di storico</strong><p class="sub" style="font-size:.85rem">9000+ partite Serie A analizzate</p></div>
+      <div class="card" style="text-align:center"><div style="font-size:2rem">📈</div><strong>xG 2025-2026</strong><p class="sub" style="font-size:.85rem">Expected Goals stagione attuale</p></div>
+      <div class="card" style="text-align:center"><div style="font-size:2rem">⚔️</div><strong>Testa a testa</strong><p class="sub" style="font-size:.85rem">Storico scontri diretti H2H</p></div>
+      <div class="card" style="text-align:center"><div style="font-size:2rem">🔥</div><strong>Forma recente</strong><p class="sub" style="font-size:.85rem">Ultime 15 partite con decay</p></div>
+      <div class="card" style="text-align:center"><div style="font-size:2rem">🧮</div><strong>Dixon-Coles</strong><p class="sub" style="font-size:.85rem">Modello Poisson avanzato</p></div>
+      <div class="card" style="text-align:center"><div style="font-size:2rem">🏥</div><strong>Infortunati live</strong><p class="sub" style="font-size:.85rem">Formazioni e assenze aggiornate</p></div>
+    </div>
+    <h2 style="text-align:center;margin:32px 0 16px">Risultati Backtesting (299 partite reali)</h2>
+    <div class="grid3">
+      <div class="stat-box card"><div class="num">52.8%</div><div class="lbl">1X2</div></div>
+      <div class="stat-box card"><div class="num">54.5%</div><div class="lbl">Goal/NoGoal</div></div>
+      <div class="stat-box card"><div class="num" style="color:var(--green)">56.0%</div><div class="lbl">Confidenza Alta</div></div>
+    </div>
+    <div style="text-align:center;margin:32px 0"><a href="#pricing" class="btn btn-blue">Vedi i Piani</a></div>
+  </div>`;
+}
+
+function pagePronostici() {
+  const opts = SQ.map(s => `<option value="${s}">${s}</option>`).join("");
+  return `
+  <div class="container">
+    <div class="card" style="text-align:center;padding:32px">
+      <h1>Calcola Pronostico</h1>
+      <p class="sub">Scegli le squadre e scopri il pronostico dell'IA</p>
+      <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin:24px 0">
+        <div><label style="color:var(--green);font-weight:700">CASA</label><br><select id="sel-home">${opts}</select></div>
+        <span style="font-size:1.5rem;font-weight:800;color:var(--yellow)">VS</span>
+        <div><label style="color:var(--red);font-weight:700">OSPITE</label><br><select id="sel-away">${opts}</select></div>
+      </div>
+      <button class="btn btn-green" style="font-size:1.1rem;padding:16px 48px" onclick="calcPronostico()">CALCOLA PRONOSTICO</button>
+    </div>
+    <div id="result"></div>
+  </div>`;
+}
+
+async function calcPronostico() {
+  const h = $("sel-home").value, a = $("sel-away").value;
+  const res = $("result");
+  if (h === a) { res.innerHTML = '<div class="card" style="color:var(--red)">Scegli due squadre diverse!</div>'; return; }
+  res.innerHTML = '<div class="spinner"></div>';
+  const d = await fetchAPI(`/api/pronostico/${h}/${a}`);
+  if (!d) { res.innerHTML = '<div class="card" style="color:var(--red)">Errore di connessione all\'API</div>'; return; }
+  const best = d.suggerimento;
+  const confCol = d.confidence_label === "Alta" ? "var(--green)" : d.confidence_label === "Media" ? "var(--yellow)" : "var(--red)";
+  const confPct = Math.round(d.confidence * 100);
+  res.innerHTML = `
+    <div class="card">
+      <h2 style="text-align:center">${h} vs ${a}</h2>
+      <div class="grid3" style="margin:20px 0">
+        <div class="box1x2 ${best==='1'?'best':''}"><div style="color:var(--green);font-weight:700">1 Casa</div><div class="pct">${d.prob_1}%</div><div class="quota">Quota ${d.quota_1}</div></div>
+        <div class="box1x2 ${best==='X'?'best':''}"><div style="color:var(--yellow);font-weight:700">X Pareggio</div><div class="pct">${d.prob_x}%</div><div class="quota">Quota ${d.quota_x}</div></div>
+        <div class="box1x2 ${best==='2'?'best':''}"><div style="color:var(--red);font-weight:700">2 Ospite</div><div class="pct">${d.prob_2}%</div><div class="quota">Quota ${d.quota_2}</div></div>
+      </div>
+      <div style="text-align:center;margin:16px 0">
+        <span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best} — ${d.sugg_label}</span>
+      </div>
+      <div style="text-align:center;margin:12px 0">
+        <span style="color:${confCol};font-weight:700">Affidabilita': ${d.confidence_label} (${confPct}%)</span>
+        <div class="bar" style="max-width:300px;margin:8px auto"><div class="bar-fill" style="width:${confPct}%;background:${confCol}"></div></div>
+      </div>
+      ${d.over_25 ? `
+      <h3 style="margin-top:20px">Mercati Extra</h3>
+      <div class="grid3" style="margin:12px 0">
+        <div class="card" style="text-align:center;padding:12px"><strong>Over 2.5</strong><br><span style="font-size:1.3rem;font-weight:700;color:${d.over_25>50?'var(--green)':'var(--accent)'}">${d.over_25}%</span></div>
+        <div class="card" style="text-align:center;padding:12px"><strong>Goal Si</strong><br><span style="font-size:1.3rem;font-weight:700;color:${d.goal_si>50?'var(--green)':'var(--accent)'}">${d.goal_si}%</span></div>
+        <div class="card" style="text-align:center;padding:12px"><strong>Gol Attesi</strong><br><span style="font-size:1.3rem;font-weight:700">${d.gol_attesi}</span></div>
+      </div>
+      ${d.risultati_esatti ? `<p style="color:var(--muted)">Risultato esatto: ${d.risultati_esatti.slice(0,3).map(r=>r.score+" ("+r.prob+"%)").join(" | ")}</p>` : ''}
+      ` : '<p style="color:var(--muted);text-align:center;margin-top:16px">Passa a Pro per Over/Under, Goal, Risultato Esatto</p>'}
+    </div>`;
+}
+
+async function pageCalendario() {
+  let html = '<div class="container"><h1>Calendario Giornate 31-38</h1><p class="sub">Clicca su una partita per il pronostico completo</p>';
+  const cal = await fetchAPI("/api/calendario");
+  if (!cal) return html + '<div class="card" style="color:var(--red)">Errore caricamento calendario</div></div>';
+  for (const g of cal.giornate) {
+    html += `<div class="card"><h2>Giornata ${g.giornata} — <span style="color:var(--muted)">${g.data}</span></h2>`;
+    for (const p of g.partite) {
+      html += `<button class="match-btn" onclick="showMatch('${p.home}','${p.away}')">
+        <span><strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong></span>
+        <span style="color:var(--accent)">Pronostico →</span>
+      </button>`;
+    }
+    html += '</div>';
+  }
+  return html + '</div>';
+}
+
+async function showMatch(h, a) {
+  const app = $("app");
+  app.innerHTML = '<div class="spinner"></div>';
+  const d = await fetchAPI(`/api/pronostico/${h}/${a}`);
+  if (!d) { app.innerHTML = '<div class="container card" style="color:var(--red)">Errore</div>'; return; }
+  const best = d.suggerimento;
+  const confPct = Math.round(d.confidence * 100);
+  const confCol = d.confidence_label === "Alta" ? "var(--green)" : d.confidence_label === "Media" ? "var(--yellow)" : "var(--red)";
+  app.innerHTML = `
+  <div class="container">
+    <a href="#calendario" style="color:var(--accent);margin-bottom:16px;display:inline-block">← Torna al Calendario</a>
+    <div class="card" style="text-align:center">
+      <h1>${h} vs ${a}</h1>
+      <div class="grid3" style="margin:20px 0">
+        <div class="box1x2 ${best==='1'?'best':''}"><div style="color:var(--green);font-weight:700">1</div><div class="pct">${d.prob_1}%</div><div class="quota">Q. ${d.quota_1}</div></div>
+        <div class="box1x2 ${best==='X'?'best':''}"><div style="color:var(--yellow);font-weight:700">X</div><div class="pct">${d.prob_x}%</div><div class="quota">Q. ${d.quota_x}</div></div>
+        <div class="box1x2 ${best==='2'?'best':''}"><div style="color:var(--red);font-weight:700">2</div><div class="pct">${d.prob_2}%</div><div class="quota">Q. ${d.quota_2}</div></div>
+      </div>
+      <span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best} — ${d.sugg_label}</span>
+      <div style="margin:12px 0"><span style="color:${confCol};font-weight:700">Affidabilita': ${d.confidence_label} (${confPct}%)</span></div>
+      ${d.over_25 ? `
+      <div class="grid3" style="margin:16px 0">
+        <div class="card" style="text-align:center;padding:12px"><strong>${d.over_25>50?'Over':'Under'} 2.5</strong><br><span style="font-size:1.3rem;font-weight:700">${Math.max(d.over_25,d.under_25)}%</span></div>
+        <div class="card" style="text-align:center;padding:12px"><strong>${d.goal_si>50?'Goal Si':'Goal No'}</strong><br><span style="font-size:1.3rem;font-weight:700">${Math.max(d.goal_si,d.goal_no)}%</span></div>
+        <div class="card" style="text-align:center;padding:12px"><strong>Gol Attesi</strong><br><span style="font-size:1.3rem;font-weight:700">${d.gol_attesi}</span></div>
+      </div>
+      ${d.risultati_esatti ? `<p style="color:var(--muted)">Esatto: ${d.risultati_esatti.slice(0,4).map(r=>'<span class="tag tag-blue" style="margin:2px">'+r.score+' '+r.prob+'%</span>').join(" ")}</p>` : ''}
+      ` : ''}
+    </div>
+  </div>`;
+}
+
+async function pageClassifica() {
+  let html = '<div class="container"><h1>Classifica Serie A 2025-2026</h1><p class="sub">Giornata 30</p>';
+  const data = await fetchAPI("/api/classifica");
+  if (!data) return html + '<div class="card" style="color:var(--red)">Errore caricamento</div></div>';
+  html += '<div class="grid2"><div class="card" style="overflow-x:auto"><table><thead><tr><th>#</th><th>Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th><th>GF</th><th>GS</th><th>DR</th><th>Pt</th></tr></thead><tbody>';
+  data.classifica.forEach((r, i) => {
+    const cls = i < 4 ? 'ucl' : i < 6 ? 'uel' : i >= 17 ? 'rel' : '';
+    html += `<tr class="${cls}"><td>${i+1}</td><td style="text-align:left;font-weight:700">${r.Squadra}</td><td>${r.G}</td><td>${r.V}</td><td>${r.N}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GS}</td><td style="color:${r.DR>0?'var(--green)':r.DR<0?'var(--red)':'var(--muted)'}">${r.DR>0?'+':''}${r.DR}</td><td style="font-weight:800">${r.Punti}</td></tr>`;
+  });
+  html += '</tbody></table><div style="margin-top:12px;display:flex;gap:16px;justify-content:center"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
+  html += '<div class="card"><h2>Top Marcatori</h2>';
+  data.marcatori.forEach(m => {
+    html += `<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><span style="width:30px;font-weight:700;color:${m.pos<=3?'var(--green)':'var(--muted)'}">${m.pos}</span><div style="flex:1"><strong>${m.giocatore}</strong><br><span style="color:var(--muted);font-size:.85rem">${m.squadra}</span></div><span style="font-weight:800;color:var(--green)">${m.gol}</span></div>`;
+  });
+  html += '</div></div></div>';
+  return html;
+}
+
+function pagePricing() {
+  return `
+  <div class="container" style="text-align:center">
+    <h1>Piani e Prezzi</h1><p class="sub">Scegli il piano adatto a te</p>
+    <div class="grid2" style="max-width:700px;margin:32px auto">
+      <div class="price-card">
+        <h2>Free</h2><div class="price" style="color:var(--muted)">0€</div><p style="color:var(--muted)">per sempre</p>
+        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2">
+          <li>✅ 2 pronostici al giorno</li><li>✅ 1X2 con probabilita'</li><li>❌ Over/Under</li><li>❌ Goal/NoGoal</li><li>❌ Risultato esatto</li><li>❌ Formazioni live</li>
+        </ul>
+        <a href="#pronostici" class="btn btn-blue">Inizia Gratis</a>
+      </div>
+      <div class="price-card pro">
+        <div class="tag tag-green" style="margin-bottom:12px">PIU' POPOLARE</div>
+        <h2>Pro</h2><div class="price">9.99€</div><p style="color:var(--muted)">/mese</p>
+        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2">
+          <li>✅ Pronostici illimitati</li><li>✅ 1X2 + Over/Under</li><li>✅ Goal Si/No</li><li>✅ Risultato esatto top 5</li><li>✅ xG confronto</li><li>✅ Formazioni e infortunati</li>
+        </ul>
+        <button class="btn btn-green">Abbonati Ora</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── ROUTER ──
+const routes = {
+  home: pageHome,
+  pronostici: pagePronostici,
+  calendario: pageCalendario,
+  classifica: pageClassifica,
+  pricing: pagePricing
+};
+
+async function navigate() {
+  const hash = (location.hash || "#home").replace("#","");
+  const page = routes[hash] || routes.home;
+  // Update nav
+  document.querySelectorAll(".nav a").forEach(a => {
+    a.classList.toggle("active", a.getAttribute("href") === "#" + hash);
+  });
+  const app = $("app");
+  const result = page();
+  if (result && typeof result.then === "function") {
+    app.innerHTML = '<div class="spinner"></div>';
+    app.innerHTML = await result;
+  } else {
+    app.innerHTML = result;
+  }
+}
+
+window.addEventListener("hashchange", navigate);
+if (!location.hash) location.hash = "#home";
+navigate();
+</script>
+</body>
+</html>

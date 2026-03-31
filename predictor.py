@@ -1,0 +1,421 @@
+"""
+predictor.py
+Calcola le probabilità 1X2 usando Dixon-Coles (Poisson corretto),
+con integrazione H2H, forma pesata, confronto bookmaker e indice di confidence.
+"""
+
+import numpy as np
+import pandas as pd
+from scipy.stats import poisson
+from stats_engine import get_h2h_stats
+from season_2526 import get_xg, get_xg_media_campionato
+from live_data import get_impatto_infortunati, get_n_indisponibili
+
+# Costanti del modello (ottimizzate da backtesting su 299 partite)
+MAX_GOL = 10
+ALPHA_H2H = 0.12         # H2H ha forte valore predittivo
+ALPHA_FORMA = 0.10        # Forma recente
+ALPHA_XG = 0.25           # xG stagione attuale
+DIXON_COLES_RHO = -0.13   # Correzione Dixon-Coles standard
+MARGINE_BK = 1.05
+
+# Coppie bookmaker (Home, Draw, Away)
+BOOKMAKER_COLS = [
+    ("WHH", "WHD", "WHA"),
+    ("GBH", "GBD", "GBA"),
+    ("IWH", "IWD", "IWA"),
+    ("LBH", "LBD", "LBA"),
+    ("SBH", "SBD", "SBA"),
+]
+
+
+def _dixon_coles_tau(i: int, j: int, lh: float, la: float, rho: float) -> float:
+    """Correzione Dixon-Coles per risultati a basso punteggio."""
+    if i == 0 and j == 0:
+        return 1.0 - lh * la * rho
+    elif i == 1 and j == 0:
+        return 1.0 + la * rho
+    elif i == 0 and j == 1:
+        return 1.0 + lh * rho
+    elif i == 1 and j == 1:
+        return 1.0 - rho
+    return 1.0
+
+
+def calcola_probabilita(lambda_home: float, lambda_away: float,
+                         rho: float = DIXON_COLES_RHO) -> dict:
+    """
+    Calcola P(1), P(X), P(2) con correzione Dixon-Coles.
+    """
+    prob_1 = 0.0
+    prob_x = 0.0
+    prob_2 = 0.0
+
+    for i in range(MAX_GOL + 1):
+        for j in range(MAX_GOL + 1):
+            p_base = poisson.pmf(i, lambda_home) * poisson.pmf(j, lambda_away)
+            tau = _dixon_coles_tau(i, j, lambda_home, lambda_away, rho)
+            p = max(0.0, p_base * tau)  # Clamp per evitare negativi
+
+            if i > j:
+                prob_1 += p
+            elif i == j:
+                prob_x += p
+            else:
+                prob_2 += p
+
+    # Normalizza
+    totale = prob_1 + prob_x + prob_2
+    if totale > 0:
+        prob_1 /= totale
+        prob_x /= totale
+        prob_2 /= totale
+
+    return {"prob_1": prob_1, "prob_x": prob_x, "prob_2": prob_2}
+
+
+def calcola_mercati_extra(lambda_home: float, lambda_away: float,
+                           rho: float = DIXON_COLES_RHO) -> dict:
+    """
+    Calcola probabilita' per mercati extra:
+    - Over/Under 1.5, 2.5, 3.5
+    - Goal/NoGoal (entrambe segnano si/no)
+    - Risultato esatto piu' probabile
+    """
+    # Matrice probabilita' (i gol home, j gol away)
+    matrice = {}
+    for i in range(MAX_GOL + 1):
+        for j in range(MAX_GOL + 1):
+            p_base = poisson.pmf(i, lambda_home) * poisson.pmf(j, lambda_away)
+            tau = _dixon_coles_tau(i, j, lambda_home, lambda_away, rho)
+            matrice[(i, j)] = max(0.0, p_base * tau)
+
+    # Normalizza
+    tot = sum(matrice.values())
+    if tot > 0:
+        matrice = {k: v / tot for k, v in matrice.items()}
+
+    # Over/Under
+    over_15 = sum(p for (i, j), p in matrice.items() if i + j > 1.5)
+    over_25 = sum(p for (i, j), p in matrice.items() if i + j > 2.5)
+    over_35 = sum(p for (i, j), p in matrice.items() if i + j > 3.5)
+
+    # Goal/NoGoal (entrambe segnano almeno 1)
+    goal_si = sum(p for (i, j), p in matrice.items() if i >= 1 and j >= 1)
+
+    # Risultato esatto piu' probabile (top 5)
+    top_esatti = sorted(matrice.items(), key=lambda x: -x[1])[:5]
+    risultati_esatti = [
+        {"score": f"{i}-{j}", "prob": round(p * 100, 1)}
+        for (i, j), p in top_esatti
+    ]
+
+    # Gol totali attesi
+    gol_attesi = lambda_home + lambda_away
+
+    # Suggerimenti
+    tips = []
+    if over_25 > 0.50:
+        tips.append(("Over 2.5", round(over_25 * 100, 1), "#2ecc71"))
+    else:
+        tips.append(("Under 2.5", round((1 - over_25) * 100, 1), "#3498db"))
+
+    if goal_si > 0.50:
+        tips.append(("Goal Si", round(goal_si * 100, 1), "#2ecc71"))
+    else:
+        tips.append(("Goal No", round((1 - goal_si) * 100, 1), "#3498db"))
+
+    return {
+        "over_15": round(over_15 * 100, 1),
+        "under_15": round((1 - over_15) * 100, 1),
+        "over_25": round(over_25 * 100, 1),
+        "under_25": round((1 - over_25) * 100, 1),
+        "over_35": round(over_35 * 100, 1),
+        "under_35": round((1 - over_35) * 100, 1),
+        "goal_si": round(goal_si * 100, 1),
+        "goal_no": round((1 - goal_si) * 100, 1),
+        "gol_attesi": round(gol_attesi, 2),
+        "risultati_esatti": risultati_esatti,
+        "tips_extra": tips,
+    }
+
+
+def _get_bookmaker_reference(df: pd.DataFrame, home: str, away: str) -> dict | None:
+    """
+    Recupera le quote bookmaker storiche e le converte in probabilita' implicite.
+    Usa la media di tutti i bookmaker disponibili.
+    Ritorna None se nessuna quota disponibile.
+    """
+    if df is None:
+        return None
+
+    # Cerca ultima partita H2H con quote
+    mask = (
+        ((df["HomeTeam"] == home) & (df["AwayTeam"] == away)) |
+        ((df["HomeTeam"] == away) & (df["AwayTeam"] == home))
+    )
+    h2h = df[mask].sort_values("Date", ascending=False)
+
+    if len(h2h) == 0:
+        return None
+
+    # Cerca la prima riga con quote valide
+    for _, row in h2h.iterrows():
+        quote_h = []
+        quote_d = []
+        quote_a = []
+
+        for col_h, col_d, col_a in BOOKMAKER_COLS:
+            qh = row.get(col_h, np.nan)
+            qd = row.get(col_d, np.nan)
+            qa = row.get(col_a, np.nan)
+            if pd.notna(qh) and pd.notna(qd) and pd.notna(qa) and qh > 1 and qd > 1 and qa > 1:
+                quote_h.append(qh)
+                quote_d.append(qd)
+                quote_a.append(qa)
+
+        if len(quote_h) > 0:
+            # Media quote su tutti i bookmaker disponibili
+            avg_h = np.mean(quote_h)
+            avg_d = np.mean(quote_d)
+            avg_a = np.mean(quote_a)
+
+            # Converti in probabilita' (rimuovi overround)
+            p_raw_h = 1.0 / avg_h
+            p_raw_d = 1.0 / avg_d
+            p_raw_a = 1.0 / avg_a
+            overround = p_raw_h + p_raw_d + p_raw_a
+
+            if overround > 0:
+                # Normalizza la prospettiva: se era home-away invertita, inverti
+                is_inverted = (row["HomeTeam"] == away)
+                if is_inverted:
+                    p_raw_h, p_raw_a = p_raw_a, p_raw_h
+
+                return {
+                    "book_prob_1": round(p_raw_h / overround * 100, 1),
+                    "book_prob_x": round(p_raw_d / overround * 100, 1),
+                    "book_prob_2": round(p_raw_a / overround * 100, 1),
+                    "n_bookmakers": len(quote_h),
+                }
+
+    return None
+
+
+def _calcola_confidence(probs: dict, n_home: int, n_away: int,
+                         h2h: dict | None, bk: dict | None) -> dict:
+    """
+    Calcola indice di affidabilita' composito [0, 1].
+    4 componenti pesate: separazione, volume dati, H2H, convergenza.
+    """
+    # 1. Separazione probabilita' (40%)
+    vals = sorted([probs["prob_1"], probs["prob_x"], probs["prob_2"]], reverse=True)
+    spread = vals[0] - vals[1]  # Distanza tra prima e seconda prob
+    sep_score = min(spread / 0.40, 1.0)  # Max se spread >= 40%
+
+    # 2. Volume dati (25%)
+    n_min = min(n_home, n_away)
+    data_score = min(n_min / 200, 1.0)
+
+    # 3. H2H (20%)
+    if h2h is not None:
+        h2h_score = min(h2h["n_partite"] / 15, 1.0)
+    else:
+        h2h_score = 0.3  # Valore base quando non ci sono abbastanza scontri diretti
+
+    # 4. Convergenza forma / bookmaker (15%)
+    if bk is not None:
+        # Quanto il modello concorda col mercato
+        delta_1 = abs(probs["prob_1"] * 100 - bk["book_prob_1"])
+        delta_x = abs(probs["prob_x"] * 100 - bk["book_prob_x"])
+        delta_2 = abs(probs["prob_2"] * 100 - bk["book_prob_2"])
+        avg_delta = (delta_1 + delta_x + delta_2) / 3
+        conv_score = max(0, 1.0 - avg_delta / 20)  # 0% delta = 1.0, 20%+ delta = 0
+    else:
+        conv_score = 0.5
+
+    confidence = 0.40 * sep_score + 0.25 * data_score + 0.20 * h2h_score + 0.15 * conv_score
+    confidence = round(min(max(confidence, 0), 1.0), 3)
+
+    if confidence >= 0.65:
+        label = "Alta"
+        color = "#2ecc71"
+    elif confidence >= 0.40:
+        label = "Media"
+        color = "#f39c12"
+    else:
+        label = "Bassa"
+        color = "#e74c3c"
+
+    return {
+        "confidence": confidence,
+        "confidence_label": label,
+        "confidence_color": color,
+    }
+
+
+def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) -> dict:
+    """
+    Genera il pronostico 1X2 SUPER INTEGRATO:
+    - Lambda base da storico CSV (26 anni)
+    - Blending con xG stagione 2025-2026 (30%)
+    - Correzione H2H
+    - Correzione forma pesata
+    - Dixon-Coles per risultati bassi
+    - Confronto quote bookmaker (5 bookmaker)
+    - Indice di confidence multi-fattore
+    """
+    home_name = home_stats.get("nome", "")
+    away_name = away_stats.get("nome", "")
+
+    # ── LAMBDA BASE (storico CSV) ──
+    lambda_home_hist = (
+        home_stats["forza_att_casa"]
+        * away_stats["forza_dif_trasf"]
+        * home_stats["media_gol_casa_campionato"]
+    )
+    lambda_away_hist = (
+        away_stats["forza_att_trasf"]
+        * home_stats["forza_dif_casa"]
+        * home_stats["media_gol_trasf_campionato"]
+    )
+
+    # ── LAMBDA DA xG 2025-2026 ──
+    xg_home = get_xg(home_name)
+    xg_away = get_xg(away_name)
+    xg_applied = False
+    xg_home_val = None
+    xg_away_val = None
+
+    if xg_home is not None and xg_away is not None:
+        xg_applied = True
+        medie_xg = get_xg_media_campionato()
+        # xG attacco casa vs xGA difesa ospite, rapportati alla media
+        lambda_home_xg = xg_home["xG_pg"] * (xg_away["xGA_pg"] / medie_xg["xGA_pg_medio"])
+        lambda_away_xg = xg_away["xG_pg"] * (xg_home["xGA_pg"] / medie_xg["xGA_pg_medio"])
+        xg_home_val = round(xg_home["xG_pg"], 2)
+        xg_away_val = round(xg_away["xG_pg"], 2)
+
+        # Blending: 70% storico + 30% xG stagione attuale
+        lambda_home = (1 - ALPHA_XG) * lambda_home_hist + ALPHA_XG * lambda_home_xg
+        lambda_away = (1 - ALPHA_XG) * lambda_away_hist + ALPHA_XG * lambda_away_xg
+    else:
+        lambda_home = lambda_home_hist
+        lambda_away = lambda_away_hist
+
+    # ── CORREZIONE H2H ──
+    h2h = home_stats.get("h2h")
+    h2h_applied = False
+    h2h_n = 0
+    if h2h is not None:
+        h2h_applied = True
+        h2h_n = h2h["n_partite"]
+        adv = h2h["h2h_advantage"]
+        lambda_home *= (1.0 + ALPHA_H2H * adv)
+        lambda_away *= (1.0 - ALPHA_H2H * adv)
+
+    # Correzione forma pesata
+    forma_home = home_stats.get("forma_casa_pesata", 1.5)
+    forma_away = away_stats.get("forma_trasf_pesata", 1.5)
+    forma_diff = forma_home - forma_away
+    forma_factor = 1.0 + ALPHA_FORMA * forma_diff
+    lambda_home *= forma_factor
+    lambda_away *= (2.0 - forma_factor)  # Inverso
+
+    # ── IMPATTO INFORTUNATI ──
+    imp_home = get_impatto_infortunati(home_name)
+    imp_away = get_impatto_infortunati(away_name)
+    lambda_home *= imp_home
+    lambda_away *= imp_away
+    inj_home = get_n_indisponibili(home_name)
+    inj_away = get_n_indisponibili(away_name)
+
+    # Clamp
+    lambda_home = max(0.3, min(lambda_home, 5.0))
+    lambda_away = max(0.3, min(lambda_away, 5.0))
+
+    # Probabilita' con Dixon-Coles
+    probs = calcola_probabilita(lambda_home, lambda_away)
+
+    # Quote con margine
+    def quota(p):
+        if p <= 0:
+            return 99.0
+        return round(MARGINE_BK / p, 2)
+
+    q1 = quota(probs["prob_1"])
+    qx = quota(probs["prob_x"])
+    q2 = quota(probs["prob_2"])
+
+    # Suggerimento
+    max_prob = max(probs["prob_1"], probs["prob_x"], probs["prob_2"])
+    if max_prob == probs["prob_1"]:
+        suggerimento = "1"
+        sugg_label = "Vittoria Casa"
+    elif max_prob == probs["prob_x"]:
+        suggerimento = "X"
+        sugg_label = "Pareggio"
+    else:
+        suggerimento = "2"
+        sugg_label = "Vittoria Ospite"
+
+    # Confronto bookmaker
+    bk = None
+    if df is not None:
+        bk = _get_bookmaker_reference(df, home_stats["nome"], away_stats["nome"])
+
+    # Confidence
+    conf = _calcola_confidence(
+        probs,
+        home_stats.get("n_partite", 0),
+        away_stats.get("n_partite", 0),
+        h2h,
+        bk
+    )
+
+    result = {
+        "prob_1": round(probs["prob_1"] * 100, 1),
+        "prob_x": round(probs["prob_x"] * 100, 1),
+        "prob_2": round(probs["prob_2"] * 100, 1),
+        "quota_1": q1,
+        "quota_x": qx,
+        "quota_2": q2,
+        "suggerimento": suggerimento,
+        "sugg_label": sugg_label,
+        "lambda_home": round(lambda_home, 3),
+        "lambda_away": round(lambda_away, 3),
+        "h2h_applied": h2h_applied,
+        "h2h_n": h2h_n,
+        "xg_applied": xg_applied,
+        "xg_home": xg_home_val,
+        "xg_away": xg_away_val,
+        "inj_home": inj_home,
+        "inj_away": inj_away,
+        "confidence": conf["confidence"],
+        "confidence_label": conf["confidence_label"],
+        "confidence_color": conf["confidence_color"],
+    }
+
+    # Mercati extra: Over/Under, Goal/NoGoal, Risultato Esatto
+    extra = calcola_mercati_extra(lambda_home, lambda_away)
+    result.update(extra)
+
+    # Aggiungi confronto bookmaker se disponibile
+    if bk is not None:
+        result["book_prob_1"] = bk["book_prob_1"]
+        result["book_prob_x"] = bk["book_prob_x"]
+        result["book_prob_2"] = bk["book_prob_2"]
+        result["delta_bk_1"] = round(result["prob_1"] - bk["book_prob_1"], 1)
+        result["delta_bk_x"] = round(result["prob_x"] - bk["book_prob_x"], 1)
+        result["delta_bk_2"] = round(result["prob_2"] - bk["book_prob_2"], 1)
+        result["n_bookmakers"] = bk["n_bookmakers"]
+    else:
+        result["book_prob_1"] = None
+        result["book_prob_x"] = None
+        result["book_prob_2"] = None
+        result["delta_bk_1"] = None
+        result["delta_bk_x"] = None
+        result["delta_bk_2"] = None
+        result["n_bookmakers"] = 0
+
+    return result

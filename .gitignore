@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.db
+*.sqlite3
+photo_cache/
+live_cache.json
+ultimo_aggiornamento.txt
+simulazioni.db
+bot_utenti.db
+webapp_users.db
+.env
+*.zip
+node_modules/
