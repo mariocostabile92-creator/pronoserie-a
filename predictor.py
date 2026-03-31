@@ -17,6 +17,7 @@ ALPHA_H2H = 0.12         # H2H ha forte valore predittivo
 ALPHA_FORMA = 0.10        # Forma recente
 ALPHA_XG = 0.25           # xG stagione attuale
 DIXON_COLES_RHO = -0.13   # Correzione Dixon-Coles standard
+DRAW_BOOST = 1.12         # Boost pareggio: Serie A ha ~28% pareggi, Poisson ne sottostima
 MARGINE_BK = 1.05
 
 # Coppie bookmaker (Home, Draw, Away)
@@ -64,7 +65,8 @@ def calcola_probabilita(lambda_home: float, lambda_away: float,
             else:
                 prob_2 += p
 
-    # Normalizza
+    # Normalizza con boost pareggio (Serie A ha piu' pareggi del modello Poisson)
+    prob_x *= DRAW_BOOST
     totale = prob_1 + prob_x + prob_2
     if totale > 0:
         prob_1 /= totale
@@ -334,8 +336,17 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     lambda_home = max(0.3, min(lambda_home, 5.0))
     lambda_away = max(0.3, min(lambda_away, 5.0))
 
-    # Probabilita' con Dixon-Coles
+    # Probabilita' con Dixon-Coles + boost pareggio
     probs = calcola_probabilita(lambda_home, lambda_away)
+
+    # Extra boost X: se le squadre sono equilibrate (lambda simili), il pareggio e' piu' probabile
+    ratio = min(lambda_home, lambda_away) / max(lambda_home, lambda_away) if max(lambda_home, lambda_away) > 0 else 0
+    if ratio > 0.85:  # Squadre molto equilibrate
+        extra_draw = 1.0 + (ratio - 0.85) * 0.5  # Fino a +7.5% extra
+        probs["prob_x"] *= extra_draw
+        # Rinormalizza
+        tot = probs["prob_1"] + probs["prob_x"] + probs["prob_2"]
+        probs = {k: v / tot for k, v in probs.items()}
 
     # Quote con margine
     def quota(p):
