@@ -235,55 +235,96 @@ def _genera_pronostico(home: str, away: str) -> dict:
         except Exception:
             pass
 
-    # Fallback: calcola dai dati hardcoded (xG + classifica)
-    if not MOTORE_DISPONIBILE:
-        # Importa solo quello che serve
-        try:
-            from season_2526 import get_xg, get_xg_media_campionato, XG_2526
-            from predictor import calcola_probabilita, calcola_mercati_extra, DIXON_COLES_RHO
-        except ImportError:
-            raise HTTPException(status_code=503, detail="Motore non disponibile")
+    # Fallback: calcola dai dati hardcoded (xG) con Poisson inline
+    from scipy.stats import poisson as poisson_dist
+    import numpy as np
 
-    xg_h = get_xg(home_norm)
-    xg_a = get_xg(away_norm)
+    # xG hardcoded per tutte le 20 squadre
+    XG_DATA = {
+        "Inter":{"xG_pg":2.40,"xGA_pg":0.84},"Milan":{"xG_pg":1.83,"xGA_pg":1.12},
+        "Napoli":{"xG_pg":1.56,"xGA_pg":1.10},"Como":{"xG_pg":1.80,"xGA_pg":1.08},
+        "Juventus":{"xG_pg":1.97,"xGA_pg":0.97},"Roma":{"xG_pg":1.54,"xGA_pg":1.20},
+        "Atalanta":{"xG_pg":1.86,"xGA_pg":1.38},"Lazio":{"xG_pg":1.21,"xGA_pg":1.34},
+        "Bologna":{"xG_pg":1.34,"xGA_pg":1.39},"Sassuolo":{"xG_pg":1.19,"xGA_pg":1.63},
+        "Udinese":{"xG_pg":1.19,"xGA_pg":1.56},"Parma":{"xG_pg":1.00,"xGA_pg":1.62},
+        "Genoa":{"xG_pg":1.30,"xGA_pg":1.45},"Torino":{"xG_pg":1.33,"xGA_pg":1.57},
+        "Cagliari":{"xG_pg":1.01,"xGA_pg":1.65},"Fiorentina":{"xG_pg":1.52,"xGA_pg":1.53},
+        "Cremonese":{"xG_pg":1.03,"xGA_pg":1.87},"Lecce":{"xG_pg":0.93,"xGA_pg":1.67},
+        "Verona":{"xG_pg":1.03,"xGA_pg":1.40},"Pisa":{"xG_pg":1.14,"xGA_pg":1.82},
+    }
+
+    xg_h = XG_DATA.get(home_norm)
+    xg_a = XG_DATA.get(away_norm)
     if not xg_h or not xg_a:
         raise HTTPException(status_code=404, detail=f"Squadra non trovata: {home_norm} o {away_norm}")
 
-    medie = get_xg_media_campionato()
-    lambda_h = xg_h["xG_pg"] * (xg_a["xGA_pg"] / medie["xGA_pg_medio"])
-    lambda_a = xg_a["xG_pg"] * (xg_h["xGA_pg"] / medie["xGA_pg_medio"])
+    # Media campionato
+    all_xg = list(XG_DATA.values())
+    avg_xg = sum(v["xG_pg"] for v in all_xg) / len(all_xg)
+    avg_xga = sum(v["xGA_pg"] for v in all_xg) / len(all_xg)
+
+    # Lambda
+    lambda_h = xg_h["xG_pg"] * (xg_a["xGA_pg"] / avg_xga)
+    lambda_a = xg_a["xG_pg"] * (xg_h["xGA_pg"] / avg_xga)
     lambda_h = max(0.3, min(lambda_h, 5.0))
     lambda_a = max(0.3, min(lambda_a, 5.0))
 
-    probs = calcola_probabilita(lambda_h, lambda_a)
-    extra = calcola_mercati_extra(lambda_h, lambda_a)
+    # Calcolo Poisson inline (nessuna dipendenza esterna)
+    prob_1 = prob_x = prob_2 = 0.0
+    for i in range(11):
+        for j in range(11):
+            p = poisson_dist.pmf(i, lambda_h) * poisson_dist.pmf(j, lambda_a)
+            # Dixon-Coles tau
+            rho = -0.13
+            if i==0 and j==0: p *= (1 - lambda_h*lambda_a*rho)
+            elif i==1 and j==0: p *= (1 + lambda_a*rho)
+            elif i==0 and j==1: p *= (1 + lambda_h*rho)
+            elif i==1 and j==1: p *= (1 - rho)
+            p = max(0, p)
+            if i > j: prob_1 += p
+            elif i == j: prob_x += p
+            else: prob_2 += p
 
-    max_p = max(probs["prob_1"], probs["prob_x"], probs["prob_2"])
-    if max_p == probs["prob_1"]:
-        sugg, sugg_l = "1", "Vittoria Casa"
-    elif max_p == probs["prob_x"]:
-        sugg, sugg_l = "X", "Pareggio"
-    else:
-        sugg, sugg_l = "2", "Vittoria Ospite"
+    # Boost pareggio Serie A
+    prob_x *= 1.12
+    tot = prob_1 + prob_x + prob_2
+    if tot > 0: prob_1/=tot; prob_x/=tot; prob_2/=tot
 
-    spread = sorted([probs["prob_1"], probs["prob_x"], probs["prob_2"]], reverse=True)
+    # Over/Under e Goal
+    over_25 = sum(poisson_dist.pmf(i,lambda_h)*poisson_dist.pmf(j,lambda_a) for i in range(11) for j in range(11) if i+j>2.5)
+    goal_si = sum(poisson_dist.pmf(i,lambda_h)*poisson_dist.pmf(j,lambda_a) for i in range(1,11) for j in range(1,11))
+
+    # Risultati esatti top 5
+    scores = []
+    for i in range(6):
+        for j in range(6):
+            scores.append({"score":f"{i}-{j}","prob":round(poisson_dist.pmf(i,lambda_h)*poisson_dist.pmf(j,lambda_a)*100,1)})
+    scores.sort(key=lambda x:-x["prob"])
+
+    max_p = max(prob_1, prob_x, prob_2)
+    if max_p == prob_1: sugg, sugg_l = "1", "Vittoria Casa"
+    elif max_p == prob_x: sugg, sugg_l = "X", "Pareggio"
+    else: sugg, sugg_l = "2", "Vittoria Ospite"
+
+    spread = sorted([prob_1, prob_x, prob_2], reverse=True)
     conf = min((spread[0] - spread[1]) / 0.40, 1.0) * 0.7 + 0.3
     conf_label = "Alta" if conf >= 0.65 else ("Media" if conf >= 0.40 else "Bassa")
 
     return {
-        "prob_1": round(probs["prob_1"] * 100, 1),
-        "prob_x": round(probs["prob_x"] * 100, 1),
-        "prob_2": round(probs["prob_2"] * 100, 1),
-        "quota_1": round(1.05 / probs["prob_1"], 2) if probs["prob_1"] > 0 else 99,
-        "quota_x": round(1.05 / probs["prob_x"], 2) if probs["prob_x"] > 0 else 99,
-        "quota_2": round(1.05 / probs["prob_2"], 2) if probs["prob_2"] > 0 else 99,
+        "prob_1": round(prob_1*100, 1), "prob_x": round(prob_x*100, 1), "prob_2": round(prob_2*100, 1),
+        "quota_1": round(1.05/prob_1, 2) if prob_1>0 else 99,
+        "quota_x": round(1.05/prob_x, 2) if prob_x>0 else 99,
+        "quota_2": round(1.05/prob_2, 2) if prob_2>0 else 99,
         "suggerimento": sugg, "sugg_label": sugg_l,
         "confidence": round(conf, 3), "confidence_label": conf_label,
-        "confidence_color": "#2ecc71" if conf >= 0.65 else ("#f39c12" if conf >= 0.40 else "#e74c3c"),
+        "confidence_color": "#2ecc71" if conf>=0.65 else ("#f39c12" if conf>=0.40 else "#e74c3c"),
         "xg_applied": True, "xg_home": xg_h["xG_pg"], "xg_away": xg_a["xG_pg"],
+        "over_25": round(over_25*100, 1), "under_25": round((1-over_25)*100, 1),
+        "goal_si": round(goal_si*100, 1), "goal_no": round((1-goal_si)*100, 1),
+        "gol_attesi": round(lambda_h+lambda_a, 2),
+        "risultati_esatti": scores[:5],
         "lambda_home": round(lambda_h, 3), "lambda_away": round(lambda_a, 3),
         "h2h_applied": False, "h2h_n": 0, "inj_home": 0, "inj_away": 0,
-        **extra,
     }
 
 
@@ -439,27 +480,46 @@ async def pronostici_giornata(
 
 @app.get("/api/classifica", response_model=ClassificaResponse, tags=["Classifica"])
 async def classifica():
-    """
-    Ritorna la classifica reale Serie A e la classifica marcatori.
-    Endpoint pubblico, non richiede autenticazione.
-    """
-    if not MOTORE_DISPONIBILE:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Dati classifica non disponibili."
-        )
-
+    """Classifica e marcatori."""
+    CLASS = [
+        {"Squadra":"Inter","Punti":69,"G":30,"V":22,"N":3,"P":5,"GF":66,"GS":24,"DR":42},
+        {"Squadra":"Milan","Punti":63,"G":30,"V":18,"N":9,"P":3,"GF":47,"GS":23,"DR":24},
+        {"Squadra":"Napoli","Punti":62,"G":30,"V":19,"N":5,"P":6,"GF":46,"GS":30,"DR":16},
+        {"Squadra":"Como","Punti":57,"G":30,"V":16,"N":9,"P":5,"GF":53,"GS":22,"DR":31},
+        {"Squadra":"Juventus","Punti":54,"G":30,"V":15,"N":9,"P":6,"GF":52,"GS":29,"DR":23},
+        {"Squadra":"Roma","Punti":54,"G":30,"V":17,"N":3,"P":10,"GF":40,"GS":23,"DR":17},
+        {"Squadra":"Atalanta","Punti":50,"G":30,"V":13,"N":11,"P":6,"GF":41,"GS":27,"DR":14},
+        {"Squadra":"Lazio","Punti":43,"G":30,"V":11,"N":10,"P":9,"GF":31,"GS":28,"DR":3},
+        {"Squadra":"Bologna","Punti":42,"G":30,"V":12,"N":6,"P":12,"GF":38,"GS":36,"DR":2},
+        {"Squadra":"Sassuolo","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":36,"GS":40,"DR":-4},
+        {"Squadra":"Udinese","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":35,"GS":42,"DR":-7},
+        {"Squadra":"Parma","Punti":34,"G":30,"V":8,"N":10,"P":12,"GF":21,"GS":38,"DR":-17},
+        {"Squadra":"Genoa","Punti":33,"G":30,"V":8,"N":9,"P":13,"GF":36,"GS":42,"DR":-6},
+        {"Squadra":"Torino","Punti":33,"G":30,"V":9,"N":6,"P":15,"GF":34,"GS":53,"DR":-19},
+        {"Squadra":"Cagliari","Punti":30,"G":30,"V":7,"N":9,"P":14,"GF":31,"GS":42,"DR":-11},
+        {"Squadra":"Fiorentina","Punti":29,"G":30,"V":6,"N":11,"P":13,"GF":35,"GS":44,"DR":-9},
+        {"Squadra":"Cremonese","Punti":27,"G":30,"V":6,"N":9,"P":15,"GF":25,"GS":44,"DR":-19},
+        {"Squadra":"Lecce","Punti":27,"G":30,"V":7,"N":6,"P":17,"GF":21,"GS":40,"DR":-19},
+        {"Squadra":"Verona","Punti":18,"G":30,"V":3,"N":9,"P":18,"GF":22,"GS":52,"DR":-30},
+        {"Squadra":"Pisa","Punti":18,"G":30,"V":2,"N":12,"P":16,"GF":23,"GS":54,"DR":-31},
+    ]
+    MARC = [
+        {"pos":1,"giocatore":"Lautaro Martinez","squadra":"Inter","gol":14},
+        {"pos":2,"giocatore":"Tasos Douvikas","squadra":"Como","gol":11},
+        {"pos":3,"giocatore":"Keinan Davis","squadra":"Udinese","gol":10},
+        {"pos":4,"giocatore":"Rasmus Hojlund","squadra":"Napoli","gol":10},
+        {"pos":5,"giocatore":"Kenan Yildiz","squadra":"Juventus","gol":10},
+        {"pos":6,"giocatore":"Nico Paz","squadra":"Como","gol":10},
+        {"pos":7,"giocatore":"Rafael Leao","squadra":"Milan","gol":9},
+        {"pos":8,"giocatore":"Hakan Calhanoglu","squadra":"Inter","gol":8},
+        {"pos":9,"giocatore":"Giovanni Simeone","squadra":"Torino","gol":8},
+        {"pos":10,"giocatore":"Christian Pulisic","squadra":"Milan","gol":8},
+    ]
     try:
-        class_raw = get_classifica_reale()
-        marcatori_raw = get_marcatori()
-
-        class_list = [SquadraClassifica(**sq) for sq in class_raw]
-        marc_list = [MarcatoreResponse(**m) for m in marcatori_raw]
-
         return ClassificaResponse(
-            classifica=class_list,
-            marcatori=marc_list,
-            giornata_attuale=GIORNATA_ATTUALE,
+            classifica=[SquadraClassifica(**sq) for sq in CLASS],
+            marcatori=[MarcatoreResponse(**m) for m in MARC],
+            giornata_attuale=30,
         )
     except Exception as e:
         raise HTTPException(
@@ -472,27 +532,25 @@ async def classifica():
 
 @app.get("/api/calendario", response_model=CalendarioResponse, tags=["Calendario"])
 async def calendario():
-    """
-    Ritorna il calendario completo delle giornate 31-38 con tutte le partite.
-    Endpoint pubblico, non richiede autenticazione.
-    """
-    if not MOTORE_DISPONIBILE:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Dati calendario non disponibili."
-        )
-
+    """Ritorna il calendario giornate 31-38."""
+    # Calendario hardcoded (funziona sempre)
+    CAL = {
+        31:{"data":"4-6 aprile 2026","partite":[("Sassuolo","Cagliari"),("Verona","Fiorentina"),("Lazio","Parma"),("Cremonese","Bologna"),("Pisa","Torino"),("Inter","Roma"),("Udinese","Como"),("Lecce","Atalanta"),("Juventus","Genoa"),("Napoli","Milan")]},
+        32:{"data":"10-13 aprile 2026","partite":[("Roma","Pisa"),("Cagliari","Cremonese"),("Torino","Verona"),("Milan","Udinese"),("Atalanta","Juventus"),("Genoa","Sassuolo"),("Parma","Napoli"),("Bologna","Lecce"),("Como","Inter"),("Fiorentina","Lazio")]},
+        33:{"data":"17-20 aprile 2026","partite":[("Sassuolo","Como"),("Inter","Cagliari"),("Udinese","Parma"),("Napoli","Lazio"),("Roma","Atalanta"),("Cremonese","Torino"),("Verona","Milan"),("Pisa","Genoa"),("Juventus","Bologna"),("Lecce","Fiorentina")]},
+        34:{"data":"24-27 aprile 2026","partite":[("Napoli","Cremonese"),("Parma","Pisa"),("Bologna","Roma"),("Verona","Lecce"),("Fiorentina","Sassuolo"),("Genoa","Como"),("Torino","Inter"),("Milan","Juventus"),("Cagliari","Atalanta"),("Lazio","Udinese")]},
+        35:{"data":"2-4 maggio 2026","partite":[("Atalanta","Genoa"),("Bologna","Cagliari"),("Como","Napoli"),("Cremonese","Lazio"),("Inter","Parma"),("Juventus","Verona"),("Pisa","Lecce"),("Roma","Fiorentina"),("Sassuolo","Milan"),("Udinese","Torino")]},
+        36:{"data":"8-10 maggio 2026","partite":[("Cagliari","Udinese"),("Cremonese","Pisa"),("Fiorentina","Genoa"),("Lazio","Inter"),("Lecce","Juventus"),("Milan","Atalanta"),("Napoli","Bologna"),("Parma","Roma"),("Torino","Sassuolo"),("Verona","Como")]},
+        37:{"data":"15-17 maggio 2026","partite":[("Atalanta","Bologna"),("Cagliari","Torino"),("Como","Parma"),("Genoa","Milan"),("Inter","Verona"),("Juventus","Fiorentina"),("Pisa","Napoli"),("Roma","Lazio"),("Sassuolo","Lecce"),("Udinese","Cremonese")]},
+        38:{"data":"24 maggio 2026","partite":[("Bologna","Inter"),("Cremonese","Como"),("Fiorentina","Atalanta"),("Lazio","Pisa"),("Lecce","Genoa"),("Milan","Cagliari"),("Napoli","Udinese"),("Parma","Sassuolo"),("Torino","Juventus"),("Verona","Roma")]},
+    }
     try:
         giornate = []
         for num in range(31, 39):
-            info = CALENDARIO_31_38.get(num)
+            info = CAL.get(num)
             if info:
                 partite = [PartitaCalendario(home=h, away=a) for h, a in info["partite"]]
-                giornate.append(GiornataCalendario(
-                    giornata=num,
-                    data=info["data"],
-                    partite=partite,
-                ))
+                giornate.append(GiornataCalendario(giornata=num, data=info["data"], partite=partite))
         return CalendarioResponse(giornate=giornate)
     except Exception as e:
         raise HTTPException(
