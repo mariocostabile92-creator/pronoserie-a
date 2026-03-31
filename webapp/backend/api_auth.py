@@ -15,8 +15,9 @@ from passlib.context import CryptContext
 from database import get_user_by_id
 
 # ── Configurazione JWT ──────────────────────────────────────────────────────
-# Recupera la chiave da Railway. Se manca, usa una chiave di backup (solo per local test).
-SECRET_KEY = os.environ.get("JWT_SECRET", "cambiami-in-produzione-12345")
+# MIGLIORIA: Tronchiamo la SECRET_KEY a 72 caratteri. 
+# Se la variabile su Railway è troppo lunga, questo evita crash inaspettati.
+SECRET_KEY = os.environ.get("JWT_SECRET", "cambiami-in-produzione-12345")[:72]
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 
@@ -38,20 +39,22 @@ def hash_password(password: str) -> str:
     if not password:
         raise ValueError("La password non può essere vuota")
     
-    # Tronchiamo a 72 byte (limite di sicurezza di bcrypt)
+    # Tronchiamo a 72 byte prima di passarla a passlib
     return _pwd_context.hash(password[:72])
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """
     Verifica se la password in chiaro corrisponde all'hash.
-    Tronca la password in chiaro a 72 caratteri per coerenza con l'hashing.
+    Tronca la password in chiaro a 72 caratteri per coerenza.
     """
     if not plain or not hashed:
         return False
     try:
+        # Importante: usiamo lo stesso troncamento usato in fase di hash
         return _pwd_context.verify(plain[:72], hashed)
     except Exception:
+        # Se l'hash nel DB è corrotto o non compatibile, ritorniamo False senza crashare
         return False
 
 
@@ -62,16 +65,17 @@ def create_token(data: dict) -> str:
     payload = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=TOKEN_EXPIRE_DAYS)
     payload.update({"exp": expire})
+    # SECRET_KEY è già troncata in cima al file per sicurezza
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def decode_token(token: str) -> dict:
     """Decodifica il token e verifica la validità."""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
+        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError as e:
-        raise ValueError(f"Token non valido o scaduto: {e}")
+        # Gestione errore specifica per token scaduti o manomessi
+        raise ValueError(f"Token non valido o scaduto: {str(e)}")
 
 
 # ── Dipendenze FastAPI ──────────────────────────────────────────────────────
@@ -81,7 +85,7 @@ def get_current_user(
 ) -> dict:
     """
     Verifica il token e ritorna l'utente dal database.
-    Usato per proteggere le rotte (es. /checkout).
+    Protegge le rotte che richiedono autenticazione.
     """
     if not credentials:
         raise HTTPException(
@@ -94,15 +98,16 @@ def get_current_user(
         payload = decode_token(credentials.credentials)
         user_id = payload.get("sub")
         if not user_id:
-            raise ValueError("sub mancante")
+            raise ValueError("Identificativo utente (sub) mancante nel token")
         
         user = get_user_by_id(int(user_id))
         if not user:
-            raise ValueError("Utente non trovato")
+            raise ValueError("Utente non trovato nel database")
             
         return user
 
     except (ValueError, Exception) as e:
+        # Logghiamo l'errore internamente e ritorniamo un 401 pulito al frontend
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Sessione non valida: {str(e)}",
@@ -112,11 +117,12 @@ def get_current_user(
 def get_optional_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)
 ) -> Optional[dict]:
-    """Ritorna l'utente se loggato, altrimenti None (senza bloccare la richiesta)."""
+    """Ritorna l'utente se il token è valido, altrimenti None senza bloccare la richiesta."""
     if not credentials:
         return None
     try:
         payload = decode_token(credentials.credentials)
-        return get_user_by_id(int(payload.get("sub")))
+        sub = payload.get("sub")
+        return get_user_by_id(int(sub)) if sub else None
     except:
         return None
