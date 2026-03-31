@@ -63,6 +63,8 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
 const API = window.location.origin;
 const SQ = ["Inter","Milan","Napoli","Como","Juventus","Roma","Atalanta","Lazio","Bologna","Sassuolo","Udinese","Parma","Genoa","Torino","Cagliari","Fiorentina","Cremonese","Lecce","Verona","Pisa"];
 let userPlan = "free"; // Cambia a "pro" dopo login
+let freeUsed = 0; // Conta pronostici usati oggi (Free max 2)
+const FREE_LIMIT = 2;
 
 async function fetchAPI(ep) {
   try { const r = await fetch(API+ep); if(!r.ok) throw new Error(r.status); return await r.json(); }
@@ -118,6 +120,11 @@ function pagePronostici(){
 async function calcPronostico(){
   const h=$("sel-home").value, a=$("sel-away").value, res=$("result");
   if(h===a){res.innerHTML='<div class="card" style="color:var(--red)">Scegli due squadre diverse!</div>';return}
+  // Limite Free
+  if(userPlan!=="pro" && freeUsed>=FREE_LIMIT){
+    res.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati, Over/Under, Goal, Risultato Esatto e molto altro.</p><a href="#pricing" class="btn btn-green" style="font-size:1.1rem;padding:14px 40px">Abbonati a Pro — 9.99€/mese</a></div>';
+    return;
+  }
   res.innerHTML='<div class="spinner"></div>';
   const d=await fetchAPI("/api/pronostico/"+encodeURIComponent(h)+"/"+encodeURIComponent(a));
   if(!d){res.innerHTML='<div class="card" style="color:var(--red)">Errore. Riprova tra qualche secondo.</div>';return}
@@ -135,6 +142,8 @@ async function calcPronostico(){
     </div>`;
     if(d.risultati_esatti)extra+=`<p style="color:var(--muted)">Esatto: ${d.risultati_esatti.slice(0,3).map(r=>r.score+" ("+r.prob+"%)").join(" | ")}</p>`;
   }
+  if(userPlan!=="pro") freeUsed++;
+  const remaining = userPlan==="pro" ? "" : `<p style="color:var(--muted);text-align:center;margin-top:12px;font-size:.85rem">Pronostici gratuiti rimanenti: ${Math.max(0,FREE_LIMIT-freeUsed)}/${FREE_LIMIT}</p>`;
   res.innerHTML=`<div class="card">
     <h2 style="text-align:center">${h} vs ${a}</h2>
     <div class="grid3" style="margin:20px 0">
@@ -147,6 +156,7 @@ async function calcPronostico(){
       <div class="bar" style="max-width:300px;margin:8px auto"><div class="bar-fill" style="width:${cp}%;background:${cc}"></div></div>
     </div>
     ${extra}
+    ${remaining}
   </div>`;
 }
 
@@ -175,9 +185,15 @@ async function pageCalendario(){
 
 async function showMatch(h,a){
   const app=$("app");
+  // Limite Free
+  if(userPlan!=="pro" && freeUsed>=FREE_LIMIT){
+    app.innerHTML='<div class="container"><div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati su tutte le partite e giornate.</p><a href="#pricing" class="btn btn-green" style="font-size:1.1rem;padding:14px 40px">Abbonati a Pro — 9.99€/mese</a><br><br><a href="#calendario" style="color:var(--accent)">← Torna al Calendario</a></div></div>';
+    return;
+  }
   app.innerHTML='<div class="spinner"></div>';
   const d=await fetchAPI("/api/pronostico/"+encodeURIComponent(h)+"/"+encodeURIComponent(a));
   if(!d){app.innerHTML='<div class="container"><div class="card" style="color:var(--red)">Errore calcolo pronostico. <a href="#calendario">Torna</a></div></div>';return}
+  if(userPlan!=="pro") freeUsed++;
   const best=d.suggerimento||"?";
   const cp=Math.round((d.confidence||0.5)*100);
   const cc=d.confidence_label==="Alta"?"var(--green)":d.confidence_label==="Media"?"var(--yellow)":"var(--red)";
