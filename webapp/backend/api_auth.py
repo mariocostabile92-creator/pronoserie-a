@@ -1,5 +1,5 @@
 """
-api_auth.py - Versione Ottimizzata
+api_auth.py - Versione Blindata
 Gestisce hashing sicuro (max 72 byte per bcrypt), JWT e integrazione Railway.
 """
 
@@ -15,14 +15,14 @@ from passlib.context import CryptContext
 from database import get_user_by_id
 
 # ── Configurazione JWT ──────────────────────────────────────────────────────
-# MIGLIORIA: Tronchiamo la SECRET_KEY a 72 caratteri. 
-# Se la variabile su Railway è troppo lunga, questo evita crash inaspettati.
-SECRET_KEY = os.environ.get("JWT_SECRET", "cambiami-in-produzione-12345")[:72]
+# Recupera la chiave da Railway. Tronchiamo a 72 per evitare crash con librerie di backend.
+_raw_secret = os.environ.get("JWT_SECRET", "cambiami-in-produzione-12345678901234567890")
+SECRET_KEY = _raw_secret[:72] 
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 
 # ── Contesto per l'hashing delle password (bcrypt) ─────────────────────────
-# bcrypt ha un limite hardware di 72 caratteri.
+# bcrypt ha un limite hardware di 72 caratteri (o byte).
 _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # ── Schema Bearer per FastAPI ───────────────────────────────────────────────
@@ -39,22 +39,22 @@ def hash_password(password: str) -> str:
     if not password:
         raise ValueError("La password non può essere vuota")
     
-    # Tronchiamo a 72 byte prima di passarla a passlib
-    return _pwd_context.hash(password[:72])
+    # Taglio precauzionale a 72 caratteri prima di processare
+    password_safe = password[:72]
+    return _pwd_context.hash(password_safe)
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """
     Verifica se la password in chiaro corrisponde all'hash.
-    Tronca la password in chiaro a 72 caratteri per coerenza.
     """
     if not plain or not hashed:
         return False
     try:
-        # Importante: usiamo lo stesso troncamento usato in fase di hash
+        # Tronchiamo anche qui per coerenza totale
         return _pwd_context.verify(plain[:72], hashed)
-    except Exception:
-        # Se l'hash nel DB è corrotto o non compatibile, ritorniamo False senza crashare
+    except Exception as e:
+        print(f"[AUTH] Errore verifica password: {e}")
         return False
 
 
@@ -62,11 +62,15 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def create_token(data: dict) -> str:
     """Genera un token JWT con scadenza impostata."""
-    payload = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(days=TOKEN_EXPIRE_DAYS)
-    payload.update({"exp": expire})
-    # SECRET_KEY è già troncata in cima al file per sicurezza
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    try:
+        payload = data.copy()
+        expire = datetime.now(timezone.utc) + timedelta(days=TOKEN_EXPIRE_DAYS)
+        payload.update({"exp": expire})
+        # Usiamo la SECRET_KEY già validata e troncata
+        return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    except Exception as e:
+        print(f"[AUTH] Errore creazione token: {e}")
+        raise e
 
 
 def decode_token(token: str) -> dict:
@@ -74,7 +78,6 @@ def decode_token(token: str) -> dict:
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError as e:
-        # Gestione errore specifica per token scaduti o manomessi
         raise ValueError(f"Token non valido o scaduto: {str(e)}")
 
 
@@ -83,10 +86,7 @@ def decode_token(token: str) -> dict:
 def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)
 ) -> dict:
-    """
-    Verifica il token e ritorna l'utente dal database.
-    Protegge le rotte che richiedono autenticazione.
-    """
+    """Verifica il token e ritorna l'utente dal database."""
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -98,16 +98,15 @@ def get_current_user(
         payload = decode_token(credentials.credentials)
         user_id = payload.get("sub")
         if not user_id:
-            raise ValueError("Identificativo utente (sub) mancante nel token")
+            raise ValueError("Identificativo utente (sub) mancante")
         
         user = get_user_by_id(int(user_id))
         if not user:
-            raise ValueError("Utente non trovato nel database")
+            raise ValueError("Utente non trovato")
             
         return user
 
     except (ValueError, Exception) as e:
-        # Logghiamo l'errore internamente e ritorniamo un 401 pulito al frontend
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Sessione non valida: {str(e)}",
@@ -117,7 +116,7 @@ def get_current_user(
 def get_optional_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)
 ) -> Optional[dict]:
-    """Ritorna l'utente se il token è valido, altrimenti None senza bloccare la richiesta."""
+    """Ritorna l'utente se loggato, altrimenti None."""
     if not credentials:
         return None
     try:
