@@ -1,5 +1,6 @@
 """
-api_auth.py - Versione Corazzata 2.0 (Soluzione Finale ValueError)
+api_auth.py - Versione 3.0 (Fix definitivo hashpw)
+Risolve il crash ValueError: password cannot be longer than 72 bytes.
 """
 
 import os
@@ -14,80 +15,82 @@ from passlib.context import CryptContext
 from database import get_user_by_id
 
 # ── Configurazione JWT ──────────────────────────────────────────────────────
-# Chiave segreta forzata a 32 caratteri (sicurissima e zero errori)
-_raw_secret = os.environ.get("JWT_SECRET", "cambiami-in-produzione-1234567890")
-SECRET_KEY = _raw_secret[:32] 
+# Usiamo una chiave fissa di 32 byte per evitare errori di checksum
+SECRET_KEY = os.environ.get("JWT_SECRET", "secret-key-32-chars-long-1234567")[:32]
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 
-# ── Contesto Hashing (Configurazione Specifica per Python 3.12) ─────────────
-# Forziamo bcrypt a non usare backend esterni che causano il crash dei 72 byte
+# ── Contesto Hashing ───────────────────────────────────────────────────────
+# Importante: impostiamo truncate_error=False per forzare la libreria a gestire il limite
 _pwd_context = CryptContext(
     schemes=["bcrypt"], 
     deprecated="auto",
-    bcrypt__truncate_error=False  # Dice a passlib di troncare lui invece di crashare
+    bcrypt__truncate_error=False 
 )
 
 _bearer_scheme = HTTPBearer(auto_error=False)
+
+# ── IL FIX PER HASHPW ───────────────────────────────────────────────────────
+
+def _prepare_password(password: str) -> str:
+    """
+    Prepara la password per bcrypt:
+    1. La codifica in UTF-8.
+    2. La taglia a 71 byte (limite hardware 72).
+    3. La riporta a stringa per passlib.
+    """
+    if not password:
+        return ""
+    # Taglio reale sui byte, non sui caratteri
+    pwd_bytes = password.encode('utf-8')[:71]
+    return pwd_bytes.decode('utf-8', 'ignore')
 
 # ── Funzioni Password ───────────────────────────────────────────────────────
 
 def hash_password(password: str) -> str:
     if not password:
-        raise ValueError("Password vuota")
+        raise ValueError("Password non fornita")
     
-    # TRONCAMENTO MANUALE RIGIDO (Max 71 byte per sicurezza)
-    # Trasformiamo in byte, tagliamo e torniamo in stringa
-    pwd_bytes = password.encode('utf-8')[:71]
-    pwd_to_hash = pwd_bytes.decode('utf-8', 'ignore')
-    
-    return _pwd_context.hash(pwd_to_hash)
+    # Passiamo la password già troncata
+    return _pwd_context.hash(_prepare_password(password))
+
 
 def verify_password(plain: str, hashed: str) -> bool:
     if not plain or not hashed:
         return False
     try:
-        # Applichiamo lo stesso trattamento in verifica
-        pwd_bytes = plain.encode('utf-8')[:71]
-        pwd_to_verify = pwd_bytes.decode('utf-8', 'ignore')
-        
-        return _pwd_context.verify(pwd_to_verify, hashed)
+        # Verifichiamo usando lo stesso troncamento
+        return _pwd_context.verify(_prepare_password(plain), hashed)
     except Exception as e:
-        print(f"[AUTH] Errore verifica: {e}")
+        print(f"[AUTH] Errore critico hashpw: {e}")
         return False
 
 # ── Funzioni Token ──────────────────────────────────────────────────────────
 
 def create_token(data: dict) -> str:
-    try:
-        payload = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(days=TOKEN_EXPIRE_DAYS)
-        payload.update({"exp": expire})
-        return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-    except Exception as e:
-        print(f"[AUTH] Errore encoding token: {e}")
-        raise e
+    payload = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=TOKEN_EXPIRE_DAYS)
+    payload.update({"exp": expire})
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 def decode_token(token: str) -> dict:
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except JWTError as e:
-        raise ValueError(f"Token non valido: {str(e)}")
+    except JWTError:
+        raise ValueError("Token non valido")
 
 # ── Dipendenze FastAPI ──────────────────────────────────────────────────────
 
 def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)) -> dict:
     if not credentials:
-        raise HTTPException(status_code=401, detail="Token mancante")
+        raise HTTPException(status_code=401, detail="Non autenticato")
     try:
         payload = decode_token(credentials.credentials)
-        user_id = payload.get("sub")
-        user = get_user_by_id(int(user_id))
-        if not user:
-            raise ValueError("Utente non trovato")
+        user = get_user_by_id(int(payload.get("sub")))
+        if not user: raise ValueError()
         return user
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Sessione invalida: {str(e)}")
+    except:
+        raise HTTPException(status_code=401, detail="Sessione non valida")
 
 def get_optional_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)) -> Optional[dict]:
     if not credentials: return None
