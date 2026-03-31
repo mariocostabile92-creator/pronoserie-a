@@ -1,10 +1,10 @@
 import os
+import bcrypt
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from database import get_user_by_id
 
 # Configurazione JWT
@@ -12,27 +12,32 @@ SECRET_KEY = os.environ.get("JWT_SECRET", "chiave-segreta-32-caratteri-base")[:3
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 
-# CryptContext semplificato (senza parametri che causano crash)
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 _bearer_scheme = HTTPBearer(auto_error=False)
+
+# --- FUNZIONI PASSWORD (USANDO BCRYPT DIRETTO) ---
 
 def hash_password(password: str) -> str:
     if not password:
         raise ValueError("Password vuota")
-    # TRONCAMENTO MANUALE RIGIDO: bcrypt accetta max 72 byte.
-    # Tagliamo a 71 per sicurezza totale.
-    pwd_safe = password.encode('utf-8')[:71].decode('utf-8', 'ignore')
-    return _pwd_context.hash(pwd_safe)
+    # Troncamento manuale di sicurezza (max 72 byte)
+    pwd_bytes = password.encode('utf-8')[:71]
+    # Generiamo il sale e l'hash
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(pwd_bytes, salt)
+    return hashed.decode('utf-8')
 
 def verify_password(plain: str, hashed: str) -> bool:
     if not plain or not hashed:
         return False
     try:
-        # Applichiamo lo stesso troncamento
-        pwd_safe = plain.encode('utf-8')[:71].decode('utf-8', 'ignore')
-        return _pwd_context.verify(pwd_safe, hashed)
-    except Exception:
+        pwd_bytes = plain.encode('utf-8')[:71]
+        hashed_bytes = hashed.encode('utf-8')
+        return bcrypt.checkpw(pwd_bytes, hashed_bytes)
+    except Exception as e:
+        print(f"Errore verifica: {e}")
         return False
+
+# --- FUNZIONI TOKEN JWT ---
 
 def create_token(data: dict) -> str:
     payload = data.copy()
@@ -46,9 +51,11 @@ def decode_token(token: str) -> dict:
     except JWTError:
         raise ValueError("Token non valido")
 
+# --- DIPENDENZE ---
+
 def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)) -> dict:
     if not credentials:
-        raise HTTPException(status_code=401, detail="Non autenticato")
+        raise HTTPException(status_code=401, detail="Token mancante")
     try:
         payload = decode_token(credentials.credentials)
         user = get_user_by_id(int(payload.get("sub")))
