@@ -15,12 +15,12 @@ from database import update_plan, update_stripe_customer, get_user_by_id
 
 # ── Configurazione Stripe (da variabili d'ambiente) ─────────────────────────
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
-STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "")
+STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "price_1TH1sxCHxpJyCrvZIBcWZPMl")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
-# URL di redirect dopo il pagamento (configurabile da env)
-SUCCESS_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000") + "/pagamento-completato"
-CANCEL_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000") + "/prezzi"
+# URL di redirect dopo il pagamento
+SUCCESS_URL = os.environ.get("FRONTEND_URL", "https://web-production-ff46b.up.railway.app") + "/app#home"
+CANCEL_URL = os.environ.get("FRONTEND_URL", "https://web-production-ff46b.up.railway.app") + "/app#pricing"
 
 # Configura la chiave Stripe
 if STRIPE_SECRET_KEY:
@@ -175,19 +175,27 @@ def _revoca_piano(obj: dict) -> None:
 
 @router.post("/checkout")
 async def crea_checkout(utente: dict = Depends(get_current_user)):
-    """
-    Crea una sessione di checkout Stripe per l'upgrade al piano Pro.
-    Richiede autenticazione.
-    Ritorna l'URL della pagina di pagamento.
-    """
+    """Crea checkout Stripe (richiede auth)."""
     if utente.get("piano") == "pro":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Sei già abbonato al piano Pro."
-        )
-
+        raise HTTPException(status_code=400, detail="Sei gia' abbonato Pro.")
     url = create_checkout_session(utente["id"], utente["email"])
     return {"checkout_url": url}
+
+
+@router.get("/checkout-direct")
+async def checkout_diretto():
+    """Crea checkout Stripe diretto (senza auth, per landing page)."""
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{"price": STRIPE_PRICE_ID, "quantity": 1}],
+            mode="subscription",
+            success_url=SUCCESS_URL,
+            cancel_url=CANCEL_URL,
+        )
+        return {"checkout_url": session.url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Errore Stripe: {e}")
 
 
 @router.post("/webhook")

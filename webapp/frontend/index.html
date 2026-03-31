@@ -122,7 +122,7 @@ async function calcPronostico(){
   if(h===a){res.innerHTML='<div class="card" style="color:var(--red)">Scegli due squadre diverse!</div>';return}
   // Limite Free
   if(userPlan!=="pro" && freeUsed>=FREE_LIMIT){
-    res.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati, Over/Under, Goal, Risultato Esatto e molto altro.</p><a href="#pricing" class="btn btn-green" style="font-size:1.1rem;padding:14px 40px">Abbonati a Pro — 9.99€/mese</a></div>';
+    res.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati, Over/Under, Goal, Risultato Esatto e molto altro.</p><button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro — 9.99€/mese</button></div>';
     return;
   }
   res.innerHTML='<div class="spinner"></div>';
@@ -170,7 +170,7 @@ async function pageCalendario(){
     html+=`<div class="card" ${locked?'style="opacity:.5"':''}>
       <h2>Giornata ${g.giornata} — <span style="color:var(--muted)">${g.data||""}</span>${locked?' <span class="tag tag-red">PRO</span>':''}</h2>`;
     if(locked){
-      html+=`<div class="lock-msg"><p>Passa a Pro per vedere le giornate ${g.giornata}-38</p><a href="#pricing" class="btn btn-green" style="font-size:.9rem;padding:8px 20px">Sblocca Pro</a></div>`;
+      html+=`<div class="lock-msg"><p>Passa a Pro per vedere le giornate ${g.giornata}-38</p><button class="btn btn-green" style="font-size:.9rem;padding:8px 20px" onclick="abbonarPro()">Sblocca Pro</button></div>`;
     } else {
       g.partite.forEach(p=>{
         html+=`<button class="match-btn" onclick="showMatch('${p.home}','${p.away}')">
@@ -187,7 +187,7 @@ async function showMatch(h,a){
   const app=$("app");
   // Limite Free
   if(userPlan!=="pro" && freeUsed>=FREE_LIMIT){
-    app.innerHTML='<div class="container"><div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati su tutte le partite e giornate.</p><a href="#pricing" class="btn btn-green" style="font-size:1.1rem;padding:14px 40px">Abbonati a Pro — 9.99€/mese</a><br><br><a href="#calendario" style="color:var(--accent)">← Torna al Calendario</a></div></div>';
+    app.innerHTML='<div class="container"><div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati su tutte le partite e giornate.</p><button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro — 9.99€/mese</button><br><br><a href="#calendario" style="color:var(--accent)">← Torna al Calendario</a></div></div>';
     return;
   }
   app.innerHTML='<div class="spinner"></div>';
@@ -224,7 +224,7 @@ async function showMatch(h,a){
 
 // ── CLASSIFICA (Pro only) ──
 async function pageClassifica(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Classifica Serie A</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><a href="#pricing" class="btn btn-green">Passa a Pro — 9.99€/mese</a></div></div>`;
+  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Classifica Serie A</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro — 9.99€/mese</button></div></div>`;
   const data=await fetchAPI("/api/classifica");
   if(!data)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento</div></div>';
   let html='<div class="container"><h1>Classifica Serie A 2025-2026</h1><p class="sub">Giornata 30</p>';
@@ -244,7 +244,7 @@ async function pageClassifica(){
 
 // ── SQUADRE (Pro only, con campo formazioni) ──
 async function pageSquadre(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Squadre Serie A</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><a href="#pricing" class="btn btn-green">Passa a Pro — 9.99€/mese</a></div></div>`;
+  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Squadre Serie A</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro — 9.99€/mese</button></div></div>`;
   return `<div class="container">
     <h1>Squadre Serie A 2025-2026</h1><p class="sub">Rose, formazioni e infortunati live</p>
     <select id="sel-sq" onchange="loadSq(this.value)" style="margin-bottom:16px">${opts()}</select>
@@ -308,10 +308,31 @@ function pagePricing(){
         <div class="tag tag-green" style="margin-bottom:12px">PIU' POPOLARE</div>
         <h2>Pro</h2><div class="price">9.99€</div><p style="color:var(--muted)">/mese</p>
         <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>✅ Pronostici illimitati</li><li>✅ Tutte le 8 giornate</li><li>✅ Classifica + Marcatori</li><li>✅ Rose complete 20 squadre</li><li>✅ Probabili formazioni live</li><li>✅ Infortunati aggiornati</li></ul>
-        <button class="btn btn-green" onclick="alert('Pagamento Stripe in arrivo! Contatta @pronoseriea per attivare Pro')">Abbonati Ora</button>
+        <button class="btn btn-green" onclick="abbonarPro()">Abbonati Ora</button>
       </div>
     </div>
   </div>`;
+}
+
+// ── STRIPE CHECKOUT ──
+async function abbonarPro(){
+  const btn = event.target;
+  btn.textContent = "Caricamento...";
+  btn.disabled = true;
+  try {
+    const d = await fetchAPI("/api/payments/checkout-direct");
+    if(d && d.checkout_url){
+      window.location.href = d.checkout_url;
+    } else {
+      alert("Errore nella creazione del pagamento. Riprova.");
+      btn.textContent = "Abbonati Ora";
+      btn.disabled = false;
+    }
+  } catch(e) {
+    alert("Errore connessione. Riprova.");
+    btn.textContent = "Abbonati Ora";
+    btn.disabled = false;
+  }
 }
 
 // ── ROUTER ──
