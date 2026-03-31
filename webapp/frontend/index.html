@@ -56,19 +56,37 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
   <a href="#classifica">Classifica</a>
   <a href="#squadre">Squadre</a>
   <a href="#pricing">Pricing</a>
+  <a href="#login" id="nav-auth" style="margin-left:auto;background:#1f3460">Accedi</a>
 </nav>
 <div id="app"><div class="spinner"></div></div>
 
 <script>
 const API = window.location.origin;
 const SQ = ["Inter","Milan","Napoli","Como","Juventus","Roma","Atalanta","Lazio","Bologna","Sassuolo","Udinese","Parma","Genoa","Torino","Cagliari","Fiorentina","Cremonese","Lecce","Verona","Pisa"];
-let userPlan = "free"; // Cambia a "pro" dopo login
-let freeUsed = 0; // Conta pronostici usati oggi (Free max 2)
+let userPlan = localStorage.getItem("userPlan") || "free";
+let userToken = localStorage.getItem("userToken") || "";
+let userEmail = localStorage.getItem("userEmail") || "";
+let freeUsed = parseInt(localStorage.getItem("freeUsed")||"0");
 const FREE_LIMIT = 2;
 
 async function fetchAPI(ep) {
-  try { const r = await fetch(API+ep); if(!r.ok) throw new Error(r.status); return await r.json(); }
-  catch(e) { console.error("API:",ep,e); return null; }
+  try {
+    const headers = {};
+    if(userToken) headers["Authorization"] = "Bearer " + userToken;
+    const r = await fetch(API+ep, {headers});
+    if(!r.ok) throw new Error(r.status);
+    return await r.json();
+  } catch(e) { console.error("API:",ep,e); return null; }
+}
+
+async function postAPI(ep, body) {
+  try {
+    const headers = {"Content-Type":"application/json"};
+    if(userToken) headers["Authorization"] = "Bearer " + userToken;
+    const r = await fetch(API+ep, {method:"POST", headers, body:JSON.stringify(body)});
+    if(!r.ok) { const err = await r.json().catch(()=>({})); throw new Error(err.detail||r.status); }
+    return await r.json();
+  } catch(e) { throw e; }
 }
 function $(id){return document.getElementById(id)}
 function opts(){return SQ.map(s=>`<option value="${s}">${s}</option>`).join("")}
@@ -142,7 +160,7 @@ async function calcPronostico(){
     </div>`;
     if(d.risultati_esatti)extra+=`<p style="color:var(--muted)">Esatto: ${d.risultati_esatti.slice(0,3).map(r=>r.score+" ("+r.prob+"%)").join(" | ")}</p>`;
   }
-  if(userPlan!=="pro") freeUsed++;
+  if(userPlan!=="pro"){freeUsed++;localStorage.setItem("freeUsed",freeUsed)}
   const remaining = userPlan==="pro" ? "" : `<p style="color:var(--muted);text-align:center;margin-top:12px;font-size:.85rem">Pronostici gratuiti rimanenti: ${Math.max(0,FREE_LIMIT-freeUsed)}/${FREE_LIMIT}</p>`;
   res.innerHTML=`<div class="card">
     <h2 style="text-align:center">${h} vs ${a}</h2>
@@ -193,7 +211,7 @@ async function showMatch(h,a){
   app.innerHTML='<div class="spinner"></div>';
   const d=await fetchAPI("/api/pronostico/"+encodeURIComponent(h)+"/"+encodeURIComponent(a));
   if(!d){app.innerHTML='<div class="container"><div class="card" style="color:var(--red)">Errore calcolo pronostico. <a href="#calendario">Torna</a></div></div>';return}
-  if(userPlan!=="pro") freeUsed++;
+  if(userPlan!=="pro"){freeUsed++;localStorage.setItem("freeUsed",freeUsed)}
   const best=d.suggerimento||"?";
   const cp=Math.round((d.confidence||0.5)*100);
   const cc=d.confidence_label==="Alta"?"var(--green)":d.confidence_label==="Media"?"var(--yellow)":"var(--red)";
@@ -314,6 +332,101 @@ function pagePricing(){
   </div>`;
 }
 
+// ── LOGIN / REGISTRAZIONE ──
+function pageLogin(){
+  if(userToken){
+    return `<div class="container"><div class="card" style="text-align:center;padding:32px">
+      <h2>Il tuo Account</h2>
+      <p style="color:var(--muted);margin:12px 0">Email: <strong>${userEmail}</strong></p>
+      <p>Piano: <span class="tag ${userPlan==="pro"?"tag-green":"tag-blue"}">${userPlan==="pro"?"PRO":"FREE"}</span></p>
+      ${userPlan!=="pro"?'<div style="margin:20px 0"><button class="btn btn-green" onclick="abbonarPro()">Passa a Pro — 9.99€/mese</button></div>':'<p style="color:var(--green);margin-top:16px;font-weight:700">Hai accesso completo a tutte le funzionalita!</p>'}
+      <button class="btn btn-blue" style="margin-top:16px" onclick="doLogout()">Esci</button>
+    </div></div>`;
+  }
+  return `<div class="container">
+    <div class="card" style="max-width:450px;margin:40px auto;padding:32px">
+      <div style="display:flex;gap:0;margin-bottom:24px">
+        <button id="tab-login" class="btn btn-blue" style="flex:1;border-radius:12px 0 0 12px" onclick="showLoginTab('login')">Accedi</button>
+        <button id="tab-reg" class="btn" style="flex:1;border-radius:0 12px 12px 0;background:#1f3460;color:var(--muted)" onclick="showLoginTab('reg')">Registrati</button>
+      </div>
+      <div id="login-form">
+        <input id="login-email" type="email" placeholder="Email" style="width:100%;padding:12px;border-radius:8px;border:1px solid #1f3460;background:#0d1b2a;color:var(--text);margin-bottom:12px;font-size:1rem">
+        <input id="login-pass" type="password" placeholder="Password" style="width:100%;padding:12px;border-radius:8px;border:1px solid #1f3460;background:#0d1b2a;color:var(--text);margin-bottom:16px;font-size:1rem">
+        <button class="btn btn-green" style="width:100%;font-size:1rem" onclick="doLogin()">Accedi</button>
+      </div>
+      <div id="reg-form" style="display:none">
+        <input id="reg-email" type="email" placeholder="Email" style="width:100%;padding:12px;border-radius:8px;border:1px solid #1f3460;background:#0d1b2a;color:var(--text);margin-bottom:12px;font-size:1rem">
+        <input id="reg-pass" type="password" placeholder="Password (min 6 caratteri)" style="width:100%;padding:12px;border-radius:8px;border:1px solid #1f3460;background:#0d1b2a;color:var(--text);margin-bottom:16px;font-size:1rem">
+        <button class="btn btn-green" style="width:100%;font-size:1rem" onclick="doRegister()">Registrati Gratis</button>
+      </div>
+      <div id="auth-msg" style="margin-top:12px;text-align:center"></div>
+    </div>
+  </div>`;
+}
+
+function showLoginTab(tab){
+  $("login-form").style.display = tab==="login"?"block":"none";
+  $("reg-form").style.display = tab==="reg"?"block":"none";
+  $("tab-login").style.background = tab==="login"?"var(--accent)":"#1f3460";
+  $("tab-login").style.color = tab==="login"?"#fff":"var(--muted)";
+  $("tab-reg").style.background = tab==="reg"?"var(--accent)":"#1f3460";
+  $("tab-reg").style.color = tab==="reg"?"#fff":"var(--muted)";
+}
+
+async function doLogin(){
+  const email=$("login-email").value, pass=$("login-pass").value, msg=$("auth-msg");
+  if(!email||!pass){msg.innerHTML='<span style="color:var(--red)">Compila tutti i campi</span>';return}
+  msg.innerHTML='<div class="spinner" style="margin:8px auto"></div>';
+  try{
+    const d=await postAPI("/api/auth/login",{email,password:pass});
+    userToken=d.access_token; userPlan=d.piano||"free"; userEmail=email;
+    localStorage.setItem("userToken",userToken);
+    localStorage.setItem("userPlan",userPlan);
+    localStorage.setItem("userEmail",userEmail);
+    updateNavAuth();
+    location.hash="#home";
+  }catch(e){msg.innerHTML=`<span style="color:var(--red)">${e.message}</span>`}
+}
+
+async function doRegister(){
+  const email=$("reg-email").value, pass=$("reg-pass").value, msg=$("auth-msg");
+  if(!email||pass.length<6){msg.innerHTML='<span style="color:var(--red)">Email e password (min 6 car.) richiesti</span>';return}
+  msg.innerHTML='<div class="spinner" style="margin:8px auto"></div>';
+  try{
+    const d=await postAPI("/api/auth/register",{email,password:pass});
+    userToken=d.access_token; userPlan=d.piano||"free"; userEmail=email;
+    localStorage.setItem("userToken",userToken);
+    localStorage.setItem("userPlan",userPlan);
+    localStorage.setItem("userEmail",userEmail);
+    updateNavAuth();
+    location.hash="#home";
+  }catch(e){msg.innerHTML=`<span style="color:var(--red)">${e.message}</span>`}
+}
+
+function doLogout(){
+  userToken=""; userPlan="free"; userEmail=""; freeUsed=0;
+  localStorage.removeItem("userToken");
+  localStorage.removeItem("userPlan");
+  localStorage.removeItem("userEmail");
+  localStorage.setItem("freeUsed","0");
+  updateNavAuth();
+  location.hash="#home";
+}
+
+function updateNavAuth(){
+  const el=$("nav-auth");
+  if(!el)return;
+  if(userToken){
+    el.textContent=userPlan==="pro"?"Account (Pro)":"Account (Free)";
+    el.style.background=userPlan==="pro"?"var(--green)":"#1f3460";
+    el.style.color=userPlan==="pro"?"#000":"var(--text)";
+  }else{
+    el.textContent="Accedi";
+    el.style.background="#1f3460";
+    el.style.color="var(--muted)";
+  }
+}
+
 // ── STRIPE CHECKOUT ──
 async function abbonarPro(){
   const btn = event.target;
@@ -336,12 +449,12 @@ async function abbonarPro(){
 }
 
 // ── ROUTER ──
-const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,pricing:pagePricing};
+const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,pricing:pagePricing,login:pageLogin};
 
 async function navigate(){
   const hash=(location.hash||"#home").replace("#","");
   const page=routes[hash]||routes.home;
-  document.querySelectorAll(".nav a").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+hash));
+  document.querySelectorAll(".nav a:not(#nav-auth)").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+hash));
   const app=$("app");
   try{
     const result=page();
@@ -349,6 +462,7 @@ async function navigate(){
     else{app.innerHTML=result}
   }catch(e){app.innerHTML='<div class="container card" style="color:var(--red)">Errore: '+e.message+'</div>'}
   if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq("Inter"),200);
+  updateNavAuth();
 }
 
 window.addEventListener("hashchange",navigate);
