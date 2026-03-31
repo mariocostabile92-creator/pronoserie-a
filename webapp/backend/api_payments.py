@@ -15,7 +15,7 @@ from database import update_plan, update_stripe_customer, get_user_by_id
 
 # ── Configurazione Stripe (da variabili d'ambiente) ─────────────────────────
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
-STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "price_1TH1sxCHxpJyCrvZIBcWZPMl")
+STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "price_1TH2aTCHxpJyCrvZwsA44539")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 # URL di redirect dopo il pagamento

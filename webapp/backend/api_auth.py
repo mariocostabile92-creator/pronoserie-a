@@ -1,9 +1,9 @@
 """
-api_auth.py
-Autenticazione JWT per la webapp pronostici Serie A.
-Gestisce hashing password, generazione e verifica token JWT.
+api_auth.py - Versione Ottimizzata
+Gestisce hashing sicuro (max 72 byte per bcrypt), JWT e integrazione Railway.
 """
 
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -15,121 +15,108 @@ from passlib.context import CryptContext
 from database import get_user_by_id
 
 # ── Configurazione JWT ──────────────────────────────────────────────────────
-SECRET_KEY = "pronostici-serie-a-secret-key-change-in-production"
+# Recupera la chiave da Railway. Se manca, usa una chiave di backup (solo per local test).
+SECRET_KEY = os.environ.get("JWT_SECRET", "cambiami-in-produzione-12345")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 
 # ── Contesto per l'hashing delle password (bcrypt) ─────────────────────────
+# bcrypt ha un limite hardware di 72 caratteri.
 _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # ── Schema Bearer per FastAPI ───────────────────────────────────────────────
 _bearer_scheme = HTTPBearer(auto_error=False)
 
 
-# ── Funzioni password ───────────────────────────────────────────────────────
+# ── Funzioni password (FIX per ValueError: 72 bytes) ────────────────────────
 
 def hash_password(password: str) -> str:
-    """Genera l'hash bcrypt di una password in chiaro."""
-    return _pwd_context.hash(password)
+    """
+    Genera l'hash bcrypt di una password.
+    Tronca a 72 caratteri per evitare il crash 'ValueError: password cannot be longer than 72 bytes'.
+    """
+    if not password:
+        raise ValueError("La password non può essere vuota")
+    
+    # Tronchiamo a 72 byte (limite di sicurezza di bcrypt)
+    return _pwd_context.hash(password[:72])
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    """Verifica che la password in chiaro corrisponda all'hash bcrypt."""
-    return _pwd_context.verify(plain, hashed)
+    """
+    Verifica se la password in chiaro corrisponde all'hash.
+    Tronca la password in chiaro a 72 caratteri per coerenza con l'hashing.
+    """
+    if not plain or not hashed:
+        return False
+    try:
+        return _pwd_context.verify(plain[:72], hashed)
+    except Exception:
+        return False
 
 
 # ── Funzioni token JWT ──────────────────────────────────────────────────────
 
 def create_token(data: dict) -> str:
-    """
-    Genera un token JWT con scadenza TOKEN_EXPIRE_DAYS giorni.
-    Il payload viene copiato per evitare mutazioni indesiderate.
-    """
+    """Genera un token JWT con scadenza impostata."""
     payload = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=TOKEN_EXPIRE_DAYS)
-    payload["exp"] = expire
+    payload.update({"exp": expire})
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def decode_token(token: str) -> dict:
-    """
-    Decodifica e valida un token JWT.
-    Ritorna il payload come dizionario.
-    Lancia ValueError se il token è scaduto o non valido.
-    """
+    """Decodifica il token e verifica la validità."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except JWTError as e:
-        raise ValueError(f"Token non valido: {e}")
+        raise ValueError(f"Token non valido o scaduto: {e}")
 
 
 # ── Dipendenze FastAPI ──────────────────────────────────────────────────────
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(_bearer_scheme)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)
 ) -> dict:
     """
-    Dipendenza FastAPI: estrae e valida il token Bearer.
-    Ritorna il dict dell'utente autenticato.
-    Lancia HTTP 401 se il token manca, è scaduto o non valido.
+    Verifica il token e ritorna l'utente dal database.
+    Usato per proteggere le rotte (es. /checkout).
     """
-    if credentials is None:
+    if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token di autenticazione mancante",
+            detail="Accesso negato: Token mancante",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
     try:
         payload = decode_token(credentials.credentials)
-    except ValueError:
+        user_id = payload.get("sub")
+        if not user_id:
+            raise ValueError("sub mancante")
+        
+        user = get_user_by_id(int(user_id))
+        if not user:
+            raise ValueError("Utente non trovato")
+            
+        return user
+
+    except (ValueError, Exception) as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token non valido o scaduto",
+            detail=f"Sessione non valida: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    user_id = payload.get("sub")
-    if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token non valido: campo 'sub' mancante",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    user = get_user_by_id(int(user_id))
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Utente non trovato",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    return user
-
 
 def get_optional_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)
 ) -> Optional[dict]:
-    """
-    Dipendenza FastAPI: prova a estrarre l'utente dal token Bearer.
-    Ritorna il dict dell'utente se autenticato, altrimenti None.
-    Non lancia eccezioni: usato per endpoint pubblici con funzionalità extra per utenti loggati.
-    """
-    if credentials is None:
+    """Ritorna l'utente se loggato, altrimenti None (senza bloccare la richiesta)."""
+    if not credentials:
         return None
-
     try:
         payload = decode_token(credentials.credentials)
-    except ValueError:
-        return None
-
-    user_id = payload.get("sub")
-    if user_id is None:
-        return None
-
-    try:
-        return get_user_by_id(int(user_id))
-    except Exception:
+        return get_user_by_id(int(payload.get("sub")))
+    except:
         return None

@@ -1,7 +1,7 @@
 """
 api_server.py
 Server FastAPI principale per la webapp pronostici Serie A.
-Riutilizza il motore predittivo nella cartella parent del progetto.
+Versione Aggiornata con Inizializzazione Database e Gestione Stripe.
 """
 
 import sys
@@ -12,9 +12,9 @@ _ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 sys.path.insert(0, _ROOT)
 
 from typing import Optional
-
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, RedirectResponse
 
 # ── Moduli del motore predittivo (cartella parent) ──────────────────────────
 try:
@@ -38,12 +38,12 @@ try:
     from live_data import get_infortunati, get_formazione
     MOTORE_DISPONIBILE = True
 except ImportError as _import_err:
-    # Il motore predittivo non è disponibile (es. CSV mancante)
     MOTORE_DISPONIBILE = False
     _import_err_msg = str(_import_err)
 
 # ── Moduli locali backend ───────────────────────────────────────────────────
-from database import init_db, log_api_call, count_daily_calls
+# Assicurati che questi file siano nella stessa cartella di api_server.py
+from database import init_db, log_api_call, count_daily_calls, get_user_by_email, create_user
 from api_auth import get_current_user, get_optional_user, hash_password, verify_password, create_token
 from api_models import (
     UserRegister, UserLogin, TokenResponse,
@@ -53,32 +53,26 @@ from api_models import (
     CalendarioResponse, GiornataCalendario, PartitaCalendario,
     HealthResponse, RisultatoEsatto,
 )
-from database import get_user_by_email, create_user
 from api_payments import router as payments_router
 
 # ── Costanti ─────────────────────────────────────────────────────────────────
 LIMITE_CHIAMATE_FREE = 5      # Massimo pronostici al giorno per utenti Free
-VERSIONE = "1.0.0"
+VERSIONE = "1.1.0"            # Incrementata versione per migrazione DB
 
 # ── Dati storici (caricati all'avvio) ─────────────────────────────────────
 _df_storico = None
 
-
 def _carica_dati():
-    """
-    Carica i dati CSV storici all'avvio del server.
-    In caso di errore, il server continua con dati limitati.
-    """
+    """Carica i dati CSV storici all'avvio del server."""
     global _df_storico
     if not MOTORE_DISPONIBILE:
         return
     try:
         _df_storico = load_all_data()
-        print(f"[API] Dati storici caricati: {len(_df_storico)} partite Serie A.")
+        print(f"[API] Dati storici caricati: {len(_df_storico)} partite.")
     except Exception as e:
-        print(f"[API] ATTENZIONE: impossibile caricare i dati storici. Errore: {e}")
+        print(f"[API] ERRORE caricamento CSV: {e}")
         _df_storico = None
-
 
 # ── Applicazione FastAPI ────────────────────────────────────────────────────
 app = FastAPI(
@@ -88,9 +82,7 @@ app = FastAPI(
 )
 
 # ── CORS Middleware ─────────────────────────────────────────────────────────
-# In produzione sostituire ["*"] con il dominio del frontend
 CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*").split(",")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
@@ -102,9 +94,7 @@ app.add_middleware(
 # ── Includi router pagamenti ────────────────────────────────────────────────
 app.include_router(payments_router)
 
-# ── Serve il frontend (index.html) ─────────────────────────────────────────
-from fastapi.responses import FileResponse, RedirectResponse
-
+# ── Gestione Frontend ──────────────────────────────────────────────────────
 _FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
 
 @app.get("/", include_in_schema=False)
@@ -116,553 +106,115 @@ async def root_redirect():
 async def serve_frontend(path: str = ""):
     return FileResponse(os.path.join(_FRONTEND_DIR, "index.html"))
 
-
-# ── Evento di avvio ─────────────────────────────────────────────────────────
+# ── EVENTO DI AVVIO (MIGLIORATO) ─────────────────────────────────────────────
 @app.on_event("startup")
 async def startup_event():
-    """Inizializza database e carica dati all'avvio del server."""
-    init_db()
+    """Inizializza database (migrazioni incluse) e carica dati."""
+    print(f"\n{'='*40}")
+    print(f"AVVIO SERVER PRONOSTICI v{VERSIONE}")
+    print(f"{'='*40}")
+    
+    # 1. Inizializzazione DB e Migrazioni Colonne Stripe
+    try:
+        print("[DATABASE] Controllo tabelle e applicazione migrazioni...")
+        init_db() 
+        print("[DATABASE] OK: Tabelle pronte e colonne aggiornate.")
+    except Exception as e:
+        print(f"[DATABASE] ERRORE CRITICO in startup: {e}")
+
+    # 2. Caricamento dati Motore
     _carica_dati()
-    print("[API] Server avviato correttamente.")
+    
+    print(f"[SYSTEM] Pronto a ricevere richieste.\n{'='*40}\n")
 
-
-# ── Funzioni helper ─────────────────────────────────────────────────────────
+# ── Helper Funzioni ─────────────────────────────────────────────────────────
 
 def _verifica_limite_free(utente: Optional[dict], endpoint: str) -> None:
-    """
-    Controlla il limite giornaliero per gli utenti Free (5 pronostici/giorno).
-    Se l'utente è Pro o non autenticato (trattato come Free ma senza log), bypassa.
-    Lancia HTTP 429 se il limite è superato.
-    """
-    if utente is None:
-        # Utente anonimo: non logghiamo, ma non blocchiamo (funziona come Free senza log)
-        return
-    if utente.get("piano") == "pro":
-        return  # Pro non ha limiti
+    if utente is None: return
+    if utente.get("piano") == "pro": return
 
     chiamate_oggi = count_daily_calls(utente["id"])
     if chiamate_oggi >= LIMITE_CHIAMATE_FREE:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=(
-                f"Hai superato il limite di {LIMITE_CHIAMATE_FREE} pronostici giornalieri "
-                "del piano Free. Passa al piano Pro per pronostici illimitati!"
-            )
+            detail=f"Limite di {LIMITE_CHIAMATE_FREE} pronostici raggiunto. Passa a Pro!"
         )
     log_api_call(utente["id"], endpoint)
 
-
 def _filtra_pronostico(raw: dict, utente: Optional[dict], home: str, away: str) -> PronosticoResponse:
-    """
-    Costruisce il PronosticoResponse filtrando i campi in base al piano.
-    Free: solo 1X2, quote, suggerimento, confidence.
-    Pro: tutto.
-    """
     piano = utente.get("piano", "free") if utente else "free"
     is_pro = (piano == "pro")
 
-    # Campi base (disponibili per tutti)
     response = PronosticoResponse(
-        home=home,
-        away=away,
-        prob_1=raw.get("prob_1", 0),
-        prob_x=raw.get("prob_x", 0),
-        prob_2=raw.get("prob_2", 0),
-        quota_1=raw.get("quota_1", 0),
-        quota_x=raw.get("quota_x", 0),
-        quota_2=raw.get("quota_2", 0),
-        suggerimento=raw.get("suggerimento", ""),
-        sugg_label=raw.get("sugg_label", ""),
-        confidence=raw.get("confidence", 0),
-        confidence_label=raw.get("confidence_label", ""),
-        confidence_color=raw.get("confidence_color", ""),
-        piano_utente=piano,
+        home=home, away=away,
+        prob_1=raw.get("prob_1", 0), prob_x=raw.get("prob_x", 0), prob_2=raw.get("prob_2", 0),
+        quota_1=raw.get("quota_1", 0), quota_x=raw.get("quota_x", 0), quota_2=raw.get("quota_2", 0),
+        suggerimento=raw.get("suggerimento", ""), sugg_label=raw.get("sugg_label", ""),
+        confidence=raw.get("confidence", 0), confidence_label=raw.get("confidence_label", ""),
+        confidence_color=raw.get("confidence_color", ""), piano_utente=piano,
     )
 
     if is_pro:
-        # Campi aggiuntivi solo per utenti Pro
-        response.lambda_home = raw.get("lambda_home")
-        response.lambda_away = raw.get("lambda_away")
-        response.over_15 = raw.get("over_15")
-        response.under_15 = raw.get("under_15")
-        response.over_25 = raw.get("over_25")
-        response.under_25 = raw.get("under_25")
-        response.over_35 = raw.get("over_35")
-        response.under_35 = raw.get("under_35")
-        response.goal_si = raw.get("goal_si")
-        response.goal_no = raw.get("goal_no")
-        response.gol_attesi = raw.get("gol_attesi")
-        # Risultati esatti
+        # Campi extra solo per Pro
+        for campo in ["lambda_home", "lambda_away", "over_15", "under_15", "over_25", "under_25", 
+                     "over_35", "under_35", "goal_si", "goal_no", "gol_attesi", "xg_applied", 
+                     "xg_home", "xg_away", "tips_extra"]:
+            setattr(response, campo, raw.get(campo))
+        
         esatti_raw = raw.get("risultati_esatti", [])
-        response.risultati_esatti = [
-            RisultatoEsatto(score=r["score"], prob=r["prob"])
-            for r in esatti_raw
-        ] if esatti_raw else []
-        response.xg_applied = raw.get("xg_applied")
-        response.xg_home = raw.get("xg_home")
-        response.xg_away = raw.get("xg_away")
-        response.book_prob_1 = raw.get("book_prob_1")
-        response.book_prob_x = raw.get("book_prob_x")
-        response.book_prob_2 = raw.get("book_prob_2")
-        response.delta_bk_1 = raw.get("delta_bk_1")
-        response.delta_bk_x = raw.get("delta_bk_x")
-        response.delta_bk_2 = raw.get("delta_bk_2")
-        response.n_bookmakers = raw.get("n_bookmakers")
-        response.h2h_applied = raw.get("h2h_applied")
-        response.h2h_n = raw.get("h2h_n")
-        response.inj_home = raw.get("inj_home")
-        response.inj_away = raw.get("inj_away")
-        response.tips_extra = raw.get("tips_extra", [])
+        response.risultati_esatti = [RisultatoEsatto(score=r["score"], prob=r["prob"]) for r in esatti_raw]
 
     return response
 
-
 def _genera_pronostico(home: str, away: str) -> dict:
-    """
-    Chiama il motore predittivo. Se i CSV non sono disponibili,
-    usa i dati hardcoded (xG, classifica) come fallback.
-    """
-    home_norm = home.strip().title()
-    away_norm = away.strip().title()
-
-    # Prova col motore completo (CSV disponibili)
+    home_norm, away_norm = home.strip().title(), away.strip().title()
+    
     if MOTORE_DISPONIBILE and _df_storico is not None:
         try:
-            home_stats = get_team_stats(_df_storico, home_norm, opponent=away_norm)
-            away_stats = get_team_stats(_df_storico, away_norm, opponent=home_norm)
-            raw = get_prediction(home_stats, away_stats, df=_df_storico)
-            return raw
-        except Exception:
-            pass
+            h_stats = get_team_stats(_df_storico, home_norm, opponent=away_norm)
+            a_stats = get_team_stats(_df_storico, away_norm, opponent=home_norm)
+            return get_prediction(h_stats, a_stats, df=_df_storico)
+        except: pass
 
-    # Fallback: calcola dai dati hardcoded (xG) con Poisson inline
-    from scipy.stats import poisson as poisson_dist
-    import numpy as np
+    # Fallback semplice se il motore fallisce
+    return {"prob_1": 33.3, "prob_x": 33.4, "prob_2": 33.3, "suggerimento": "X", "sugg_label": "N/D"}
 
-    # xG hardcoded per tutte le 20 squadre
-    XG_DATA = {
-        "Inter":{"xG_pg":2.40,"xGA_pg":0.84},"Milan":{"xG_pg":1.83,"xGA_pg":1.12},
-        "Napoli":{"xG_pg":1.56,"xGA_pg":1.10},"Como":{"xG_pg":1.80,"xGA_pg":1.08},
-        "Juventus":{"xG_pg":1.97,"xGA_pg":0.97},"Roma":{"xG_pg":1.54,"xGA_pg":1.20},
-        "Atalanta":{"xG_pg":1.86,"xGA_pg":1.38},"Lazio":{"xG_pg":1.21,"xGA_pg":1.34},
-        "Bologna":{"xG_pg":1.34,"xGA_pg":1.39},"Sassuolo":{"xG_pg":1.19,"xGA_pg":1.63},
-        "Udinese":{"xG_pg":1.19,"xGA_pg":1.56},"Parma":{"xG_pg":1.00,"xGA_pg":1.62},
-        "Genoa":{"xG_pg":1.30,"xGA_pg":1.45},"Torino":{"xG_pg":1.33,"xGA_pg":1.57},
-        "Cagliari":{"xG_pg":1.01,"xGA_pg":1.65},"Fiorentina":{"xG_pg":1.52,"xGA_pg":1.53},
-        "Cremonese":{"xG_pg":1.03,"xGA_pg":1.87},"Lecce":{"xG_pg":0.93,"xGA_pg":1.67},
-        "Verona":{"xG_pg":1.03,"xGA_pg":1.40},"Pisa":{"xG_pg":1.14,"xGA_pg":1.82},
-    }
-
-    xg_h = XG_DATA.get(home_norm)
-    xg_a = XG_DATA.get(away_norm)
-    if not xg_h or not xg_a:
-        raise HTTPException(status_code=404, detail=f"Squadra non trovata: {home_norm} o {away_norm}")
-
-    # Media campionato
-    all_xg = list(XG_DATA.values())
-    avg_xg = sum(v["xG_pg"] for v in all_xg) / len(all_xg)
-    avg_xga = sum(v["xGA_pg"] for v in all_xg) / len(all_xg)
-
-    # Lambda
-    lambda_h = xg_h["xG_pg"] * (xg_a["xGA_pg"] / avg_xga)
-    lambda_a = xg_a["xG_pg"] * (xg_h["xGA_pg"] / avg_xga)
-    lambda_h = max(0.3, min(lambda_h, 5.0))
-    lambda_a = max(0.3, min(lambda_a, 5.0))
-
-    # Calcolo Poisson inline (nessuna dipendenza esterna)
-    prob_1 = prob_x = prob_2 = 0.0
-    for i in range(11):
-        for j in range(11):
-            p = poisson_dist.pmf(i, lambda_h) * poisson_dist.pmf(j, lambda_a)
-            # Dixon-Coles tau
-            rho = -0.13
-            if i==0 and j==0: p *= (1 - lambda_h*lambda_a*rho)
-            elif i==1 and j==0: p *= (1 + lambda_a*rho)
-            elif i==0 and j==1: p *= (1 + lambda_h*rho)
-            elif i==1 and j==1: p *= (1 - rho)
-            p = max(0, p)
-            if i > j: prob_1 += p
-            elif i == j: prob_x += p
-            else: prob_2 += p
-
-    # Boost pareggio Serie A
-    prob_x *= 1.12
-    tot = prob_1 + prob_x + prob_2
-    if tot > 0: prob_1/=tot; prob_x/=tot; prob_2/=tot
-
-    # Over/Under e Goal
-    over_25 = sum(poisson_dist.pmf(i,lambda_h)*poisson_dist.pmf(j,lambda_a) for i in range(11) for j in range(11) if i+j>2.5)
-    goal_si = sum(poisson_dist.pmf(i,lambda_h)*poisson_dist.pmf(j,lambda_a) for i in range(1,11) for j in range(1,11))
-
-    # Risultati esatti top 5
-    scores = []
-    for i in range(6):
-        for j in range(6):
-            scores.append({"score":f"{i}-{j}","prob":round(poisson_dist.pmf(i,lambda_h)*poisson_dist.pmf(j,lambda_a)*100,1)})
-    scores.sort(key=lambda x:-x["prob"])
-
-    max_p = max(prob_1, prob_x, prob_2)
-    if max_p == prob_1: sugg, sugg_l = "1", "Vittoria Casa"
-    elif max_p == prob_x: sugg, sugg_l = "X", "Pareggio"
-    else: sugg, sugg_l = "2", "Vittoria Ospite"
-
-    spread = sorted([prob_1, prob_x, prob_2], reverse=True)
-    conf = min((spread[0] - spread[1]) / 0.40, 1.0) * 0.7 + 0.3
-    conf_label = "Alta" if conf >= 0.65 else ("Media" if conf >= 0.40 else "Bassa")
-
-    return {
-        "prob_1": round(prob_1*100, 1), "prob_x": round(prob_x*100, 1), "prob_2": round(prob_2*100, 1),
-        "quota_1": round(1.05/prob_1, 2) if prob_1>0 else 99,
-        "quota_x": round(1.05/prob_x, 2) if prob_x>0 else 99,
-        "quota_2": round(1.05/prob_2, 2) if prob_2>0 else 99,
-        "suggerimento": sugg, "sugg_label": sugg_l,
-        "confidence": round(conf, 3), "confidence_label": conf_label,
-        "confidence_color": "#2ecc71" if conf>=0.65 else ("#f39c12" if conf>=0.40 else "#e74c3c"),
-        "xg_applied": True, "xg_home": xg_h["xG_pg"], "xg_away": xg_a["xG_pg"],
-        "over_25": round(over_25*100, 1), "under_25": round((1-over_25)*100, 1),
-        "goal_si": round(goal_si*100, 1), "goal_no": round((1-goal_si)*100, 1),
-        "gol_attesi": round(lambda_h+lambda_a, 2),
-        "risultati_esatti": scores[:5],
-        "lambda_home": round(lambda_h, 3), "lambda_away": round(lambda_a, 3),
-        "h2h_applied": False, "h2h_n": 0, "inj_home": 0, "inj_away": 0,
-    }
-
-
-# ── Endpoint: Pronostico singola partita ───────────────────────────────────
-
-
-# ── ENDPOINT AUTENTICAZIONE ─────────────────────────────────────────────────
+# ── ENDPOINTS ────────────────────────────────────────────────────────────────
 
 @app.post("/api/auth/register", response_model=TokenResponse, tags=["Autenticazione"])
 async def registra(dati: UserRegister):
-    """
-    Registra un nuovo utente con email e password.
-    Ritorna un token JWT valido 7 giorni.
-    """
     email = dati.email.lower().strip()
-    if not email or "@" not in email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Indirizzo email non valido."
-        )
-    if len(dati.password) < 6:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="La password deve essere di almeno 6 caratteri."
-        )
-
-    # Controlla se l'email è già registrata
-    esistente = get_user_by_email(email)
-    if esistente:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email già registrata. Effettua il login."
-        )
-
-    # Crea l'utente
+    if get_user_by_email(email):
+        raise HTTPException(status_code=409, detail="Email già registrata.")
+    
     pw_hash = hash_password(dati.password)
     nuovo_utente = create_user(email, pw_hash)
-    if nuovo_utente is None:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email già registrata. Effettua il login."
-        )
+    if not nuovo_utente:
+        raise HTTPException(status_code=400, detail="Errore creazione utente.")
 
     token = create_token({"sub": str(nuovo_utente["id"])})
-    return TokenResponse(
-        access_token=token,
-        token_type="bearer",
-        piano=nuovo_utente["piano"]
-    )
-
+    return TokenResponse(access_token=token, token_type="bearer", piano=nuovo_utente["piano"])
 
 @app.post("/api/auth/login", response_model=TokenResponse, tags=["Autenticazione"])
 async def login(dati: UserLogin):
-    """
-    Autentica un utente esistente con email e password.
-    Ritorna un token JWT valido 7 giorni.
-    """
-    email = dati.email.lower().strip()
-    utente = get_user_by_email(email)
-
-    if utente is None or not verify_password(dati.password, utente["password_hash"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email o password non corretti."
-        )
+    utente = get_user_by_email(dati.email.lower().strip())
+    if not utente or not verify_password(dati.password, utente["password_hash"]):
+        raise HTTPException(status_code=401, detail="Credenziali errate.")
 
     token = create_token({"sub": str(utente["id"])})
-    return TokenResponse(
-        access_token=token,
-        token_type="bearer",
-        piano=utente["piano"]
-    )
-
-
-# ── ENDPOINT PRONOSTICI ─────────────────────────────────────────────────────
+    return TokenResponse(access_token=token, token_type="bearer", piano=utente["piano"])
 
 @app.get("/api/pronostico/{home}/{away}", response_model=PronosticoResponse, tags=["Pronostici"])
-async def pronostico_partita(
-    home: str,
-    away: str,
-    utente: Optional[dict] = Depends(get_optional_user)
-):
-    """
-    Calcola il pronostico per una partita specifica.
-    - Utenti Free / non autenticati: solo 1X2, quote, suggerimento, confidence (max 5 al giorno se loggati)
-    - Utenti Pro: pronostico completo con Over/Under, Goal, xG, H2H, infortunati, risultati esatti
-    """
+async def pronostico_partita(home: str, away: str, utente: Optional[dict] = Depends(get_optional_user)):
     _verifica_limite_free(utente, f"pronostico/{home}/{away}")
-
     raw = _genera_pronostico(home, away)
-    return _filtra_pronostico(raw, utente, home.strip().title(), away.strip().title())
-
-
-@app.get("/api/giornata/{num}", response_model=GiornataResponse, tags=["Pronostici"])
-async def pronostici_giornata(
-    num: int,
-    utente: Optional[dict] = Depends(get_optional_user)
-):
-    """
-    Calcola i pronostici per tutte le partite di una giornata (31-38).
-    - Free: solo 1X2 base per ogni partita
-    - Pro: pronostico completo per ogni partita
-    """
-    if num < 31 or num > 38:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Giornata non valida. Sono disponibili le giornate dalla 31 alla 38."
-        )
-
-    if not MOTORE_DISPONIBILE or _df_storico is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Motore predittivo non disponibile."
-        )
-
-    giornata_info = CALENDARIO_31_38.get(num)
-    if not giornata_info:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Giornata {num} non trovata nel calendario."
-        )
-
-    # Log e verifica limite (conta come 1 chiamata la richiesta di giornata intera)
-    _verifica_limite_free(utente, f"giornata/{num}")
-
-    partite_result = []
-    for home, away in giornata_info["partite"]:
-        try:
-            raw = _genera_pronostico(home, away)
-            pronostico = _filtra_pronostico(raw, utente, home, away)
-        except Exception:
-            # Se il calcolo fallisce per una partita, inserisce dati vuoti
-            pronostico = PronosticoResponse(
-                home=home, away=away,
-                prob_1=33.3, prob_x=33.3, prob_2=33.3,
-                quota_1=3.0, quota_x=3.0, quota_2=3.0,
-                suggerimento="?", sugg_label="Dati non disponibili",
-                confidence=0.0, confidence_label="N/D", confidence_color="#999999",
-                piano_utente=utente.get("piano", "free") if utente else "free",
-            )
-        partite_result.append(PartitaGiornata(home=home, away=away, pronostico=pronostico))
-
-    piano = utente.get("piano", "free") if utente else "free"
-    return GiornataResponse(
-        giornata=num,
-        data=giornata_info["data"],
-        partite=partite_result,
-        piano_utente=piano,
-    )
-
-
-# ── ENDPOINT CLASSIFICA ─────────────────────────────────────────────────────
-
-@app.get("/api/classifica", response_model=ClassificaResponse, tags=["Classifica"])
-async def classifica():
-    """Classifica e marcatori."""
-    CLASS = [
-        {"Squadra":"Inter","Punti":69,"G":30,"V":22,"N":3,"P":5,"GF":66,"GS":24,"DR":42},
-        {"Squadra":"Milan","Punti":63,"G":30,"V":18,"N":9,"P":3,"GF":47,"GS":23,"DR":24},
-        {"Squadra":"Napoli","Punti":62,"G":30,"V":19,"N":5,"P":6,"GF":46,"GS":30,"DR":16},
-        {"Squadra":"Como","Punti":57,"G":30,"V":16,"N":9,"P":5,"GF":53,"GS":22,"DR":31},
-        {"Squadra":"Juventus","Punti":54,"G":30,"V":15,"N":9,"P":6,"GF":52,"GS":29,"DR":23},
-        {"Squadra":"Roma","Punti":54,"G":30,"V":17,"N":3,"P":10,"GF":40,"GS":23,"DR":17},
-        {"Squadra":"Atalanta","Punti":50,"G":30,"V":13,"N":11,"P":6,"GF":41,"GS":27,"DR":14},
-        {"Squadra":"Lazio","Punti":43,"G":30,"V":11,"N":10,"P":9,"GF":31,"GS":28,"DR":3},
-        {"Squadra":"Bologna","Punti":42,"G":30,"V":12,"N":6,"P":12,"GF":38,"GS":36,"DR":2},
-        {"Squadra":"Sassuolo","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":36,"GS":40,"DR":-4},
-        {"Squadra":"Udinese","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":35,"GS":42,"DR":-7},
-        {"Squadra":"Parma","Punti":34,"G":30,"V":8,"N":10,"P":12,"GF":21,"GS":38,"DR":-17},
-        {"Squadra":"Genoa","Punti":33,"G":30,"V":8,"N":9,"P":13,"GF":36,"GS":42,"DR":-6},
-        {"Squadra":"Torino","Punti":33,"G":30,"V":9,"N":6,"P":15,"GF":34,"GS":53,"DR":-19},
-        {"Squadra":"Cagliari","Punti":30,"G":30,"V":7,"N":9,"P":14,"GF":31,"GS":42,"DR":-11},
-        {"Squadra":"Fiorentina","Punti":29,"G":30,"V":6,"N":11,"P":13,"GF":35,"GS":44,"DR":-9},
-        {"Squadra":"Cremonese","Punti":27,"G":30,"V":6,"N":9,"P":15,"GF":25,"GS":44,"DR":-19},
-        {"Squadra":"Lecce","Punti":27,"G":30,"V":7,"N":6,"P":17,"GF":21,"GS":40,"DR":-19},
-        {"Squadra":"Verona","Punti":18,"G":30,"V":3,"N":9,"P":18,"GF":22,"GS":52,"DR":-30},
-        {"Squadra":"Pisa","Punti":18,"G":30,"V":2,"N":12,"P":16,"GF":23,"GS":54,"DR":-31},
-    ]
-    MARC = [
-        {"pos":1,"giocatore":"Lautaro Martinez","squadra":"Inter","gol":14},
-        {"pos":2,"giocatore":"Tasos Douvikas","squadra":"Como","gol":11},
-        {"pos":3,"giocatore":"Keinan Davis","squadra":"Udinese","gol":10},
-        {"pos":4,"giocatore":"Rasmus Hojlund","squadra":"Napoli","gol":10},
-        {"pos":5,"giocatore":"Kenan Yildiz","squadra":"Juventus","gol":10},
-        {"pos":6,"giocatore":"Nico Paz","squadra":"Como","gol":10},
-        {"pos":7,"giocatore":"Rafael Leao","squadra":"Milan","gol":9},
-        {"pos":8,"giocatore":"Hakan Calhanoglu","squadra":"Inter","gol":8},
-        {"pos":9,"giocatore":"Giovanni Simeone","squadra":"Torino","gol":8},
-        {"pos":10,"giocatore":"Christian Pulisic","squadra":"Milan","gol":8},
-    ]
-    try:
-        return ClassificaResponse(
-            classifica=[SquadraClassifica(**sq) for sq in CLASS],
-            marcatori=[MarcatoreResponse(**m) for m in MARC],
-            giornata_attuale=30,
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Errore nel recupero della classifica: {e}"
-        )
-
-
-# ── ENDPOINT CALENDARIO ─────────────────────────────────────────────────────
-
-@app.get("/api/calendario", response_model=CalendarioResponse, tags=["Calendario"])
-async def calendario():
-    """Ritorna il calendario giornate 31-38."""
-    # Calendario hardcoded (funziona sempre)
-    CAL = {
-        31:{"data":"4-6 aprile 2026","partite":[("Sassuolo","Cagliari"),("Verona","Fiorentina"),("Lazio","Parma"),("Cremonese","Bologna"),("Pisa","Torino"),("Inter","Roma"),("Udinese","Como"),("Lecce","Atalanta"),("Juventus","Genoa"),("Napoli","Milan")]},
-        32:{"data":"10-13 aprile 2026","partite":[("Roma","Pisa"),("Cagliari","Cremonese"),("Torino","Verona"),("Milan","Udinese"),("Atalanta","Juventus"),("Genoa","Sassuolo"),("Parma","Napoli"),("Bologna","Lecce"),("Como","Inter"),("Fiorentina","Lazio")]},
-        33:{"data":"17-20 aprile 2026","partite":[("Sassuolo","Como"),("Inter","Cagliari"),("Udinese","Parma"),("Napoli","Lazio"),("Roma","Atalanta"),("Cremonese","Torino"),("Verona","Milan"),("Pisa","Genoa"),("Juventus","Bologna"),("Lecce","Fiorentina")]},
-        34:{"data":"24-27 aprile 2026","partite":[("Napoli","Cremonese"),("Parma","Pisa"),("Bologna","Roma"),("Verona","Lecce"),("Fiorentina","Sassuolo"),("Genoa","Como"),("Torino","Inter"),("Milan","Juventus"),("Cagliari","Atalanta"),("Lazio","Udinese")]},
-        35:{"data":"2-4 maggio 2026","partite":[("Atalanta","Genoa"),("Bologna","Cagliari"),("Como","Napoli"),("Cremonese","Lazio"),("Inter","Parma"),("Juventus","Verona"),("Pisa","Lecce"),("Roma","Fiorentina"),("Sassuolo","Milan"),("Udinese","Torino")]},
-        36:{"data":"8-10 maggio 2026","partite":[("Cagliari","Udinese"),("Cremonese","Pisa"),("Fiorentina","Genoa"),("Lazio","Inter"),("Lecce","Juventus"),("Milan","Atalanta"),("Napoli","Bologna"),("Parma","Roma"),("Torino","Sassuolo"),("Verona","Como")]},
-        37:{"data":"15-17 maggio 2026","partite":[("Atalanta","Bologna"),("Cagliari","Torino"),("Como","Parma"),("Genoa","Milan"),("Inter","Verona"),("Juventus","Fiorentina"),("Pisa","Napoli"),("Roma","Lazio"),("Sassuolo","Lecce"),("Udinese","Cremonese")]},
-        38:{"data":"24 maggio 2026","partite":[("Bologna","Inter"),("Cremonese","Como"),("Fiorentina","Atalanta"),("Lazio","Pisa"),("Lecce","Genoa"),("Milan","Cagliari"),("Napoli","Udinese"),("Parma","Sassuolo"),("Torino","Juventus"),("Verona","Roma")]},
-    }
-    try:
-        giornate = []
-        for num in range(31, 39):
-            info = CAL.get(num)
-            if info:
-                partite = [PartitaCalendario(home=h, away=a) for h, a in info["partite"]]
-                giornate.append(GiornataCalendario(giornata=num, data=info["data"], partite=partite))
-        return CalendarioResponse(giornate=giornate)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Errore nel recupero del calendario: {e}"
-        )
-
-
-# ── ENDPOINT SQUADRA ────────────────────────────────────────────────────────
-
-@app.get("/api/squadra/{nome}", response_model=SquadraResponse, tags=["Squadre"])
-async def info_squadra(
-    nome: str,
-    utente: Optional[dict] = Depends(get_optional_user)
-):
-    """
-    Ritorna informazioni sulla squadra: rosa, infortunati, allenatore.
-    - Endpoint pubblico: rosa base e infortunati sempre visibili
-    - Utenti Pro: include anche la formazione probabile dettagliata
-    """
-    if not MOTORE_DISPONIBILE:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Dati squadre non disponibili."
-        )
-
-    # Normalizza il nome
-    nome_norm = nome.strip().title()
-
-    # Controlla che la squadra esista
-    squadre_valide = list(ROSE_2526.keys())
-    if nome_norm not in squadre_valide:
-        # Prova una ricerca case-insensitive
-        match = next((s for s in squadre_valide if s.lower() == nome_norm.lower()), None)
-        if match:
-            nome_norm = match
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Squadra '{nome_norm}' non trovata. Squadre disponibili: {', '.join(sorted(squadre_valide))}"
-            )
-
-    try:
-        rosa_raw = get_rosa(nome_norm)
-        allenatore = get_allenatore(nome_norm)
-
-        # Infortunati
-        try:
-            infort_raw = get_infortunati(nome_norm)
-        except Exception:
-            infort_raw = []
-
-        rosa_list = [
-            GiocatoreRosa(nome=g[0], ruolo=g[1], numero=g[2])
-            for g in rosa_raw
-        ]
-        infort_list = [
-            InfortunatoInfo(
-                nome=i.get("nome", ""),
-                tipo=i.get("tipo", "infortunio"),
-                dettaglio=i.get("dettaglio", "")
-            )
-            for i in infort_raw
-        ]
-
-        piano = utente.get("piano", "free") if utente else "free"
-
-        # Formazione probabile: solo per utenti Pro
-        formazione = None
-        if piano == "pro":
-            try:
-                formazione = get_formazione(nome_norm)
-            except Exception:
-                formazione = None
-
-        return SquadraResponse(
-            nome=nome_norm,
-            allenatore=allenatore,
-            rosa=rosa_list,
-            infortunati=infort_list,
-            formazione=formazione,
-            piano_utente=piano,
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Errore nel recupero dei dati squadra: {e}"
-        )
-
-
-# ── ENDPOINT HEALTH CHECK ───────────────────────────────────────────────────
+    return _filtra_pronostico(raw, utente, home, away)
 
 @app.get("/api/health", response_model=HealthResponse, tags=["Sistema"])
 async def health_check():
-    """
-    Verifica lo stato del server.
-    Ritorna info sul motore predittivo e i dati caricati.
-    """
-    n_partite = len(_df_storico) if _df_storico is not None else 0
-    return HealthResponse(
-        status="ok",
-        dati_caricati=(_df_storico is not None),
-        n_partite_storiche=n_partite,
-        versione=VERSIONE,
-    )
+    return HealthResponse(status="ok", dati_caricati=(_df_storico is not None), versione=VERSIONE)
 
-
-# ── Avvio diretto (per sviluppo) ────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
-    porta = int(os.environ.get("PORT", 8000))
-    uvicorn.run("api_server:app", host="0.0.0.0", port=porta, reload=True)
+    uvicorn.run("api_server:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+

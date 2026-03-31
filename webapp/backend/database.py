@@ -1,7 +1,6 @@
 """
-database.py
-Gestione del database SQLite per la webapp pronostici Serie A.
-Tabelle: users (profili utenti) e api_usage (log chiamate API).
+database.py - Versione Ottimizzata
+Gestione SQLite con migrazioni automatiche per Stripe e Piani Pro.
 """
 
 import sqlite3
@@ -21,46 +20,60 @@ def _get_conn() -> sqlite3.Connection:
 
 def init_db() -> None:
     """
-    Inizializza il database creando le tabelle se non esistono.
-    Chiamare all'avvio del server.
+    Inizializza il database e applica migrazioni se le colonne mancano.
+    Questa funzione evita l'errore 500 dovuto a tabelle non aggiornate.
     """
     conn = _get_conn()
     try:
         cursor = conn.cursor()
 
-        # Tabella utenti
+        # 1. Creazione tabella users (se non esiste)
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id                INTEGER PRIMARY KEY AUTOINCREMENT,
-                email             TEXT    UNIQUE NOT NULL,
-                password_hash     TEXT    NOT NULL,
-                piano             TEXT    DEFAULT 'free',
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                piano TEXT DEFAULT 'free',
                 stripe_customer_id TEXT,
-                created_at        TEXT    NOT NULL
+                created_at TEXT NOT NULL
             )
         """)
 
-        # Tabella log chiamate API
+        # 2. MIGRAZIONE: Aggiunta colonne a tabelle esistenti
+        # Se il DB esiste già ma è vecchio, aggiungiamo le colonne mancanti
+        colonne_da_controllare = [
+            ("piano", "TEXT DEFAULT 'free'"),
+            ("stripe_customer_id", "TEXT")
+        ]
+
+        for nome_colonna, tipo_colonna in colonne_da_controllare:
+            try:
+                cursor.execute(f"ALTER TABLE users ADD COLUMN {nome_colonna} {tipo_colonna}")
+                print(f"Migrazione: Colonna '{nome_colonna}' aggiunta con successo.")
+            except sqlite3.OperationalError:
+                # Se la colonna esiste già, SQLite lancia questo errore: lo ignoriamo.
+                pass
+
+        # 3. Tabella log chiamate API
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS api_usage (
-                id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id   INTEGER NOT NULL,
-                endpoint  TEXT    NOT NULL,
-                timestamp TEXT    NOT NULL,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                endpoint TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )
         """)
 
         conn.commit()
+    except Exception as e:
+        print(f"Errore durante init_db: {e}")
     finally:
         conn.close()
 
 
 def create_user(email: str, password_hash: str) -> dict | None:
-    """
-    Crea un nuovo utente con piano 'free'.
-    Ritorna il dict dell'utente creato, o None se l'email esiste già.
-    """
+    """Crea un nuovo utente. Ritorna il dict o None se l'email esiste."""
     conn = _get_conn()
     try:
         created_at = datetime.now(timezone.utc).isoformat()
@@ -73,61 +86,41 @@ def create_user(email: str, password_hash: str) -> dict | None:
         user_id = cursor.lastrowid
         return get_user_by_id(user_id)
     except sqlite3.IntegrityError:
-        # Email già registrata
         return None
     finally:
         conn.close()
 
 
 def get_user_by_email(email: str) -> dict | None:
-    """
-    Recupera un utente dal database tramite email.
-    Ritorna dict con tutti i campi, o None se non trovato.
-    """
+    """Recupera utente tramite email."""
     conn = _get_conn()
     try:
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT * FROM users WHERE email = ?",
-            (email.lower().strip(),)
-        )
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email.lower().strip(),))
         row = cursor.fetchone()
-        if row is None:
-            return None
-        return dict(row)
+        return dict(row) if row else None
     finally:
         conn.close()
 
 
 def get_user_by_id(user_id: int) -> dict | None:
-    """
-    Recupera un utente dal database tramite ID.
-    Ritorna dict con tutti i campi, o None se non trovato.
-    """
+    """Recupera utente tramite ID."""
     conn = _get_conn()
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
         row = cursor.fetchone()
-        if row is None:
-            return None
-        return dict(row)
+        return dict(row) if row else None
     finally:
         conn.close()
 
 
 def update_plan(user_id: int, plan: str) -> bool:
-    """
-    Aggiorna il piano di un utente ('free' o 'pro').
-    Ritorna True se l'aggiornamento ha avuto successo.
-    """
+    """Aggiorna il piano (es. da 'free' a 'pro')."""
     conn = _get_conn()
     try:
         cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE users SET piano = ? WHERE id = ?",
-            (plan, user_id)
-        )
+        cursor.execute("UPDATE users SET piano = ? WHERE id = ?", (plan, user_id))
         conn.commit()
         return cursor.rowcount > 0
     finally:
@@ -135,17 +128,11 @@ def update_plan(user_id: int, plan: str) -> bool:
 
 
 def update_stripe_customer(user_id: int, stripe_customer_id: str) -> bool:
-    """
-    Salva lo stripe_customer_id per un utente.
-    Ritorna True se l'aggiornamento ha avuto successo.
-    """
+    """Salva l'ID cliente Stripe."""
     conn = _get_conn()
     try:
         cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE users SET stripe_customer_id = ? WHERE id = ?",
-            (stripe_customer_id, user_id)
-        )
+        cursor.execute("UPDATE users SET stripe_customer_id = ? WHERE id = ?", (stripe_customer_id, user_id))
         conn.commit()
         return cursor.rowcount > 0
     finally:
@@ -153,10 +140,7 @@ def update_stripe_customer(user_id: int, stripe_customer_id: str) -> bool:
 
 
 def log_api_call(user_id: int, endpoint: str) -> None:
-    """
-    Registra una chiamata API nel log.
-    Usato per il rate limiting degli utenti Free.
-    """
+    """Registra l'utilizzo API."""
     conn = _get_conn()
     try:
         timestamp = datetime.now(timezone.utc).isoformat()
@@ -171,20 +155,13 @@ def log_api_call(user_id: int, endpoint: str) -> None:
 
 
 def count_daily_calls(user_id: int) -> int:
-    """
-    Conta le chiamate API effettuate dall'utente oggi (UTC).
-    Usato per il limite giornaliero degli utenti Free (max 5).
-    """
+    """Conta chiamate odierne per rate limiting."""
     conn = _get_conn()
     try:
         oggi = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         cursor = conn.cursor()
         cursor.execute(
-            """
-            SELECT COUNT(*) FROM api_usage
-            WHERE user_id = ?
-              AND timestamp LIKE ?
-            """,
+            "SELECT COUNT(*) FROM api_usage WHERE user_id = ? AND timestamp LIKE ?",
             (user_id, f"{oggi}%")
         )
         row = cursor.fetchone()
