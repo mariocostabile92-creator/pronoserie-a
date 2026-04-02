@@ -96,7 +96,10 @@ async def root():
 @app.get("/app", include_in_schema=False)
 @app.get("/app/{path:path}", include_in_schema=False)
 async def serve_app(path: str = ""):
-    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+    from fastapi.responses import HTMLResponse
+    with open(os.path.join(FRONTEND_DIR, "index.html"), "r", encoding="utf-8") as f:
+        content = f.read()
+    return HTMLResponse(content, headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"})
 
 # ─────────────────────────────
 # UTILS
