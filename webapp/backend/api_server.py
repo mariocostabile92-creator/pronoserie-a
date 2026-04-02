@@ -6,6 +6,7 @@ Fix calendario + fallback + debug + Railway ready
 
 import sys
 import os
+import json
 
 # PATH ROOT
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -177,25 +178,76 @@ def genera_pronostico(home, away):
         except Exception as e:
             print("❌ ERRORE PREDICTOR:", e)
 
-    # Fallback con Poisson + xG inline (funziona SEMPRE)
+    # Calcolo Poisson AVANZATO con 26 anni CSV + xG + H2H + forma
     from scipy.stats import poisson as pdist
-    XG = {
-        "Inter":{"xG":2.40,"xGA":0.84},"Milan":{"xG":1.83,"xGA":1.12},"Napoli":{"xG":1.56,"xGA":1.10},
-        "Como":{"xG":1.80,"xGA":1.08},"Juventus":{"xG":1.97,"xGA":0.97},"Roma":{"xG":1.54,"xGA":1.20},
-        "Atalanta":{"xG":1.86,"xGA":1.38},"Lazio":{"xG":1.21,"xGA":1.34},"Bologna":{"xG":1.34,"xGA":1.39},
-        "Sassuolo":{"xG":1.19,"xGA":1.63},"Udinese":{"xG":1.19,"xGA":1.56},"Parma":{"xG":1.00,"xGA":1.62},
-        "Genoa":{"xG":1.30,"xGA":1.45},"Torino":{"xG":1.33,"xGA":1.57},"Cagliari":{"xG":1.01,"xGA":1.65},
-        "Fiorentina":{"xG":1.52,"xGA":1.53},"Cremonese":{"xG":1.03,"xGA":1.87},"Lecce":{"xG":0.93,"xGA":1.67},
-        "Verona":{"xG":1.03,"xGA":1.40},"Pisa":{"xG":1.14,"xGA":1.82},
-    }
-    h = home.strip().title()
-    a = away.strip().title()
-    xh = XG.get(h, {"xG":1.3,"xGA":1.3})
-    xa = XG.get(a, {"xG":1.3,"xGA":1.3})
-    avg = sum(v["xGA"] for v in XG.values()) / len(XG)
-    lh = max(0.3, min(xh["xG"] * (xa["xGA"] / avg), 5.0))
-    la = max(0.3, min(xa["xG"] * (xh["xGA"] / avg), 5.0))
 
+    # Carica statistiche pre-calcolate dai CSV (26 anni)
+    _stats_path = os.path.join(os.path.dirname(__file__), "team_stats.json")
+    _h2h_path = os.path.join(os.path.dirname(__file__), "h2h_stats.json")
+    _avg_path = os.path.join(os.path.dirname(__file__), "league_averages.json")
+
+    try:
+        with open(_stats_path) as f: TEAM_STATS = json.loads(f.read())
+        with open(_h2h_path) as f: H2H_DATA = json.loads(f.read())
+        with open(_avg_path) as f: LEAGUE_AVG = json.loads(f.read())
+    except Exception:
+        TEAM_STATS = {}
+        H2H_DATA = {}
+        LEAGUE_AVG = {"media_gol_casa": 1.5, "media_gol_trasferta": 1.17}
+
+    h = home_norm
+    a = away_norm
+    sh = TEAM_STATS.get(h, {})
+    sa = TEAM_STATS.get(a, {})
+
+    if not sh or not sa:
+        # Squadra non trovata nei CSV, usa solo xG
+        XG = {"Inter":{"xG":2.40,"xGA":0.84},"Milan":{"xG":1.83,"xGA":1.12},"Napoli":{"xG":1.56,"xGA":1.10},"Como":{"xG":1.80,"xGA":1.08},"Juventus":{"xG":1.97,"xGA":0.97},"Roma":{"xG":1.54,"xGA":1.20},"Atalanta":{"xG":1.86,"xGA":1.38},"Lazio":{"xG":1.21,"xGA":1.34},"Bologna":{"xG":1.34,"xGA":1.39},"Sassuolo":{"xG":1.19,"xGA":1.63},"Udinese":{"xG":1.19,"xGA":1.56},"Parma":{"xG":1.00,"xGA":1.62},"Genoa":{"xG":1.30,"xGA":1.45},"Torino":{"xG":1.33,"xGA":1.57},"Cagliari":{"xG":1.01,"xGA":1.65},"Fiorentina":{"xG":1.52,"xGA":1.53},"Cremonese":{"xG":1.03,"xGA":1.87},"Lecce":{"xG":0.93,"xGA":1.67},"Verona":{"xG":1.03,"xGA":1.40},"Pisa":{"xG":1.14,"xGA":1.82}}
+        xh = XG.get(h, {"xG":1.3,"xGA":1.3})
+        xa = XG.get(a, {"xG":1.3,"xGA":1.3})
+        avg = sum(v["xGA"] for v in XG.values()) / len(XG)
+        lh = xh["xG"] * (xa["xGA"] / avg)
+        la = xa["xG"] * (xh["xGA"] / avg)
+    else:
+        # Lambda base da 26 anni di storico
+        avg_gc = LEAGUE_AVG.get("media_gol_casa", 1.5)
+        avg_gt = LEAGUE_AVG.get("media_gol_trasferta", 1.17)
+        lh_hist = sh["forza_att_casa"] * sa["forza_dif_trasf"] * avg_gc
+        la_hist = sa["forza_att_trasf"] * sh["forza_dif_casa"] * avg_gt
+
+        # Lambda da xG stagione corrente
+        xg_h = sh.get("xG_pg", 1.3)
+        xga_h = sh.get("xGA_pg", 1.3)
+        xg_a = sa.get("xG_pg", 1.3)
+        xga_a = sa.get("xGA_pg", 1.3)
+        avg_xga = 1.38  # media xGA campionato
+        lh_xg = xg_h * (xga_a / avg_xga)
+        la_xg = xg_a * (xga_h / avg_xga)
+
+        # Blending: 65% storico + 35% xG
+        lh = 0.65 * lh_hist + 0.35 * lh_xg
+        la = 0.65 * la_hist + 0.35 * la_xg
+
+        # Correzione H2H
+        h2h_key = f"{h}_vs_{a}"
+        h2h = H2H_DATA.get(h2h_key, {})
+        if h2h.get("n_partite", 0) >= 3:
+            adv = h2h["h2h_advantage"]
+            lh *= (1.0 + 0.12 * adv)
+            la *= (1.0 - 0.12 * adv)
+
+        # Correzione forma pesata
+        fh = sh.get("forma_casa_pesata", 1.5)
+        fa = sa.get("forma_trasf_pesata", 1.5)
+        fd = fh - fa
+        ff = 1.0 + 0.10 * fd
+        lh *= ff
+        la *= (2.0 - ff)
+
+    lh = max(0.3, min(lh, 5.0))
+    la = max(0.3, min(la, 5.0))
+
+    # Calcolo Poisson con Dixon-Coles
     p1 = px = p2 = 0.0
     for i in range(11):
         for j in range(11):

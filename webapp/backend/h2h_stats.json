@@ -1,0 +1,1330 @@
+{
+  "Inter_vs_Milan": {
+    "h2h_advantage": 0.08,
+    "n_partite": 50
+  },
+  "Inter_vs_Napoli": {
+    "h2h_advantage": 0.025,
+    "n_partite": 40
+  },
+  "Inter_vs_Como": {
+    "h2h_advantage": 1.0,
+    "n_partite": 5
+  },
+  "Inter_vs_Juventus": {
+    "h2h_advantage": -0.265,
+    "n_partite": 49
+  },
+  "Inter_vs_Roma": {
+    "h2h_advantage": 0.061,
+    "n_partite": 49
+  },
+  "Inter_vs_Atalanta": {
+    "h2h_advantage": 0.391,
+    "n_partite": 46
+  },
+  "Inter_vs_Lazio": {
+    "h2h_advantage": 0.2,
+    "n_partite": 50
+  },
+  "Inter_vs_Bologna": {
+    "h2h_advantage": 0.415,
+    "n_partite": 41
+  },
+  "Inter_vs_Sassuolo": {
+    "h2h_advantage": 0.083,
+    "n_partite": 24
+  },
+  "Inter_vs_Udinese": {
+    "h2h_advantage": 0.38,
+    "n_partite": 50
+  },
+  "Inter_vs_Parma": {
+    "h2h_advantage": 0.278,
+    "n_partite": 36
+  },
+  "Inter_vs_Genoa": {
+    "h2h_advantage": 0.5,
+    "n_partite": 36
+  },
+  "Inter_vs_Torino": {
+    "h2h_advantage": 0.541,
+    "n_partite": 37
+  },
+  "Inter_vs_Cagliari": {
+    "h2h_advantage": 0.487,
+    "n_partite": 39
+  },
+  "Inter_vs_Fiorentina": {
+    "h2h_advantage": 0.375,
+    "n_partite": 48
+  },
+  "Inter_vs_Cremonese": {
+    "h2h_advantage": 1.0,
+    "n_partite": 4
+  },
+  "Inter_vs_Lecce": {
+    "h2h_advantage": 0.654,
+    "n_partite": 26
+  },
+  "Inter_vs_Verona": {
+    "h2h_advantage": 0.8,
+    "n_partite": 25
+  },
+  "Milan_vs_Inter": {
+    "h2h_advantage": -0.08,
+    "n_partite": 50
+  },
+  "Milan_vs_Napoli": {
+    "h2h_advantage": -0.103,
+    "n_partite": 39
+  },
+  "Milan_vs_Como": {
+    "h2h_advantage": 0.833,
+    "n_partite": 6
+  },
+  "Milan_vs_Juventus": {
+    "h2h_advantage": -0.245,
+    "n_partite": 49
+  },
+  "Milan_vs_Roma": {
+    "h2h_advantage": 0.039,
+    "n_partite": 51
+  },
+  "Milan_vs_Atalanta": {
+    "h2h_advantage": 0.089,
+    "n_partite": 45
+  },
+  "Milan_vs_Lazio": {
+    "h2h_advantage": 0.286,
+    "n_partite": 49
+  },
+  "Milan_vs_Bologna": {
+    "h2h_advantage": 0.524,
+    "n_partite": 42
+  },
+  "Milan_vs_Sassuolo": {
+    "h2h_advantage": 0.174,
+    "n_partite": 23
+  },
+  "Milan_vs_Udinese": {
+    "h2h_advantage": 0.245,
+    "n_partite": 49
+  },
+  "Milan_vs_Parma": {
+    "h2h_advantage": 0.421,
+    "n_partite": 38
+  },
+  "Milan_vs_Genoa": {
+    "h2h_advantage": 0.371,
+    "n_partite": 35
+  },
+  "Milan_vs_Torino": {
+    "h2h_advantage": 0.342,
+    "n_partite": 38
+  },
+  "Milan_vs_Cagliari": {
+    "h2h_advantage": 0.737,
+    "n_partite": 38
+  },
+  "Milan_vs_Fiorentina": {
+    "h2h_advantage": 0.208,
+    "n_partite": 48
+  },
+  "Milan_vs_Cremonese": {
+    "h2h_advantage": 0.0,
+    "n_partite": 4
+  },
+  "Milan_vs_Lecce": {
+    "h2h_advantage": 0.64,
+    "n_partite": 25
+  },
+  "Milan_vs_Verona": {
+    "h2h_advantage": 0.56,
+    "n_partite": 25
+  },
+  "Napoli_vs_Inter": {
+    "h2h_advantage": -0.025,
+    "n_partite": 40
+  },
+  "Napoli_vs_Milan": {
+    "h2h_advantage": 0.103,
+    "n_partite": 39
+  },
+  "Napoli_vs_Como": {
+    "h2h_advantage": 0.0,
+    "n_partite": 3
+  },
+  "Napoli_vs_Juventus": {
+    "h2h_advantage": -0.05,
+    "n_partite": 40
+  },
+  "Napoli_vs_Roma": {
+    "h2h_advantage": 0.05,
+    "n_partite": 40
+  },
+  "Napoli_vs_Atalanta": {
+    "h2h_advantage": 0.079,
+    "n_partite": 38
+  },
+  "Napoli_vs_Lazio": {
+    "h2h_advantage": 0.231,
+    "n_partite": 39
+  },
+  "Napoli_vs_Bologna": {
+    "h2h_advantage": 0.229,
+    "n_partite": 35
+  },
+  "Napoli_vs_Sassuolo": {
+    "h2h_advantage": 0.542,
+    "n_partite": 24
+  },
+  "Napoli_vs_Udinese": {
+    "h2h_advantage": 0.333,
+    "n_partite": 39
+  },
+  "Napoli_vs_Parma": {
+    "h2h_advantage": 0.24,
+    "n_partite": 25
+  },
+  "Napoli_vs_Genoa": {
+    "h2h_advantage": 0.361,
+    "n_partite": 36
+  },
+  "Napoli_vs_Torino": {
+    "h2h_advantage": 0.406,
+    "n_partite": 32
+  },
+  "Napoli_vs_Cagliari": {
+    "h2h_advantage": 0.5,
+    "n_partite": 34
+  },
+  "Napoli_vs_Fiorentina": {
+    "h2h_advantage": 0.35,
+    "n_partite": 40
+  },
+  "Napoli_vs_Cremonese": {
+    "h2h_advantage": 1.0,
+    "n_partite": 3
+  },
+  "Napoli_vs_Lecce": {
+    "h2h_advantage": 0.5,
+    "n_partite": 18
+  },
+  "Napoli_vs_Verona": {
+    "h2h_advantage": 0.5,
+    "n_partite": 24
+  },
+  "Como_vs_Inter": {
+    "h2h_advantage": -1.0,
+    "n_partite": 5
+  },
+  "Como_vs_Milan": {
+    "h2h_advantage": -0.833,
+    "n_partite": 6
+  },
+  "Como_vs_Napoli": {
+    "h2h_advantage": 0.0,
+    "n_partite": 3
+  },
+  "Como_vs_Juventus": {
+    "h2h_advantage": -0.167,
+    "n_partite": 6
+  },
+  "Como_vs_Roma": {
+    "h2h_advantage": 0.0,
+    "n_partite": 6
+  },
+  "Como_vs_Atalanta": {
+    "h2h_advantage": -0.167,
+    "n_partite": 6
+  },
+  "Como_vs_Lazio": {
+    "h2h_advantage": -0.167,
+    "n_partite": 6
+  },
+  "Como_vs_Bologna": {
+    "h2h_advantage": -0.333,
+    "n_partite": 6
+  },
+  "Como_vs_Udinese": {
+    "h2h_advantage": -0.2,
+    "n_partite": 5
+  },
+  "Como_vs_Parma": {
+    "h2h_advantage": 0.0,
+    "n_partite": 5
+  },
+  "Como_vs_Genoa": {
+    "h2h_advantage": 0.333,
+    "n_partite": 3
+  },
+  "Como_vs_Torino": {
+    "h2h_advantage": 0.5,
+    "n_partite": 6
+  },
+  "Como_vs_Cagliari": {
+    "h2h_advantage": 0.5,
+    "n_partite": 4
+  },
+  "Como_vs_Fiorentina": {
+    "h2h_advantage": 0.0,
+    "n_partite": 4
+  },
+  "Como_vs_Lecce": {
+    "h2h_advantage": 1.0,
+    "n_partite": 4
+  },
+  "Como_vs_Verona": {
+    "h2h_advantage": 0.667,
+    "n_partite": 3
+  },
+  "Juventus_vs_Inter": {
+    "h2h_advantage": 0.265,
+    "n_partite": 49
+  },
+  "Juventus_vs_Milan": {
+    "h2h_advantage": 0.245,
+    "n_partite": 49
+  },
+  "Juventus_vs_Napoli": {
+    "h2h_advantage": 0.05,
+    "n_partite": 40
+  },
+  "Juventus_vs_Como": {
+    "h2h_advantage": 0.167,
+    "n_partite": 6
+  },
+  "Juventus_vs_Roma": {
+    "h2h_advantage": 0.327,
+    "n_partite": 49
+  },
+  "Juventus_vs_Atalanta": {
+    "h2h_advantage": 0.476,
+    "n_partite": 42
+  },
+  "Juventus_vs_Lazio": {
+    "h2h_advantage": 0.408,
+    "n_partite": 49
+  },
+  "Juventus_vs_Bologna": {
+    "h2h_advantage": 0.619,
+    "n_partite": 42
+  },
+  "Juventus_vs_Sassuolo": {
+    "h2h_advantage": 0.5,
+    "n_partite": 24
+  },
+  "Juventus_vs_Udinese": {
+    "h2h_advantage": 0.571,
+    "n_partite": 49
+  },
+  "Juventus_vs_Parma": {
+    "h2h_advantage": 0.371,
+    "n_partite": 35
+  },
+  "Juventus_vs_Genoa": {
+    "h2h_advantage": 0.514,
+    "n_partite": 35
+  },
+  "Juventus_vs_Torino": {
+    "h2h_advantage": 0.657,
+    "n_partite": 35
+  },
+  "Juventus_vs_Cagliari": {
+    "h2h_advantage": 0.595,
+    "n_partite": 37
+  },
+  "Juventus_vs_Fiorentina": {
+    "h2h_advantage": 0.386,
+    "n_partite": 44
+  },
+  "Juventus_vs_Cremonese": {
+    "h2h_advantage": 1.0,
+    "n_partite": 4
+  },
+  "Juventus_vs_Lecce": {
+    "h2h_advantage": 0.542,
+    "n_partite": 24
+  },
+  "Juventus_vs_Verona": {
+    "h2h_advantage": 0.48,
+    "n_partite": 25
+  },
+  "Roma_vs_Inter": {
+    "h2h_advantage": -0.061,
+    "n_partite": 49
+  },
+  "Roma_vs_Milan": {
+    "h2h_advantage": -0.039,
+    "n_partite": 51
+  },
+  "Roma_vs_Napoli": {
+    "h2h_advantage": -0.05,
+    "n_partite": 40
+  },
+  "Roma_vs_Como": {
+    "h2h_advantage": 0.0,
+    "n_partite": 6
+  },
+  "Roma_vs_Juventus": {
+    "h2h_advantage": -0.327,
+    "n_partite": 49
+  },
+  "Roma_vs_Atalanta": {
+    "h2h_advantage": 0.023,
+    "n_partite": 44
+  },
+  "Roma_vs_Lazio": {
+    "h2h_advantage": 0.18,
+    "n_partite": 50
+  },
+  "Roma_vs_Bologna": {
+    "h2h_advantage": 0.268,
+    "n_partite": 41
+  },
+  "Roma_vs_Sassuolo": {
+    "h2h_advantage": 0.458,
+    "n_partite": 24
+  },
+  "Roma_vs_Udinese": {
+    "h2h_advantage": 0.46,
+    "n_partite": 50
+  },
+  "Roma_vs_Parma": {
+    "h2h_advantage": 0.629,
+    "n_partite": 35
+  },
+  "Roma_vs_Genoa": {
+    "h2h_advantage": 0.472,
+    "n_partite": 36
+  },
+  "Roma_vs_Torino": {
+    "h2h_advantage": 0.579,
+    "n_partite": 38
+  },
+  "Roma_vs_Cagliari": {
+    "h2h_advantage": 0.375,
+    "n_partite": 40
+  },
+  "Roma_vs_Fiorentina": {
+    "h2h_advantage": 0.37,
+    "n_partite": 46
+  },
+  "Roma_vs_Cremonese": {
+    "h2h_advantage": 0.5,
+    "n_partite": 4
+  },
+  "Roma_vs_Lecce": {
+    "h2h_advantage": 0.68,
+    "n_partite": 25
+  },
+  "Roma_vs_Verona": {
+    "h2h_advantage": 0.52,
+    "n_partite": 25
+  },
+  "Atalanta_vs_Inter": {
+    "h2h_advantage": -0.391,
+    "n_partite": 46
+  },
+  "Atalanta_vs_Milan": {
+    "h2h_advantage": -0.089,
+    "n_partite": 45
+  },
+  "Atalanta_vs_Napoli": {
+    "h2h_advantage": -0.079,
+    "n_partite": 38
+  },
+  "Atalanta_vs_Como": {
+    "h2h_advantage": 0.167,
+    "n_partite": 6
+  },
+  "Atalanta_vs_Juventus": {
+    "h2h_advantage": -0.476,
+    "n_partite": 42
+  },
+  "Atalanta_vs_Roma": {
+    "h2h_advantage": -0.023,
+    "n_partite": 44
+  },
+  "Atalanta_vs_Lazio": {
+    "h2h_advantage": -0.089,
+    "n_partite": 45
+  },
+  "Atalanta_vs_Bologna": {
+    "h2h_advantage": 0.237,
+    "n_partite": 38
+  },
+  "Atalanta_vs_Sassuolo": {
+    "h2h_advantage": 0.292,
+    "n_partite": 24
+  },
+  "Atalanta_vs_Udinese": {
+    "h2h_advantage": 0.022,
+    "n_partite": 46
+  },
+  "Atalanta_vs_Parma": {
+    "h2h_advantage": 0.219,
+    "n_partite": 32
+  },
+  "Atalanta_vs_Genoa": {
+    "h2h_advantage": 0.242,
+    "n_partite": 33
+  },
+  "Atalanta_vs_Torino": {
+    "h2h_advantage": 0.026,
+    "n_partite": 38
+  },
+  "Atalanta_vs_Cagliari": {
+    "h2h_advantage": 0.118,
+    "n_partite": 34
+  },
+  "Atalanta_vs_Fiorentina": {
+    "h2h_advantage": -0.186,
+    "n_partite": 43
+  },
+  "Atalanta_vs_Cremonese": {
+    "h2h_advantage": 0.5,
+    "n_partite": 4
+  },
+  "Atalanta_vs_Lecce": {
+    "h2h_advantage": 0.5,
+    "n_partite": 18
+  },
+  "Atalanta_vs_Verona": {
+    "h2h_advantage": 0.154,
+    "n_partite": 26
+  },
+  "Lazio_vs_Inter": {
+    "h2h_advantage": -0.2,
+    "n_partite": 50
+  },
+  "Lazio_vs_Milan": {
+    "h2h_advantage": -0.286,
+    "n_partite": 49
+  },
+  "Lazio_vs_Napoli": {
+    "h2h_advantage": -0.231,
+    "n_partite": 39
+  },
+  "Lazio_vs_Como": {
+    "h2h_advantage": 0.167,
+    "n_partite": 6
+  },
+  "Lazio_vs_Juventus": {
+    "h2h_advantage": -0.408,
+    "n_partite": 49
+  },
+  "Lazio_vs_Roma": {
+    "h2h_advantage": -0.18,
+    "n_partite": 50
+  },
+  "Lazio_vs_Atalanta": {
+    "h2h_advantage": 0.089,
+    "n_partite": 45
+  },
+  "Lazio_vs_Bologna": {
+    "h2h_advantage": 0.209,
+    "n_partite": 43
+  },
+  "Lazio_vs_Sassuolo": {
+    "h2h_advantage": 0.333,
+    "n_partite": 24
+  },
+  "Lazio_vs_Udinese": {
+    "h2h_advantage": 0.235,
+    "n_partite": 51
+  },
+  "Lazio_vs_Parma": {
+    "h2h_advantage": 0.306,
+    "n_partite": 36
+  },
+  "Lazio_vs_Genoa": {
+    "h2h_advantage": 0.194,
+    "n_partite": 36
+  },
+  "Lazio_vs_Torino": {
+    "h2h_advantage": 0.211,
+    "n_partite": 38
+  },
+  "Lazio_vs_Cagliari": {
+    "h2h_advantage": 0.5,
+    "n_partite": 40
+  },
+  "Lazio_vs_Fiorentina": {
+    "h2h_advantage": 0.277,
+    "n_partite": 47
+  },
+  "Lazio_vs_Cremonese": {
+    "h2h_advantage": 0.667,
+    "n_partite": 3
+  },
+  "Lazio_vs_Lecce": {
+    "h2h_advantage": 0.231,
+    "n_partite": 26
+  },
+  "Lazio_vs_Verona": {
+    "h2h_advantage": 0.385,
+    "n_partite": 26
+  },
+  "Bologna_vs_Inter": {
+    "h2h_advantage": -0.415,
+    "n_partite": 41
+  },
+  "Bologna_vs_Milan": {
+    "h2h_advantage": -0.524,
+    "n_partite": 42
+  },
+  "Bologna_vs_Napoli": {
+    "h2h_advantage": -0.229,
+    "n_partite": 35
+  },
+  "Bologna_vs_Como": {
+    "h2h_advantage": 0.333,
+    "n_partite": 6
+  },
+  "Bologna_vs_Juventus": {
+    "h2h_advantage": -0.619,
+    "n_partite": 42
+  },
+  "Bologna_vs_Roma": {
+    "h2h_advantage": -0.268,
+    "n_partite": 41
+  },
+  "Bologna_vs_Atalanta": {
+    "h2h_advantage": -0.237,
+    "n_partite": 38
+  },
+  "Bologna_vs_Lazio": {
+    "h2h_advantage": -0.209,
+    "n_partite": 43
+  },
+  "Bologna_vs_Sassuolo": {
+    "h2h_advantage": 0.136,
+    "n_partite": 22
+  },
+  "Bologna_vs_Udinese": {
+    "h2h_advantage": -0.047,
+    "n_partite": 43
+  },
+  "Bologna_vs_Parma": {
+    "h2h_advantage": 0.207,
+    "n_partite": 29
+  },
+  "Bologna_vs_Genoa": {
+    "h2h_advantage": -0.062,
+    "n_partite": 32
+  },
+  "Bologna_vs_Torino": {
+    "h2h_advantage": 0.0,
+    "n_partite": 32
+  },
+  "Bologna_vs_Cagliari": {
+    "h2h_advantage": 0.033,
+    "n_partite": 30
+  },
+  "Bologna_vs_Fiorentina": {
+    "h2h_advantage": -0.25,
+    "n_partite": 40
+  },
+  "Bologna_vs_Cremonese": {
+    "h2h_advantage": 0.0,
+    "n_partite": 3
+  },
+  "Bologna_vs_Lecce": {
+    "h2h_advantage": 0.391,
+    "n_partite": 23
+  },
+  "Bologna_vs_Verona": {
+    "h2h_advantage": 0.167,
+    "n_partite": 24
+  },
+  "Sassuolo_vs_Inter": {
+    "h2h_advantage": -0.083,
+    "n_partite": 24
+  },
+  "Sassuolo_vs_Milan": {
+    "h2h_advantage": -0.174,
+    "n_partite": 23
+  },
+  "Sassuolo_vs_Napoli": {
+    "h2h_advantage": -0.542,
+    "n_partite": 24
+  },
+  "Sassuolo_vs_Juventus": {
+    "h2h_advantage": -0.5,
+    "n_partite": 24
+  },
+  "Sassuolo_vs_Roma": {
+    "h2h_advantage": -0.458,
+    "n_partite": 24
+  },
+  "Sassuolo_vs_Atalanta": {
+    "h2h_advantage": -0.292,
+    "n_partite": 24
+  },
+  "Sassuolo_vs_Lazio": {
+    "h2h_advantage": -0.333,
+    "n_partite": 24
+  },
+  "Sassuolo_vs_Bologna": {
+    "h2h_advantage": -0.136,
+    "n_partite": 22
+  },
+  "Sassuolo_vs_Udinese": {
+    "h2h_advantage": -0.083,
+    "n_partite": 24
+  },
+  "Sassuolo_vs_Parma": {
+    "h2h_advantage": -0.182,
+    "n_partite": 11
+  },
+  "Sassuolo_vs_Genoa": {
+    "h2h_advantage": 0.0,
+    "n_partite": 21
+  },
+  "Sassuolo_vs_Torino": {
+    "h2h_advantage": -0.261,
+    "n_partite": 23
+  },
+  "Sassuolo_vs_Cagliari": {
+    "h2h_advantage": -0.053,
+    "n_partite": 19
+  },
+  "Sassuolo_vs_Fiorentina": {
+    "h2h_advantage": -0.043,
+    "n_partite": 23
+  },
+  "Sassuolo_vs_Cremonese": {
+    "h2h_advantage": 0.25,
+    "n_partite": 4
+  },
+  "Sassuolo_vs_Lecce": {
+    "h2h_advantage": 0.286,
+    "n_partite": 7
+  },
+  "Sassuolo_vs_Verona": {
+    "h2h_advantage": 0.2,
+    "n_partite": 20
+  },
+  "Udinese_vs_Inter": {
+    "h2h_advantage": -0.38,
+    "n_partite": 50
+  },
+  "Udinese_vs_Milan": {
+    "h2h_advantage": -0.245,
+    "n_partite": 49
+  },
+  "Udinese_vs_Napoli": {
+    "h2h_advantage": -0.333,
+    "n_partite": 39
+  },
+  "Udinese_vs_Como": {
+    "h2h_advantage": 0.2,
+    "n_partite": 5
+  },
+  "Udinese_vs_Juventus": {
+    "h2h_advantage": -0.571,
+    "n_partite": 49
+  },
+  "Udinese_vs_Roma": {
+    "h2h_advantage": -0.46,
+    "n_partite": 50
+  },
+  "Udinese_vs_Atalanta": {
+    "h2h_advantage": -0.022,
+    "n_partite": 46
+  },
+  "Udinese_vs_Lazio": {
+    "h2h_advantage": -0.235,
+    "n_partite": 51
+  },
+  "Udinese_vs_Bologna": {
+    "h2h_advantage": 0.047,
+    "n_partite": 43
+  },
+  "Udinese_vs_Sassuolo": {
+    "h2h_advantage": 0.083,
+    "n_partite": 24
+  },
+  "Udinese_vs_Parma": {
+    "h2h_advantage": 0.0,
+    "n_partite": 36
+  },
+  "Udinese_vs_Genoa": {
+    "h2h_advantage": -0.056,
+    "n_partite": 36
+  },
+  "Udinese_vs_Torino": {
+    "h2h_advantage": -0.081,
+    "n_partite": 37
+  },
+  "Udinese_vs_Cagliari": {
+    "h2h_advantage": 0.211,
+    "n_partite": 38
+  },
+  "Udinese_vs_Fiorentina": {
+    "h2h_advantage": -0.234,
+    "n_partite": 47
+  },
+  "Udinese_vs_Cremonese": {
+    "h2h_advantage": 0.333,
+    "n_partite": 3
+  },
+  "Udinese_vs_Lecce": {
+    "h2h_advantage": 0.208,
+    "n_partite": 24
+  },
+  "Udinese_vs_Verona": {
+    "h2h_advantage": 0.077,
+    "n_partite": 26
+  },
+  "Parma_vs_Inter": {
+    "h2h_advantage": -0.278,
+    "n_partite": 36
+  },
+  "Parma_vs_Milan": {
+    "h2h_advantage": -0.421,
+    "n_partite": 38
+  },
+  "Parma_vs_Napoli": {
+    "h2h_advantage": -0.24,
+    "n_partite": 25
+  },
+  "Parma_vs_Como": {
+    "h2h_advantage": 0.0,
+    "n_partite": 5
+  },
+  "Parma_vs_Juventus": {
+    "h2h_advantage": -0.371,
+    "n_partite": 35
+  },
+  "Parma_vs_Roma": {
+    "h2h_advantage": -0.629,
+    "n_partite": 35
+  },
+  "Parma_vs_Atalanta": {
+    "h2h_advantage": -0.219,
+    "n_partite": 32
+  },
+  "Parma_vs_Lazio": {
+    "h2h_advantage": -0.306,
+    "n_partite": 36
+  },
+  "Parma_vs_Bologna": {
+    "h2h_advantage": -0.207,
+    "n_partite": 29
+  },
+  "Parma_vs_Sassuolo": {
+    "h2h_advantage": 0.182,
+    "n_partite": 11
+  },
+  "Parma_vs_Udinese": {
+    "h2h_advantage": 0.0,
+    "n_partite": 36
+  },
+  "Parma_vs_Genoa": {
+    "h2h_advantage": -0.083,
+    "n_partite": 24
+  },
+  "Parma_vs_Torino": {
+    "h2h_advantage": 0.125,
+    "n_partite": 24
+  },
+  "Parma_vs_Cagliari": {
+    "h2h_advantage": -0.2,
+    "n_partite": 30
+  },
+  "Parma_vs_Fiorentina": {
+    "h2h_advantage": -0.03,
+    "n_partite": 33
+  },
+  "Parma_vs_Lecce": {
+    "h2h_advantage": 0.278,
+    "n_partite": 18
+  },
+  "Parma_vs_Verona": {
+    "h2h_advantage": -0.188,
+    "n_partite": 16
+  },
+  "Genoa_vs_Inter": {
+    "h2h_advantage": -0.5,
+    "n_partite": 36
+  },
+  "Genoa_vs_Milan": {
+    "h2h_advantage": -0.371,
+    "n_partite": 35
+  },
+  "Genoa_vs_Napoli": {
+    "h2h_advantage": -0.361,
+    "n_partite": 36
+  },
+  "Genoa_vs_Como": {
+    "h2h_advantage": -0.333,
+    "n_partite": 3
+  },
+  "Genoa_vs_Juventus": {
+    "h2h_advantage": -0.514,
+    "n_partite": 35
+  },
+  "Genoa_vs_Roma": {
+    "h2h_advantage": -0.472,
+    "n_partite": 36
+  },
+  "Genoa_vs_Atalanta": {
+    "h2h_advantage": -0.242,
+    "n_partite": 33
+  },
+  "Genoa_vs_Lazio": {
+    "h2h_advantage": -0.194,
+    "n_partite": 36
+  },
+  "Genoa_vs_Bologna": {
+    "h2h_advantage": 0.062,
+    "n_partite": 32
+  },
+  "Genoa_vs_Sassuolo": {
+    "h2h_advantage": 0.0,
+    "n_partite": 21
+  },
+  "Genoa_vs_Udinese": {
+    "h2h_advantage": 0.056,
+    "n_partite": 36
+  },
+  "Genoa_vs_Parma": {
+    "h2h_advantage": 0.083,
+    "n_partite": 24
+  },
+  "Genoa_vs_Torino": {
+    "h2h_advantage": -0.133,
+    "n_partite": 30
+  },
+  "Genoa_vs_Cagliari": {
+    "h2h_advantage": 0.206,
+    "n_partite": 34
+  },
+  "Genoa_vs_Fiorentina": {
+    "h2h_advantage": -0.343,
+    "n_partite": 35
+  },
+  "Genoa_vs_Lecce": {
+    "h2h_advantage": 0.462,
+    "n_partite": 13
+  },
+  "Genoa_vs_Verona": {
+    "h2h_advantage": 0.3,
+    "n_partite": 20
+  },
+  "Torino_vs_Inter": {
+    "h2h_advantage": -0.541,
+    "n_partite": 37
+  },
+  "Torino_vs_Milan": {
+    "h2h_advantage": -0.342,
+    "n_partite": 38
+  },
+  "Torino_vs_Napoli": {
+    "h2h_advantage": -0.406,
+    "n_partite": 32
+  },
+  "Torino_vs_Como": {
+    "h2h_advantage": -0.5,
+    "n_partite": 6
+  },
+  "Torino_vs_Juventus": {
+    "h2h_advantage": -0.657,
+    "n_partite": 35
+  },
+  "Torino_vs_Roma": {
+    "h2h_advantage": -0.579,
+    "n_partite": 38
+  },
+  "Torino_vs_Atalanta": {
+    "h2h_advantage": -0.026,
+    "n_partite": 38
+  },
+  "Torino_vs_Lazio": {
+    "h2h_advantage": -0.211,
+    "n_partite": 38
+  },
+  "Torino_vs_Bologna": {
+    "h2h_advantage": 0.0,
+    "n_partite": 32
+  },
+  "Torino_vs_Sassuolo": {
+    "h2h_advantage": 0.261,
+    "n_partite": 23
+  },
+  "Torino_vs_Udinese": {
+    "h2h_advantage": 0.081,
+    "n_partite": 37
+  },
+  "Torino_vs_Parma": {
+    "h2h_advantage": -0.125,
+    "n_partite": 24
+  },
+  "Torino_vs_Genoa": {
+    "h2h_advantage": 0.133,
+    "n_partite": 30
+  },
+  "Torino_vs_Cagliari": {
+    "h2h_advantage": 0.034,
+    "n_partite": 29
+  },
+  "Torino_vs_Fiorentina": {
+    "h2h_advantage": -0.25,
+    "n_partite": 36
+  },
+  "Torino_vs_Cremonese": {
+    "h2h_advantage": 0.667,
+    "n_partite": 3
+  },
+  "Torino_vs_Lecce": {
+    "h2h_advantage": 0.143,
+    "n_partite": 14
+  },
+  "Torino_vs_Verona": {
+    "h2h_advantage": 0.348,
+    "n_partite": 23
+  },
+  "Cagliari_vs_Inter": {
+    "h2h_advantage": -0.487,
+    "n_partite": 39
+  },
+  "Cagliari_vs_Milan": {
+    "h2h_advantage": -0.737,
+    "n_partite": 38
+  },
+  "Cagliari_vs_Napoli": {
+    "h2h_advantage": -0.5,
+    "n_partite": 34
+  },
+  "Cagliari_vs_Como": {
+    "h2h_advantage": -0.5,
+    "n_partite": 4
+  },
+  "Cagliari_vs_Juventus": {
+    "h2h_advantage": -0.595,
+    "n_partite": 37
+  },
+  "Cagliari_vs_Roma": {
+    "h2h_advantage": -0.375,
+    "n_partite": 40
+  },
+  "Cagliari_vs_Atalanta": {
+    "h2h_advantage": -0.118,
+    "n_partite": 34
+  },
+  "Cagliari_vs_Lazio": {
+    "h2h_advantage": -0.5,
+    "n_partite": 40
+  },
+  "Cagliari_vs_Bologna": {
+    "h2h_advantage": -0.033,
+    "n_partite": 30
+  },
+  "Cagliari_vs_Sassuolo": {
+    "h2h_advantage": 0.053,
+    "n_partite": 19
+  },
+  "Cagliari_vs_Udinese": {
+    "h2h_advantage": -0.211,
+    "n_partite": 38
+  },
+  "Cagliari_vs_Parma": {
+    "h2h_advantage": 0.2,
+    "n_partite": 30
+  },
+  "Cagliari_vs_Genoa": {
+    "h2h_advantage": -0.206,
+    "n_partite": 34
+  },
+  "Cagliari_vs_Torino": {
+    "h2h_advantage": -0.034,
+    "n_partite": 29
+  },
+  "Cagliari_vs_Fiorentina": {
+    "h2h_advantage": -0.282,
+    "n_partite": 39
+  },
+  "Cagliari_vs_Lecce": {
+    "h2h_advantage": -0.059,
+    "n_partite": 17
+  },
+  "Cagliari_vs_Verona": {
+    "h2h_advantage": -0.167,
+    "n_partite": 18
+  },
+  "Fiorentina_vs_Inter": {
+    "h2h_advantage": -0.375,
+    "n_partite": 48
+  },
+  "Fiorentina_vs_Milan": {
+    "h2h_advantage": -0.208,
+    "n_partite": 48
+  },
+  "Fiorentina_vs_Napoli": {
+    "h2h_advantage": -0.35,
+    "n_partite": 40
+  },
+  "Fiorentina_vs_Como": {
+    "h2h_advantage": 0.0,
+    "n_partite": 4
+  },
+  "Fiorentina_vs_Juventus": {
+    "h2h_advantage": -0.386,
+    "n_partite": 44
+  },
+  "Fiorentina_vs_Roma": {
+    "h2h_advantage": -0.37,
+    "n_partite": 46
+  },
+  "Fiorentina_vs_Atalanta": {
+    "h2h_advantage": 0.186,
+    "n_partite": 43
+  },
+  "Fiorentina_vs_Lazio": {
+    "h2h_advantage": -0.277,
+    "n_partite": 47
+  },
+  "Fiorentina_vs_Bologna": {
+    "h2h_advantage": 0.25,
+    "n_partite": 40
+  },
+  "Fiorentina_vs_Sassuolo": {
+    "h2h_advantage": 0.043,
+    "n_partite": 23
+  },
+  "Fiorentina_vs_Udinese": {
+    "h2h_advantage": 0.234,
+    "n_partite": 47
+  },
+  "Fiorentina_vs_Parma": {
+    "h2h_advantage": 0.03,
+    "n_partite": 33
+  },
+  "Fiorentina_vs_Genoa": {
+    "h2h_advantage": 0.343,
+    "n_partite": 35
+  },
+  "Fiorentina_vs_Torino": {
+    "h2h_advantage": 0.25,
+    "n_partite": 36
+  },
+  "Fiorentina_vs_Cagliari": {
+    "h2h_advantage": 0.282,
+    "n_partite": 39
+  },
+  "Fiorentina_vs_Cremonese": {
+    "h2h_advantage": 1.0,
+    "n_partite": 4
+  },
+  "Fiorentina_vs_Lecce": {
+    "h2h_advantage": 0.043,
+    "n_partite": 23
+  },
+  "Fiorentina_vs_Verona": {
+    "h2h_advantage": 0.16,
+    "n_partite": 25
+  },
+  "Cremonese_vs_Inter": {
+    "h2h_advantage": -1.0,
+    "n_partite": 4
+  },
+  "Cremonese_vs_Milan": {
+    "h2h_advantage": 0.0,
+    "n_partite": 4
+  },
+  "Cremonese_vs_Napoli": {
+    "h2h_advantage": -1.0,
+    "n_partite": 3
+  },
+  "Cremonese_vs_Juventus": {
+    "h2h_advantage": -1.0,
+    "n_partite": 4
+  },
+  "Cremonese_vs_Roma": {
+    "h2h_advantage": -0.5,
+    "n_partite": 4
+  },
+  "Cremonese_vs_Atalanta": {
+    "h2h_advantage": -0.5,
+    "n_partite": 4
+  },
+  "Cremonese_vs_Lazio": {
+    "h2h_advantage": -0.667,
+    "n_partite": 3
+  },
+  "Cremonese_vs_Bologna": {
+    "h2h_advantage": 0.0,
+    "n_partite": 3
+  },
+  "Cremonese_vs_Sassuolo": {
+    "h2h_advantage": -0.25,
+    "n_partite": 4
+  },
+  "Cremonese_vs_Udinese": {
+    "h2h_advantage": -0.333,
+    "n_partite": 3
+  },
+  "Cremonese_vs_Torino": {
+    "h2h_advantage": -0.667,
+    "n_partite": 3
+  },
+  "Cremonese_vs_Fiorentina": {
+    "h2h_advantage": -1.0,
+    "n_partite": 4
+  },
+  "Cremonese_vs_Lecce": {
+    "h2h_advantage": -0.25,
+    "n_partite": 4
+  },
+  "Cremonese_vs_Verona": {
+    "h2h_advantage": -0.25,
+    "n_partite": 4
+  },
+  "Lecce_vs_Inter": {
+    "h2h_advantage": -0.654,
+    "n_partite": 26
+  },
+  "Lecce_vs_Milan": {
+    "h2h_advantage": -0.64,
+    "n_partite": 25
+  },
+  "Lecce_vs_Napoli": {
+    "h2h_advantage": -0.5,
+    "n_partite": 18
+  },
+  "Lecce_vs_Como": {
+    "h2h_advantage": -1.0,
+    "n_partite": 4
+  },
+  "Lecce_vs_Juventus": {
+    "h2h_advantage": -0.542,
+    "n_partite": 24
+  },
+  "Lecce_vs_Roma": {
+    "h2h_advantage": -0.68,
+    "n_partite": 25
+  },
+  "Lecce_vs_Atalanta": {
+    "h2h_advantage": -0.5,
+    "n_partite": 18
+  },
+  "Lecce_vs_Lazio": {
+    "h2h_advantage": -0.231,
+    "n_partite": 26
+  },
+  "Lecce_vs_Bologna": {
+    "h2h_advantage": -0.391,
+    "n_partite": 23
+  },
+  "Lecce_vs_Sassuolo": {
+    "h2h_advantage": -0.286,
+    "n_partite": 7
+  },
+  "Lecce_vs_Udinese": {
+    "h2h_advantage": -0.208,
+    "n_partite": 24
+  },
+  "Lecce_vs_Parma": {
+    "h2h_advantage": -0.278,
+    "n_partite": 18
+  },
+  "Lecce_vs_Genoa": {
+    "h2h_advantage": -0.462,
+    "n_partite": 13
+  },
+  "Lecce_vs_Torino": {
+    "h2h_advantage": -0.143,
+    "n_partite": 14
+  },
+  "Lecce_vs_Cagliari": {
+    "h2h_advantage": 0.059,
+    "n_partite": 17
+  },
+  "Lecce_vs_Fiorentina": {
+    "h2h_advantage": -0.043,
+    "n_partite": 23
+  },
+  "Lecce_vs_Cremonese": {
+    "h2h_advantage": 0.25,
+    "n_partite": 4
+  },
+  "Lecce_vs_Verona": {
+    "h2h_advantage": -0.308,
+    "n_partite": 13
+  },
+  "Verona_vs_Inter": {
+    "h2h_advantage": -0.8,
+    "n_partite": 25
+  },
+  "Verona_vs_Milan": {
+    "h2h_advantage": -0.56,
+    "n_partite": 25
+  },
+  "Verona_vs_Napoli": {
+    "h2h_advantage": -0.5,
+    "n_partite": 24
+  },
+  "Verona_vs_Como": {
+    "h2h_advantage": -0.667,
+    "n_partite": 3
+  },
+  "Verona_vs_Juventus": {
+    "h2h_advantage": -0.48,
+    "n_partite": 25
+  },
+  "Verona_vs_Roma": {
+    "h2h_advantage": -0.52,
+    "n_partite": 25
+  },
+  "Verona_vs_Atalanta": {
+    "h2h_advantage": -0.154,
+    "n_partite": 26
+  },
+  "Verona_vs_Lazio": {
+    "h2h_advantage": -0.385,
+    "n_partite": 26
+  },
+  "Verona_vs_Bologna": {
+    "h2h_advantage": -0.167,
+    "n_partite": 24
+  },
+  "Verona_vs_Sassuolo": {
+    "h2h_advantage": -0.2,
+    "n_partite": 20
+  },
+  "Verona_vs_Udinese": {
+    "h2h_advantage": -0.077,
+    "n_partite": 26
+  },
+  "Verona_vs_Parma": {
+    "h2h_advantage": 0.188,
+    "n_partite": 16
+  },
+  "Verona_vs_Genoa": {
+    "h2h_advantage": -0.3,
+    "n_partite": 20
+  },
+  "Verona_vs_Torino": {
+    "h2h_advantage": -0.348,
+    "n_partite": 23
+  },
+  "Verona_vs_Cagliari": {
+    "h2h_advantage": 0.167,
+    "n_partite": 18
+  },
+  "Verona_vs_Fiorentina": {
+    "h2h_advantage": -0.16,
+    "n_partite": 25
+  },
+  "Verona_vs_Cremonese": {
+    "h2h_advantage": 0.25,
+    "n_partite": 4
+  },
+  "Verona_vs_Lecce": {
+    "h2h_advantage": 0.308,
+    "n_partite": 13
+  }
+}
