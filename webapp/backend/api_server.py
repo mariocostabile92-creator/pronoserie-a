@@ -704,8 +704,8 @@ async def schedina_del_giorno():
                     "prob": max(raw["prob_1"], raw["prob_x"], raw["prob_2"]),
                     "quota": raw.get(f"quota_{raw['suggerimento'].lower().replace('x','x')}", 0),
                     "confidence": raw["confidence"],
-                    "over_under": "Over 2.5" if raw.get("over_25",0) > 55 else "Under 2.5",
-                    "goal": "Goal Si" if raw.get("goal_si",0) > 55 else "Goal No",
+                    "over_under": ("Over 2.5 " + str(raw.get("over_25",50)) + "%") if raw.get("over_25",0) > 50 else ("Under 2.5 " + str(raw.get("under_25",50)) + "%"),
+                    "goal": ("Goal Si " + str(raw.get("goal_si",50)) + "%") if raw.get("goal_si",0) > 50 else ("Goal No " + str(raw.get("goal_no",50)) + "%"),
                 })
         except Exception:
             continue
