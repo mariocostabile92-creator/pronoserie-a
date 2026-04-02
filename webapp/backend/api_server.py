@@ -1,6 +1,7 @@
 """
-api_server.py - VERSIONE STABILE PRODUZIONE
-Fix calendario + debug + compatibilità frontend
+api_server.py - VERSIONE FINALE STABILE
+Compatibile con frontend PronoSerie A
+Fix calendario + fallback + debug + Railway ready
 """
 
 import sys
@@ -16,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 
 # ─────────────────────────────
-# IMPORT MOTORE
+# IMPORT MOTORE (SAFE)
 # ─────────────────────────────
 try:
     from data_loader import load_all_data
@@ -39,7 +40,7 @@ from api_payments import router as payments_router
 # ─────────────────────────────
 # APP
 # ─────────────────────────────
-app = FastAPI(title="Pronostici API", version="FINAL")
+app = FastAPI(title="Pronostici API", version="2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -51,6 +52,9 @@ app.add_middleware(
 
 app.include_router(payments_router)
 
+# ─────────────────────────────
+# GLOBAL
+# ─────────────────────────────
 _df = None
 LIMITE_FREE = 2
 
@@ -61,20 +65,24 @@ LIMITE_FREE = 2
 async def startup():
     global _df
 
-    print("🚀 AVVIO SERVER...")
+    print("\n🚀 AVVIO SERVER PRONOSERIE A\n")
 
+    # DB
     try:
         init_db()
-        print("✅ DB OK")
+        print("✅ DATABASE OK")
     except Exception as e:
-        print("❌ DB ERROR:", e)
+        print("❌ ERRORE DATABASE:", e)
 
+    # DATI
     if MOTORE_DISPONIBILE:
         try:
             _df = load_all_data()
-            print("✅ DATI CARICATI")
+            print("✅ DATI CARICATI:", len(_df))
         except Exception as e:
             print("❌ ERRORE DATI:", e)
+    else:
+        print("⚠️ MOTORE NON DISPONIBILE")
 
 # ─────────────────────────────
 # FRONTEND
@@ -98,6 +106,7 @@ def check_limit(user):
         return
 
     calls = count_daily_calls(user["id"])
+
     if calls >= LIMITE_FREE:
         raise HTTPException(429, "Limite giornaliero raggiunto")
 
@@ -110,8 +119,9 @@ def genera_pronostico(home, away):
             aw = get_team_stats(_df, away, opponent=home)
             return get_prediction(hs, aw, df=_df)
         except Exception as e:
-            print("Errore predizione:", e)
+            print("❌ ERRORE PREDICTOR:", e)
 
+    # fallback (non crasha mai)
     return {
         "prob_1": 34,
         "prob_x": 33,
@@ -130,7 +140,7 @@ def genera_pronostico(home, away):
 # ─────────────────────────────
 @app.post("/api/auth/register")
 async def register(data: dict):
-    email = data["email"].lower()
+    email = data["email"].lower().strip()
 
     if get_user_by_email(email):
         raise HTTPException(409, "Email già registrata")
@@ -142,7 +152,7 @@ async def register(data: dict):
 
 @app.post("/api/auth/login")
 async def login(data: dict):
-    user = get_user_by_email(data["email"].lower())
+    user = get_user_by_email(data["email"].lower().strip())
 
     if not user or not verify_password(data["password"], user["password_hash"]):
         raise HTTPException(401, "Credenziali errate")
@@ -157,6 +167,7 @@ async def login(data: dict):
 @app.get("/api/pronostico/{home}/{away}")
 async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_optional_user)):
     check_limit(user)
+
     raw = genera_pronostico(home, away)
 
     return {
@@ -181,7 +192,7 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
     }
 
 # ─────────────────────────────
-# CALENDARIO (SUPER STABILE)
+# CALENDARIO (FIX DEFINITIVO)
 # ─────────────────────────────
 @app.get("/api/calendario")
 async def calendario():
@@ -191,7 +202,7 @@ async def calendario():
 
         cal = get_calendario_rimanente()
 
-        print("DEBUG calendario:", cal)
+        print("📅 DEBUG CALENDARIO:", cal)
 
         giornate = []
 
@@ -203,8 +214,8 @@ async def calendario():
             }
 
             for p in g.get("partite", []):
-                home = p.get("home") or p.get("casa")
-                away = p.get("away") or p.get("trasferta")
+                home = p.get("home") or p.get("casa") or p.get("team_home")
+                away = p.get("away") or p.get("trasferta") or p.get("team_away")
 
                 if home and away:
                     giornata["partite"].append({
@@ -228,7 +239,7 @@ async def classifica():
     try:
         return get_classifica_reale()
     except Exception as e:
-        print("Errore classifica:", e)
+        print("❌ ERRORE CLASSIFICA:", e)
         return {}
 
 # ─────────────────────────────
@@ -239,22 +250,22 @@ async def marcatori():
     try:
         return get_marcatori()
     except Exception as e:
-        print("Errore marcatori:", e)
+        print("❌ ERRORE MARCATORI:", e)
         return []
 
 # ─────────────────────────────
-# HEALTH
+# HEALTH CHECK
 # ─────────────────────────────
 @app.get("/api/health")
 async def health():
     return {
         "status": "ok",
         "motore": MOTORE_DISPONIBILE,
-        "dati": _df is not None
+        "dati_caricati": _df is not None
     }
 
 # ─────────────────────────────
-# RUN
+# RUN LOCALE
 # ─────────────────────────────
 if __name__ == "__main__":
     import uvicorn
