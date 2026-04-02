@@ -309,16 +309,9 @@ async function pageClassifica(){
     html+=`<tr class="${c}"><td>${i+1}</td><td style="text-align:left;font-weight:700">${r.Squadra}</td><td>${r.G}</td><td>${r.V}</td><td>${r.N}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GS}</td><td style="color:${r.DR>0?"var(--green)":r.DR<0?"var(--red)":"var(--muted)"}">${r.DR>0?"+":""}${r.DR}</td><td style="font-weight:800">${r.Punti}</td></tr>`;
   });
   html+='</tbody></table><div style="margin-top:8px;display:flex;gap:12px;justify-content:center;font-size:.8rem"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
-  // DESTRA: Marcatori + Consigliati
-  html+='<div>';
-  html+='<div class="card"><h2>Top Marcatori</h2>';
-  (data.marcatori||[]).forEach(m=>{
-    html+=`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460"><span style="width:28px;font-weight:700;color:${m.pos<=3?"var(--green)":"var(--muted)"}">${m.pos}</span><div style="flex:1"><strong style="font-size:.9rem">${m.giocatore}</strong><br><span style="color:var(--muted);font-size:.8rem">${m.squadra}</span></div><span style="font-weight:800;color:var(--green);font-size:1.1rem">${m.gol}</span></div>`;
-  });
-  html+='</div>';
-  // Marcatori consigliati per la prossima giornata
+  // Marcatori consigliati sotto classifica (stessa colonna SX)
   html+='<div class="card" style="margin-top:12px;border-color:var(--green)"><h2 style="color:var(--green)">Marcatori Consigliati G.31</h2><p style="color:var(--muted);font-size:.8rem;margin-bottom:8px">Basato su xG, forma e storico gol</p>';
-  const consgiliati=[
+  const consigliati=[
     {nome:"Lautaro Martinez",sq:"Inter",motivo:"14 gol, xG 2.40/p, casa vs Roma"},
     {nome:"Tasos Douvikas",sq:"Como",motivo:"11 gol, forma eccellente"},
     {nome:"Kenan Yildiz",sq:"Juventus",motivo:"10 gol, casa vs Genoa"},
@@ -328,8 +321,15 @@ async function pageClassifica(){
     {nome:"Keinan Davis",sq:"Udinese",motivo:"10 gol, casa vs Como"},
     {nome:"Nikola Krstovic",sq:"Atalanta",motivo:"8 gol, trasferta a Lecce"},
   ];
-  consgiliati.forEach((c,i)=>{
+  consigliati.forEach((c,i)=>{
     html+=`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460"><span style="width:24px;font-weight:700;color:var(--green)">${i+1}</span><div style="flex:1"><strong style="font-size:.9rem">${c.nome}</strong><br><span style="color:var(--muted);font-size:.8rem">${c.sq} — ${c.motivo}</span></div></div>`;
+  });
+  html+='</div></div>';
+  // DESTRA: Marcatori
+  html+='<div>';
+  html+='<div class="card"><h2>Top Marcatori</h2>';
+  (data.marcatori||[]).forEach(m=>{
+    html+=`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460"><span style="width:28px;font-weight:700;color:${m.pos<=3?"var(--green)":"var(--muted)"}">${m.pos}</span><div style="flex:1"><strong style="font-size:.9rem">${m.giocatore}</strong><br><span style="color:var(--muted);font-size:.8rem">${m.squadra}</span></div><span style="font-weight:800;color:var(--green);font-size:1.1rem">${m.gol}</span></div>`;
   });
   html+='</div>';
   html+='</div></div></div>';
