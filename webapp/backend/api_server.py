@@ -220,18 +220,30 @@ def genera_pronostico(home, away):
         xga_h = sh.get("xGA_pg", 1.3)
         xg_a = sa.get("xG_pg", 1.3)
         xga_a = sa.get("xGA_pg", 1.3)
-        avg_xga = 1.38  # media xGA campionato
+        avg_xga = 1.38
         lh_xg = xg_h * (xga_a / avg_xga)
         la_xg = xg_a * (xga_h / avg_xga)
 
-        # Blending: 65% storico + 35% xG
-        lh = 0.65 * lh_hist + 0.35 * lh_xg
-        la = 0.65 * la_hist + 0.35 * la_xg
+        # PUNTO 1: Quote bookmaker come calibrazione
+        # Le quote implicite dei bookmaker (medie storiche) calibrano il modello
+        # Forza relativa dalla classifica come proxy delle quote
+        CLASSIFICA_PTS = {"Inter":69,"Milan":63,"Napoli":62,"Como":57,"Juventus":54,"Roma":54,"Atalanta":50,"Lazio":43,"Bologna":42,"Sassuolo":39,"Udinese":39,"Parma":34,"Genoa":33,"Torino":33,"Cagliari":30,"Fiorentina":29,"Cremonese":27,"Lecce":27,"Verona":18,"Pisa":18}
+        pts_h = CLASSIFICA_PTS.get(h, 35)
+        pts_a = CLASSIFICA_PTS.get(a, 35)
+        pts_diff = (pts_h - pts_a) / 100  # Normalizzato
+        # Lambda da classifica (proxy quote)
+        lh_cls = avg_gc * (1 + pts_diff * 0.5)
+        la_cls = avg_gt * (1 - pts_diff * 0.5)
+
+        # PUNTO 2: Ensemble — blend storico (50%) + xG (30%) + classifica (20%)
+        lh = 0.50 * lh_hist + 0.30 * lh_xg + 0.20 * lh_cls
+        la = 0.50 * la_hist + 0.30 * la_xg + 0.20 * la_cls
 
         # Correzione H2H
         h2h_key = f"{h}_vs_{a}"
         h2h = H2H_DATA.get(h2h_key, {})
-        if h2h.get("n_partite", 0) >= 3:
+        h2h_n = h2h.get("n_partite", 0)
+        if h2h_n >= 3:
             adv = h2h["h2h_advantage"]
             lh *= (1.0 + 0.12 * adv)
             la *= (1.0 - 0.12 * adv)
@@ -243,6 +255,19 @@ def genera_pronostico(home, away):
         ff = 1.0 + 0.10 * fd
         lh *= ff
         la *= (2.0 - ff)
+
+        # PUNTO 4: Feature avanzate
+        # Fattore motivazione: squadre in lotta salvezza/scudetto sono piu' motivate
+        if pts_h <= 30 or pts_h >= 60:  # Lotta salvezza o scudetto
+            lh *= 1.03
+        if pts_a <= 30 or pts_a >= 60:
+            la *= 1.03
+        # Differenza classifica: squadre molto distanti = meno equilibrio
+        if abs(pts_h - pts_a) > 25:
+            if pts_h > pts_a:
+                lh *= 1.04
+            else:
+                la *= 1.04
 
     lh = max(0.3, min(lh, 5.0))
     la = max(0.3, min(la, 5.0))
@@ -262,7 +287,6 @@ def genera_pronostico(home, away):
             elif i == j: px += p
             else: p2 += p
     px *= 1.12
-    # Extra boost X per squadre equilibrate
     ratio = min(lh,la)/max(lh,la) if max(lh,la)>0 else 0
     if ratio > 0.80:
         px *= 1.0 + (ratio-0.80)*0.8
@@ -270,12 +294,10 @@ def genera_pronostico(home, away):
     if tot > 0: p1/=tot; px/=tot; p2/=tot
 
     ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
-    # Goal Si con calibrazione Serie A (in media ~55% delle partite sono Goal)
     gsi_raw = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
-    # Correggi: se la squadra piu debole ha xGA basso (difesa forte), NoGoal piu probabile
     xga_min = min(sh.get("xGA_pg", sa.get("xGA_pg", 1.3)), sa.get("xGA_pg", sh.get("xGA_pg", 1.3)))
     if xga_min < 1.0:
-        gsi = gsi_raw * 0.88  # Difese forti = meno Goal
+        gsi = gsi_raw * 0.88
     elif xga_min < 1.2:
         gsi = gsi_raw * 0.94
     else:
@@ -285,14 +307,27 @@ def genera_pronostico(home, away):
     mp = max(p1, px, p2)
     sg = "1" if mp==p1 else ("X" if mp==px else "2")
     sl = "Vittoria Casa" if sg=="1" else ("Pareggio" if sg=="X" else "Vittoria Ospite")
+
+    # PUNTO 5: Confidence avanzata multi-fattore
     sp = sorted([p1,px,p2], reverse=True)
-    cf = min((sp[0]-sp[1])/0.4, 1.0)*0.7+0.3
-    cl = "Alta" if cf>=0.65 else ("Media" if cf>=0.4 else "Bassa")
+    spread = sp[0] - sp[1]
+    # Componenti: separazione (40%) + dati (25%) + H2H (20%) + classifica (15%)
+    c_spread = min(spread / 0.35, 1.0)
+    c_dati = min(sh.get("n_partite", 0) / 200, 1.0) if sh else 0.3
+    c_h2h = min(h2h_n / 15, 1.0) if sh and h2h_n >= 3 else 0.3
+    c_class = min(abs(pts_diff) * 3, 1.0) if sh else 0.3
+    cf = 0.40*c_spread + 0.25*c_dati + 0.20*c_h2h + 0.15*c_class
+    cf = round(min(max(cf, 0), 1.0), 3)
+    cl = "Alta" if cf>=0.65 else ("Media" if cf>=0.40 else "Bassa")
+
+    # PUNTO 5: Badge sicura
+    sicura = cf >= 0.65 and sp[0] > 0.45
 
     return {
         "prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),
         "quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,
         "suggerimento":sg,"sugg_label":sl,"confidence":round(cf,3),"confidence_label":cl,
+        "sicura": sicura,
         "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
         "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
         "gol_attesi":round(lh+la,2),"risultati_esatti":scores[:5],
@@ -300,6 +335,8 @@ def genera_pronostico(home, away):
         "marcatori_ospite": TOP_SCORER.get(a, []),
         "formazione_casa": FORMAZIONI.get(h),
         "formazione_ospite": FORMAZIONI.get(a),
+        "h2h_applicato": h2h_n >= 3 if sh else False,
+        "h2h_partite": h2h_n if sh else 0,
     }
 
 # ─────────────────────────────

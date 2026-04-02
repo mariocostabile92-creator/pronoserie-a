@@ -183,7 +183,7 @@ async function calcPronostico(){
       <div class="box1x2 ${best==="X"?"best":""}"><div style="color:var(--yellow);font-weight:700">X Pareggio</div><div class="pct">${d.prob_x}%</div><div class="quota">Quota ${d.quota_x}</div></div>
       <div class="box1x2 ${best==="2"?"best":""}"><div style="color:var(--red);font-weight:700">2 Ospite</div><div class="pct">${d.prob_2}%</div><div class="quota">Quota ${d.quota_2}</div></div>
     </div>
-    <div style="text-align:center"><span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best} — ${d.sugg_label||""}</span></div>
+    <div style="text-align:center"><span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best} — ${d.sugg_label||""}</span>${d.sicura?' <span class="tag" style="background:#ff6b35;color:#fff;font-size:.8rem;padding:4px 12px;margin-left:8px">SICURA</span>':''}</div>
     <div style="text-align:center;margin:12px 0"><span style="color:${cc};font-weight:700">Affidabilita': ${d.confidence_label} (${cp}%)</span>
       <div class="bar" style="max-width:300px;margin:8px auto"><div class="bar-fill" style="width:${cp}%;background:${cc}"></div></div>
     </div>
@@ -245,7 +245,7 @@ async function simulaGiornata(gNum){
       <td style="color:var(--green)">${d.prob_1}%</td>
       <td style="color:var(--yellow)">${d.prob_x}%</td>
       <td style="color:var(--red)">${d.prob_2}%</td>
-      <td><span style="color:${tipCol};font-weight:800">${d.suggerimento}</span></td>
+      <td><span style="color:${tipCol};font-weight:800">${d.suggerimento}</span>${d.sicura?'<span style="background:#ff6b35;color:#fff;font-size:.6rem;padding:1px 4px;border-radius:4px;margin-left:2px">!</span>':''}</td>
       <td><span style="color:${ouCol}">${ouLbl} ${ouVal}%</span></td>
       <td><span style="color:${glCol}">${glLbl} ${glVal}%</span></td>
       <td style="color:var(--muted)">${d.gol_attesi||"-"}</td>
