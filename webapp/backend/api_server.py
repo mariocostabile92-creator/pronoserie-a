@@ -284,11 +284,51 @@ async def calendario():
 # ─────────────────────────────
 @app.get("/api/classifica")
 async def classifica():
-    try:
-        return get_classifica_reale()
-    except Exception as e:
-        print("❌ ERRORE CLASSIFICA:", e)
-        return {}
+    CLASS = [
+        {"Squadra":"Inter","Punti":69,"G":30,"V":22,"N":3,"P":5,"GF":66,"GS":24,"DR":42},
+        {"Squadra":"Milan","Punti":63,"G":30,"V":18,"N":9,"P":3,"GF":47,"GS":23,"DR":24},
+        {"Squadra":"Napoli","Punti":62,"G":30,"V":19,"N":5,"P":6,"GF":46,"GS":30,"DR":16},
+        {"Squadra":"Como","Punti":57,"G":30,"V":16,"N":9,"P":5,"GF":53,"GS":22,"DR":31},
+        {"Squadra":"Juventus","Punti":54,"G":30,"V":15,"N":9,"P":6,"GF":52,"GS":29,"DR":23},
+        {"Squadra":"Roma","Punti":54,"G":30,"V":17,"N":3,"P":10,"GF":40,"GS":23,"DR":17},
+        {"Squadra":"Atalanta","Punti":50,"G":30,"V":13,"N":11,"P":6,"GF":41,"GS":27,"DR":14},
+        {"Squadra":"Lazio","Punti":43,"G":30,"V":11,"N":10,"P":9,"GF":31,"GS":28,"DR":3},
+        {"Squadra":"Bologna","Punti":42,"G":30,"V":12,"N":6,"P":12,"GF":38,"GS":36,"DR":2},
+        {"Squadra":"Sassuolo","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":36,"GS":40,"DR":-4},
+        {"Squadra":"Udinese","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":35,"GS":42,"DR":-7},
+        {"Squadra":"Parma","Punti":34,"G":30,"V":8,"N":10,"P":12,"GF":21,"GS":38,"DR":-17},
+        {"Squadra":"Genoa","Punti":33,"G":30,"V":8,"N":9,"P":13,"GF":36,"GS":42,"DR":-6},
+        {"Squadra":"Torino","Punti":33,"G":30,"V":9,"N":6,"P":15,"GF":34,"GS":53,"DR":-19},
+        {"Squadra":"Cagliari","Punti":30,"G":30,"V":7,"N":9,"P":14,"GF":31,"GS":42,"DR":-11},
+        {"Squadra":"Fiorentina","Punti":29,"G":30,"V":6,"N":11,"P":13,"GF":35,"GS":44,"DR":-9},
+        {"Squadra":"Cremonese","Punti":27,"G":30,"V":6,"N":9,"P":15,"GF":25,"GS":44,"DR":-19},
+        {"Squadra":"Lecce","Punti":27,"G":30,"V":7,"N":6,"P":17,"GF":21,"GS":40,"DR":-19},
+        {"Squadra":"Verona","Punti":18,"G":30,"V":3,"N":9,"P":18,"GF":22,"GS":52,"DR":-30},
+        {"Squadra":"Pisa","Punti":18,"G":30,"V":2,"N":12,"P":16,"GF":23,"GS":54,"DR":-31},
+    ]
+    MARC = [
+        {"pos":1,"giocatore":"Lautaro Martinez","squadra":"Inter","gol":14},
+        {"pos":2,"giocatore":"Tasos Douvikas","squadra":"Como","gol":11},
+        {"pos":3,"giocatore":"Keinan Davis","squadra":"Udinese","gol":10},
+        {"pos":4,"giocatore":"Rasmus Hojlund","squadra":"Napoli","gol":10},
+        {"pos":5,"giocatore":"Kenan Yildiz","squadra":"Juventus","gol":10},
+        {"pos":6,"giocatore":"Nico Paz","squadra":"Como","gol":10},
+        {"pos":7,"giocatore":"Rafael Leao","squadra":"Milan","gol":9},
+        {"pos":8,"giocatore":"Hakan Calhanoglu","squadra":"Inter","gol":8},
+        {"pos":9,"giocatore":"Giovanni Simeone","squadra":"Torino","gol":8},
+        {"pos":10,"giocatore":"Christian Pulisic","squadra":"Milan","gol":8},
+        {"pos":11,"giocatore":"Gianluca Scamacca","squadra":"Atalanta","gol":8},
+        {"pos":12,"giocatore":"Nikola Krstovic","squadra":"Atalanta","gol":8},
+        {"pos":13,"giocatore":"Moise Kean","squadra":"Fiorentina","gol":8},
+        {"pos":14,"giocatore":"Mateo Pellegrino","squadra":"Parma","gol":8},
+        {"pos":15,"giocatore":"Domenico Berardi","squadra":"Sassuolo","gol":7},
+        {"pos":16,"giocatore":"Nikola Vlasic","squadra":"Torino","gol":7},
+        {"pos":17,"giocatore":"Scott McTominay","squadra":"Napoli","gol":7},
+        {"pos":18,"giocatore":"Donyell Malen","squadra":"Roma","gol":7},
+        {"pos":19,"giocatore":"Marcus Thuram","squadra":"Inter","gol":7},
+        {"pos":20,"giocatore":"Andrea Pinamonti","squadra":"Sassuolo","gol":7},
+    ]
+    return {"classifica": CLASS, "marcatori": MARC}
 
 # ─────────────────────────────
 # MARCATORI
@@ -352,26 +392,26 @@ INFORTUNATI = {
 }
 
 ROSE = {
-    "Inter":[("Sommer","P",1),("Martinez J.","P",13),("Bastoni","D",95),("Bisseck","D",31),("Akanji","D",25),("De Vrij","D",6),("Acerbi","D",15),("Dimarco","D",32),("Dumfries","D",2),("Darmian","D",36),("Calhanoglu","C",20),("Barella","C",23),("Sucic","C",8),("Frattesi","C",16),("Zielinski","C",7),("Mkhitaryan","C",22),("Lautaro Martinez","A",10),("Thuram","A",9),("Bonny","A",14),("Luis Henrique","A",11)],
-    "Milan":[("Maignan","P",16),("Terracciano","P",1),("Pavlovic","D",31),("De Winter","D",5),("Tomori","D",23),("Gabbia","D",46),("Estupinan","D",2),("Bartesaghi","D",33),("Ricci","C",4),("Fofana","C",19),("Rabiot","C",12),("Loftus-Cheek","C",8),("Modric","C",14),("Jashari","C",30),("Leao","A",10),("Pulisic","A",11),("Nkunku","A",18),("Gimenez","A",7),("Fullkrug","A",9),("Saelemaekers","A",56)],
-    "Napoli":[("Meret","P",1),("Contini","P",14),("Buongiorno","D",4),("Beukema","D",31),("Rrahmani","D",13),("Gutierrez","D",3),("Olivera","D",17),("Di Lorenzo","D",22),("Gilmour","C",6),("Lobotka","C",68),("McTominay","C",8),("Anguissa","C",99),("De Bruyne","C",11),("Hojlund","A",19),("Lukaku","A",9),("Neres","A",7),("Politano","A",21),("Giovane","A",23),("Alisson Santos","A",77)],
-    "Juventus":[("Di Gregorio","P",16),("Perin","P",1),("Bremer","D",3),("Kalulu","D",15),("Kelly","D",6),("Gatti","D",4),("Cambiaso","D",27),("Holm","D",2),("Locatelli","C",5),("Thuram K.","C",19),("McKennie","C",22),("Koopmeiners","C",8),("Vlahovic","A",9),("David","A",30),("Openda","A",20),("Conceicao","A",7),("Yildiz","A",10),("Boga","A",14)],
-    "Roma":[("Svilar","P",99),("Gollini","P",95),("Ndicka","D",5),("Mancini","D",23),("Hermoso","D",22),("Angelino","D",3),("Tsimikas","D",12),("Celik","D",19),("Rensch","D",2),("Cristante","C",4),("Kone","C",17),("El Aynaoui","C",8),("Pisilli","C",61),("Pellegrini","C",7),("Dybala","A",21),("Malen","A",14),("Ferguson","A",11),("Dovbyk","A",9),("Soule","A",18),("El Shaarawy","A",92),("Zaragoza","A",97),("Vaz","A",78)],
-    "Atalanta":[("Carnesecchi","P",29),("Sportiello","P",57),("Scalvini","D",42),("Hien","D",4),("Kossounou","D",3),("Kolasinac","D",23),("Djimsiti","D",19),("Ederson","C",13),("Musah","C",6),("Pasalic","C",8),("De Roon","C",15),("Bellanova","C",16),("Zappacosta","C",77),("De Ketelaere","A",17),("Samardzic","A",10),("Raspadori","A",18),("Scamacca","A",9),("Krstovic","A",90)],
-    "Lazio":[("Provedel","P",94),("Motta","P",40),("Gila","D",34),("Romagnoli","D",13),("Gigot","D",2),("Tavares","D",17),("Marusic","D",77),("Lazzari","D",29),("Rovella","C",6),("Belahyane","C",21),("Taylor","C",24),("Dele-Bashiru","C",7),("Maldini","A",27),("Zaccagni","A",10),("Isaksen","A",18),("Dia","A",19),("Pedro","A",9),("Noslin","A",14),("Ratkov","A",20)],
-    "Bologna":[("Skorupski","P",1),("Ravaglia","P",13),("Lucumi","D",26),("Vitik","D",41),("Casale","D",16),("Miranda","D",33),("Joao Mario","D",17),("Moro","C",6),("Ferguson L.","C",19),("Pobega","C",4),("Freuler","C",8),("Odgaard","C",21),("Castro","A",9),("Dallinga","A",24),("Orsolini","A",7),("Bernardeschi","A",10),("Rowe","A",11)],
-    "Sassuolo":[("Muric","P",49),("Turati","P",13),("Idzes","D",21),("Doig","D",3),("Walukiewicz","D",6),("Romagna","D",19),("Pieragnolo","D",15),("Lipani","C",35),("Boloca","C",11),("Matic","C",18),("Kone","C",90),("Thorstvedt","C",42),("Berardi","A",25),("Pinamonti","A",9),("Lauriente","A",45),("Volpato","A",7)],
-    "Udinese":[("Okoye","P",40),("Sava","P",90),("Solet","D",28),("Kristensen","D",31),("Bertola","D",13),("Kabasele","D",27),("Zemura","D",33),("Zanoli","D",59),("Karlstrom","C",8),("Miller","C",38),("Zarraga","C",6),("Zaniolo","A",10),("Davis","A",9),("Buksa","A",18)],
-    "Parma":[("Suzuki","P",31),("Circati","D",39),("Valenti","D",5),("Delprato","D",15),("Valeri","D",14),("Carboni","D",29),("Keita","C",16),("Bernabe","C",10),("Nicolussi Caviglia","C",41),("Oristanio","C",21),("Strefezza","A",7),("Almqvist","A",11),("Pellegrino","A",9)],
-    "Genoa":[("Bijlow","P",16),("Leali","P",1),("Vasquez","D",22),("Ostigard","D",5),("Martin","D",3),("Norton-Cuffy","D",15),("Sabelli","D",20),("Frendrup","C",32),("Malinovskyi","C",17),("Baldanzi","C",8),("Ellertsson","C",77),("Messias","A",10),("Colombo","A",29),("Vitinha","A",9),("Ekuban","A",18)],
-    "Torino":[("Israel","P",81),("Paleari","P",1),("Coco","D",23),("Ismajli","D",44),("Maripan","D",13),("Biraghi","D",34),("Pedersen","D",16),("Nkounkou","D",25),("Prati","C",4),("Casadei","C",22),("Ilic","C",8),("Gineitis","C",66),("Lazaro","C",20),("Vlasic","A",10),("Adams","A",19),("Simeone","A",7)],
-    "Cagliari":[("Caprile","P",1),("Sherri","P",12),("Dossena","D",22),("Mina","D",26),("Obert","D",33),("Zappa","D",28),("Sulemana","C",25),("Adopo","C",8),("Folorunsho","C",90),("Mazzitelli","C",4),("Gaetano","C",10),("Esposito","A",94),("Kilicsoy","A",9),("Felici","A",17)],
-    "Fiorentina":[("De Gea","P",43),("Christensen","P",53),("Comuzzo","D",15),("Ranieri","D",6),("Gosens","D",21),("Dodo","D",2),("Lamptey","D",48),("Parisi","D",65),("Mandragora","C",8),("Fagioli","C",44),("Brescianini","C",4),("Fazzini","C",22),("Gudmundsson","A",10),("Kean","A",9),("Beltran","A",7),("Harrison","A",17)],
-    "Cremonese":[("Audero","P",1),("Silvestri","P",16),("Pezzella","D",3),("Luperto","D",5),("Baschirotto","D",6),("Bianchetti","D",15),("Barbieri","D",4),("Faye","D",30),("Thorsby","C",2),("Bondo","C",38),("Vandeputte","C",27),("Payero","C",32),("Grassi","C",33),("Vardy","A",10),("Djuric","A",9),("Zerbin","A",7),("Sanabria","A",99)],
-    "Lecce":[("Falcone","P",30),("Fruchtl","P",1),("Gaspar","D",4),("Gallo","D",25),("Veiga","D",17),("Ramadani","C",20),("Berisha","C",10),("Coulibaly","C",29),("Sala","C",6),("Marchwinski","C",36),("Banda","A",19),("Camarda","A",22),("Cheddira","A",99),("Pierotti","A",50)],
-    "Verona":[("Montipo","P",1),("Perilli","P",34),("Nelsson","D",15),("Bella-Kotchap","D",37),("Bradaric","D",12),("Lirola","D",14),("Oyegoke","D",2),("Lovric","C",4),("Serdar","C",8),("Harroui","C",21),("Gagliardini","C",63),("Suslov","A",10),("Henry","A",9),("Tengstedt","A",20),("Duda","A",27)],
-    "Pisa":[("Semper","P",1),("Scuffet","P",22),("Canestrelli","D",5),("Calabresi","D",33),("Loyola","D",35),("Angori","D",3),("Marin","C",6),("Hojholt","C",8),("Aebischer","C",20),("Stengs","C",23),("Cuadrado","C",11),("Meister","A",9),("Tramoni","A",10),("Iling-Junior","A",19),("Moreo","A",32)],
-    "Como":[("Butez","P",1),("Tornqvist","P",21),("Diego Carlos","D",34),("Kempf","D",2),("Goldaniga","D",5),("Valle","D",3),("Moreno","D",18),("Van der Brempt","D",77),("Vojvoda","D",31),("Perrone","C",23),("Da Cunha","C",33),("Caqueret","C",6),("Sergi Roberto","C",8),("Paz","C",10),("Baturina","C",20),("Diao","A",38),("Kuhn","A",19),("Douvikas","A",11),("Morata","A",7)],
+    "Inter":[("Sommer","P",1),("Martinez J.","P",13),("Di Gennaro","P",12),("Bastoni","D",95),("Bisseck","D",31),("Akanji","D",25),("De Vrij","D",6),("Acerbi","D",15),("Dimarco","D",32),("Carlos Augusto","D",30),("Dumfries","D",2),("Darmian","D",36),("Calhanoglu","C",20),("Barella","C",23),("Sucic","C",8),("Frattesi","C",16),("Diouf","C",17),("Zielinski","C",7),("Mkhitaryan","C",22),("Lautaro Martinez","A",10),("Thuram","A",9),("Bonny","A",14),("Pio Esposito","A",94),("Luis Henrique","A",11)],
+    "Milan":[("Maignan","P",16),("Terracciano","P",1),("Torriani","P",96),("Pavlovic","D",31),("De Winter","D",5),("Tomori","D",23),("Gabbia","D",46),("Estupinan","D",2),("Bartesaghi","D",33),("Ricci","C",4),("Fofana","C",19),("Rabiot","C",12),("Loftus-Cheek","C",8),("Modric","C",14),("Jashari","C",30),("Leao","A",10),("Pulisic","A",11),("Nkunku","A",18),("Gimenez","A",7),("Fullkrug","A",9),("Saelemaekers","A",56)],
+    "Napoli":[("Meret","P",1),("Contini","P",14),("Milinkovic-Savic","P",32),("Buongiorno","D",4),("Beukema","D",31),("Rrahmani","D",13),("Gutierrez","D",3),("Olivera","D",17),("Di Lorenzo","D",22),("Spinazzola","D",37),("Mazzocchi","D",30),("Gilmour","C",6),("Lobotka","C",68),("McTominay","C",8),("Anguissa","C",99),("De Bruyne","C",11),("Hojlund","A",19),("Lukaku","A",9),("Neres","A",7),("Politano","A",21),("Giovane","A",23),("Alisson Santos","A",77)],
+    "Juventus":[("Di Gregorio","P",16),("Perin","P",1),("Pinsoglio","P",23),("Bremer","D",3),("Kalulu","D",15),("Kelly","D",6),("Gatti","D",4),("Cambiaso","D",27),("Cabal","D",32),("Holm","D",2),("Locatelli","C",5),("Thuram K.","C",19),("McKennie","C",22),("Koopmeiners","C",8),("Kostic","C",18),("Vlahovic","A",9),("David","A",30),("Openda","A",20),("Conceicao","A",7),("Yildiz","A",10),("Zhegrova","A",11),("Boga","A",14)],
+    "Roma":[("Svilar","P",99),("Gollini","P",95),("Zelezny","P",91),("Ndicka","D",5),("Mancini","D",23),("Hermoso","D",22),("Angelino","D",3),("Tsimikas","D",12),("Wesley","D",43),("Celik","D",19),("Rensch","D",2),("Cristante","C",4),("Kone","C",17),("El Aynaoui","C",8),("Pisilli","C",61),("Pellegrini","C",7),("Dybala","A",21),("Malen","A",14),("Ferguson","A",11),("Dovbyk","A",9),("Soule","A",18),("El Shaarawy","A",92),("Zaragoza","A",97),("Vaz","A",78)],
+    "Atalanta":[("Carnesecchi","P",29),("Sportiello","P",57),("Rossi","P",31),("Scalvini","D",42),("Hien","D",4),("Kossounou","D",3),("Kolasinac","D",23),("Djimsiti","D",19),("Ederson","C",13),("Musah","C",6),("Pasalic","C",8),("De Roon","C",15),("Bellanova","C",16),("Zappacosta","C",77),("Zalewski","C",59),("De Ketelaere","A",17),("Samardzic","A",10),("Raspadori","A",18),("Scamacca","A",9),("Krstovic","A",90)],
+    "Lazio":[("Provedel","P",94),("Motta","P",40),("Furlanetto","P",55),("Gila","D",34),("Provstgaard","D",25),("Romagnoli","D",13),("Gigot","D",2),("Patric","D",4),("Tavares","D",17),("Pellegrini L.","D",3),("Marusic","D",77),("Lazzari","D",29),("Rovella","C",6),("Belahyane","C",21),("Taylor","C",24),("Dele-Bashiru","C",7),("Maldini","A",27),("Przyborek","A",28),("Zaccagni","A",10),("Isaksen","A",18),("Dia","A",19),("Pedro","A",9),("Noslin","A",14),("Ratkov","A",20)],
+    "Bologna":[("Skorupski","P",1),("Ravaglia","P",13),("Pessina","P",25),("Lucumi","D",26),("Heggem","D",14),("Vitik","D",41),("Helland","D",5),("Casale","D",16),("Miranda","D",33),("Joao Mario","D",17),("Zortea","D",20),("Moro","C",6),("Ferguson L.","C",19),("Pobega","C",4),("Freuler","C",8),("Odgaard","C",21),("Sohm","C",23),("Castro","A",9),("Dallinga","A",24),("Orsolini","A",7),("Bernardeschi","A",10),("Rowe","A",11)],
+    "Sassuolo":[("Muric","P",49),("Turati","P",13),("Zacchi","P",16),("Idzes","D",21),("Doig","D",3),("Walukiewicz","D",6),("Romagna","D",19),("Pieragnolo","D",15),("Garcia","D",23),("Coulibaly","D",25),("Lipani","C",35),("Boloca","C",11),("Matic","C",18),("Kone","C",90),("Thorstvedt","C",42),("Vranckx","C",40),("Berardi","A",25),("Pinamonti","A",9),("Lauriente","A",45),("Volpato","A",7)],
+    "Udinese":[("Okoye","P",40),("Sava","P",90),("Nunziante","P",1),("Solet","D",28),("Kristensen","D",31),("Bertola","D",13),("Mlacic","D",22),("Kabasele","D",27),("Zemura","D",33),("Kamara","D",11),("Zanoli","D",59),("Ehizibue","D",19),("Karlstrom","C",8),("Camara","C",29),("Miller","C",38),("Zarraga","C",6),("Piotrowski","C",24),("Zaniolo","A",10),("Davis","A",9),("Buksa","A",18),("Bayo","A",15)],
+    "Parma":[("Suzuki","P",31),("Corvi","P",40),("Rinaldi","P",66),("Circati","D",39),("Valenti","D",5),("Delprato","D",15),("Valeri","D",14),("Carboni","D",29),("Britschgi","D",27),("Ndiaye","D",3),("Keita","C",16),("Estevez","C",8),("Bernabe","C",10),("Sorensen","C",22),("Nicolussi Caviglia","C",41),("Oristanio","C",21),("Strefezza","A",7),("Almqvist","A",11),("Pellegrino","A",9),("Ondrejka","A",17)],
+    "Genoa":[("Bijlow","P",16),("Leali","P",1),("Siegrist","P",31),("Vasquez","D",22),("Ostigard","D",5),("Marcandalli","D",27),("Zattstrom","D",13),("Martin","D",3),("Norton-Cuffy","D",15),("Sabelli","D",20),("Frendrup","C",32),("Onana","C",14),("Malinovskyi","C",17),("Baldanzi","C",8),("Ellertsson","C",77),("Messias","A",10),("Colombo","A",29),("Vitinha","A",9),("Ekuban","A",18),("Ekhator","A",21)],
+    "Torino":[("Israel","P",81),("Paleari","P",1),("Siviero","P",99),("Coco","D",23),("Ismajli","D",44),("Maripan","D",13),("Ebosse","D",77),("Biraghi","D",34),("Pedersen","D",16),("Nkounkou","D",25),("Obrador","D",33),("Prati","C",4),("Casadei","C",22),("Ilic","C",8),("Gineitis","C",66),("Lazaro","C",20),("Tameze","C",61),("Vlasic","A",10),("Adams","A",19),("Simeone","A",7),("Aboukhlal","A",17)],
+    "Cagliari":[("Caprile","P",1),("Sherri","P",12),("Ciocci","P",24),("Dossena","D",22),("Obert","D",33),("Rodriguez","D",15),("Mina","D",26),("Ze Pedro","D",32),("Zappa","D",28),("Raterink","D",18),("Sulemana","C",25),("Adopo","C",8),("Folorunsho","C",90),("Mazzitelli","C",4),("Gaetano","C",10),("Deiola","C",14),("Esposito","A",94),("Kilicsoy","A",9),("Felici","A",17),("Borrelli","A",29)],
+    "Fiorentina":[("De Gea","P",43),("Christensen","P",53),("Lezzerini","P",1),("Comuzzo","D",15),("Pongracic","D",5),("Ranieri","D",6),("Gosens","D",21),("Dodo","D",2),("Lamptey","D",48),("Parisi","D",65),("Fortini","D",29),("Mandragora","C",8),("Fagioli","C",44),("Ndour","C",27),("Brescianini","C",4),("Fazzini","C",22),("Gudmundsson","A",10),("Kean","A",9),("Beltran","A",7),("Sottil","A",14),("Harrison","A",17),("Solomon","A",19)],
+    "Cremonese":[("Audero","P",1),("Silvestri","P",16),("Nava","P",69),("Pezzella","D",3),("Luperto","D",5),("Baschirotto","D",6),("Bianchetti","D",15),("Barbieri","D",4),("Faye","D",30),("Terracciano F.","D",24),("Thorsby","C",2),("Bondo","C",38),("Vandeputte","C",27),("Maleh","C",29),("Payero","C",32),("Grassi","C",33),("Collocolo","C",18),("Vardy","A",10),("Djuric","A",9),("Zerbin","A",7),("Okereke","A",77),("Sanabria","A",99),("Bonazzoli","A",90)],
+    "Lecce":[("Falcone","P",30),("Fruchtl","P",1),("Samooja","P",32),("Gaspar","D",4),("Gallo","D",25),("Veiga","D",17),("Jean","D",18),("Perez","D",13),("Ndaba","D",3),("Siebert","D",5),("Ramadani","C",20),("Fofana","C",8),("Berisha","C",10),("Coulibaly","C",29),("Sala","C",6),("Helgason","C",14),("Marchwinski","C",36),("Banda","A",19),("Camarda","A",22),("Cheddira","A",99),("N'Dri","A",11),("Pierotti","A",50)],
+    "Verona":[("Montipo","P",1),("Perilli","P",34),("Toniolo","P",94),("Nelsson","D",15),("Bella-Kotchap","D",37),("Slotsager","D",19),("Edmundsson","D",5),("Frese","D",3),("Bradaric","D",12),("Lirola","D",14),("Oyegoke","D",2),("Al-Musrati","C",73),("Lovric","C",4),("Serdar","C",8),("Harroui","C",21),("Gagliardini","C",63),("Akpa Akpro","C",11),("Suslov","A",10),("Henry","A",9),("Tengstedt","A",20),("Lazovic","A",17),("Duda","A",27)],
+    "Pisa":[("Semper","P",1),("Nicolas","P",12),("Scuffet","P",22),("Canestrelli","D",5),("Calabresi","D",33),("Loyola","D",35),("Angori","D",3),("Albiol","D",39),("Marin","C",6),("Leris","C",7),("Hojholt","C",8),("Cuadrado","C",11),("Akinsanmiro","C",14),("Aebischer","C",20),("Stengs","C",23),("Lorran","C",99),("Meister","A",9),("Tramoni","A",10),("Durosinmi","A",17),("Iling-Junior","A",19),("Moreo","A",32)],
+    "Como":[("Butez","P",1),("Tornqvist","P",21),("Cavlina","P",44),("Diego Carlos","D",34),("Kempf","D",2),("Goldaniga","D",5),("Valle","D",3),("Moreno","D",18),("Van der Brempt","D",77),("Vojvoda","D",31),("Smolcic","D",28),("Ramon","D",14),("Perrone","C",23),("Da Cunha","C",33),("Caqueret","C",6),("Ladho","C",15),("Sergi Roberto","C",8),("Paz","C",10),("Baturina","C",20),("Diao","A",38),("Kuhn","A",19),("Douvikas","A",11),("Morata","A",7),("Jesus Rodriguez","A",17)],
 }
 
 @app.get("/api/squadra/{nome}")
