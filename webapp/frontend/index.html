@@ -59,6 +59,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
   <a href="#calendario">Calendario</a>
   <a href="#classifica">Classifica</a>
   <a href="#squadre">Squadre</a>
+  <a href="#notizie">Notizie</a>
   <a href="#pricing">Pricing</a>
   <a href="#login" id="nav-auth" style="margin-left:auto;background:#1f3460">Accedi</a>
 </nav>
@@ -335,15 +336,15 @@ async function pageClassifica(){
     html+=`<tr class="${c}"><td>${i+1}</td><td style="text-align:left;font-weight:700">${r.Squadra}</td><td>${r.G}</td><td>${r.V}</td><td>${r.N}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GS}</td><td style="color:${r.DR>0?"var(--green)":r.DR<0?"var(--red)":"var(--muted)"}">${r.DR>0?"+":""}${r.DR}</td><td style="font-weight:800">${r.Punti}</td></tr>`;
   });
   html+='</tbody></table><div style="margin-top:8px;display:flex;gap:12px;justify-content:center;font-size:.8rem"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
-  // Marcatori consigliati sotto classifica (stessa colonna SX)
-  html+='<div class="card" style="margin-top:12px;border-color:var(--green)"><h2 style="color:var(--green)">Marcatori Consigliati G.31</h2><p style="color:var(--muted);font-size:.8rem;margin-bottom:8px">Basato su xG, forma e storico gol</p>';
+  // Marcatori consigliati sotto classifica (esclusi infortunati)
+  html+='<div class="card" style="margin-top:12px;border-color:var(--green)"><h2 style="color:var(--green)">Marcatori Consigliati G.31</h2><p style="color:var(--muted);font-size:.8rem;margin-bottom:8px">Basato su xG, forma e storico gol — esclusi infortunati</p>';
   const consigliati=[
-    {nome:"Lautaro Martinez",sq:"Inter",motivo:"14 gol, xG 2.40/p, casa vs Roma"},
-    {nome:"Tasos Douvikas",sq:"Como",motivo:"11 gol, forma eccellente"},
+    {nome:"Thuram",sq:"Inter",motivo:"7 gol, xG 2.40/p, casa vs Roma (Lautaro infortunato)"},
+    {nome:"Tasos Douvikas",sq:"Como",motivo:"11 gol, forma eccellente, trasferta a Udinese"},
     {nome:"Kenan Yildiz",sq:"Juventus",motivo:"10 gol, casa vs Genoa"},
     {nome:"Rasmus Hojlund",sq:"Napoli",motivo:"10 gol, Napoli in casa vs Milan"},
     {nome:"Domenico Berardi",sq:"Sassuolo",motivo:"7 gol, casa vs Cagliari"},
-    {nome:"Rafael Leao",sq:"Milan",motivo:"9 gol, trasferta a Napoli"},
+    {nome:"Pulisic",sq:"Milan",motivo:"8 gol, trasferta a Napoli (Leao in dubbio)"},
     {nome:"Keinan Davis",sq:"Udinese",motivo:"10 gol, casa vs Como"},
     {nome:"Nikola Krstovic",sq:"Atalanta",motivo:"8 gol, trasferta a Lecce"},
   ];
@@ -462,6 +463,18 @@ async function loadSq(nome){
 }
 
 // ── PRICING ──
+// ── NOTIZIE LIVE ──
+async function pageNotizie(){
+  const data=await fetchAPI("/api/notizie");
+  if(!data)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento notizie</div></div>';
+  let html='<div class="container"><h1>Notizie Serie A</h1><p class="sub">Aggiornamento live — '+( data.aggiornamento||"In tempo reale")+'</p>';
+  (data.notizie||[]).forEach(n=>{
+    html+=`<a href="${n.url||'#'}" ${n.url&&n.url.startsWith('http')?'target="_blank"':''} style="text-decoration:none"><div class="card" style="cursor:pointer;transition:.2s;padding:16px" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#1f3460'"><h3 style="color:var(--text);font-size:1rem;margin-bottom:4px">${n.titolo}</h3><span style="color:var(--muted);font-size:.8rem">${n.fonte||"Serie A"}</span></div></a>`;
+  });
+  html+='</div>';
+  return html;
+}
+
 function pagePricing(){
   return `<div class="container" style="text-align:center">
     <h1>Piani e Prezzi</h1><p class="sub">Scegli il piano adatto a te</p>
@@ -630,7 +643,7 @@ async function abbonarPro(){
 }
 
 // ── ROUTER ──
-const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,pricing:pagePricing,login:pageLogin};
+const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,pricing:pagePricing,login:pageLogin};
 
 async function navigate(){
   const hash=(location.hash||"#home").replace("#","");

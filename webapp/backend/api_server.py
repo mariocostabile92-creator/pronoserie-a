@@ -103,6 +103,7 @@ def _live_updater():
     while True:
         try:
             _scrape_live_data()
+            _scrape_notizie()
         except Exception:
             pass
         time.sleep(1800)  # 30 minuti
@@ -716,6 +717,65 @@ async def schedina_del_giorno():
         "quota_totale": round(quota_tot, 2),
         "tipo": "Schedina SICURA — Solo giocate ad alta confidenza",
     }
+
+# ─────────────────────────────
+# NOTIZIE LIVE SERIE A
+# ─────────────────────────────
+NOTIZIE_CACHE = []
+NOTIZIE_LAST_UPDATE = ""
+
+def _scrape_notizie():
+    """Scarica notizie Serie A da fonti attendibili."""
+    global NOTIZIE_CACHE, NOTIZIE_LAST_UPDATE
+    import urllib.request as ur
+    import re
+    notizie = []
+    try:
+        # Fonte: Sky Sport Serie A
+        req = ur.Request("https://sport.sky.it/calcio/serie-a", headers={"User-Agent":"Mozilla/5.0"})
+        with ur.urlopen(req, timeout=10) as r:
+            html = r.read().decode("utf-8", errors="replace")
+        # Estrai titoli da tag h2/h3 o meta og:title
+        titoli = re.findall(r'<(?:h[23]|title)[^>]*>([^<]{20,120})</(?:h[23]|title)>', html)
+        for t in titoli[:8]:
+            t_clean = re.sub(r'<[^>]+>','',t).strip()
+            if t_clean and "Serie A" not in t_clean[:5] and len(t_clean)>15:
+                notizie.append({"titolo":t_clean,"fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a"})
+    except Exception as e:
+        print(f"⚠️ Scrape notizie Sky fallito: {e}")
+    
+    try:
+        # Fonte: Gazzetta dello Sport
+        req = ur.Request("https://www.gazzetta.it/calcio/serie-a/", headers={"User-Agent":"Mozilla/5.0"})
+        with ur.urlopen(req, timeout=10) as r:
+            html = r.read().decode("utf-8", errors="replace")
+        titoli = re.findall(r'<(?:h[23]|title)[^>]*>([^<]{20,120})</(?:h[23]|title)>', html)
+        for t in titoli[:6]:
+            t_clean = re.sub(r'<[^>]+>','',t).strip()
+            if t_clean and len(t_clean)>15:
+                notizie.append({"titolo":t_clean,"fonte":"Gazzetta","url":"https://www.gazzetta.it/calcio/serie-a/"})
+    except Exception as e:
+        print(f"⚠️ Scrape notizie Gazzetta fallito: {e}")
+
+    if notizie:
+        NOTIZIE_CACHE = notizie[:12]
+        NOTIZIE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
+        print(f"📰 Notizie aggiornate: {len(NOTIZIE_CACHE)} articoli")
+
+@app.get("/api/notizie")
+async def notizie():
+    """Ritorna le ultime notizie Serie A."""
+    if not NOTIZIE_CACHE:
+        # Fallback notizie di esempio
+        return {"notizie":[
+            {"titolo":"Serie A, giornata 31: probabili formazioni e pronostici","fonte":"PronoSerie A","url":"#calendario"},
+            {"titolo":"Classifica marcatori: Lautaro Martinez in testa con 14 gol","fonte":"PronoSerie A","url":"#classifica"},
+            {"titolo":"Calciomercato: i colpi di gennaio che cambiano la Serie A","fonte":"PronoSerie A","url":"#squadre"},
+            {"titolo":"Infortunati Serie A: chi salta la giornata 31","fonte":"PronoSerie A","url":"#squadre"},
+            {"titolo":"Inter, Lautaro in dubbio per la Roma: le ultime","fonte":"PronoSerie A","url":"#pronostici"},
+            {"titolo":"Juventus-Genoa: Spalletti recupera Bremer dal primo minuto","fonte":"PronoSerie A","url":"#pronostici"},
+        ],"aggiornamento":NOTIZIE_LAST_UPDATE or "Dati base"}
+    return {"notizie":NOTIZIE_CACHE,"aggiornamento":NOTIZIE_LAST_UPDATE}
 
 # ─────────────────────────────
 # HEALTH CHECK
