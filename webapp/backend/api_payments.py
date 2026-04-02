@@ -19,8 +19,9 @@ STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "price_1TH2aTCHxpJyCrvZwsA44
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 # URL di redirect dopo il pagamento
-SUCCESS_URL = os.environ.get("FRONTEND_URL", "https://web-production-ff46b.up.railway.app") + "/app#home"
-CANCEL_URL = os.environ.get("FRONTEND_URL", "https://web-production-ff46b.up.railway.app") + "/app#pricing"
+BASE_URL = os.environ.get("FRONTEND_URL", "https://web-production-ff46b.up.railway.app")
+SUCCESS_URL = BASE_URL + "/app?paid=1#home"
+CANCEL_URL = BASE_URL + "/app#pricing"
 
 # Configura la chiave Stripe
 if STRIPE_SECRET_KEY:
@@ -183,19 +184,42 @@ async def crea_checkout(utente: dict = Depends(get_current_user)):
 
 
 @router.get("/checkout-direct")
-async def checkout_diretto():
-    """Crea checkout Stripe diretto (senza auth, per landing page)."""
+async def checkout_diretto(email: str = ""):
+    """Crea checkout Stripe. Se email fornita, la pre-compila."""
     try:
-        session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
-            line_items=[{"price": STRIPE_PRICE_ID, "quantity": 1}],
-            mode="subscription",
-            success_url=SUCCESS_URL,
-            cancel_url=CANCEL_URL,
-        )
+        params = {
+            "payment_method_types": ["card"],
+            "line_items": [{"price": STRIPE_PRICE_ID, "quantity": 1}],
+            "mode": "subscription",
+            "success_url": SUCCESS_URL,
+            "cancel_url": CANCEL_URL,
+        }
+        if email:
+            params["customer_email"] = email
+        session = stripe.checkout.Session.create(**params)
         return {"checkout_url": session.url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Errore Stripe: {e}")
+
+
+@router.post("/activate-pro")
+async def activate_pro(data: dict):
+    """Attiva Pro per un utente (tramite email). Chiamato dopo pagamento."""
+    email = data.get("email", "").lower().strip()
+    if not email:
+        raise HTTPException(400, "Email richiesta")
+    from database import get_user_by_email, update_plan
+    user = get_user_by_email(email)
+    if user:
+        update_plan(user["id"], "pro")
+        return {"status": "ok", "piano": "pro"}
+    return {"status": "utente_non_trovato"}
+
+
+@router.get("/check-plan")
+async def check_plan(user: dict = Depends(get_current_user)):
+    """Ritorna il piano attuale dell'utente."""
+    return {"piano": user.get("piano", "free"), "email": user.get("email", "")}
 
 
 @router.post("/webhook")

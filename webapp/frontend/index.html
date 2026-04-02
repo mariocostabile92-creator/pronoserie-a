@@ -433,7 +433,8 @@ async function abbonarPro(){
   btn.textContent = "Caricamento...";
   btn.disabled = true;
   try {
-    const d = await fetchAPI("/api/payments/checkout-direct");
+    const ep = userEmail ? `/api/payments/checkout-direct?email=${encodeURIComponent(userEmail)}` : "/api/payments/checkout-direct";
+    const d = await fetchAPI(ep);
     if(d && d.checkout_url){
       window.location.href = d.checkout_url;
     } else {
@@ -465,8 +466,48 @@ async function navigate(){
   updateNavAuth();
 }
 
+// ── GESTIONE RITORNO DA STRIPE ──
+async function checkPaidReturn(){
+  if(window.location.search.includes("paid=1")){
+    // L'utente torna da Stripe dopo il pagamento
+    if(userToken && userEmail){
+      // Attiva Pro nel backend
+      try{
+        await postAPI("/api/payments/activate-pro", {email: userEmail});
+      }catch(e){}
+      userPlan = "pro";
+      localStorage.setItem("userPlan","pro");
+      freeUsed = 0;
+      localStorage.setItem("freeUsed","0");
+      updateNavAuth();
+      // Pulisci URL
+      history.replaceState(null,"","/app#home");
+      alert("Pagamento completato! Ora hai accesso Pro illimitato.");
+    } else {
+      // Non loggato: salva che ha pagato
+      localStorage.setItem("stripe_paid","1");
+      history.replaceState(null,"","/app#login");
+      location.hash = "#login";
+      alert("Pagamento ricevuto! Accedi con la tua email per attivare il piano Pro.");
+    }
+  }
+  // Se ha pagato ma non era loggato, attiva dopo login
+  if(localStorage.getItem("stripe_paid")==="1" && userToken && userEmail){
+    try{
+      const r = await postAPI("/api/payments/activate-pro", {email: userEmail});
+      if(r.piano==="pro"){
+        userPlan = "pro";
+        localStorage.setItem("userPlan","pro");
+        localStorage.removeItem("stripe_paid");
+        updateNavAuth();
+      }
+    }catch(e){}
+  }
+}
+
 window.addEventListener("hashchange",navigate);
 if(!location.hash)location.hash="#home";
+checkPaidReturn();
 navigate();
 </script>
 </body>
