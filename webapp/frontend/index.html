@@ -365,7 +365,19 @@ async function simulaGiornata(gNum){
       <td><span style="color:${d.confidence_label==="Alta"?"var(--green)":d.confidence_label==="Media"?"var(--yellow)":"var(--red)"};font-weight:700">${Math.round((d.confidence||0)*100)}%</span></td>
     </tr>`;
   }
-  html+='</tbody></table></div></div>';
+  html+='</tbody></table></div>';
+  // Legenda colori e abbreviazioni
+  html+=`<div style="margin-top:10px;padding:10px;background:#0d1b2a;border-radius:8px;font-size:.7rem;color:var(--muted)">
+    <strong style="color:var(--text)">Legenda:</strong>
+    <span style="color:var(--green)"> ● Verde</span> = alta probabilita' (>50%)
+    <span style="color:var(--yellow)"> ● Giallo</span> = media (35-50%)
+    <span style="color:var(--red)"> ● Rosso</span> = bassa (<35%)
+    | <strong>Tip</strong> = consiglio 1X2
+    | <strong>O/U</strong> = Over/Under 2.5
+    | <strong>Aff.</strong> = Affidabilita' del pronostico
+    | <span style="background:#ff6b35;color:#fff;padding:0 4px;border-radius:3px">!</span> = giocata SICURA
+  </div>`;
+  html+='</div>';
   det.innerHTML=html;
 }
 
@@ -426,14 +438,14 @@ async function pageClassifica(){
   // Layout 2 colonne: classifica SX, marcatori DX
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
   // SINISTRA: Classifica
-  html+='<div class="card" style="overflow-x:auto"><h2 style="margin-bottom:8px">Classifica</h2><table><thead><tr><th>#</th><th>Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th><th>GF</th><th>GS</th><th>DR</th><th>Pt</th></tr></thead><tbody>';
+  html+='<div class="card" style="overflow-x:auto;padding:8px"><h2 style="margin-bottom:8px;font-size:1.1rem">Classifica</h2><table style="font-size:.75rem;white-space:nowrap"><thead><tr><th>#</th><th style="text-align:left">Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th><th>GF</th><th>GS</th><th>DR</th><th>Pt</th></tr></thead><tbody>';
   (data.classifica||[]).forEach((r,i)=>{
     const c=i<4?"ucl":i<6?"uel":i===6?"conf":i>=17?"rel":"";
     html+=`<tr class="${c}"><td>${i+1}</td><td style="text-align:left;font-weight:700">${r.Squadra}</td><td>${r.G}</td><td>${r.V}</td><td>${r.N}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GS}</td><td style="color:${r.DR>0?"var(--green)":r.DR<0?"var(--red)":"var(--muted)"}">${r.DR>0?"+":""}${r.DR}</td><td style="font-weight:800">${r.Punti}</td></tr>`;
   });
   html+='</tbody></table><div style="margin-top:8px;display:flex;gap:10px;justify-content:center;font-size:.8rem;flex-wrap:wrap"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:#9b59b6">● Conference</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
   // Marcatori consigliati PER PARTITA della giornata 31
-  html+='<div class="card" style="margin-top:12px;border-color:var(--green)"><h2 style="color:var(--green)">Marcatori Consigliati G.31</h2><p style="color:var(--muted);font-size:.8rem;margin-bottom:12px">Per ogni partita — basato su xG, gol stagionali e forma (esclusi infortunati)</p>';
+  html+='<div class="card" style="margin-top:12px;border-color:var(--green);padding:10px"><h3 style="color:var(--green);font-size:1rem;margin-bottom:6px">Marcatori Consigliati G.31</h3><p style="color:var(--muted);font-size:.7rem;margin-bottom:8px">Per partita — esclusi infortunati</p>';
   const marcPartite=[
     {partita:"Sassuolo - Cagliari",casa:"Berardi (7 gol), Pinamonti (7)",ospite:"Esposito (5), Kilicsoy (4)"},
     {partita:"Verona - Fiorentina",casa:"Tengstedt (5), Henry (4)",ospite:"Kean (8), Gudmundsson (5)"},
@@ -447,7 +459,7 @@ async function pageClassifica(){
     {partita:"Napoli - Milan",casa:"Hojlund (10), McTominay (7)",ospite:"Pulisic (8), Gimenez (5)"},
   ];
   marcPartite.forEach(m=>{
-    html+=`<div style="padding:8px 0;border-bottom:1px solid #1f3460"><div style="display:flex;justify-content:space-between;align-items:center"><strong style="font-size:.9rem;color:var(--text)">${m.partita}</strong></div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:var(--green);font-size:.8rem">Casa: ${m.casa}</span><span style="color:var(--red);font-size:.8rem">Ospite: ${m.ospite}</span></div></div>`;
+    html+=`<div style="padding:5px 0;border-bottom:1px solid #1f3460"><strong style="font-size:.8rem;color:var(--text)">${m.partita}</strong><div style="display:flex;justify-content:space-between;font-size:.7rem;margin-top:2px"><span style="color:var(--green)">${m.casa}</span><span style="color:var(--red)">${m.ospite}</span></div></div>`;
   });
   html+='</div></div>';
   // DESTRA: Marcatori
