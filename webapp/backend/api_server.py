@@ -281,8 +281,9 @@ def genera_pronostico(home, away):
             else:
                 la *= 1.04
 
-    lh = max(0.3, min(lh, 5.0))
-    la = max(0.3, min(la, 5.0))
+    # Clamp realistico: nessuna squadra segna piu' di 2.5 gol a partita in media
+    lh = max(0.3, min(lh, 2.5))
+    la = max(0.2, min(la, 2.0))
 
     # Calcolo Poisson con Dixon-Coles
     p1 = px = p2 = 0.0
@@ -759,7 +760,7 @@ def _scrape_notizie():
         req = ur.Request("https://www.gazzetta.it/calcio/serie-a/", headers={"User-Agent":"Mozilla/5.0"})
         with ur.urlopen(req, timeout=10) as r:
             html = r.read().decode("utf-8", errors="replace")
-        links = re.findall(r'<a[^>]+href="(https?://www\.gazzetta\.it/[^"]{20,})"[^>]*>([^<]{15,120})</a>', html)
+        links = re.findall(r'<a[^>]+href="(https?://www\.gazzetta\.it/calcio/serie-a/[^"]{10,})"[^>]*>([^<]{15,120})</a>', html)
         seen2 = set()
         for url, titolo in links:
             t = re.sub(r'<[^>]+>','',titolo).strip()
