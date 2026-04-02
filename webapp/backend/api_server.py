@@ -300,6 +300,90 @@ async def marcatori():
         return []
 
 # ─────────────────────────────
+# SQUADRE (rose, formazioni, infortunati)
+# ─────────────────────────────
+ALLENATORI = {"Inter":"Cristian Chivu","Milan":"Massimiliano Allegri","Napoli":"Antonio Conte","Como":"Cesc Fabregas","Juventus":"Luciano Spalletti","Roma":"Gian Piero Gasperini","Atalanta":"Raffaele Palladino","Lazio":"Maurizio Sarri","Bologna":"Vincenzo Italiano","Sassuolo":"Fabio Grosso","Udinese":"Kosta Runjaic","Parma":"Carlos Cuesta","Genoa":"Patrick Vieira","Torino":"Roberto D'Aversa","Cagliari":"Fabio Pisacane","Fiorentina":"Paolo Vanoli","Cremonese":"Davide Nicola","Lecce":"Eusebio Di Francesco","Verona":"Paolo Sammarco","Pisa":"Oscar Hiljemark"}
+
+FORMAZIONI = {
+    "Inter":{"modulo":"3-5-2","titolari":["Sommer","Bisseck","Akanji","Bastoni","Dumfries","Barella","Calhanoglu","Sucic","Dimarco","Thuram","Bonny"]},
+    "Milan":{"modulo":"4-2-3-1","titolari":["Maignan","Estupinan","Tomori","De Winter","Bartesaghi","Ricci","Fofana","Pulisic","Modric","Saelemaekers","Gimenez"]},
+    "Napoli":{"modulo":"3-4-2-1","titolari":["Meret","Buongiorno","Beukema","Olivera","Gutierrez","Lobotka","Anguissa","McTominay","De Bruyne","Politano","Hojlund"]},
+    "Como":{"modulo":"4-2-3-1","titolari":["Butez","Van der Brempt","Diego Carlos","Kempf","Moreno","Perrone","Caqueret","Kuhn","Paz","Da Cunha","Douvikas"]},
+    "Juventus":{"modulo":"4-2-3-1","titolari":["Di Gregorio","Kalulu","Gatti","Kelly","Cambiaso","Locatelli","Thuram K.","Conceicao","Koopmeiners","Yildiz","Vlahovic"]},
+    "Roma":{"modulo":"3-4-2-1","titolari":["Svilar","Ndicka","Mancini","Hermoso","Rensch","El Aynaoui","Cristante","Tsimikas","Soule","Pellegrini","Malen"]},
+    "Atalanta":{"modulo":"3-4-2-1","titolari":["Carnesecchi","Scalvini","Hien","Kolasinac","Bellanova","De Roon","Ederson","Zappacosta","De Ketelaere","Samardzic","Krstovic"]},
+    "Lazio":{"modulo":"4-3-3","titolari":["Motta","Marusic","Provstgaard","Romagnoli","Tavares","Dele-Bashiru","Patric","Taylor","Isaksen","Maldini","Pedro"]},
+    "Bologna":{"modulo":"4-3-3","titolari":["Ravaglia","Joao Mario","Vitik","Lucumi","Miranda","Moro","Freuler","Ferguson","Orsolini","Castro","Rowe"]},
+    "Sassuolo":{"modulo":"4-2-3-1","titolari":["Muric","Walukiewicz","Idzes","Muharemovic","Garcia","Kone","Vranckx","Berardi","Volpato","Lauriente","Pinamonti"]},
+    "Udinese":{"modulo":"3-5-2","titolari":["Okoye","Solet","Kristensen","Bertola","Ehizibue","Karlstrom","Miller","Zarraga","Zemura","Zaniolo","Davis"]},
+    "Parma":{"modulo":"3-4-2-1","titolari":["Suzuki","Delprato","Circati","Valenti","Britschgi","Keita","Sorensen","Valeri","Strefezza","Ondrejka","Pellegrino"]},
+    "Genoa":{"modulo":"3-5-2","titolari":["Bijlow","Vasquez","Ostigard","Martin","Norton-Cuffy","Frendrup","Malinovskyi","Baldanzi","Sabelli","Vitinha","Colombo"]},
+    "Torino":{"modulo":"3-5-2","titolari":["Israel","Coco","Ismajli","Maripan","Pedersen","Casadei","Ilic","Gineitis","Nkounkou","Vlasic","Adams"]},
+    "Cagliari":{"modulo":"3-5-2","titolari":["Caprile","Ze Pedro","Mina","Rodriguez","Palestra","Adopo","Gaetano","Folorunsho","Obert","Esposito","Kilicsoy"]},
+    "Fiorentina":{"modulo":"4-3-3","titolari":["De Gea","Fortini","Pongracic","Ranieri","Gosens","Ndour","Fagioli","Brescianini","Parisi","Kean","Gudmundsson"]},
+    "Cremonese":{"modulo":"4-4-2","titolari":["Audero","Terracciano","Bianchetti","Luperto","Pezzella","Zerbin","Maleh","Grassi","Vandeputte","Bonazzoli","Vardy"]},
+    "Lecce":{"modulo":"4-3-3","titolari":["Falcone","Veiga","Siebert","Jean","Gallo","Sala","Ramadani","Fofana","Banda","Cheddira","Pierotti"]},
+    "Verona":{"modulo":"3-5-2","titolari":["Montipo","Edmundsson","Nelsson","Valentini","Belghali","Akpa Akpro","Gagliardini","Harroui","Frese","Bowie","Orban"]},
+    "Pisa":{"modulo":"3-4-2-1","titolari":["Semper","Canestrelli","Calabresi","Angori","Loyola","Hojholt","Aebischer","Cuadrado","Stengs","Tramoni","Meister"]},
+}
+
+INFORTUNATI = {
+    "Inter":[{"nome":"Lautaro Martinez","tipo":"infortunio","dettaglio":"Da monitorare, rientro inizio aprile"},{"nome":"Mkhitaryan","tipo":"infortunio","dettaglio":"Problema muscolare"},{"nome":"Carlos Augusto","tipo":"squalifica","dettaglio":"Squalificato 1 giornata"}],
+    "Milan":[{"nome":"Gabbia","tipo":"infortunio","dettaglio":"Problema muscolare, rientro aprile"},{"nome":"Loftus-Cheek","tipo":"infortunio","dettaglio":"Infortunio ginocchio"},{"nome":"Leao","tipo":"dubbio","dettaglio":"Affaticamento, da valutare"}],
+    "Napoli":[{"nome":"Neres","tipo":"infortunio","dettaglio":"Problema muscolare, rientro aprile"},{"nome":"Di Lorenzo","tipo":"infortunio","dettaglio":"Distorsione ginocchio, fine aprile"},{"nome":"Rrahmani","tipo":"infortunio","dettaglio":"Rientro maggio"}],
+    "Juventus":[{"nome":"Holm","tipo":"infortunio","dettaglio":"Rientro inizio aprile"}],
+    "Roma":[{"nome":"Kone","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Dybala","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Dovbyk","tipo":"infortunio","dettaglio":"Rientro maggio"},{"nome":"Ferguson","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Atalanta":[{"nome":"Scamacca","tipo":"dubbio","dettaglio":"Da monitorare"}],
+    "Lazio":[{"nome":"Zaccagni","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Rovella","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Provedel","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Bologna":[{"nome":"Odgaard","tipo":"infortunio","dettaglio":"Meta aprile"},{"nome":"Pobega","tipo":"infortunio","dettaglio":"Meta aprile"},{"nome":"Skorupski","tipo":"infortunio","dettaglio":"Maggio"}],
+    "Sassuolo":[{"nome":"Pieragnolo","tipo":"infortunio","dettaglio":"Inizio aprile"},{"nome":"Cande","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Fadera","tipo":"infortunio","dettaglio":"Maggio"}],
+    "Udinese":[{"nome":"Buksa","tipo":"infortunio","dettaglio":"Meta aprile"},{"nome":"Zanoli","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Parma":[{"nome":"Almqvist","tipo":"infortunio","dettaglio":"Rientro dopo sosta"},{"nome":"Cremaschi","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Genoa":[{"nome":"Onana","tipo":"dubbio","dettaglio":"Da valutare"}],
+    "Torino":[{"nome":"Aboukhlal","tipo":"dubbio","dettaglio":"Da valutare"}],
+    "Cagliari":[{"nome":"Felici","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Idrissi","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Fiorentina":[{"nome":"Solomon","tipo":"infortunio","dettaglio":"Rientro aprile"},{"nome":"Lamptey","tipo":"infortunio","dettaglio":"Rientro aprile"}],
+    "Cremonese":[{"nome":"Baschirotto","tipo":"infortunio","dettaglio":"Inizio aprile"}],
+    "Lecce":[{"nome":"Gaspar","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Berisha","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Camarda","tipo":"infortunio","dettaglio":"Rientro aprile"}],
+    "Verona":[], "Pisa":[{"nome":"Denoon","tipo":"infortunio","dettaglio":"Lungodegente"},{"nome":"Scuffet","tipo":"infortunio","dettaglio":"Inizio aprile"}],
+    "Como":[{"nome":"Addai","tipo":"infortunio","dettaglio":"Stagione finita"}],
+}
+
+ROSE = {
+    "Inter":[("Sommer","P",1),("Martinez J.","P",13),("Bastoni","D",95),("Bisseck","D",31),("Akanji","D",25),("De Vrij","D",6),("Acerbi","D",15),("Dimarco","D",32),("Dumfries","D",2),("Darmian","D",36),("Calhanoglu","C",20),("Barella","C",23),("Sucic","C",8),("Frattesi","C",16),("Zielinski","C",7),("Mkhitaryan","C",22),("Lautaro Martinez","A",10),("Thuram","A",9),("Bonny","A",14),("Luis Henrique","A",11)],
+    "Milan":[("Maignan","P",16),("Terracciano","P",1),("Pavlovic","D",31),("De Winter","D",5),("Tomori","D",23),("Gabbia","D",46),("Estupinan","D",2),("Bartesaghi","D",33),("Ricci","C",4),("Fofana","C",19),("Rabiot","C",12),("Loftus-Cheek","C",8),("Modric","C",14),("Jashari","C",30),("Leao","A",10),("Pulisic","A",11),("Nkunku","A",18),("Gimenez","A",7),("Fullkrug","A",9),("Saelemaekers","A",56)],
+    "Napoli":[("Meret","P",1),("Contini","P",14),("Buongiorno","D",4),("Beukema","D",31),("Rrahmani","D",13),("Gutierrez","D",3),("Olivera","D",17),("Di Lorenzo","D",22),("Gilmour","C",6),("Lobotka","C",68),("McTominay","C",8),("Anguissa","C",99),("De Bruyne","C",11),("Hojlund","A",19),("Lukaku","A",9),("Neres","A",7),("Politano","A",21),("Giovane","A",23),("Alisson Santos","A",77)],
+    "Juventus":[("Di Gregorio","P",16),("Perin","P",1),("Bremer","D",3),("Kalulu","D",15),("Kelly","D",6),("Gatti","D",4),("Cambiaso","D",27),("Holm","D",2),("Locatelli","C",5),("Thuram K.","C",19),("McKennie","C",22),("Koopmeiners","C",8),("Vlahovic","A",9),("David","A",30),("Openda","A",20),("Conceicao","A",7),("Yildiz","A",10),("Boga","A",14)],
+    "Roma":[("Svilar","P",99),("Gollini","P",95),("Ndicka","D",5),("Mancini","D",23),("Hermoso","D",22),("Angelino","D",3),("Tsimikas","D",12),("Celik","D",19),("Rensch","D",2),("Cristante","C",4),("Kone","C",17),("El Aynaoui","C",8),("Pisilli","C",61),("Pellegrini","C",7),("Dybala","A",21),("Malen","A",14),("Ferguson","A",11),("Dovbyk","A",9),("Soule","A",18),("El Shaarawy","A",92),("Zaragoza","A",97),("Vaz","A",78)],
+    "Atalanta":[("Carnesecchi","P",29),("Sportiello","P",57),("Scalvini","D",42),("Hien","D",4),("Kossounou","D",3),("Kolasinac","D",23),("Djimsiti","D",19),("Ederson","C",13),("Musah","C",6),("Pasalic","C",8),("De Roon","C",15),("Bellanova","C",16),("Zappacosta","C",77),("De Ketelaere","A",17),("Samardzic","A",10),("Raspadori","A",18),("Scamacca","A",9),("Krstovic","A",90)],
+    "Lazio":[("Provedel","P",94),("Motta","P",40),("Gila","D",34),("Romagnoli","D",13),("Gigot","D",2),("Tavares","D",17),("Marusic","D",77),("Lazzari","D",29),("Rovella","C",6),("Belahyane","C",21),("Taylor","C",24),("Dele-Bashiru","C",7),("Maldini","A",27),("Zaccagni","A",10),("Isaksen","A",18),("Dia","A",19),("Pedro","A",9),("Noslin","A",14),("Ratkov","A",20)],
+    "Bologna":[("Skorupski","P",1),("Ravaglia","P",13),("Lucumi","D",26),("Vitik","D",41),("Casale","D",16),("Miranda","D",33),("Joao Mario","D",17),("Moro","C",6),("Ferguson L.","C",19),("Pobega","C",4),("Freuler","C",8),("Odgaard","C",21),("Castro","A",9),("Dallinga","A",24),("Orsolini","A",7),("Bernardeschi","A",10),("Rowe","A",11)],
+    "Sassuolo":[("Muric","P",49),("Turati","P",13),("Idzes","D",21),("Doig","D",3),("Walukiewicz","D",6),("Romagna","D",19),("Pieragnolo","D",15),("Lipani","C",35),("Boloca","C",11),("Matic","C",18),("Kone","C",90),("Thorstvedt","C",42),("Berardi","A",25),("Pinamonti","A",9),("Lauriente","A",45),("Volpato","A",7)],
+    "Udinese":[("Okoye","P",40),("Sava","P",90),("Solet","D",28),("Kristensen","D",31),("Bertola","D",13),("Kabasele","D",27),("Zemura","D",33),("Zanoli","D",59),("Karlstrom","C",8),("Miller","C",38),("Zarraga","C",6),("Zaniolo","A",10),("Davis","A",9),("Buksa","A",18)],
+    "Parma":[("Suzuki","P",31),("Circati","D",39),("Valenti","D",5),("Delprato","D",15),("Valeri","D",14),("Carboni","D",29),("Keita","C",16),("Bernabe","C",10),("Nicolussi Caviglia","C",41),("Oristanio","C",21),("Strefezza","A",7),("Almqvist","A",11),("Pellegrino","A",9)],
+    "Genoa":[("Bijlow","P",16),("Leali","P",1),("Vasquez","D",22),("Ostigard","D",5),("Martin","D",3),("Norton-Cuffy","D",15),("Sabelli","D",20),("Frendrup","C",32),("Malinovskyi","C",17),("Baldanzi","C",8),("Ellertsson","C",77),("Messias","A",10),("Colombo","A",29),("Vitinha","A",9),("Ekuban","A",18)],
+    "Torino":[("Israel","P",81),("Paleari","P",1),("Coco","D",23),("Ismajli","D",44),("Maripan","D",13),("Biraghi","D",34),("Pedersen","D",16),("Nkounkou","D",25),("Prati","C",4),("Casadei","C",22),("Ilic","C",8),("Gineitis","C",66),("Lazaro","C",20),("Vlasic","A",10),("Adams","A",19),("Simeone","A",7)],
+    "Cagliari":[("Caprile","P",1),("Sherri","P",12),("Dossena","D",22),("Mina","D",26),("Obert","D",33),("Zappa","D",28),("Sulemana","C",25),("Adopo","C",8),("Folorunsho","C",90),("Mazzitelli","C",4),("Gaetano","C",10),("Esposito","A",94),("Kilicsoy","A",9),("Felici","A",17)],
+    "Fiorentina":[("De Gea","P",43),("Christensen","P",53),("Comuzzo","D",15),("Ranieri","D",6),("Gosens","D",21),("Dodo","D",2),("Lamptey","D",48),("Parisi","D",65),("Mandragora","C",8),("Fagioli","C",44),("Brescianini","C",4),("Fazzini","C",22),("Gudmundsson","A",10),("Kean","A",9),("Beltran","A",7),("Harrison","A",17)],
+    "Cremonese":[("Audero","P",1),("Silvestri","P",16),("Pezzella","D",3),("Luperto","D",5),("Baschirotto","D",6),("Bianchetti","D",15),("Barbieri","D",4),("Faye","D",30),("Thorsby","C",2),("Bondo","C",38),("Vandeputte","C",27),("Payero","C",32),("Grassi","C",33),("Vardy","A",10),("Djuric","A",9),("Zerbin","A",7),("Sanabria","A",99)],
+    "Lecce":[("Falcone","P",30),("Fruchtl","P",1),("Gaspar","D",4),("Gallo","D",25),("Veiga","D",17),("Ramadani","C",20),("Berisha","C",10),("Coulibaly","C",29),("Sala","C",6),("Marchwinski","C",36),("Banda","A",19),("Camarda","A",22),("Cheddira","A",99),("Pierotti","A",50)],
+    "Verona":[("Montipo","P",1),("Perilli","P",34),("Nelsson","D",15),("Bella-Kotchap","D",37),("Bradaric","D",12),("Lirola","D",14),("Oyegoke","D",2),("Lovric","C",4),("Serdar","C",8),("Harroui","C",21),("Gagliardini","C",63),("Suslov","A",10),("Henry","A",9),("Tengstedt","A",20),("Duda","A",27)],
+    "Pisa":[("Semper","P",1),("Scuffet","P",22),("Canestrelli","D",5),("Calabresi","D",33),("Loyola","D",35),("Angori","D",3),("Marin","C",6),("Hojholt","C",8),("Aebischer","C",20),("Stengs","C",23),("Cuadrado","C",11),("Meister","A",9),("Tramoni","A",10),("Iling-Junior","A",19),("Moreo","A",32)],
+    "Como":[("Butez","P",1),("Tornqvist","P",21),("Diego Carlos","D",34),("Kempf","D",2),("Goldaniga","D",5),("Valle","D",3),("Moreno","D",18),("Van der Brempt","D",77),("Vojvoda","D",31),("Perrone","C",23),("Da Cunha","C",33),("Caqueret","C",6),("Sergi Roberto","C",8),("Paz","C",10),("Baturina","C",20),("Diao","A",38),("Kuhn","A",19),("Douvikas","A",11),("Morata","A",7)],
+}
+
+@app.get("/api/squadra/{nome}")
+async def squadra(nome: str):
+    n = nome.strip().title()
+    return {
+        "nome": n,
+        "allenatore": ALLENATORI.get(n, "N/D"),
+        "formazione": FORMAZIONI.get(n),
+        "infortunati": INFORTUNATI.get(n, []),
+        "rosa": [{"nome":g[0],"ruolo":g[1],"numero":g[2]} for g in ROSE.get(n, [])],
+    }
+
+# ─────────────────────────────
 # HEALTH CHECK
 # ─────────────────────────────
 @app.get("/api/health")
