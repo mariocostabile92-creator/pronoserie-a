@@ -336,7 +336,7 @@ def genera_pronostico(home, away):
         "prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),
         "quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,
         "suggerimento":sg,"sugg_label":sl,"confidence":round(cf,3),"confidence_label":cl,
-        "sicura": sicura,
+        "sicura": bool(sicura),
         "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
         "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
         "gol_attesi":round(lh+la,2),"risultati_esatti":scores[:5],
@@ -472,13 +472,13 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "goal_no": raw.get("goal_no"),
         "gol_attesi": raw.get("gol_attesi"),
         "risultati_esatti": raw.get("risultati_esatti", []),
-        "sicura": raw.get("sicura", False),
+        "sicura": bool(raw.get("sicura", False)),
         "marcatori_casa": raw.get("marcatori_casa") or TOP_SCORER.get(home.strip().title(), []),
         "marcatori_ospite": raw.get("marcatori_ospite") or TOP_SCORER.get(away.strip().title(), []),
         "formazione_casa": raw.get("formazione_casa") or FORMAZIONI.get(home.strip().title()),
         "formazione_ospite": raw.get("formazione_ospite") or FORMAZIONI.get(away.strip().title()),
-        "h2h_applicato": raw.get("h2h_applicato", False),
-        "h2h_partite": raw.get("h2h_partite", 0),
+        "h2h_applicato": bool(raw.get("h2h_applicato", False)),
+        "h2h_partite": int(raw.get("h2h_partite", 0)),
     }
 
 # ─────────────────────────────
