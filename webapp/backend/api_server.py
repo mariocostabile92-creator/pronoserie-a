@@ -1,52 +1,45 @@
 """
-api_server.py
-Versione completa FIXATA per frontend + Railway
+api_server.py - VERSIONE STABILE PRODUZIONE
+Fix calendario + debug + compatibilità frontend
 """
 
 import sys
 import os
 
-# ─────────────────────────────────────────────
-# PATH PROJECT ROOT
-# ─────────────────────────────────────────────
+# PATH ROOT
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, _ROOT)
 
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 # IMPORT MOTORE
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 try:
     from data_loader import load_all_data
     from stats_engine import get_team_stats
     from predictor import get_prediction
-    from season_2526 import (
-        get_classifica_reale,
-        get_calendario_rimanente,
-        GIORNATA_ATTUALE,
-    )
+    from season_2526 import get_classifica_reale, get_calendario_rimanente
     from squads_2526 import get_marcatori
     MOTORE_DISPONIBILE = True
 except Exception as e:
-    print("Errore motore:", e)
+    print("❌ ERRORE IMPORT MOTORE:", e)
     MOTORE_DISPONIBILE = False
 
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 # IMPORT BACKEND
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 from database import init_db, log_api_call, count_daily_calls, get_user_by_email, create_user
-from api_auth import get_current_user, get_optional_user, hash_password, verify_password, create_token
-from api_models import *
+from api_auth import get_optional_user, hash_password, verify_password, create_token
 from api_payments import router as payments_router
 
-# ─────────────────────────────────────────────
-# CONFIG
-# ─────────────────────────────────────────────
-app = FastAPI(title="Pronostici Serie A API", version="2.0")
+# ─────────────────────────────
+# APP
+# ─────────────────────────────
+app = FastAPI(title="Pronostici API", version="FINAL")
 
 app.add_middleware(
     CORSMiddleware,
@@ -58,36 +51,34 @@ app.add_middleware(
 
 app.include_router(payments_router)
 
-LIMITE_FREE = 2
 _df = None
+LIMITE_FREE = 2
 
-
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 # STARTUP
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 @app.on_event("startup")
 async def startup():
     global _df
 
-    print("🚀 Avvio server...")
+    print("🚀 AVVIO SERVER...")
 
     try:
         init_db()
-        print("✅ Database pronto")
+        print("✅ DB OK")
     except Exception as e:
-        print("❌ DB error:", e)
+        print("❌ DB ERROR:", e)
 
     if MOTORE_DISPONIBILE:
         try:
             _df = load_all_data()
-            print("✅ Dati caricati")
+            print("✅ DATI CARICATI")
         except Exception as e:
-            print("❌ Errore dati:", e)
+            print("❌ ERRORE DATI:", e)
 
-
-# ─────────────────────────────────────────────
-# FRONTEND SERVE
-# ─────────────────────────────────────────────
+# ─────────────────────────────
+# FRONTEND
+# ─────────────────────────────
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 
 @app.get("/", include_in_schema=False)
@@ -99,10 +90,9 @@ async def root():
 async def serve_app(path: str = ""):
     return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
-
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 # UTILS
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 def check_limit(user):
     if not user or user.get("piano") == "pro":
         return
@@ -113,17 +103,15 @@ def check_limit(user):
 
     log_api_call(user["id"], "pronostico")
 
-
 def genera_pronostico(home, away):
     if MOTORE_DISPONIBILE and _df is not None:
         try:
             hs = get_team_stats(_df, home, opponent=away)
             aw = get_team_stats(_df, away, opponent=home)
             return get_prediction(hs, aw, df=_df)
-        except:
-            pass
+        except Exception as e:
+            print("Errore predizione:", e)
 
-    # fallback
     return {
         "prob_1": 34,
         "prob_x": 33,
@@ -131,48 +119,44 @@ def genera_pronostico(home, away):
         "quota_1": 2.2,
         "quota_x": 3.1,
         "quota_2": 2.9,
-        "suggerimento": "1",
+        "suggerimento": "X",
         "sugg_label": "Fallback",
         "confidence": 0.5,
         "confidence_label": "Media",
     }
 
-
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 # AUTH
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 @app.post("/api/auth/register")
-async def register(data: UserRegister):
-    email = data.email.lower()
+async def register(data: dict):
+    email = data["email"].lower()
 
     if get_user_by_email(email):
         raise HTTPException(409, "Email già registrata")
 
-    user = create_user(email, hash_password(data.password))
+    user = create_user(email, hash_password(data["password"]))
     token = create_token({"sub": str(user["id"])})
 
     return {"access_token": token, "piano": user["piano"]}
 
-
 @app.post("/api/auth/login")
-async def login(data: UserLogin):
-    user = get_user_by_email(data.email.lower())
+async def login(data: dict):
+    user = get_user_by_email(data["email"].lower())
 
-    if not user or not verify_password(data.password, user["password_hash"]):
+    if not user or not verify_password(data["password"], user["password_hash"]):
         raise HTTPException(401, "Credenziali errate")
 
     token = create_token({"sub": str(user["id"])})
 
     return {"access_token": token, "piano": user["piano"]}
 
-
-# ─────────────────────────────────────────────
-# PRONOSTICO (compatibile frontend)
-# ─────────────────────────────────────────────
+# ─────────────────────────────
+# PRONOSTICO
+# ─────────────────────────────
 @app.get("/api/pronostico/{home}/{away}")
 async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_optional_user)):
     check_limit(user)
-
     raw = genera_pronostico(home, away)
 
     return {
@@ -196,10 +180,9 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "risultati_esatti": raw.get("risultati_esatti", [])
     }
 
-
-# ─────────────────────────────────────────────
-# CALENDARIO (FIX ERRORE 404)
-# ─────────────────────────────────────────────
+# ─────────────────────────────
+# CALENDARIO (SUPER STABILE)
+# ─────────────────────────────
 @app.get("/api/calendario")
 async def calendario():
     try:
@@ -208,49 +191,60 @@ async def calendario():
 
         cal = get_calendario_rimanente()
 
-        return {
-            "giornate": [
-                {
-                    "giornata": g["giornata"],
-                    "data": g.get("data", ""),
-                    "partite": [
-                        {"home": p["home"], "away": p["away"]}
-                        for p in g["partite"]
-                    ]
-                }
-                for g in cal
-            ]
-        }
+        print("DEBUG calendario:", cal)
+
+        giornate = []
+
+        for g in cal:
+            giornata = {
+                "giornata": g.get("giornata", 0),
+                "data": g.get("data", ""),
+                "partite": []
+            }
+
+            for p in g.get("partite", []):
+                home = p.get("home") or p.get("casa")
+                away = p.get("away") or p.get("trasferta")
+
+                if home and away:
+                    giornata["partite"].append({
+                        "home": home,
+                        "away": away
+                    })
+
+            giornate.append(giornata)
+
+        return {"giornate": giornate}
 
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print("❌ ERRORE CALENDARIO:", e)
+        return {"giornate": [], "errore": str(e)}
 
-
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 # CLASSIFICA
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 @app.get("/api/classifica")
 async def classifica():
     try:
         return get_classifica_reale()
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print("Errore classifica:", e)
+        return {}
 
-
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 # MARCATORI
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 @app.get("/api/marcatori")
 async def marcatori():
     try:
         return get_marcatori()
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print("Errore marcatori:", e)
+        return []
 
-
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 # HEALTH
-# ─────────────────────────────────────────────
+# ─────────────────────────────
 @app.get("/api/health")
 async def health():
     return {
@@ -259,11 +253,9 @@ async def health():
         "dati": _df is not None
     }
 
-
-# ─────────────────────────────────────────────
-# RUN LOCALE
-# ─────────────────────────────────────────────
+# ─────────────────────────────
+# RUN
+# ─────────────────────────────
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("api_server:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
-
