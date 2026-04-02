@@ -228,18 +228,30 @@ async function simulaGiornata(gNum){
   if(!cal)return;
   const g=cal.giornate.find(x=>x.giornata===gNum);
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
-  let html='<div class="card"><h3 style="margin-bottom:8px">Pronostici Giornata '+gNum+'</h3>';
+  let html='<div class="card"><h3 style="margin-bottom:12px">Pronostici Giornata '+gNum+'</h3>';
+  html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.85rem"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U 2.5</th><th>Goal</th><th>Gol Att.</th></tr></thead><tbody>';
   for(const p of g.partite){
     const d=await fetchAPI("/api/pronostico/"+p.home+"/"+p.away);
     if(!d)continue;
-    const ou=d.over_25>50?"O2.5":"U2.5";
-    const gl=d.goal_si>50?"Si":"No";
-    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460;font-size:.9rem">
-      <span><strong>${p.home}</strong> vs <strong>${p.away}</strong></span>
-      <span><span class="tag ${d.suggerimento==="1"?"tag-green":d.suggerimento==="X"?"tag-yellow":"tag-red"}" style="font-size:.75rem">${d.suggerimento}</span> <span style="color:var(--muted)">${ou} | Goal ${gl}</span></span>
-    </div>`;
+    const tipCol=d.suggerimento==="1"?"var(--green)":d.suggerimento==="X"?"var(--yellow)":"var(--red)";
+    const ouLbl=d.over_25>50?"Over":"Under";
+    const ouVal=d.over_25>50?d.over_25:d.under_25;
+    const ouCol=d.over_25>50?"var(--green)":"var(--accent)";
+    const glLbl=d.goal_si>50?"Si":"No";
+    const glVal=d.goal_si>50?d.goal_si:d.goal_no;
+    const glCol=d.goal_si>50?"var(--green)":"var(--accent)";
+    html+=`<tr style="border-bottom:1px solid #1f3460;cursor:pointer" onclick="showMatch('${p.home}','${p.away}')">
+      <td style="text-align:left;padding:8px 4px"><strong>${p.home}</strong> - <strong>${p.away}</strong></td>
+      <td style="color:var(--green)">${d.prob_1}%</td>
+      <td style="color:var(--yellow)">${d.prob_x}%</td>
+      <td style="color:var(--red)">${d.prob_2}%</td>
+      <td><span style="color:${tipCol};font-weight:800">${d.suggerimento}</span></td>
+      <td><span style="color:${ouCol}">${ouLbl} ${ouVal}%</span></td>
+      <td><span style="color:${glCol}">${glLbl} ${glVal}%</span></td>
+      <td style="color:var(--muted)">${d.gol_attesi||"-"}</td>
+    </tr>`;
   }
-  html+='</div>';
+  html+='</tbody></table></div></div>';
   det.innerHTML=html;
 }
 
