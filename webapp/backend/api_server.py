@@ -273,7 +273,7 @@ def genera_pronostico(home, away):
     # Goal Si con calibrazione Serie A (in media ~55% delle partite sono Goal)
     gsi_raw = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
     # Correggi: se la squadra piu debole ha xGA basso (difesa forte), NoGoal piu probabile
-    xga_min = min(xh.get("xGA",1.3), xa.get("xGA",1.3))
+    xga_min = min(sh.get("xGA_pg", sa.get("xGA_pg", 1.3)), sa.get("xGA_pg", sh.get("xGA_pg", 1.3)))
     if xga_min < 1.0:
         gsi = gsi_raw * 0.88  # Difese forti = meno Goal
     elif xga_min < 1.2:
