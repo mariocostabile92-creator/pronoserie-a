@@ -159,6 +159,8 @@ async function calcPronostico(){
       <div class="card" style="text-align:center;padding:12px"><strong>Gol Attesi</strong><br><span style="font-size:1.3rem;font-weight:700">${d.gol_attesi||"-"}</span></div>
     </div>`;
     if(d.risultati_esatti)extra+=`<p style="color:var(--muted)">Esatto: ${d.risultati_esatti.slice(0,3).map(r=>r.score+" ("+r.prob+"%)").join(" | ")}</p>`;
+    // Marcatori consigliati dall'IA
+    extra+=`<div style="margin-top:12px;padding:12px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--green);margin-bottom:6px">Marcatori Consigliati dall'IA</h4><p style="color:var(--text);font-size:.9rem">Migliori marcatori da tenere d'occhio per questa partita basandosi su xG, forma e storico gol.</p></div>`;
   }
   if(userPlan!=="pro"){freeUsed++;localStorage.setItem("freeUsed",freeUsed)}
   const remaining = userPlan==="pro" ? "" : `<p style="color:var(--muted);text-align:center;margin-top:12px;font-size:.85rem">Pronostici gratuiti rimanenti: ${Math.max(0,FREE_LIMIT-freeUsed)}/${FREE_LIMIT}</p>`;
@@ -178,27 +180,55 @@ async function calcPronostico(){
   </div>`;
 }
 
-// ── CALENDARIO (Free: solo G31-32, Pro: tutte) ──
+// ── CALENDARIO (layout 2 colonne: principale sx, altre dx) ──
 async function pageCalendario(){
-  let html='<div class="container"><h1>Calendario Giornate 31-38</h1><p class="sub">Clicca su una partita per il pronostico</p>';
   const cal=await fetchAPI("/api/calendario");
-  if(!cal||!cal.giornate){return html+'<div class="card" style="color:var(--red)">Errore caricamento calendario. Riprova.</div></div>';}
-  cal.giornate.forEach((g,idx)=>{
-    const locked=userPlan!=="pro"&&idx>=2;
-    html+=`<div class="card" ${locked?'style="opacity:.5"':''}>
-      <h2>Giornata ${g.giornata} — <span style="color:var(--muted)">${g.data||""}</span>${locked?' <span class="tag tag-red">PRO</span>':''}</h2>`;
-    if(locked){
-      html+=`<div class="lock-msg"><p>Passa a Pro per vedere le giornate ${g.giornata}-38</p><button class="btn btn-green" style="font-size:.9rem;padding:8px 20px" onclick="abbonarPro()">Sblocca Pro</button></div>`;
-    } else {
-      g.partite.forEach(p=>{
-        html+=`<button class="match-btn" onclick="showMatch('${p.home}','${p.away}')">
-          <span><strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong></span>
-          <span style="color:var(--accent)">Pronostico →</span></button>`;
-      });
-    }
+  if(!cal||!cal.giornate||!cal.giornate.length)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>';
+  const g0=cal.giornate[0]; // giornata principale (31)
+  let html='<div class="container"><h1>Calendario Serie A 2025-2026</h1><p class="sub">Giornata corrente + prossime giornate</p>';
+  html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
+  // SINISTRA: giornata principale
+  html+='<div>';
+  html+=`<div class="card"><h2 style="color:var(--green)">Giornata ${g0.giornata} — ${g0.data||""}</h2>`;
+  html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata(${g0.giornata})">Simula Pronostici Giornata</button>`;
+  g0.partite.forEach(p=>{
+    html+=`<button class="match-btn" onclick="showMatch('${p.home}','${p.away}')"><span><strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong></span><span style="color:var(--accent)">→</span></button>`;
+  });
+  html+='</div><div id="sim-result-main"></div></div>';
+  // DESTRA: altre giornate
+  html+='<div>';
+  cal.giornate.slice(1).forEach((g,idx)=>{
+    const locked=userPlan!=="pro"&&idx>=1;
+    html+=`<div class="card" style="padding:12px${locked?";opacity:.4":""}"><h3>G.${g.giornata} <span style="color:var(--muted);font-size:.8rem">${g.data||""}</span>${locked?' <span class="tag tag-red" style="font-size:.7rem">PRO</span>':''}</h3>`;
+    if(locked){html+=`<p style="color:var(--muted);font-size:.8rem">Sblocca con Pro</p>`}
+    else{g.partite.forEach(p=>{html+=`<p style="font-size:.85rem;padding:2px 0;cursor:pointer;color:var(--text)" onclick="showMatch('${p.home}','${p.away}')">${p.home} - ${p.away}</p>`})}
     html+='</div>';
   });
-  return html+'</div>';
+  html+='</div></div></div>';
+  return html;
+}
+
+async function simulaGiornata(gNum){
+  const det=$("sim-result-main");
+  if(!det)return;
+  det.innerHTML='<div class="spinner"></div>';
+  const cal=await fetchAPI("/api/calendario");
+  if(!cal)return;
+  const g=cal.giornate.find(x=>x.giornata===gNum);
+  if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
+  let html='<div class="card"><h3 style="margin-bottom:8px">Pronostici Giornata '+gNum+'</h3>';
+  for(const p of g.partite){
+    const d=await fetchAPI("/api/pronostico/"+p.home+"/"+p.away);
+    if(!d)continue;
+    const ou=d.over_25>50?"O2.5":"U2.5";
+    const gl=d.goal_si>50?"Si":"No";
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460;font-size:.9rem">
+      <span><strong>${p.home}</strong> vs <strong>${p.away}</strong></span>
+      <span><span class="tag ${d.suggerimento==="1"?"tag-green":d.suggerimento==="X"?"tag-yellow":"tag-red"}" style="font-size:.75rem">${d.suggerimento}</span> <span style="color:var(--muted)">${ou} | Goal ${gl}</span></span>
+    </div>`;
+  }
+  html+='</div>';
+  det.innerHTML=html;
 }
 
 async function showMatch(h,a){
@@ -280,11 +310,47 @@ async function loadSq(nome){
   html+='<div>';
   html+=`<div class="card"><h2>${d.nome||nome}</h2><p style="color:var(--muted)">Allenatore: <strong>${d.allenatore||"N/D"}</strong></p>${d.ultimo_aggiornamento?`<p style="color:var(--muted);font-size:.8rem;margin-top:4px">Aggiornamento: ${d.ultimo_aggiornamento}</p>`:''}</div>`;
   if(d.formazione&&d.formazione.titolari){
-    html+=`<div class="card"><h3>Probabile Formazione (${d.formazione.modulo||""})</h3>
-      <div class="pitch" style="margin-top:12px">
-        <div class="pitch-line"></div>
-        <p style="color:rgba(255,255,255,.5);font-size:.75rem;margin-bottom:8px">${d.formazione.modulo||""}</p>
-        <div style="padding:10px 0">${d.formazione.titolari.map(g=>'<span class="player-dot">'+g+'</span>').join(" ")}</div>
+    const tit=d.formazione.titolari;
+    const mod=d.formazione.modulo||"4-4-2";
+    // Posizioni per modulo
+    const layouts={"3-5-2":[[1],[3],[5],[2]],"4-4-2":[[1],[4],[4],[2]],"4-3-3":[[1],[4],[3],[3]],"4-2-3-1":[[1],[4],[2],[3],[1]],"3-4-2-1":[[1],[3],[4],[2],[1]],"3-4-1-2":[[1],[3],[4],[1],[2]],"4-3-1-2":[[1],[4],[3],[1],[2]],"4-1-4-1":[[1],[4],[1],[4],[1]]};
+    const ruoliCol={"P":"#f39c12","D":"#3498db","C":"#2ecc71","A":"#e74c3c"};
+    const ruoliLabel={"P":"POR","D":"DIF","C":"CC","A":"ATT"};
+    // Assegna ruoli in base alla posizione
+    const modParts=(mod.match(/\d/g)||[]).map(Number);
+    let ruoliSeq=["P"];
+    const ruoloMap=["D","C","C","A"];
+    modParts.forEach((n,i)=>{for(let j=0;j<n;j++)ruoliSeq.push(ruoloMap[Math.min(i,3)])});
+    // Anche dalla rosa se disponibile
+    const rosaMap={};
+    if(d.rosa)d.rosa.forEach(g=>{rosaMap[g.nome.split(" ").pop().toLowerCase()]=g.ruolo});
+
+    const layout=layouts[mod]||layouts["4-4-2"];
+    let idx=0;
+    let pitchHtml='';
+    const rowNames=["POR","DIF","CC","ATT","ATT"];
+    layout.forEach((row,ri)=>{
+      pitchHtml+=`<div style="display:flex;justify-content:center;gap:8px;margin:${ri===0?'4px':'6px'} 0">`;
+      for(let c=0;c<row[0];c++){
+        if(idx<tit.length){
+          const nome=tit[idx];
+          const cognome=nome.split(" ").pop();
+          // Trova ruolo dalla rosa o dalla posizione
+          let ruolo=rosaMap[cognome.toLowerCase()]||ruoliSeq[idx]||"C";
+          const col=ruoliCol[ruolo]||"#3498db";
+          const lbl=ruoliLabel[ruolo]||"";
+          pitchHtml+=`<div style="text-align:center;min-width:60px"><div style="background:${col};color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:.7rem;font-weight:800;border:2px solid rgba(255,255,255,.3)">${lbl}</div><div style="color:#fff;font-size:.7rem;font-weight:600;margin-top:2px">${cognome}</div></div>`;
+          idx++;
+        }
+      }
+      pitchHtml+='</div>';
+    });
+
+    html+=`<div class="card"><h3>Probabile Formazione (${mod})</h3>
+      <div class="pitch" style="margin-top:12px;padding:16px 8px">
+        <div style="text-align:center;color:rgba(255,255,255,.4);font-size:.7rem;margin-bottom:4px">ATTACCO</div>
+        ${pitchHtml.split('</div></div>').reverse().join('</div></div>')}
+        <div style="text-align:center;color:rgba(255,255,255,.4);font-size:.7rem;margin-top:4px">PORTA</div>
       </div>
     </div>`;
   }
