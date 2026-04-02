@@ -248,13 +248,8 @@ def genera_pronostico(home, away):
         lh = 0.50 * lh_hist + 0.30 * lh_xg + 0.20 * lh_cls
         la = 0.50 * la_hist + 0.30 * la_xg + 0.20 * la_cls
 
-        # Calibrazione: media gol Serie A 2025-26 = 2.67/partita
-        # Se lambda totali sono troppo alti, riduci proporzionalmente
-        tot_lambda = lh + la
-        if tot_lambda > 3.0:
-            scale = 2.85 / tot_lambda  # Target ~2.85 (leggermente sopra media per partite forti)
-            lh *= scale
-            la *= scale
+        # I gol attesi riflettono la forza SPECIFICA delle due squadre
+        # Non applichiamo cap alla media campionato
 
         # Correzione H2H
         h2h_key = f"{h}_vs_{a}"
