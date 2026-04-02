@@ -178,6 +178,45 @@ def check_limit(user):
 
     log_api_call(user["id"], "pronostico")
 
+def _filtra_marcatori(marcatori, infortunati):
+    """Rimuove i giocatori infortunati dalla lista marcatori."""
+    if not infortunati:
+        return marcatori
+    nomi_inj = set()
+    for inj in infortunati:
+        nome = inj.get("nome", "").lower()
+        # Aggiungi cognome
+        parts = nome.split()
+        for p in parts:
+            if len(p) > 3:
+                nomi_inj.add(p)
+    filtrati = []
+    for m in marcatori:
+        m_lower = m.lower()
+        escluso = False
+        for ni in nomi_inj:
+            if ni in m_lower:
+                escluso = True
+                break
+        if not escluso:
+            filtrati.append(m)
+    return filtrati
+
+def _filtra_esatti(scores, ov25):
+    """Filtra risultati esatti coerenti con Over/Under."""
+    if ov25 > 0.50:
+        # Over 2.5: privilegia risultati con 3+ gol
+        over_scores = [s for s in scores if sum(int(x) for x in s["score"].split("-")) >= 3]
+        under_scores = [s for s in scores if sum(int(x) for x in s["score"].split("-")) < 3]
+        # Metti i risultati over prima, poi gli under
+        result = over_scores[:3] + under_scores[:2]
+    else:
+        # Under 2.5: privilegia risultati con 0-2 gol
+        under_scores = [s for s in scores if sum(int(x) for x in s["score"].split("-")) <= 2]
+        over_scores = [s for s in scores if sum(int(x) for x in s["score"].split("-")) > 2]
+        result = under_scores[:3] + over_scores[:2]
+    return result[:5]
+
 def genera_pronostico(home, away):
     if MOTORE_DISPONIBILE and _df is not None:
         try:
@@ -345,9 +384,12 @@ def genera_pronostico(home, away):
         "sicura": bool(sicura),
         "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
         "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
-        "gol_attesi":round(lh+la,2),"risultati_esatti":scores[:5],
-        "marcatori_casa": TOP_SCORER.get(h, []),
-        "marcatori_ospite": TOP_SCORER.get(a, []),
+        "gol_attesi":round(lh+la,2),
+        # Risultati esatti coerenti con Over/Under
+        "risultati_esatti": _filtra_esatti(scores, ov25),
+        # Marcatori senza infortunati
+        "marcatori_casa": _filtra_marcatori(TOP_SCORER.get(h, []), INFORTUNATI.get(h, [])),
+        "marcatori_ospite": _filtra_marcatori(TOP_SCORER.get(a, []), INFORTUNATI.get(a, [])),
         "formazione_casa": FORMAZIONI.get(h),
         "formazione_ospite": FORMAZIONI.get(a),
         "h2h_applicato": h2h_n >= 3 if sh else False,
@@ -479,8 +521,8 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "gol_attesi": raw.get("gol_attesi"),
         "risultati_esatti": raw.get("risultati_esatti", []),
         "sicura": bool(raw.get("sicura", False)),
-        "marcatori_casa": raw.get("marcatori_casa") or TOP_SCORER.get(home.strip().title(), []),
-        "marcatori_ospite": raw.get("marcatori_ospite") or TOP_SCORER.get(away.strip().title(), []),
+        "marcatori_casa": raw.get("marcatori_casa") or _filtra_marcatori(TOP_SCORER.get(home.strip().title(), []), INFORTUNATI.get(home.strip().title(), [])),
+        "marcatori_ospite": raw.get("marcatori_ospite") or _filtra_marcatori(TOP_SCORER.get(away.strip().title(), []), INFORTUNATI.get(away.strip().title(), [])),
         "formazione_casa": raw.get("formazione_casa") or FORMAZIONI.get(home.strip().title()),
         "formazione_ospite": raw.get("formazione_ospite") or FORMAZIONI.get(away.strip().title()),
         "h2h_applicato": bool(raw.get("h2h_applicato", False)),
