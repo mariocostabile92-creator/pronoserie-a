@@ -302,7 +302,7 @@ async function simulaGiornata(gNum){
   const g=cal.giornate.find(x=>x.giornata===gNum);
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
   let html='<div class="card"><h3 style="margin-bottom:12px">Pronostici Giornata '+gNum+'</h3>';
-  html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.85rem"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U 2.5</th><th>Goal</th><th>Gol Att.</th></tr></thead><tbody>';
+  html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.85rem"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U 2.5</th><th>Goal</th><th>Gol</th><th>Aff.</th></tr></thead><tbody>';
   for(const p of g.partite){
     const d=await fetchAPI("/api/pronostico/"+p.home+"/"+p.away);
     if(!d)continue;
@@ -324,6 +324,7 @@ async function simulaGiornata(gNum){
       <td><span style="color:${ouCol}">${ouLbl} ${ouVal}%</span></td>
       <td><span style="color:${glCol}">${glLbl} ${glVal}%</span></td>
       <td style="color:var(--muted)">${d.gol_attesi||"-"}</td>
+      <td><span style="color:${d.confidence_label==="Alta"?"var(--green)":d.confidence_label==="Media"?"var(--yellow)":"var(--red)"};font-weight:700">${Math.round((d.confidence||0)*100)}%</span></td>
     </tr>`;
   }
   html+='</tbody></table></div></div>';
@@ -346,12 +347,21 @@ async function showMatch(h,a){
   const cc=d.confidence_label==="Alta"?"var(--green)":d.confidence_label==="Media"?"var(--yellow)":"var(--red)";
   let extra="";
   if(d.over_25){
+    const ouV=Math.max(d.over_25,d.under_25);const ouC=ouV>60?"var(--green)":ouV>55?"#8bc34a":"var(--accent)";
+    const glV=Math.max(d.goal_si,d.goal_no);const glC=glV>60?"var(--green)":glV>55?"#8bc34a":"var(--accent)";
     extra=`<div class="grid3" style="margin:16px 0">
-      <div class="card" style="text-align:center;padding:12px"><strong>${d.over_25>50?"Over":"Under"} 2.5</strong><br><span style="font-size:1.2rem;font-weight:700">${Math.max(d.over_25,d.under_25)}%</span></div>
-      <div class="card" style="text-align:center;padding:12px"><strong>${d.goal_si>50?"Goal Si":"Goal No"}</strong><br><span style="font-size:1.2rem;font-weight:700">${Math.max(d.goal_si,d.goal_no)}%</span></div>
-      <div class="card" style="text-align:center;padding:12px"><strong>Gol Attesi</strong><br><span style="font-size:1.2rem;font-weight:700">${d.gol_attesi||"-"}</span></div>
+      <div class="card" style="text-align:center;padding:12px"><strong>${d.over_25>50?"Over":"Under"} 2.5</strong><br><span style="font-size:1.2rem;font-weight:700;color:${ouC}">${ouV}%</span></div>
+      <div class="card" style="text-align:center;padding:12px"><strong>${d.goal_si>50?"Goal Si":"Goal No"}</strong><br><span style="font-size:1.2rem;font-weight:700;color:${glC}">${glV}%</span></div>
+      <div class="card" style="text-align:center;padding:12px"><strong>Gol Attesi</strong><br><span style="font-size:1.2rem;font-weight:700;color:${d.gol_attesi>2.5?'var(--green)':'var(--accent)'}">${d.gol_attesi||"-"}</span></div>
     </div>`;
-    if(d.risultati_esatti)extra+=`<p style="color:var(--muted);margin-top:8px">Esatto: ${d.risultati_esatti.slice(0,4).map(r=>'<span class="tag tag-blue" style="margin:2px">'+r.score+" "+r.prob+"%</span>").join(" ")}</p>`;
+    if(d.risultati_esatti&&d.risultati_esatti.length){
+      extra+=`<div class="grid3" style="gap:8px;margin-top:8px">`;
+      d.risultati_esatti.slice(0,3).forEach((r,i)=>{
+        const bg=i===0?"var(--green)":i===1?"var(--accent)":"var(--muted)";
+        extra+=`<div style="text-align:center;padding:10px;background:#0d1b2a;border-radius:8px;border:2px solid ${bg}"><div style="font-size:1.5rem;font-weight:800;color:${bg}">${r.score}</div><div style="color:var(--muted);font-size:.8rem">${r.prob}%</div></div>`;
+      });
+      extra+=`</div>`;
+    }
   }
   app.innerHTML=`<div class="container">
     <a href="javascript:void(0)" onclick="location.hash='';setTimeout(()=>location.hash='#calendario',50)" style="color:var(--accent);display:inline-block;margin-bottom:16px">← Torna al Calendario</a>

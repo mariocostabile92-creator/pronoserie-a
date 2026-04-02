@@ -775,15 +775,16 @@ def _scrape_notizie():
 async def notizie():
     """Ritorna le ultime notizie Serie A."""
     if not NOTIZIE_CACHE:
-        # Fallback notizie di esempio
         return {"notizie":[
-            {"titolo":"Serie A, giornata 31: probabili formazioni e pronostici","fonte":"PronoSerie A","url":"#calendario"},
-            {"titolo":"Classifica marcatori: Lautaro Martinez in testa con 14 gol","fonte":"PronoSerie A","url":"#classifica"},
-            {"titolo":"Calciomercato: i colpi di gennaio che cambiano la Serie A","fonte":"PronoSerie A","url":"#squadre"},
-            {"titolo":"Infortunati Serie A: chi salta la giornata 31","fonte":"PronoSerie A","url":"#squadre"},
-            {"titolo":"Inter, Lautaro in dubbio per la Roma: le ultime","fonte":"PronoSerie A","url":"#pronostici"},
-            {"titolo":"Juventus-Genoa: Spalletti recupera Bremer dal primo minuto","fonte":"PronoSerie A","url":"#pronostici"},
-        ],"aggiornamento":NOTIZIE_LAST_UPDATE or "Dati base"}
+            {"titolo":"Serie A Giornata 31: Inter-Roma, Napoli-Milan e tutte le probabili formazioni","fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a/calendario-risultati"},
+            {"titolo":"Classifica Serie A 2025-2026: Inter prima a 69 punti, Milan insegue","fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a/classifica"},
+            {"titolo":"Classifica marcatori Serie A: Lautaro Martinez capocannoniere con 14 gol","fonte":"Tuttosport","url":"https://www.tuttosport.com/live/classifica-marcatori-serie-a"},
+            {"titolo":"Infortunati Serie A: Dybala, Dovbyk e Lautaro in dubbio per la giornata 31","fonte":"Fantacalcio","url":"https://www.fantacalciopedia.com/articoli-fcp/consigli-fantacalcio/75-lista-infortunati-serie-a-aggiornata.html"},
+            {"titolo":"Calciomercato Serie A: tutti gli acquisti e le cessioni di gennaio 2026","fonte":"Sky Sport","url":"https://sport.sky.it/calciomercato"},
+            {"titolo":"Spalletti alla Juventus: i risultati dopo il cambio in panchina","fonte":"Gazzetta","url":"https://www.gazzetta.it/calcio/serie-a/squadre/juventus/"},
+            {"titolo":"Como sorpresa: Fabregas quarto in classifica, Douvikas bomber","fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a"},
+            {"titolo":"Palladino rilancia l'Atalanta: Krstovic e Raspadori coppia gol","fonte":"Gazzetta","url":"https://www.gazzetta.it/calcio/serie-a/squadre/atalanta/"},
+        ],"aggiornamento":"Aggiornamento automatico ogni 30 min"}
     return {"notizie":NOTIZIE_CACHE,"aggiornamento":NOTIZIE_LAST_UPDATE}
 
 # ─────────────────────────────
