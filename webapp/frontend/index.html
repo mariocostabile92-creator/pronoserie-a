@@ -178,12 +178,16 @@ async function calcPronostico(){
   const cp=Math.round((d.confidence||0.5)*100);
   let extra="";
   if(d.over_25){
-    const ou=d.over_25>50?"Over 2.5: "+d.over_25+"%":"Under 2.5: "+d.under_25+"%";
-    const gl=d.goal_si>50?"Goal Si: "+d.goal_si+"%":"Goal No: "+d.goal_no+"%";
+    const ouVal=Math.max(d.over_25,d.under_25);
+    const ouLbl=d.over_25>50?"Over 2.5":"Under 2.5";
+    const ouCol=ouVal>60?"var(--green)":ouVal>55?"#8bc34a":"var(--accent)";
+    const glVal=Math.max(d.goal_si,d.goal_no);
+    const glLbl=d.goal_si>50?"Goal Si":"Goal No";
+    const glCol=glVal>60?"var(--green)":glVal>55?"#8bc34a":"var(--accent)";
     extra=`<div class="grid3" style="margin:16px 0">
-      <div class="card" style="text-align:center;padding:12px"><strong>${ou.split(":")[0]}</strong><br><span style="font-size:1.3rem;font-weight:700;color:var(--green)">${ou.split(": ")[1]}</span></div>
-      <div class="card" style="text-align:center;padding:12px"><strong>${gl.split(":")[0]}</strong><br><span style="font-size:1.3rem;font-weight:700;color:var(--green)">${gl.split(": ")[1]}</span></div>
-      <div class="card" style="text-align:center;padding:12px"><strong>Gol Attesi</strong><br><span style="font-size:1.3rem;font-weight:700">${d.gol_attesi||"-"}</span></div>
+      <div class="card" style="text-align:center;padding:12px"><strong>${ouLbl}</strong><br><span style="font-size:1.3rem;font-weight:700;color:${ouCol}">${ouVal}%</span></div>
+      <div class="card" style="text-align:center;padding:12px"><strong>${glLbl}</strong><br><span style="font-size:1.3rem;font-weight:700;color:${glCol}">${glVal}%</span></div>
+      <div class="card" style="text-align:center;padding:12px"><strong>Gol Attesi</strong><br><span style="font-size:1.3rem;font-weight:700;color:${d.gol_attesi>2.5?'var(--green)':'var(--accent)'}">${d.gol_attesi||"-"}</span></div>
     </div>`;
     if(d.risultati_esatti)extra+=`<p style="color:var(--muted)">Esatto: ${d.risultati_esatti.slice(0,3).map(r=>r.score+" ("+r.prob+"%)").join(" | ")}</p>`;
     // Marcatori consigliati dall'IA
@@ -263,15 +267,17 @@ async function simulaGiornata(gNum){
     const tipCol=d.suggerimento==="1"?"var(--green)":d.suggerimento==="X"?"var(--yellow)":"var(--red)";
     const ouLbl=d.over_25>50?"Over":"Under";
     const ouVal=d.over_25>50?d.over_25:d.under_25;
-    const ouCol=d.over_25>50?"var(--green)":"var(--accent)";
+    const ouCol=ouVal>60?"var(--green)":ouVal>55?"#8bc34a":"var(--accent)";
     const glLbl=d.goal_si>50?"Si":"No";
     const glVal=d.goal_si>50?d.goal_si:d.goal_no;
-    const glCol=d.goal_si>50?"var(--green)":"var(--accent)";
+    const glCol=glVal>60?"var(--green)":glVal>55?"#8bc34a":"var(--accent)";
+    // Colori percentuali 1X2 basati su forza
+    function pCol(v){return v>50?"var(--green)":v>35?"var(--yellow)":"var(--red)"}
     html+=`<tr style="border-bottom:1px solid #1f3460;cursor:pointer" onclick="showMatch('${p.home}','${p.away}')">
       <td style="text-align:left;padding:8px 4px"><strong>${p.home}</strong> - <strong>${p.away}</strong></td>
-      <td style="color:var(--green)">${d.prob_1}%</td>
-      <td style="color:var(--yellow)">${d.prob_x}%</td>
-      <td style="color:var(--red)">${d.prob_2}%</td>
+      <td style="color:${pCol(d.prob_1)};font-weight:${d.prob_1>40?'800':'400'}">${d.prob_1}%</td>
+      <td style="color:${pCol(d.prob_x)};font-weight:${d.prob_x>30?'800':'400'}">${d.prob_x}%</td>
+      <td style="color:${pCol(d.prob_2)};font-weight:${d.prob_2>40?'800':'400'}">${d.prob_2}%</td>
       <td><span style="color:${tipCol};font-weight:800">${d.suggerimento}</span>${d.sicura?'<span style="background:#ff6b35;color:#fff;font-size:.6rem;padding:1px 4px;border-radius:4px;margin-left:2px">!</span>':''}</td>
       <td><span style="color:${ouCol}">${ouLbl} ${ouVal}%</span></td>
       <td><span style="color:${glCol}">${glLbl} ${glVal}%</span></td>

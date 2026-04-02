@@ -304,11 +304,11 @@ def genera_pronostico(home, away):
 
     ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
     gsi_raw = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
-    xga_min = min(sh.get("xGA_pg", sa.get("xGA_pg", 1.3)), sa.get("xGA_pg", sh.get("xGA_pg", 1.3)))
-    if xga_min < 1.0:
-        gsi = gsi_raw * 0.88
-    elif xga_min < 1.2:
-        gsi = gsi_raw * 0.94
+    # Calibrazione Goal: Serie A ha 57% Goal Si in media
+    # Solo leggera correzione per difese top (xGA < 0.9)
+    xga_min = min(sh.get("xGA_pg", 1.3) if sh else 1.3, sa.get("xGA_pg", 1.3) if sa else 1.3)
+    if xga_min < 0.9:
+        gsi = gsi_raw * 0.95  # Solo -5% per difese top (Inter 0.84)
     else:
         gsi = gsi_raw
     scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(6) for j in range(6)], key=lambda x:-x["prob"])
