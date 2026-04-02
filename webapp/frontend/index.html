@@ -34,7 +34,7 @@ select{background:#0d1b2a;color:var(--text);border:1px solid #1f3460;padding:10p
 .tag{display:inline-block;padding:4px 12px;border-radius:12px;font-size:.8rem;font-weight:700}
 .tag-green{background:var(--green);color:#000}.tag-red{background:var(--red);color:#fff}.tag-blue{background:var(--accent);color:#fff}
 table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:center;border-bottom:1px solid #1f3460}th{color:var(--muted);font-size:.85rem}
-.ucl{border-left:3px solid var(--green)}.uel{border-left:3px solid var(--yellow)}.rel{border-left:3px solid var(--red)}
+.ucl{border-left:3px solid var(--green)}.uel{border-left:3px solid var(--yellow)}.conf{border-left:3px solid #9b59b6}.rel{border-left:3px solid var(--red)}
 .spinner{width:32px;height:32px;border:3px solid #1f3460;border-top:3px solid var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:40px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 .match-btn{width:100%;text-align:left;padding:12px 16px;background:var(--card);border:1px solid #1f3460;border-radius:8px;color:var(--text);cursor:pointer;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;transition:.2s;font-size:.95rem}
@@ -76,9 +76,10 @@ const FREE_LIMIT = 2;
 
 async function fetchAPI(ep) {
   try {
+    const sep = ep.includes("?") ? "&" : "?";
     const headers = {};
     if(userToken) headers["Authorization"] = "Bearer " + userToken;
-    const r = await fetch(API+ep, {headers});
+    const r = await fetch(API+ep+sep+"_t="+Date.now(), {headers});
     if(!r.ok) throw new Error(r.status);
     return await r.json();
   } catch(e) { console.error("API:",ep,e); return null; }
@@ -277,8 +278,9 @@ async function pageCalendario(){
   html+=`<div class="card"><h2 style="color:var(--green)">Giornata ${g0.giornata} — ${g0.data||""}</h2>`;
   html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata(${g0.giornata})">Simula Pronostici Giornata</button>`;
   g0.partite.forEach(p=>{
-    html+=`<button class="match-btn" onclick="showMatch('${p.home}','${p.away}')"><span><strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong></span><span style="color:var(--accent)">→</span></button>`;
+    html+=`<div class="match-btn" style="cursor:default"><span><strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong></span></div>`;
   });
+  html+=`<p style="color:var(--muted);font-size:.85rem;margin-top:8px;text-align:center">Per il pronostico di una partita singola vai su <a href="#pronostici" style="color:var(--accent)">Pronostici</a> e seleziona le squadre</p>`;
   html+='</div><div id="sim-result-main"></div></div>';
   // DESTRA: altre giornate
   html+='<div>';
@@ -286,7 +288,7 @@ async function pageCalendario(){
     const locked=userPlan!=="pro"&&idx>=1;
     html+=`<div class="card" style="padding:12px${locked?";opacity:.4":""}"><h3>G.${g.giornata} <span style="color:var(--muted);font-size:.8rem">${g.data||""}</span>${locked?' <span class="tag tag-red" style="font-size:.7rem">PRO</span>':''}</h3>`;
     if(locked){html+=`<p style="color:var(--muted);font-size:.8rem">Sblocca con Pro</p>`}
-    else{g.partite.forEach(p=>{html+=`<p style="font-size:.85rem;padding:2px 0;cursor:pointer;color:var(--text)" onclick="showMatch('${p.home}','${p.away}')">${p.home} - ${p.away}</p>`})}
+    else{g.partite.forEach(p=>{html+=`<p style="font-size:.85rem;padding:2px 0;color:var(--text)">${p.home} - ${p.away}</p>`})}
     html+='</div>';
   });
   html+='</div></div></div>';
@@ -390,10 +392,10 @@ async function pageClassifica(){
   // SINISTRA: Classifica
   html+='<div class="card" style="overflow-x:auto"><h2 style="margin-bottom:8px">Classifica</h2><table><thead><tr><th>#</th><th>Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th><th>GF</th><th>GS</th><th>DR</th><th>Pt</th></tr></thead><tbody>';
   (data.classifica||[]).forEach((r,i)=>{
-    const c=i<4?"ucl":i<6?"uel":i>=17?"rel":"";
+    const c=i<4?"ucl":i<6?"uel":i===6?"conf":i>=17?"rel":"";
     html+=`<tr class="${c}"><td>${i+1}</td><td style="text-align:left;font-weight:700">${r.Squadra}</td><td>${r.G}</td><td>${r.V}</td><td>${r.N}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GS}</td><td style="color:${r.DR>0?"var(--green)":r.DR<0?"var(--red)":"var(--muted)"}">${r.DR>0?"+":""}${r.DR}</td><td style="font-weight:800">${r.Punti}</td></tr>`;
   });
-  html+='</tbody></table><div style="margin-top:8px;display:flex;gap:12px;justify-content:center;font-size:.8rem"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
+  html+='</tbody></table><div style="margin-top:8px;display:flex;gap:10px;justify-content:center;font-size:.8rem;flex-wrap:wrap"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:#9b59b6">● Conference</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
   // Marcatori consigliati sotto classifica (esclusi infortunati)
   html+='<div class="card" style="margin-top:12px;border-color:var(--green)"><h2 style="color:var(--green)">Marcatori Consigliati G.31</h2><p style="color:var(--muted);font-size:.8rem;margin-bottom:8px">Basato su xG, forma e storico gol — esclusi infortunati</p>';
   const consigliati=[
