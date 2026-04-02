@@ -428,20 +428,22 @@ async function pageClassifica(){
     html+=`<tr class="${c}"><td>${i+1}</td><td style="text-align:left;font-weight:700">${r.Squadra}</td><td>${r.G}</td><td>${r.V}</td><td>${r.N}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GS}</td><td style="color:${r.DR>0?"var(--green)":r.DR<0?"var(--red)":"var(--muted)"}">${r.DR>0?"+":""}${r.DR}</td><td style="font-weight:800">${r.Punti}</td></tr>`;
   });
   html+='</tbody></table><div style="margin-top:8px;display:flex;gap:10px;justify-content:center;font-size:.8rem;flex-wrap:wrap"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:#9b59b6">● Conference</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
-  // Marcatori consigliati sotto classifica (esclusi infortunati)
-  html+='<div class="card" style="margin-top:12px;border-color:var(--green)"><h2 style="color:var(--green)">Marcatori Consigliati G.31</h2><p style="color:var(--muted);font-size:.8rem;margin-bottom:8px">Basato su xG, forma e storico gol — esclusi infortunati</p>';
-  const consigliati=[
-    {nome:"Thuram",sq:"Inter",motivo:"7 gol, xG 2.40/p, casa vs Roma (Lautaro infortunato)"},
-    {nome:"Tasos Douvikas",sq:"Como",motivo:"11 gol, forma eccellente, trasferta a Udinese"},
-    {nome:"Kenan Yildiz",sq:"Juventus",motivo:"10 gol, casa vs Genoa"},
-    {nome:"Rasmus Hojlund",sq:"Napoli",motivo:"10 gol, Napoli in casa vs Milan"},
-    {nome:"Domenico Berardi",sq:"Sassuolo",motivo:"7 gol, casa vs Cagliari"},
-    {nome:"Pulisic",sq:"Milan",motivo:"8 gol, trasferta a Napoli (Leao in dubbio)"},
-    {nome:"Keinan Davis",sq:"Udinese",motivo:"10 gol, casa vs Como"},
-    {nome:"Nikola Krstovic",sq:"Atalanta",motivo:"8 gol, trasferta a Lecce"},
+  // Marcatori consigliati PER PARTITA della giornata 31
+  html+='<div class="card" style="margin-top:12px;border-color:var(--green)"><h2 style="color:var(--green)">Marcatori Consigliati G.31</h2><p style="color:var(--muted);font-size:.8rem;margin-bottom:12px">Per ogni partita — basato su xG, gol stagionali e forma (esclusi infortunati)</p>';
+  const marcPartite=[
+    {partita:"Sassuolo - Cagliari",casa:"Berardi (7 gol), Pinamonti (7)",ospite:"Esposito (5), Kilicsoy (4)"},
+    {partita:"Verona - Fiorentina",casa:"Tengstedt (5), Henry (4)",ospite:"Kean (8), Gudmundsson (5)"},
+    {partita:"Lazio - Parma",casa:"Maldini (6), Dia (5)",ospite:"Pellegrino (8), Strefezza (4)"},
+    {partita:"Cremonese - Bologna",casa:"Vardy (5), Sanabria (4)",ospite:"Castro (6), Orsolini (5)"},
+    {partita:"Pisa - Torino",casa:"Meister (5), Tramoni (4)",ospite:"Simeone (8), Vlasic (7)"},
+    {partita:"Inter - Roma",casa:"Thuram (7), Calhanoglu (8)",ospite:"Malen (7), Soule (4)"},
+    {partita:"Udinese - Como",casa:"Davis (10), Zaniolo (5)",ospite:"Douvikas (11), Paz (10)"},
+    {partita:"Lecce - Atalanta",casa:"Cheddira (4), Banda (3)",ospite:"Krstovic (8), Scamacca (8)"},
+    {partita:"Juventus - Genoa",casa:"Yildiz (10), Vlahovic (6)",ospite:"Vitinha (5), Colombo (4)"},
+    {partita:"Napoli - Milan",casa:"Hojlund (10), McTominay (7)",ospite:"Pulisic (8), Gimenez (5)"},
   ];
-  consigliati.forEach((c,i)=>{
-    html+=`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460"><span style="width:24px;font-weight:700;color:var(--green)">${i+1}</span><div style="flex:1"><strong style="font-size:.9rem">${c.nome}</strong><br><span style="color:var(--muted);font-size:.8rem">${c.sq} — ${c.motivo}</span></div></div>`;
+  marcPartite.forEach(m=>{
+    html+=`<div style="padding:8px 0;border-bottom:1px solid #1f3460"><div style="display:flex;justify-content:space-between;align-items:center"><strong style="font-size:.9rem;color:var(--text)">${m.partita}</strong></div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:var(--green);font-size:.8rem">Casa: ${m.casa}</span><span style="color:var(--red);font-size:.8rem">Ospite: ${m.ospite}</span></div></div>`;
   });
   html+='</div></div>';
   // DESTRA: Marcatori
