@@ -471,7 +471,14 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "goal_si": raw.get("goal_si"),
         "goal_no": raw.get("goal_no"),
         "gol_attesi": raw.get("gol_attesi"),
-        "risultati_esatti": raw.get("risultati_esatti", [])
+        "risultati_esatti": raw.get("risultati_esatti", []),
+        "sicura": raw.get("sicura", False),
+        "marcatori_casa": raw.get("marcatori_casa") or TOP_SCORER.get(home.strip().title(), []),
+        "marcatori_ospite": raw.get("marcatori_ospite") or TOP_SCORER.get(away.strip().title(), []),
+        "formazione_casa": raw.get("formazione_casa") or FORMAZIONI.get(home.strip().title()),
+        "formazione_ospite": raw.get("formazione_ospite") or FORMAZIONI.get(away.strip().title()),
+        "h2h_applicato": raw.get("h2h_applicato", False),
+        "h2h_partite": raw.get("h2h_partite", 0),
     }
 
 # ─────────────────────────────
@@ -725,42 +732,44 @@ NOTIZIE_CACHE = []
 NOTIZIE_LAST_UPDATE = ""
 
 def _scrape_notizie():
-    """Scarica notizie Serie A da fonti attendibili."""
+    """Scarica notizie Serie A con link specifici agli articoli."""
     global NOTIZIE_CACHE, NOTIZIE_LAST_UPDATE
     import urllib.request as ur
     import re
     notizie = []
     try:
-        # Fonte: Sky Sport Serie A
         req = ur.Request("https://sport.sky.it/calcio/serie-a", headers={"User-Agent":"Mozilla/5.0"})
         with ur.urlopen(req, timeout=10) as r:
             html = r.read().decode("utf-8", errors="replace")
-        # Estrai titoli da tag h2/h3 o meta og:title
-        titoli = re.findall(r'<(?:h[23]|title)[^>]*>([^<]{20,120})</(?:h[23]|title)>', html)
-        for t in titoli[:8]:
-            t_clean = re.sub(r'<[^>]+>','',t).strip()
-            if t_clean and "Serie A" not in t_clean[:5] and len(t_clean)>15:
-                notizie.append({"titolo":t_clean,"fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a"})
+        # Estrai coppie link+titolo: <a href="/calcio/serie-a/...">Titolo</a>
+        links = re.findall(r'<a[^>]+href="(/calcio/serie-a/[^"]{20,})"[^>]*>([^<]{15,120})</a>', html)
+        seen = set()
+        for url, titolo in links:
+            t = re.sub(r'<[^>]+>','',titolo).strip()
+            if t and t not in seen and len(t)>15:
+                seen.add(t)
+                notizie.append({"titolo":t,"fonte":"Sky Sport","url":"https://sport.sky.it"+url})
+                if len(notizie)>=6: break
     except Exception as e:
-        print(f"⚠️ Scrape notizie Sky fallito: {e}")
-    
+        print(f"⚠️ Scrape Sky: {e}")
     try:
-        # Fonte: Gazzetta dello Sport
         req = ur.Request("https://www.gazzetta.it/calcio/serie-a/", headers={"User-Agent":"Mozilla/5.0"})
         with ur.urlopen(req, timeout=10) as r:
             html = r.read().decode("utf-8", errors="replace")
-        titoli = re.findall(r'<(?:h[23]|title)[^>]*>([^<]{20,120})</(?:h[23]|title)>', html)
-        for t in titoli[:6]:
-            t_clean = re.sub(r'<[^>]+>','',t).strip()
-            if t_clean and len(t_clean)>15:
-                notizie.append({"titolo":t_clean,"fonte":"Gazzetta","url":"https://www.gazzetta.it/calcio/serie-a/"})
+        links = re.findall(r'<a[^>]+href="(https?://www\.gazzetta\.it/[^"]{20,})"[^>]*>([^<]{15,120})</a>', html)
+        seen2 = set()
+        for url, titolo in links:
+            t = re.sub(r'<[^>]+>','',titolo).strip()
+            if t and t not in seen2 and len(t)>15:
+                seen2.add(t)
+                notizie.append({"titolo":t,"fonte":"Gazzetta","url":url})
+                if len(notizie)>=12: break
     except Exception as e:
-        print(f"⚠️ Scrape notizie Gazzetta fallito: {e}")
-
+        print(f"⚠️ Scrape Gazzetta: {e}")
     if notizie:
         NOTIZIE_CACHE = notizie[:12]
         NOTIZIE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
-        print(f"📰 Notizie aggiornate: {len(NOTIZIE_CACHE)} articoli")
+        print(f"📰 Notizie: {len(NOTIZIE_CACHE)} articoli con link")
 
 @app.get("/api/notizie")
 async def notizie():
