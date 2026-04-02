@@ -210,11 +210,24 @@ def genera_pronostico(home, away):
             elif i == j: px += p
             else: p2 += p
     px *= 1.12
+    # Extra boost X per squadre equilibrate
+    ratio = min(lh,la)/max(lh,la) if max(lh,la)>0 else 0
+    if ratio > 0.80:
+        px *= 1.0 + (ratio-0.80)*0.8
     tot = p1 + px + p2
     if tot > 0: p1/=tot; px/=tot; p2/=tot
 
     ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
-    gsi = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
+    # Goal Si con calibrazione Serie A (in media ~55% delle partite sono Goal)
+    gsi_raw = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
+    # Correggi: se la squadra piu debole ha xGA basso (difesa forte), NoGoal piu probabile
+    xga_min = min(xh.get("xGA",1.3), xa.get("xGA",1.3))
+    if xga_min < 1.0:
+        gsi = gsi_raw * 0.88  # Difese forti = meno Goal
+    elif xga_min < 1.2:
+        gsi = gsi_raw * 0.94
+    else:
+        gsi = gsi_raw
     scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(6) for j in range(6)], key=lambda x:-x["prob"])
 
     mp = max(p1, px, p2)

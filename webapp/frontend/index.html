@@ -312,45 +312,48 @@ async function loadSq(nome){
   if(d.formazione&&d.formazione.titolari){
     const tit=d.formazione.titolari;
     const mod=d.formazione.modulo||"4-4-2";
-    // Posizioni per modulo
-    const layouts={"3-5-2":[[1],[3],[5],[2]],"4-4-2":[[1],[4],[4],[2]],"4-3-3":[[1],[4],[3],[3]],"4-2-3-1":[[1],[4],[2],[3],[1]],"3-4-2-1":[[1],[3],[4],[2],[1]],"3-4-1-2":[[1],[3],[4],[1],[2]],"4-3-1-2":[[1],[4],[3],[1],[2]],"4-1-4-1":[[1],[4],[1],[4],[1]]};
+    const modNums=(mod.match(/\d/g)||[]).map(Number);
+    // Righe dal portiere (basso) all'attacco (alto): [1, def, cen, att]
+    const rows=[[1]];
+    modNums.forEach(n=>rows.push([n]));
+    const ruoliPerRiga=["P","D","C","C","A"];
     const ruoliCol={"P":"#f39c12","D":"#3498db","C":"#2ecc71","A":"#e74c3c"};
-    const ruoliLabel={"P":"POR","D":"DIF","C":"CC","A":"ATT"};
-    // Assegna ruoli in base alla posizione
-    const modParts=(mod.match(/\d/g)||[]).map(Number);
-    let ruoliSeq=["P"];
-    const ruoloMap=["D","C","C","A"];
-    modParts.forEach((n,i)=>{for(let j=0;j<n;j++)ruoliSeq.push(ruoloMap[Math.min(i,3)])});
-    // Anche dalla rosa se disponibile
-    const rosaMap={};
-    if(d.rosa)d.rosa.forEach(g=>{rosaMap[g.nome.split(" ").pop().toLowerCase()]=g.ruolo});
+    const ruoliLbl={"P":"POR","D":"DIF","C":"CC","A":"ATT"};
 
-    const layout=layouts[mod]||layouts["4-4-2"];
+    // Costruisci righe dall'attacco (alto) al portiere (basso)
+    let pitchRows=[];
     let idx=0;
-    let pitchHtml='';
-    const rowNames=["POR","DIF","CC","ATT","ATT"];
-    layout.forEach((row,ri)=>{
-      pitchHtml+=`<div style="display:flex;justify-content:center;gap:8px;margin:${ri===0?'4px':'6px'} 0">`;
+    rows.forEach((row,ri)=>{
+      let cells=[];
       for(let c=0;c<row[0];c++){
         if(idx<tit.length){
           const nome=tit[idx];
           const cognome=nome.split(" ").pop();
-          // Trova ruolo dalla rosa o dalla posizione
-          let ruolo=rosaMap[cognome.toLowerCase()]||ruoliSeq[idx]||"C";
-          const col=ruoliCol[ruolo]||"#3498db";
-          const lbl=ruoliLabel[ruolo]||"";
-          pitchHtml+=`<div style="text-align:center;min-width:60px"><div style="background:${col};color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:.7rem;font-weight:800;border:2px solid rgba(255,255,255,.3)">${lbl}</div><div style="color:#fff;font-size:.7rem;font-weight:600;margin-top:2px">${cognome}</div></div>`;
+          const ruolo=ruoliPerRiga[Math.min(ri, ruoliPerRiga.length-1)];
+          cells.push({cognome, ruolo});
           idx++;
         }
       }
+      pitchRows.push(cells);
+    });
+
+    // Inverti: attacco in alto, portiere in basso
+    pitchRows.reverse();
+
+    let pitchHtml='';
+    pitchRows.forEach(cells=>{
+      pitchHtml+=`<div style="display:flex;justify-content:center;gap:12px;margin:8px 0">`;
+      cells.forEach(c=>{
+        const col=ruoliCol[c.ruolo]||"#3498db";
+        const lbl=ruoliLbl[c.ruolo]||"";
+        pitchHtml+=`<div style="text-align:center;min-width:55px"><div style="background:${col};color:#fff;width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;border:2px solid rgba(255,255,255,.4)">${lbl}</div><div style="color:#fff;font-size:.65rem;font-weight:600;margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.5)">${c.cognome}</div></div>`;
+      });
       pitchHtml+='</div>';
     });
 
     html+=`<div class="card"><h3>Probabile Formazione (${mod})</h3>
-      <div class="pitch" style="margin-top:12px;padding:16px 8px">
-        <div style="text-align:center;color:rgba(255,255,255,.4);font-size:.7rem;margin-bottom:4px">ATTACCO</div>
-        ${pitchHtml.split('</div></div>').reverse().join('</div></div>')}
-        <div style="text-align:center;color:rgba(255,255,255,.4);font-size:.7rem;margin-top:4px">PORTA</div>
+      <div class="pitch" style="margin-top:8px;padding:20px 12px;min-height:320px;display:flex;flex-direction:column;justify-content:space-between">
+        ${pitchHtml}
       </div>
     </div>`;
   }
