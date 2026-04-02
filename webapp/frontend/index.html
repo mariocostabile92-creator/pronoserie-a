@@ -160,7 +160,19 @@ async function calcPronostico(){
     </div>`;
     if(d.risultati_esatti)extra+=`<p style="color:var(--muted)">Esatto: ${d.risultati_esatti.slice(0,3).map(r=>r.score+" ("+r.prob+"%)").join(" | ")}</p>`;
     // Marcatori consigliati dall'IA
-    extra+=`<div style="margin-top:12px;padding:12px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--green);margin-bottom:6px">Marcatori Consigliati dall'IA</h4><p style="color:var(--text);font-size:.9rem">Migliori marcatori da tenere d'occhio per questa partita basandosi su xG, forma e storico gol.</p></div>`;
+    if(d.marcatori_casa||d.marcatori_ospite){
+      extra+=`<div style="margin-top:12px;padding:12px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--green);margin-bottom:8px">Probabili Marcatori</h4>`;
+      if(d.marcatori_casa&&d.marcatori_casa.length)extra+=`<p style="color:var(--text);font-size:.9rem"><strong style="color:var(--green)">${h}:</strong> ${d.marcatori_casa.join(" · ")}</p>`;
+      if(d.marcatori_ospite&&d.marcatori_ospite.length)extra+=`<p style="color:var(--text);font-size:.9rem;margin-top:4px"><strong style="color:var(--red)">${a}:</strong> ${d.marcatori_ospite.join(" · ")}</p>`;
+      extra+=`</div>`;
+    }
+    // Formazioni
+    if(d.formazione_casa||d.formazione_ospite){
+      extra+=`<div style="margin-top:12px;padding:12px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--accent);margin-bottom:8px">Probabili Formazioni</h4>`;
+      if(d.formazione_casa)extra+=`<p style="font-size:.85rem"><strong style="color:var(--green)">${h} (${d.formazione_casa.modulo}):</strong> <span style="color:var(--text)">${d.formazione_casa.titolari.join(", ")}</span></p>`;
+      if(d.formazione_ospite)extra+=`<p style="font-size:.85rem;margin-top:4px"><strong style="color:var(--red)">${a} (${d.formazione_ospite.modulo}):</strong> <span style="color:var(--text)">${d.formazione_ospite.titolari.join(", ")}</span></p>`;
+      extra+=`</div>`;
+    }
   }
   if(userPlan!=="pro"){freeUsed++;localStorage.setItem("freeUsed",freeUsed)}
   const remaining = userPlan==="pro" ? "" : `<p style="color:var(--muted);text-align:center;margin-top:12px;font-size:.85rem">Pronostici gratuiti rimanenti: ${Math.max(0,FREE_LIMIT-freeUsed)}/${FREE_LIMIT}</p>`;
@@ -313,10 +325,17 @@ async function loadSq(nome){
     const tit=d.formazione.titolari;
     const mod=d.formazione.modulo||"4-4-2";
     const modNums=(mod.match(/\d/g)||[]).map(Number);
-    // Righe dal portiere (basso) all'attacco (alto): [1, def, cen, att]
+    // Righe dal portiere (basso) all'attacco (alto): [1, def, cen..., att]
     const rows=[[1]];
     modNums.forEach(n=>rows.push([n]));
-    const ruoliPerRiga=["P","D","C","C","A"];
+    // Ruoli: prima riga=P, ultima=A, mezzo=D poi C
+    const nRows=rows.length;
+    function getRuolo(ri){
+      if(ri===0) return "P";
+      if(ri===nRows-1) return "A";
+      if(ri===1) return "D";
+      return "C";
+    }
     const ruoliCol={"P":"#f39c12","D":"#3498db","C":"#2ecc71","A":"#e74c3c"};
     const ruoliLbl={"P":"POR","D":"DIF","C":"CC","A":"ATT"};
 
@@ -329,7 +348,7 @@ async function loadSq(nome){
         if(idx<tit.length){
           const nome=tit[idx];
           const cognome=nome.split(" ").pop();
-          const ruolo=ruoliPerRiga[Math.min(ri, ruoliPerRiga.length-1)];
+          const ruolo=getRuolo(ri);
           cells.push({cognome, ruolo});
           idx++;
         }

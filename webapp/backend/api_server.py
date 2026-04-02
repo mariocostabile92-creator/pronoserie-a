@@ -244,6 +244,10 @@ def genera_pronostico(home, away):
         "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
         "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
         "gol_attesi":round(lh+la,2),"risultati_esatti":scores[:5],
+        "marcatori_casa": TOP_SCORER.get(h, []),
+        "marcatori_ospite": TOP_SCORER.get(a, []),
+        "formazione_casa": FORMAZIONI.get(h),
+        "formazione_ospite": FORMAZIONI.get(a),
     }
 
 # ─────────────────────────────
@@ -414,6 +418,29 @@ async def marcatori():
 # SQUADRE (rose, formazioni, infortunati)
 # ─────────────────────────────
 ALLENATORI = {"Inter":"Cristian Chivu","Milan":"Massimiliano Allegri","Napoli":"Antonio Conte","Como":"Cesc Fabregas","Juventus":"Luciano Spalletti","Roma":"Gian Piero Gasperini","Atalanta":"Raffaele Palladino","Lazio":"Maurizio Sarri","Bologna":"Vincenzo Italiano","Sassuolo":"Fabio Grosso","Udinese":"Kosta Runjaic","Parma":"Carlos Cuesta","Genoa":"Patrick Vieira","Torino":"Roberto D'Aversa","Cagliari":"Fabio Pisacane","Fiorentina":"Paolo Vanoli","Cremonese":"Davide Nicola","Lecce":"Eusebio Di Francesco","Verona":"Paolo Sammarco","Pisa":"Oscar Hiljemark"}
+
+TOP_SCORER = {
+    "Inter":["Lautaro Martinez (14 gol)","Hakan Calhanoglu (8)","Marcus Thuram (7)"],
+    "Milan":["Rafael Leao (9)","Christian Pulisic (8)","Santiago Gimenez (5)"],
+    "Napoli":["Rasmus Hojlund (10)","Scott McTominay (7)","Matteo Politano (5)"],
+    "Como":["Tasos Douvikas (11)","Nico Paz (10)","Nicolas Kuhn (4)"],
+    "Juventus":["Kenan Yildiz (10)","Dusan Vlahovic (6)","Francisco Conceicao (5)"],
+    "Roma":["Donyell Malen (7)","Paulo Dybala (5)","Matias Soule (4)"],
+    "Atalanta":["Gianluca Scamacca (8)","Nikola Krstovic (8)","Charles De Ketelaere (6)"],
+    "Lazio":["Daniel Maldini (6)","Boulaye Dia (5)","Mattia Zaccagni (4)"],
+    "Bologna":["Santiago Castro (6)","Riccardo Orsolini (5)","Federico Bernardeschi (4)"],
+    "Sassuolo":["Domenico Berardi (7)","Andrea Pinamonti (7)","Armand Lauriente (4)"],
+    "Udinese":["Keinan Davis (10)","Nicolo Zaniolo (5)","Adam Buksa (3)"],
+    "Parma":["Mateo Pellegrino (8)","Gabriel Strefezza (4)","Adrian Bernabe (3)"],
+    "Genoa":["Vitinha (5)","Lorenzo Colombo (4)","Junior Messias (3)"],
+    "Torino":["Giovanni Simeone (8)","Nikola Vlasic (7)","Che Adams (5)"],
+    "Cagliari":["Sebastiano Esposito (5)","Semih Kilicsoy (4)","Gianluca Gaetano (3)"],
+    "Fiorentina":["Moise Kean (8)","Albert Gudmundsson (5)","Lucas Beltran (3)"],
+    "Cremonese":["Jamie Vardy (5)","Antonio Sanabria (4)","Milan Djuric (3)"],
+    "Lecce":["Walid Cheddira (4)","Lameck Banda (3)","Santiago Pierotti (2)"],
+    "Verona":["Casper Tengstedt (5)","Thomas Henry (4)","Tomas Suslov (3)"],
+    "Pisa":["Henrik Meister (5)","Matteo Tramoni (4)","Samuel Iling-Junior (3)"],
+}
 
 FORMAZIONI = {
     "Inter":{"modulo":"3-5-2","titolari":["Sommer","Bisseck","Akanji","Bastoni","Dumfries","Barella","Calhanoglu","Sucic","Dimarco","Thuram","Bonny"]},
