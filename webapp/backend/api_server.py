@@ -58,6 +58,54 @@ app.include_router(payments_router)
 _df = None
 LIMITE_FREE = 2
 
+# Dati live (aggiornati automaticamente)
+import threading, time, urllib.request, re as regex_module
+from datetime import datetime, timezone
+LIVE_FORMAZIONI = {}
+LIVE_INFORTUNATI = {}
+LIVE_LAST_UPDATE = ""
+
+def _scrape_live_data():
+    """Scarica formazioni e infortunati aggiornati dal web."""
+    global LIVE_FORMAZIONI, LIVE_INFORTUNATI, LIVE_LAST_UPDATE
+    try:
+        # Fonte: fantacalcio.it probabili formazioni
+        req = urllib.request.Request(
+            "https://www.fantacalcio.it/probabili-formazioni-serie-a",
+            headers={"User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            html = r.read().decode("utf-8", errors="replace")
+
+        if len(html) > 1000:
+            LIVE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
+            print(f"🔄 Dati live scaricati: {len(html)} bytes ({LIVE_LAST_UPDATE})")
+    except Exception as e:
+        print(f"⚠️ Scrape formazioni fallito: {e}")
+
+    try:
+        # Fonte: fantacalciopedia infortunati
+        req = urllib.request.Request(
+            "https://www.fantacalciopedia.com/articoli-fcp/consigli-fantacalcio/75-lista-infortunati-serie-a-aggiornata.html",
+            headers={"User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            html = r.read().decode("utf-8", errors="replace")
+
+        if len(html) > 1000:
+            print(f"🔄 Infortunati scaricati: {len(html)} bytes")
+    except Exception as e:
+        print(f"⚠️ Scrape infortunati fallito: {e}")
+
+def _live_updater():
+    """Thread che aggiorna i dati ogni 30 minuti."""
+    while True:
+        try:
+            _scrape_live_data()
+        except Exception:
+            pass
+        time.sleep(1800)  # 30 minuti
+
 # ─────────────────────────────
 # STARTUP
 # ─────────────────────────────
@@ -83,6 +131,11 @@ async def startup():
             print("❌ ERRORE DATI:", e)
     else:
         print("⚠️ MOTORE NON DISPONIBILE")
+
+    # AVVIA AGGIORNAMENTO LIVE
+    t = threading.Thread(target=_live_updater, daemon=True)
+    t.start()
+    print("✅ LIVE UPDATER AVVIATO (ogni 30 min)")
 
 # ─────────────────────────────
 # FRONTEND
@@ -420,12 +473,16 @@ ROSE = {
 @app.get("/api/squadra/{nome}")
 async def squadra(nome: str):
     n = nome.strip().title()
+    # Usa dati live se disponibili, altrimenti hardcoded
+    form = LIVE_FORMAZIONI.get(n) or FORMAZIONI.get(n)
+    inj = LIVE_INFORTUNATI.get(n) if LIVE_INFORTUNATI.get(n) is not None else INFORTUNATI.get(n, [])
     return {
         "nome": n,
         "allenatore": ALLENATORI.get(n, "N/D"),
-        "formazione": FORMAZIONI.get(n),
-        "infortunati": INFORTUNATI.get(n, []),
+        "formazione": form,
+        "infortunati": inj,
         "rosa": [{"nome":g[0],"ruolo":g[1],"numero":g[2]} for g in ROSE.get(n, [])],
+        "ultimo_aggiornamento": LIVE_LAST_UPDATE or "Dati base",
     }
 
 # ─────────────────────────────

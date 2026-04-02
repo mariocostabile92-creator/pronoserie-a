@@ -278,12 +278,13 @@ async function loadSq(nome){
   let html='<div class="grid2">';
   // Sinistra: info + formazione campo
   html+='<div>';
-  html+=`<div class="card"><h2>${d.nome||nome}</h2><p style="color:var(--muted)">Allenatore: <strong>${d.allenatore||"N/D"}</strong></p></div>`;
+  html+=`<div class="card"><h2>${d.nome||nome}</h2><p style="color:var(--muted)">Allenatore: <strong>${d.allenatore||"N/D"}</strong></p>${d.ultimo_aggiornamento?`<p style="color:var(--muted);font-size:.8rem;margin-top:4px">Aggiornamento: ${d.ultimo_aggiornamento}</p>`:''}</div>`;
   if(d.formazione&&d.formazione.titolari){
     html+=`<div class="card"><h3>Probabile Formazione (${d.formazione.modulo||""})</h3>
       <div class="pitch" style="margin-top:12px">
         <div class="pitch-line"></div>
-        <div style="padding:20px 0">${d.formazione.titolari.map(g=>'<span class="player-dot">'+g+'</span>').join(" ")}</div>
+        <p style="color:rgba(255,255,255,.5);font-size:.75rem;margin-bottom:8px">${d.formazione.modulo||""}</p>
+        <div style="padding:10px 0">${d.formazione.titolari.map(g=>'<span class="player-dot">'+g+'</span>').join(" ")}</div>
       </div>
     </div>`;
   }
