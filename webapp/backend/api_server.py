@@ -251,6 +251,52 @@ def genera_pronostico(home, away):
     }
 
 # ─────────────────────────────
+# EMAIL (Resend)
+# ─────────────────────────────
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "re_ShqALKcH_HAnRE4SUyU9asxwpcAXC16AL")
+
+def send_welcome_email(to_email):
+    """Invia email di benvenuto dopo la registrazione."""
+    try:
+        import urllib.request as ur
+        import json as js
+        body = js.dumps({
+            "from": "PronoSerie A <onboarding@resend.dev>",
+            "to": [to_email],
+            "subject": "Benvenuto su PronoSerie A!",
+            "html": f"""
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0f1a;color:#e8eaf6;padding:32px;border-radius:12px">
+                <h1 style="color:#2ecc71;text-align:center">Benvenuto su PronoSerie A!</h1>
+                <p style="text-align:center;color:#8892b0">Il tuo account e' stato creato con successo.</p>
+                <div style="background:#162447;padding:20px;border-radius:8px;margin:20px 0;text-align:center">
+                    <p style="margin:0"><strong>Email:</strong> {to_email}</p>
+                    <p style="margin:8px 0 0"><strong>Piano:</strong> Free</p>
+                </div>
+                <h3 style="color:#3498db">Cosa puoi fare:</h3>
+                <ul style="color:#8892b0;line-height:2">
+                    <li>2 pronostici gratuiti al giorno</li>
+                    <li>Pronostici 1X2 con probabilita' e quote</li>
+                    <li>Calendario Serie A giornate 31-38</li>
+                </ul>
+                <div style="text-align:center;margin:24px 0">
+                    <a href="https://web-production-ff46b.up.railway.app/app#pronostici" style="background:#2ecc71;color:#000;padding:14px 32px;border-radius:20px;text-decoration:none;font-weight:700;font-size:1.1rem">Calcola il tuo primo pronostico</a>
+                </div>
+                <p style="text-align:center;color:#8892b0;font-size:.85rem">Passa a Pro per pronostici illimitati, classifica, marcatori, rose e formazioni live!</p>
+                <hr style="border:1px solid #1f3460;margin:20px 0">
+                <p style="text-align:center;color:#8892b0;font-size:.8rem">PronoSerie A — Pronostici Serie A con Intelligenza Artificiale</p>
+            </div>
+            """
+        }).encode()
+        req = ur.Request("https://api.resend.com/emails", data=body, headers={
+            "Authorization": f"Bearer {RESEND_API_KEY}",
+            "Content-Type": "application/json"
+        })
+        ur.urlopen(req, timeout=10)
+        print(f"📧 Email inviata a {to_email}")
+    except Exception as e:
+        print(f"⚠️ Errore invio email a {to_email}: {e}")
+
+# ─────────────────────────────
 # AUTH
 # ─────────────────────────────
 @app.post("/api/auth/register")
@@ -258,10 +304,13 @@ async def register(data: dict):
     email = data["email"].lower().strip()
 
     if get_user_by_email(email):
-        raise HTTPException(409, "Email già registrata")
+        raise HTTPException(409, "Email gia' registrata")
 
     user = create_user(email, hash_password(data["password"]))
     token = create_token({"sub": str(user["id"])})
+
+    # Invia email di benvenuto (in background, non blocca la risposta)
+    threading.Thread(target=send_welcome_email, args=(email,), daemon=True).start()
 
     return {"access_token": token, "piano": user["piano"]}
 
