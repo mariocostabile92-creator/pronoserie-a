@@ -1,170 +1,131 @@
 """
-database.py - Versione Ottimizzata
-Gestione SQLite con migrazioni automatiche per Stripe e Piani Pro.
+database.py - PostgreSQL (Neon.tech)
+Database persistente che non si cancella mai.
 """
 
-import sqlite3
 import os
+import psycopg2
+import psycopg2.extras
 from datetime import datetime, timezone
 
-# Percorso del database nella cartella backend
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "webapp_users.db")
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://neondb_owner:npg_MH8IvDSTg3mq@ep-soft-voice-aga6gbd9-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+)
 
 
-def _get_conn() -> sqlite3.Connection:
-    """Apre e ritorna una connessione al database SQLite."""
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row  # Risultati come dizionari
+def _get_conn():
+    conn = psycopg2.connect(DATABASE_URL)
     return conn
 
 
-def init_db() -> None:
-    """
-    Inizializza il database e applica migrazioni se le colonne mancano.
-    Questa funzione evita l'errore 500 dovuto a tabelle non aggiornate.
-    """
+def init_db():
     conn = _get_conn()
-    try:
-        cursor = conn.cursor()
-
-        # 1. Creazione tabella users (se non esiste)
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                piano TEXT DEFAULT 'free',
-                stripe_customer_id TEXT,
-                created_at TEXT NOT NULL
-            )
-        """)
-
-        # 2. MIGRAZIONE: Aggiunta colonne a tabelle esistenti
-        # Se il DB esiste già ma è vecchio, aggiungiamo le colonne mancanti
-        colonne_da_controllare = [
-            ("piano", "TEXT DEFAULT 'free'"),
-            ("stripe_customer_id", "TEXT")
-        ]
-
-        for nome_colonna, tipo_colonna in colonne_da_controllare:
-            try:
-                cursor.execute(f"ALTER TABLE users ADD COLUMN {nome_colonna} {tipo_colonna}")
-                print(f"Migrazione: Colonna '{nome_colonna}' aggiunta con successo.")
-            except sqlite3.OperationalError:
-                # Se la colonna esiste già, SQLite lancia questo errore: lo ignoriamo.
-                pass
-
-        # 3. Tabella log chiamate API
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS api_usage (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                endpoint TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES users(id)
-            )
-        """)
-
-        conn.commit()
-    except Exception as e:
-        print(f"Errore durante init_db: {e}")
-    finally:
-        conn.close()
-
-
-def create_user(email: str, password_hash: str) -> dict | None:
-    """Crea un nuovo utente. Ritorna il dict o None se l'email esiste."""
-    conn = _get_conn()
-    try:
-        created_at = datetime.now(timezone.utc).isoformat()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO users (email, password_hash, piano, created_at) VALUES (?, ?, 'free', ?)",
-            (email.lower().strip(), password_hash, created_at)
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            piano TEXT DEFAULT 'free',
+            stripe_customer_id TEXT,
+            created_at TEXT NOT NULL
         )
+    """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS api_usage (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            endpoint TEXT NOT NULL,
+            timestamp TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("DB PostgreSQL OK")
+
+
+def create_user(email, password_hash):
+    conn = _get_conn()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    try:
+        cur.execute(
+            "INSERT INTO users (email, password_hash, piano, created_at) VALUES (%s, %s, 'free', %s) RETURNING *",
+            (email.lower().strip(), password_hash, datetime.now(timezone.utc).isoformat())
+        )
+        user = dict(cur.fetchone())
         conn.commit()
-        user_id = cursor.lastrowid
-        return get_user_by_id(user_id)
-    except sqlite3.IntegrityError:
+        return user
+    except psycopg2.IntegrityError:
+        conn.rollback()
         return None
     finally:
+        cur.close()
         conn.close()
 
 
-def get_user_by_email(email: str) -> dict | None:
-    """Recupera utente tramite email."""
+def get_user_by_email(email):
     conn = _get_conn()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE email = ?", (email.lower().strip(),))
-        row = cursor.fetchone()
-        return dict(row) if row else None
-    finally:
-        conn.close()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT * FROM users WHERE email = %s", (email.lower().strip(),))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return dict(row) if row else None
 
 
-def get_user_by_id(user_id: int) -> dict | None:
-    """Recupera utente tramite ID."""
+def get_user_by_id(user_id):
     conn = _get_conn()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
-        row = cursor.fetchone()
-        return dict(row) if row else None
-    finally:
-        conn.close()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return dict(row) if row else None
 
 
-def update_plan(user_id: int, plan: str) -> bool:
-    """Aggiorna il piano (es. da 'free' a 'pro')."""
+def update_plan(user_id, plan):
     conn = _get_conn()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("UPDATE users SET piano = ? WHERE id = ?", (plan, user_id))
-        conn.commit()
-        return cursor.rowcount > 0
-    finally:
-        conn.close()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET piano = %s WHERE id = %s", (plan, user_id))
+    conn.commit()
+    ok = cur.rowcount > 0
+    cur.close()
+    conn.close()
+    return ok
 
 
-def update_stripe_customer(user_id: int, stripe_customer_id: str) -> bool:
-    """Salva l'ID cliente Stripe."""
+def update_stripe_customer(user_id, stripe_customer_id):
     conn = _get_conn()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("UPDATE users SET stripe_customer_id = ? WHERE id = ?", (stripe_customer_id, user_id))
-        conn.commit()
-        return cursor.rowcount > 0
-    finally:
-        conn.close()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET stripe_customer_id = %s WHERE id = %s", (stripe_customer_id, user_id))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 
-def log_api_call(user_id: int, endpoint: str) -> None:
-    """Registra l'utilizzo API."""
+def log_api_call(user_id, endpoint):
     conn = _get_conn()
-    try:
-        timestamp = datetime.now(timezone.utc).isoformat()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO api_usage (user_id, endpoint, timestamp) VALUES (?, ?, ?)",
-            (user_id, endpoint, timestamp)
-        )
-        conn.commit()
-    finally:
-        conn.close()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO api_usage (user_id, endpoint, timestamp) VALUES (%s, %s, %s)",
+        (user_id, endpoint, datetime.now(timezone.utc).isoformat())
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
 
 
-def count_daily_calls(user_id: int) -> int:
-    """Conta chiamate odierne per rate limiting."""
+def count_daily_calls(user_id):
     conn = _get_conn()
-    try:
-        oggi = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT COUNT(*) FROM api_usage WHERE user_id = ? AND timestamp LIKE ?",
-            (user_id, f"{oggi}%")
-        )
-        row = cursor.fetchone()
-        return row[0] if row else 0
-    finally:
-        conn.close()
+    cur = conn.cursor()
+    oggi = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    cur.execute(
+        "SELECT COUNT(*) FROM api_usage WHERE user_id = %s AND timestamp LIKE %s",
+        (user_id, f"{oggi}%")
+    )
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return row[0] if row else 0

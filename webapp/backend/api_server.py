@@ -217,8 +217,10 @@ async def reset_password(data: dict):
     # Aggiorna nel DB
     from database import _get_conn
     conn = _get_conn()
-    conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hash_password(new_pass), user["id"]))
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET password_hash = %s WHERE id = %s", (hash_password(new_pass), user["id"]))
     conn.commit()
+    cur.close()
     conn.close()
     return {"new_password": new_pass}
 
