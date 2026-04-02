@@ -308,7 +308,11 @@ async function pageCalendario(){
   // SINISTRA: giornata principale
   html+='<div>';
   html+=`<div class="card"><h2 style="color:var(--green)">Giornata ${g0.giornata} — ${g0.data||""}</h2>`;
-  html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata(${g0.giornata})">Simula Pronostici Giornata</button>`;
+  if(userPlan==="pro"){
+    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata(${g0.giornata})">Simula Pronostici Giornata</button>`;
+  } else {
+    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem;opacity:.7" onclick="abbonarPro()">Simula Giornata — Solo Pro</button>`;
+  }
   g0.partite.forEach(p=>{
     html+=`<div class="match-btn" style="cursor:default"><span><strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong></span></div>`;
   });
@@ -559,6 +563,7 @@ async function loadSq(nome){
 // ── PRICING ──
 // ── NOTIZIE LIVE ──
 async function pageNotizie(){
+  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Notizie Live Serie A</h2><p style="margin:16px 0">Le notizie live della Serie A sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro — 9.99€/mese</button></div></div>`;
   const data=await fetchAPI("/api/notizie");
   if(!data)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento notizie</div></div>';
   let html='<div class="container"><h1>Notizie Serie A</h1><p class="sub">Aggiornamento live — '+( data.aggiornamento||"In tempo reale")+'</p>';
