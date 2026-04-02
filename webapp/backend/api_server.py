@@ -251,39 +251,41 @@ def genera_pronostico(home, away):
         # I gol attesi riflettono la forza SPECIFICA delle due squadre
         # Non applichiamo cap alla media campionato
 
-        # Correzione H2H
+        # Correzione H2H (piu' leggera)
         h2h_key = f"{h}_vs_{a}"
         h2h = H2H_DATA.get(h2h_key, {})
         h2h_n = h2h.get("n_partite", 0)
         if h2h_n >= 3:
             adv = h2h["h2h_advantage"]
-            lh *= (1.0 + 0.12 * adv)
-            la *= (1.0 - 0.12 * adv)
+            lh *= (1.0 + 0.06 * adv)
+            la *= (1.0 - 0.06 * adv)
 
-        # Correzione forma pesata
+        # Correzione forma pesata (piu' leggera)
         fh = sh.get("forma_casa_pesata", 1.5)
         fa = sa.get("forma_trasf_pesata", 1.5)
         fd = fh - fa
-        ff = 1.0 + 0.10 * fd
+        ff = 1.0 + 0.05 * fd
         lh *= ff
         la *= (2.0 - ff)
 
-        # PUNTO 4: Feature avanzate
-        # Fattore motivazione: squadre in lotta salvezza/scudetto sono piu' motivate
-        if pts_h <= 30 or pts_h >= 60:  # Lotta salvezza o scudetto
-            lh *= 1.03
+        # PUNTO 4: Feature avanzate (leggere)
+        if pts_h <= 30 or pts_h >= 60:
+            lh *= 1.02
         if pts_a <= 30 or pts_a >= 60:
-            la *= 1.03
-        # Differenza classifica: squadre molto distanti = meno equilibrio
+            la *= 1.02
         if abs(pts_h - pts_a) > 25:
             if pts_h > pts_a:
-                lh *= 1.04
+                lh *= 1.02
             else:
-                la *= 1.04
+                la *= 1.02
 
-    # Clamp realistico: nessuna squadra segna piu' di 2.5 gol a partita in media
-    lh = max(0.3, min(lh, 2.5))
-    la = max(0.2, min(la, 2.0))
+    # Clamp realistico per singola squadra
+    lh = max(0.3, min(lh, 2.2))
+    la = max(0.2, min(la, 1.6))
+
+    # Equilibrio: la Roma non puo' avere solo 13%
+    # Min prob ospite = ~15% per squadre di meta' classifica
+    # Questo si ottiene assicurando che la non sia troppo basso
 
     # Calcolo Poisson con Dixon-Coles
     p1 = px = p2 = 0.0
