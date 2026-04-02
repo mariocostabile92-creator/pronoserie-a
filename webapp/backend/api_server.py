@@ -203,6 +203,25 @@ async def login(data: dict):
 
     return {"access_token": token, "piano": user["piano"]}
 
+@app.post("/api/auth/reset-password")
+async def reset_password(data: dict):
+    import random, string
+    email = data.get("email", "").lower().strip()
+    if not email:
+        raise HTTPException(400, "Email richiesta")
+    user = get_user_by_email(email)
+    if not user:
+        raise HTTPException(404, "Email non trovata")
+    # Genera nuova password casuale
+    new_pass = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    # Aggiorna nel DB
+    from database import _get_conn
+    conn = _get_conn()
+    conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hash_password(new_pass), user["id"]))
+    conn.commit()
+    conn.close()
+    return {"new_password": new_pass}
+
 # ─────────────────────────────
 # PRONOSTICO
 # ─────────────────────────────
