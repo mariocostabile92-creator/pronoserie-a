@@ -121,18 +121,60 @@ def genera_pronostico(home, away):
         except Exception as e:
             print("❌ ERRORE PREDICTOR:", e)
 
-    # fallback (non crasha mai)
+    # Fallback con Poisson + xG inline (funziona SEMPRE)
+    from scipy.stats import poisson as pdist
+    XG = {
+        "Inter":{"xG":2.40,"xGA":0.84},"Milan":{"xG":1.83,"xGA":1.12},"Napoli":{"xG":1.56,"xGA":1.10},
+        "Como":{"xG":1.80,"xGA":1.08},"Juventus":{"xG":1.97,"xGA":0.97},"Roma":{"xG":1.54,"xGA":1.20},
+        "Atalanta":{"xG":1.86,"xGA":1.38},"Lazio":{"xG":1.21,"xGA":1.34},"Bologna":{"xG":1.34,"xGA":1.39},
+        "Sassuolo":{"xG":1.19,"xGA":1.63},"Udinese":{"xG":1.19,"xGA":1.56},"Parma":{"xG":1.00,"xGA":1.62},
+        "Genoa":{"xG":1.30,"xGA":1.45},"Torino":{"xG":1.33,"xGA":1.57},"Cagliari":{"xG":1.01,"xGA":1.65},
+        "Fiorentina":{"xG":1.52,"xGA":1.53},"Cremonese":{"xG":1.03,"xGA":1.87},"Lecce":{"xG":0.93,"xGA":1.67},
+        "Verona":{"xG":1.03,"xGA":1.40},"Pisa":{"xG":1.14,"xGA":1.82},
+    }
+    h = home.strip().title()
+    a = away.strip().title()
+    xh = XG.get(h, {"xG":1.3,"xGA":1.3})
+    xa = XG.get(a, {"xG":1.3,"xGA":1.3})
+    avg = sum(v["xGA"] for v in XG.values()) / len(XG)
+    lh = max(0.3, min(xh["xG"] * (xa["xGA"] / avg), 5.0))
+    la = max(0.3, min(xa["xG"] * (xh["xGA"] / avg), 5.0))
+
+    p1 = px = p2 = 0.0
+    for i in range(11):
+        for j in range(11):
+            p = pdist.pmf(i, lh) * pdist.pmf(j, la)
+            rho = -0.13
+            if i==0 and j==0: p *= (1 - lh*la*rho)
+            elif i==1 and j==0: p *= (1 + la*rho)
+            elif i==0 and j==1: p *= (1 + lh*rho)
+            elif i==1 and j==1: p *= (1 - rho)
+            p = max(0, p)
+            if i > j: p1 += p
+            elif i == j: px += p
+            else: p2 += p
+    px *= 1.12
+    tot = p1 + px + p2
+    if tot > 0: p1/=tot; px/=tot; p2/=tot
+
+    ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
+    gsi = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
+    scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(6) for j in range(6)], key=lambda x:-x["prob"])
+
+    mp = max(p1, px, p2)
+    sg = "1" if mp==p1 else ("X" if mp==px else "2")
+    sl = "Vittoria Casa" if sg=="1" else ("Pareggio" if sg=="X" else "Vittoria Ospite")
+    sp = sorted([p1,px,p2], reverse=True)
+    cf = min((sp[0]-sp[1])/0.4, 1.0)*0.7+0.3
+    cl = "Alta" if cf>=0.65 else ("Media" if cf>=0.4 else "Bassa")
+
     return {
-        "prob_1": 34,
-        "prob_x": 33,
-        "prob_2": 33,
-        "quota_1": 2.2,
-        "quota_x": 3.1,
-        "quota_2": 2.9,
-        "suggerimento": "X",
-        "sugg_label": "Fallback",
-        "confidence": 0.5,
-        "confidence_label": "Media",
+        "prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),
+        "quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,
+        "suggerimento":sg,"sugg_label":sl,"confidence":round(cf,3),"confidence_label":cl,
+        "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
+        "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
+        "gol_attesi":round(lh+la,2),"risultati_esatti":scores[:5],
     }
 
 # ─────────────────────────────
@@ -194,42 +236,27 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
 # ─────────────────────────────
 # CALENDARIO (FIX DEFINITIVO)
 # ─────────────────────────────
+CAL_HARDCODED = {
+    31:{"data":"4-6 aprile 2026","partite":[("Sassuolo","Cagliari"),("Verona","Fiorentina"),("Lazio","Parma"),("Cremonese","Bologna"),("Pisa","Torino"),("Inter","Roma"),("Udinese","Como"),("Lecce","Atalanta"),("Juventus","Genoa"),("Napoli","Milan")]},
+    32:{"data":"10-13 aprile 2026","partite":[("Roma","Pisa"),("Cagliari","Cremonese"),("Torino","Verona"),("Milan","Udinese"),("Atalanta","Juventus"),("Genoa","Sassuolo"),("Parma","Napoli"),("Bologna","Lecce"),("Como","Inter"),("Fiorentina","Lazio")]},
+    33:{"data":"17-20 aprile 2026","partite":[("Sassuolo","Como"),("Inter","Cagliari"),("Udinese","Parma"),("Napoli","Lazio"),("Roma","Atalanta"),("Cremonese","Torino"),("Verona","Milan"),("Pisa","Genoa"),("Juventus","Bologna"),("Lecce","Fiorentina")]},
+    34:{"data":"24-27 aprile 2026","partite":[("Napoli","Cremonese"),("Parma","Pisa"),("Bologna","Roma"),("Verona","Lecce"),("Fiorentina","Sassuolo"),("Genoa","Como"),("Torino","Inter"),("Milan","Juventus"),("Cagliari","Atalanta"),("Lazio","Udinese")]},
+    35:{"data":"2-4 maggio 2026","partite":[("Atalanta","Genoa"),("Bologna","Cagliari"),("Como","Napoli"),("Cremonese","Lazio"),("Inter","Parma"),("Juventus","Verona"),("Pisa","Lecce"),("Roma","Fiorentina"),("Sassuolo","Milan"),("Udinese","Torino")]},
+    36:{"data":"8-10 maggio 2026","partite":[("Cagliari","Udinese"),("Cremonese","Pisa"),("Fiorentina","Genoa"),("Lazio","Inter"),("Lecce","Juventus"),("Milan","Atalanta"),("Napoli","Bologna"),("Parma","Roma"),("Torino","Sassuolo"),("Verona","Como")]},
+    37:{"data":"15-17 maggio 2026","partite":[("Atalanta","Bologna"),("Cagliari","Torino"),("Como","Parma"),("Genoa","Milan"),("Inter","Verona"),("Juventus","Fiorentina"),("Pisa","Napoli"),("Roma","Lazio"),("Sassuolo","Lecce"),("Udinese","Cremonese")]},
+    38:{"data":"24 maggio 2026","partite":[("Bologna","Inter"),("Cremonese","Como"),("Fiorentina","Atalanta"),("Lazio","Pisa"),("Lecce","Genoa"),("Milan","Cagliari"),("Napoli","Udinese"),("Parma","Sassuolo"),("Torino","Juventus"),("Verona","Roma")]},
+}
+
 @app.get("/api/calendario")
 async def calendario():
-    try:
-        if not MOTORE_DISPONIBILE:
-            return {"giornate": []}
-
-        cal = get_calendario_rimanente()
-
-        print("📅 DEBUG CALENDARIO:", cal)
-
-        giornate = []
-
-        for g in cal:
-            giornata = {
-                "giornata": g.get("giornata", 0),
-                "data": g.get("data", ""),
-                "partite": []
-            }
-
-            for p in g.get("partite", []):
-                home = p.get("home") or p.get("casa") or p.get("team_home")
-                away = p.get("away") or p.get("trasferta") or p.get("team_away")
-
-                if home and away:
-                    giornata["partite"].append({
-                        "home": home,
-                        "away": away
-                    })
-
-            giornate.append(giornata)
-
-        return {"giornate": giornate}
-
-    except Exception as e:
-        print("❌ ERRORE CALENDARIO:", e)
-        return {"giornate": [], "errore": str(e)}
+    # Usa dati hardcoded (funziona SEMPRE, anche senza CSV)
+    giornate = []
+    for num in range(31, 39):
+        info = CAL_HARDCODED.get(num)
+        if info:
+            partite = [{"home": h, "away": a} for h, a in info["partite"]]
+            giornate.append({"giornata": num, "data": info["data"], "partite": partite})
+    return {"giornate": giornate}
 
 # ─────────────────────────────
 # CLASSIFICA
