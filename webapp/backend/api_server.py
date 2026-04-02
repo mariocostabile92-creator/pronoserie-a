@@ -195,8 +195,8 @@ def genera_pronostico(home, away):
         H2H_DATA = {}
         LEAGUE_AVG = {"media_gol_casa": 1.5, "media_gol_trasferta": 1.17}
 
-    h = home_norm
-    a = away_norm
+    h = home.strip().title()
+    a = away.strip().title()
     sh = TEAM_STATS.get(h, {})
     sa = TEAM_STATS.get(a, {})
 
