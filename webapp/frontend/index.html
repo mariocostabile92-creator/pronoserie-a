@@ -27,7 +27,7 @@ h1{font-size:2rem;margin-bottom:8px}h2{font-size:1.4rem;margin-bottom:12px}
 select{background:#0d1b2a;color:var(--text);border:1px solid #1f3460;padding:10px 16px;border-radius:8px;font-size:1rem;min-width:180px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}}
+@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}.nav{gap:6px;padding:8px 12px}.nav a{font-size:.75rem;padding:4px 8px}.nav .logo{font-size:1rem}table{font-size:.7rem}th,td{padding:4px 2px}.box1x2 .pct{font-size:1.3rem}.hero h1{font-size:1.5rem}.container{padding:12px 8px}.card{padding:14px}.stat-box .num{font-size:1.5rem}}
 .box1x2{text-align:center;padding:16px;border-radius:12px;background:#0d1b2a;border:2px solid #1f3460}
 .box1x2.best{border-color:var(--green);box-shadow:0 0 20px rgba(46,204,113,.2)}
 .box1x2 .pct{font-size:2rem;font-weight:800}.box1x2 .quota{color:var(--muted);font-size:.85rem}
@@ -336,7 +336,7 @@ async function simulaGiornata(gNum){
   const g=cal.giornate.find(x=>x.giornata===gNum);
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
   let html='<div class="card"><h3 style="margin-bottom:12px">Pronostici Giornata '+gNum+'</h3>';
-  html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.85rem"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U 2.5</th><th>Goal</th><th>Gol</th><th>Aff.</th></tr></thead><tbody>';
+  html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.75rem;white-space:nowrap"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U</th><th>Goal</th><th>Gol</th><th>Aff.</th></tr></thead><tbody>';
   for(const p of g.partite){
     const d=await fetchAPI("/api/pronostico/"+p.home+"/"+p.away);
     if(!d)continue;
@@ -448,9 +448,9 @@ async function pageClassifica(){
   html+='</div></div>';
   // DESTRA: Marcatori
   html+='<div>';
-  html+='<div class="card"><h2>Top Marcatori</h2>';
-  (data.marcatori||[]).forEach(m=>{
-    html+=`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460"><span style="width:28px;font-weight:700;color:${m.pos<=3?"var(--green)":"var(--muted)"}">${m.pos}</span><div style="flex:1"><strong style="font-size:.9rem">${m.giocatore}</strong><br><span style="color:var(--muted);font-size:.8rem">${m.squadra}</span></div><span style="font-weight:800;color:var(--green);font-size:1.1rem">${m.gol}</span></div>`;
+  html+='<div class="card" style="padding:12px"><h3 style="margin-bottom:6px">Top 10 Marcatori</h3>';
+  (data.marcatori||[]).slice(0,10).forEach(m=>{
+    html+=`<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1f3460"><span style="width:22px;font-weight:700;color:${m.pos<=3?"var(--green)":"var(--muted)"};font-size:.85rem">${m.pos}</span><div style="flex:1"><strong style="font-size:.8rem">${m.giocatore}</strong> <span style="color:var(--muted);font-size:.7rem">${m.squadra}</span></div><span style="font-weight:800;color:var(--green);font-size:.9rem">${m.gol}</span></div>`;
   });
   html+='</div>';
   html+='</div></div></div>';
