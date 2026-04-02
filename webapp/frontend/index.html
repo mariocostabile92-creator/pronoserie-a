@@ -189,19 +189,61 @@ async function calcPronostico(){
       <div class="card" style="text-align:center;padding:12px"><strong>${glLbl}</strong><br><span style="font-size:1.3rem;font-weight:700;color:${glCol}">${glVal}%</span></div>
       <div class="card" style="text-align:center;padding:12px"><strong>Gol Attesi</strong><br><span style="font-size:1.3rem;font-weight:700;color:${d.gol_attesi>2.5?'var(--green)':'var(--accent)'}">${d.gol_attesi||"-"}</span></div>
     </div>`;
-    if(d.risultati_esatti)extra+=`<p style="color:var(--muted)">Esatto: ${d.risultati_esatti.slice(0,3).map(r=>r.score+" ("+r.prob+"%)").join(" | ")}</p>`;
-    // Marcatori consigliati dall'IA
+    // Risultato esatto ben visibile
+    if(d.risultati_esatti&&d.risultati_esatti.length){
+      extra+=`<div style="margin-top:16px"><h4 style="color:var(--accent);margin-bottom:8px">Risultato Esatto Piu' Probabile</h4><div class="grid3" style="gap:8px">`;
+      d.risultati_esatti.slice(0,3).forEach((r,i)=>{
+        const bg=i===0?"var(--green)":i===1?"var(--accent)":"var(--muted)";
+        extra+=`<div style="text-align:center;padding:12px;background:#0d1b2a;border-radius:10px;border:2px solid ${bg}"><div style="font-size:1.8rem;font-weight:800;color:${bg}">${r.score}</div><div style="color:var(--muted);font-size:.85rem">${r.prob}%</div></div>`;
+      });
+      extra+=`</div>`;
+      if(d.risultati_esatti.length>3){
+        extra+=`<div style="display:flex;gap:8px;margin-top:6px;justify-content:center">`;
+        d.risultati_esatti.slice(3,5).forEach(r=>{
+          extra+=`<span style="color:var(--muted);font-size:.85rem">${r.score} (${r.prob}%)</span>`;
+        });
+        extra+=`</div>`;
+      }
+      extra+=`</div>`;
+    }
+    // GIOCATA MIGLIORE consigliata dall'IA
+    const ouTip=d.over_25>50?"Over 2.5":"Under 2.5";
+    const ouProb=Math.max(d.over_25,d.under_25);
+    const glTip=d.goal_si>50?"Goal Si":"Goal No";
+    const glProb=Math.max(d.goal_si,d.goal_no);
+    // Trova la giocata con probabilita' piu' alta
+    const giocate=[
+      {nome:`1X2: ${best}`,prob:Math.max(d.prob_1,d.prob_x,d.prob_2),quota:best==="1"?d.quota_1:best==="X"?d.quota_x:d.quota_2},
+      {nome:ouTip,prob:ouProb,quota:ouProb>55?1.85:2.10},
+      {nome:glTip,prob:glProb,quota:glProb>55?1.75:2.00},
+    ];
+    giocate.sort((a,b)=>b.prob-a.prob);
+    extra+=`<div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,#0d3b1e,#162447);border-radius:12px;border:2px solid var(--green)">
+      <h4 style="color:var(--green);margin-bottom:8px;text-align:center">Giocata Migliore Consigliata dall'IA</h4>
+      <div style="text-align:center"><span style="font-size:1.5rem;font-weight:800;color:var(--green)">${giocate[0].nome}</span><br><span style="color:var(--muted)">Probabilita': ${giocate[0].prob}% | Quota ~${giocate[0].quota}</span></div>
+      <div style="display:flex;justify-content:center;gap:12px;margin-top:8px">
+        ${giocate.slice(1).map(g=>`<span style="color:var(--muted);font-size:.85rem">${g.nome}: ${g.prob}%</span>`).join(" | ")}
+      </div>
+    </div>`;
+    // Marcatori consigliati
     if(d.marcatori_casa||d.marcatori_ospite){
       extra+=`<div style="margin-top:12px;padding:12px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--green);margin-bottom:8px">Probabili Marcatori</h4>`;
       if(d.marcatori_casa&&d.marcatori_casa.length)extra+=`<p style="color:var(--text);font-size:.9rem"><strong style="color:var(--green)">${h}:</strong> ${d.marcatori_casa.join(" · ")}</p>`;
       if(d.marcatori_ospite&&d.marcatori_ospite.length)extra+=`<p style="color:var(--text);font-size:.9rem;margin-top:4px"><strong style="color:var(--red)">${a}:</strong> ${d.marcatori_ospite.join(" · ")}</p>`;
       extra+=`</div>`;
     }
-    // Formazioni
+    // Formazioni con campo
     if(d.formazione_casa||d.formazione_ospite){
-      extra+=`<div style="margin-top:12px;padding:12px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--accent);margin-bottom:8px">Probabili Formazioni</h4>`;
-      if(d.formazione_casa)extra+=`<p style="font-size:.85rem"><strong style="color:var(--green)">${h} (${d.formazione_casa.modulo}):</strong> <span style="color:var(--text)">${d.formazione_casa.titolari.join(", ")}</span></p>`;
-      if(d.formazione_ospite)extra+=`<p style="font-size:.85rem;margin-top:4px"><strong style="color:var(--red)">${a} (${d.formazione_ospite.modulo}):</strong> <span style="color:var(--text)">${d.formazione_ospite.titolari.join(", ")}</span></p>`;
+      extra+=`<div style="margin-top:12px;padding:16px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--accent);margin-bottom:12px">Probabili Formazioni</h4>`;
+      [["casa",h,d.formazione_casa,"var(--green)"],[" ospite",a,d.formazione_ospite,"var(--red)"]].forEach(([tipo,nome,form,col])=>{
+        if(form){
+          extra+=`<div style="margin-bottom:12px"><strong style="color:${col};font-size:1rem">${nome} (${form.modulo})</strong><div style="background:#2d8a4e;border-radius:8px;padding:12px;margin-top:6px;text-align:center">`;
+          form.titolari.forEach(g=>{
+            extra+=`<span style="display:inline-block;background:${col};color:#fff;padding:3px 10px;border-radius:12px;font-size:.75rem;margin:2px;font-weight:600">${g}</span>`;
+          });
+          extra+=`</div></div>`;
+        }
+      });
       extra+=`</div>`;
     }
   }
