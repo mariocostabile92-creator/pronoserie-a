@@ -147,6 +147,14 @@ FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 async def root():
     return RedirectResponse("/app")
 
+@app.get("/manifest.json", include_in_schema=False)
+async def serve_manifest():
+    return FileResponse(os.path.join(FRONTEND_DIR, "manifest.json"), media_type="application/json")
+
+@app.get("/sw.js", include_in_schema=False)
+async def serve_sw():
+    return FileResponse(os.path.join(FRONTEND_DIR, "sw.js"), media_type="application/javascript")
+
 @app.get("/app", include_in_schema=False)
 @app.get("/app/{path:path}", include_in_schema=False)
 async def serve_app(path: str = ""):
@@ -661,6 +669,52 @@ async def squadra(nome: str):
         "infortunati": inj,
         "rosa": [{"nome":g[0],"ruolo":g[1],"numero":g[2]} for g in ROSE.get(n, [])],
         "ultimo_aggiornamento": LIVE_LAST_UPDATE or "Dati base",
+    }
+
+# ─────────────────────────────
+# SCHEDINA DEL GIORNO (IA)
+# ─────────────────────────────
+@app.get("/api/schedina")
+async def schedina_del_giorno():
+    """L'IA seleziona le 3-5 giocate piu' sicure della giornata 31."""
+    giocate = []
+    cal = CAL_HARDCODED.get(31, {})
+    partite = cal.get("partite", [])
+
+    for home, away in partite:
+        try:
+            raw = genera_pronostico(home, away)
+            if raw.get("sicura"):
+                giocate.append({
+                    "home": home, "away": away,
+                    "tip": raw["suggerimento"],
+                    "tip_label": raw["sugg_label"],
+                    "prob": max(raw["prob_1"], raw["prob_x"], raw["prob_2"]),
+                    "quota": raw.get(f"quota_{raw['suggerimento'].lower().replace('x','x')}", 0),
+                    "confidence": raw["confidence"],
+                    "over_under": "Over 2.5" if raw.get("over_25",0) > 55 else "Under 2.5",
+                    "goal": "Goal Si" if raw.get("goal_si",0) > 55 else "Goal No",
+                })
+        except Exception:
+            continue
+
+    # Ordina per confidence e prendi top 5
+    giocate.sort(key=lambda x: -x["confidence"])
+    top = giocate[:5]
+
+    # Calcola quota totale schedina
+    quota_tot = 1.0
+    for g in top:
+        q = g.get("quota", 1.5)
+        if q > 1: quota_tot *= q
+
+    return {
+        "giornata": 31,
+        "data": cal.get("data", ""),
+        "giocate": top,
+        "n_giocate": len(top),
+        "quota_totale": round(quota_tot, 2),
+        "tipo": "Schedina SICURA — Solo giocate ad alta confidenza",
     }
 
 # ─────────────────────────────

@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.json">
 <title>PronoSerie A - Pronostici Serie A con IA</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -115,7 +119,24 @@ function pageHome(){
       <div class="stat-box card"><div class="num" style="color:var(--green)">56.0%</div><div class="lbl">Confidenza Alta</div></div>
     </div>
     <div style="text-align:center;margin:32px 0"><a href="#pricing" class="btn btn-blue">Vedi i Piani</a></div>
+    <div id="schedina-home"></div>
   </div>`;
+}
+
+// Carica schedina nella home
+async function loadSchedina(){
+  const el=$("schedina-home");
+  if(!el)return;
+  const d=await fetchAPI("/api/schedina");
+  if(!d||!d.giocate||!d.giocate.length)return;
+  let html='<div class="card" style="border-color:var(--green);border-width:2px"><h2 style="color:var(--green);text-align:center">Schedina del Giorno — G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:16px">'+d.tipo+'</p>';
+  d.giocate.forEach((g,i)=>{
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f3460"><div><strong>${g.home}</strong> vs <strong>${g.away}</strong><br><span style="color:var(--muted);font-size:.8rem">Conf. ${Math.round(g.confidence*100)}% | ${g.over_under} | ${g.goal}</span></div><div style="text-align:right"><span class="tag tag-green" style="font-size:1rem;padding:6px 16px">${g.tip}</span><br><span style="color:var(--muted);font-size:.85rem">Quota ${g.quota}</span></div></div>`;
+  });
+  html+=`<div style="text-align:center;margin-top:16px;padding:16px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted)">Quota totale schedina:</span><br><span style="font-size:2rem;font-weight:800;color:var(--green)">${d.quota_totale}</span></div>`;
+  if(userPlan!=="pro")html+=`<div style="text-align:center;margin-top:12px"><button class="btn btn-green" onclick="abbonarPro()">Sblocca Schedina Pro — 9.99/mese</button></div>`;
+  html+='</div>';
+  el.innerHTML=html;
 }
 
 // ── PRONOSTICI (2 gratis/giorno) ──
@@ -617,6 +638,7 @@ async function navigate(){
     else{app.innerHTML=result}
   }catch(e){app.innerHTML='<div class="container card" style="color:var(--red)">Errore: '+e.message+'</div>'}
   if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq("Inter"),200);
+  if(hash==="home")setTimeout(()=>loadSchedina(),300);
   updateNavAuth();
 }
 
@@ -663,6 +685,9 @@ window.addEventListener("hashchange",navigate);
 if(!location.hash)location.hash="#home";
 checkPaidReturn();
 navigate();
+
+// PWA Service Worker
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}
 </script>
 </body>
 </html>
