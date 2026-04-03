@@ -104,6 +104,7 @@ def _live_updater():
         try:
             _scrape_live_data()
             _scrape_notizie()
+            _scrape_odds()
         except Exception:
             pass
         time.sleep(1800)  # 30 minuti
@@ -177,6 +178,101 @@ def check_limit(user):
         raise HTTPException(429, "Limite giornaliero raggiunto")
 
     log_api_call(user["id"], "pronostico")
+
+# ─────────────────────────────
+# QUOTE BOOKMAKER LIVE (the-odds-api.com)
+# ─────────────────────────────
+ODDS_API_KEY = "6003dadbc1da344808124a37f63f316a"
+ODDS_CACHE = {}  # {"Inter_vs_Roma": {"prob_1": 55, "prob_x": 25, "prob_2": 20}, ...}
+ODDS_LAST_UPDATE = ""
+
+def _scrape_odds():
+    """Scarica quote live Serie A dai bookmaker."""
+    global ODDS_CACHE, ODDS_LAST_UPDATE
+    try:
+        url = f"https://api.the-odds-api.com/v4/sports/soccer_italy_serie_a/odds/?apiKey={ODDS_API_KEY}&regions=eu&markets=h2h&oddsFormat=decimal"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        # Mappa nomi squadre API -> nostri nomi
+        NOME_MAP = {
+            "FC Internazionale Milano": "Inter", "Inter Milan": "Inter", "Inter": "Inter",
+            "AC Milan": "Milan", "Milan": "Milan",
+            "SSC Napoli": "Napoli", "Napoli": "Napoli",
+            "Como 1907": "Como", "Como": "Como",
+            "Juventus FC": "Juventus", "Juventus": "Juventus",
+            "AS Roma": "Roma", "Roma": "Roma",
+            "Atalanta BC": "Atalanta", "Atalanta": "Atalanta",
+            "SS Lazio": "Lazio", "Lazio": "Lazio",
+            "Bologna FC 1909": "Bologna", "Bologna": "Bologna",
+            "US Sassuolo": "Sassuolo", "Sassuolo": "Sassuolo",
+            "Udinese Calcio": "Udinese", "Udinese": "Udinese",
+            "Parma Calcio 1913": "Parma", "Parma": "Parma",
+            "Genoa CFC": "Genoa", "Genoa": "Genoa",
+            "Torino FC": "Torino", "Torino": "Torino",
+            "Cagliari Calcio": "Cagliari", "Cagliari": "Cagliari",
+            "ACF Fiorentina": "Fiorentina", "Fiorentina": "Fiorentina",
+            "US Cremonese": "Cremonese", "Cremonese": "Cremonese",
+            "US Lecce": "Lecce", "Lecce": "Lecce",
+            "Hellas Verona FC": "Verona", "Verona": "Verona",
+            "AC Pisa 1909": "Pisa", "Pisa": "Pisa",
+        }
+
+        new_cache = {}
+        for match in data:
+            home_api = match.get("home_team", "")
+            away_api = match.get("away_team", "")
+            home = NOME_MAP.get(home_api, home_api)
+            away = NOME_MAP.get(away_api, away_api)
+
+            # Prendi le quote medie di tutti i bookmaker
+            quotes_1 = []
+            quotes_x = []
+            quotes_2 = []
+            for bk in match.get("bookmakers", []):
+                for market in bk.get("markets", []):
+                    if market.get("key") == "h2h":
+                        for outcome in market.get("outcomes", []):
+                            nome_out = NOME_MAP.get(outcome["name"], outcome["name"])
+                            if nome_out == home:
+                                quotes_1.append(outcome["price"])
+                            elif nome_out == away:
+                                quotes_2.append(outcome["price"])
+                            elif outcome["name"] == "Draw":
+                                quotes_x.append(outcome["price"])
+
+            if quotes_1 and quotes_x and quotes_2:
+                avg_1 = sum(quotes_1) / len(quotes_1)
+                avg_x = sum(quotes_x) / len(quotes_x)
+                avg_2 = sum(quotes_2) / len(quotes_2)
+                # Converti in probabilita' (rimuovi overround)
+                p1 = 1 / avg_1
+                px = 1 / avg_x
+                p2 = 1 / avg_2
+                tot = p1 + px + p2
+                key = f"{home}_vs_{away}"
+                new_cache[key] = {
+                    "prob_1": round(p1 / tot * 100, 1),
+                    "prob_x": round(px / tot * 100, 1),
+                    "prob_2": round(p2 / tot * 100, 1),
+                    "quota_1": round(avg_1, 2),
+                    "quota_x": round(avg_x, 2),
+                    "quota_2": round(avg_2, 2),
+                    "n_bookmakers": len(quotes_1),
+                }
+
+        if new_cache:
+            ODDS_CACHE = new_cache
+            ODDS_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
+            print(f"📊 Quote bookmaker: {len(ODDS_CACHE)} partite da {len(data)} match")
+    except Exception as e:
+        print(f"⚠️ Scrape quote fallito: {e}")
+
+def get_bookmaker_odds(home, away):
+    """Ritorna le probabilita' bookmaker per una partita."""
+    key = f"{home}_vs_{away}"
+    return ODDS_CACHE.get(key)
 
 def _filtra_marcatori(marcatori, infortunati):
     """Rimuove i giocatori infortunati dalla lista marcatori."""
@@ -347,6 +443,22 @@ def genera_pronostico(home, away):
     tot = p1 + px + p2
     if tot > 0: p1/=tot; px/=tot; p2/=tot
 
+    # BLENDING CON QUOTE BOOKMAKER (se disponibili)
+    bk_odds = get_bookmaker_odds(h, a)
+    bk_used = False
+    if bk_odds:
+        bk_used = True
+        bk_p1 = bk_odds["prob_1"] / 100
+        bk_px = bk_odds["prob_x"] / 100
+        bk_p2 = bk_odds["prob_2"] / 100
+        # Blend: 60% nostro modello + 40% bookmaker
+        p1 = 0.60 * p1 + 0.40 * bk_p1
+        px = 0.60 * px + 0.40 * bk_px
+        p2 = 0.60 * p2 + 0.40 * bk_p2
+        # Rinormalizza
+        tot = p1 + px + p2
+        if tot > 0: p1/=tot; px/=tot; p2/=tot
+
     ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
     gsi_raw = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
     # Calibrazione Goal: Serie A ha 57% Goal Si in media
@@ -394,6 +506,8 @@ def genera_pronostico(home, away):
         "formazione_ospite": FORMAZIONI.get(a),
         "h2h_applicato": h2h_n >= 3 if sh else False,
         "h2h_partite": h2h_n if sh else 0,
+        "bookmaker_used": bool(bk_used),
+        "bookmaker_odds": bk_odds,
     }
 
 # ─────────────────────────────
