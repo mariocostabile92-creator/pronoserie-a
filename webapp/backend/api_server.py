@@ -190,7 +190,7 @@ def _scrape_odds():
     """Scarica quote live Serie A dai bookmaker."""
     global ODDS_CACHE, ODDS_LAST_UPDATE
     try:
-        url = f"https://api.the-odds-api.com/v4/sports/soccer_italy_serie_a/odds/?apiKey={ODDS_API_KEY}&regions=eu&markets=h2h&oddsFormat=decimal"
+        url = f"https://api.the-odds-api.com/v4/sports/soccer_italy_serie_a/odds/?apiKey={ODDS_API_KEY}&regions=eu&markets=h2h,totals&oddsFormat=decimal"
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=15) as r:
             data = json.loads(r.read().decode())
@@ -230,6 +230,8 @@ def _scrape_odds():
             quotes_1 = []
             quotes_x = []
             quotes_2 = []
+            quotes_over = []
+            quotes_under = []
             for bk in match.get("bookmakers", []):
                 for market in bk.get("markets", []):
                     if market.get("key") == "h2h":
@@ -241,18 +243,23 @@ def _scrape_odds():
                                 quotes_2.append(outcome["price"])
                             elif outcome["name"] == "Draw":
                                 quotes_x.append(outcome["price"])
+                    elif market.get("key") == "totals":
+                        for outcome in market.get("outcomes", []):
+                            if outcome.get("name") == "Over" and outcome.get("point", 0) == 2.5:
+                                quotes_over.append(outcome["price"])
+                            elif outcome.get("name") == "Under" and outcome.get("point", 0) == 2.5:
+                                quotes_under.append(outcome["price"])
 
             if quotes_1 and quotes_x and quotes_2:
                 avg_1 = sum(quotes_1) / len(quotes_1)
                 avg_x = sum(quotes_x) / len(quotes_x)
                 avg_2 = sum(quotes_2) / len(quotes_2)
-                # Converti in probabilita' (rimuovi overround)
                 p1 = 1 / avg_1
                 px = 1 / avg_x
                 p2 = 1 / avg_2
                 tot = p1 + px + p2
                 key = f"{home}_vs_{away}"
-                new_cache[key] = {
+                entry = {
                     "prob_1": round(p1 / tot * 100, 1),
                     "prob_x": round(px / tot * 100, 1),
                     "prob_2": round(p2 / tot * 100, 1),
@@ -261,6 +268,16 @@ def _scrape_odds():
                     "quota_2": round(avg_2, 2),
                     "n_bookmakers": len(quotes_1),
                 }
+                # Over/Under bookmaker
+                if quotes_over and quotes_under:
+                    avg_ov = sum(quotes_over) / len(quotes_over)
+                    avg_un = sum(quotes_under) / len(quotes_under)
+                    p_ov = 1 / avg_ov
+                    p_un = 1 / avg_un
+                    tot_ou = p_ov + p_un
+                    entry["bk_over_25"] = round(p_ov / tot_ou * 100, 1)
+                    entry["bk_under_25"] = round(p_un / tot_ou * 100, 1)
+                new_cache[key] = entry
 
         if new_cache:
             ODDS_CACHE = new_cache
@@ -459,7 +476,13 @@ def genera_pronostico(home, away):
         tot = p1 + px + p2
         if tot > 0: p1/=tot; px/=tot; p2/=tot
 
-    ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
+    ov25_model = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
+    # Blend Over/Under con bookmaker (se disponibile)
+    if bk_odds and bk_odds.get("bk_over_25"):
+        bk_ov = bk_odds["bk_over_25"] / 100
+        ov25 = 0.60 * ov25_model + 0.40 * bk_ov
+    else:
+        ov25 = ov25_model
     gsi_raw = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
     # Calibrazione Goal: Serie A ha 57% Goal Si in media
     # Solo leggera correzione per difese top (xGA < 0.9)
