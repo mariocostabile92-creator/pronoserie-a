@@ -968,11 +968,15 @@ async def notizie():
             {"titolo":"Probabili formazioni Serie A Giornata 31: le scelte dei tecnici","fonte":"Fantacalcio.it","url":"https://www.fantacalcio.it/probabili-formazioni-serie-a"},
             {"titolo":"Calciomercato Serie A: tutti i trasferimenti di gennaio 2026","fonte":"Sky Sport","url":"https://sport.sky.it/calciomercato/serie-a"},
             {"titolo":"Serie A Giornata 31: Inter-Roma, Napoli-Milan - pronostici e analisi","fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a/calendario-risultati"},
-            {"titolo":"Classifica Serie A 2025-2026: Inter a 69pt, lotta Champions aperta","fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a/classifica"},
             {"titolo":"Classifica marcatori Serie A: Lautaro 14 gol, Douvikas secondo","fonte":"Tuttosport","url":"https://www.tuttosport.com/live/classifica-marcatori-serie-a"},
             {"titolo":"Infortunati Serie A: tutti gli indisponibili per la giornata 31","fonte":"Fantacalciopedia","url":"https://www.fantacalciopedia.com/articoli-fcp/consigli-fantacalcio/75-lista-infortunati-serie-a-aggiornata.html"},
+            {"titolo":"Champions League: calendario e risultati delle italiane","fonte":"UEFA","url":"https://www.uefa.com/uefachampionsleague/"},
+            {"titolo":"Premier League 2025-2026: classifica e risultati aggiornati","fonte":"Premier League","url":"https://www.premierleague.com/tables"},
+            {"titolo":"La Liga 2025-2026: classifica e calendario aggiornato","fonte":"La Liga","url":"https://www.laliga.com/en-GB/laliga-easports/standing"},
+            {"titolo":"Bundesliga 2025-2026: risultati e classifica","fonte":"Bundesliga","url":"https://www.bundesliga.com/en/bundesliga/table"},
+            {"titolo":"Ligue 1 2025-2026: classifica e top scorer","fonte":"Ligue 1","url":"https://www.ligue1.com/ranking"},
+            {"titolo":"Europa League: il cammino delle squadre italiane","fonte":"UEFA","url":"https://www.uefa.com/uefaeuropaleague/"},
             {"titolo":"Serie A, la lotta salvezza: Verona e Pisa a 18 punti, chi retrocede?","fonte":"Gazzetta","url":"https://www.gazzetta.it/calcio/serie-a/"},
-            {"titolo":"Conference League: la corsa al 7 posto in Serie A","fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a/classifica"},
         ],"aggiornamento":"Aggiornamento automatico ogni 30 min"}
     return {"notizie":NOTIZIE_CACHE,"aggiornamento":NOTIZIE_LAST_UPDATE}
 
