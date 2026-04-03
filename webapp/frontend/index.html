@@ -438,12 +438,21 @@ async function pageClassifica(){
   // Layout 2 colonne: classifica SX, marcatori DX
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
   // SINISTRA: Classifica
-  html+='<div class="card" style="overflow-x:auto;padding:8px"><h2 style="margin-bottom:8px;font-size:1.1rem">Classifica</h2><table style="font-size:.75rem;white-space:nowrap"><thead><tr><th>#</th><th style="text-align:left">Squadra</th><th>G</th><th>V</th><th>N</th><th>P</th><th>GF</th><th>GS</th><th>DR</th><th>Pt</th></tr></thead><tbody>';
+  html+='<div class="card" style="overflow-x:auto;padding:8px"><h2 style="margin-bottom:8px;font-size:1.1rem">Classifica</h2>';
   (data.classifica||[]).forEach((r,i)=>{
-    const c=i<4?"ucl":i<6?"uel":i===6?"conf":i>=17?"rel":"";
-    html+=`<tr class="${c}"><td>${i+1}</td><td style="text-align:left;font-weight:700">${r.Squadra}</td><td>${r.G}</td><td>${r.V}</td><td>${r.N}</td><td>${r.P}</td><td>${r.GF}</td><td>${r.GS}</td><td style="color:${r.DR>0?"var(--green)":r.DR<0?"var(--red)":"var(--muted)"}">${r.DR>0?"+":""}${r.DR}</td><td style="font-weight:800">${r.Punti}</td></tr>`;
+    const c=i<4?"var(--green)":i<6?"var(--yellow)":i===6?"#9b59b6":i>=17?"var(--red)":"transparent";
+    html+=`<div style="display:flex;align-items:center;padding:6px 4px;border-bottom:1px solid #1f3460;border-left:3px solid ${c}">
+      <span style="width:22px;font-weight:700;color:var(--muted);font-size:.8rem">${i+1}</span>
+      <span style="flex:1;font-weight:700;font-size:.85rem">${r.Squadra}</span>
+      <span style="width:22px;color:var(--muted);font-size:.75rem">${r.G}</span>
+      <span style="width:22px;color:var(--green);font-size:.75rem">${r.V}</span>
+      <span style="width:22px;color:var(--muted);font-size:.75rem">${r.N}</span>
+      <span style="width:22px;color:var(--red);font-size:.75rem">${r.P}</span>
+      <span style="width:30px;color:${r.DR>0?'var(--green)':r.DR<0?'var(--red)':'var(--muted)'};font-size:.75rem">${r.DR>0?'+':''}${r.DR}</span>
+      <span style="width:28px;font-weight:800;font-size:.85rem;text-align:right">${r.Punti}</span>
+    </div>`;
   });
-  html+='</tbody></table><div style="margin-top:8px;display:flex;gap:10px;justify-content:center;font-size:.8rem;flex-wrap:wrap"><span style="color:var(--green)">● Champions</span><span style="color:var(--yellow)">● Europa League</span><span style="color:#9b59b6">● Conference</span><span style="color:var(--red)">● Retrocessione</span></div></div>';
+  html+='<div style="margin-top:6px;display:flex;gap:8px;justify-content:center;font-size:.7rem;flex-wrap:wrap"><span style="color:var(--green)">● UCL</span><span style="color:var(--yellow)">● UEL</span><span style="color:#9b59b6">● Conf.</span><span style="color:var(--red)">● Retr.</span></div></div>';
   // Marcatori consigliati PER PARTITA della giornata 31
   html+='<div class="card" style="margin-top:12px;border-color:var(--green);padding:10px"><h3 style="color:var(--green);font-size:1rem;margin-bottom:6px">Marcatori Consigliati G.31</h3><p style="color:var(--muted);font-size:.7rem;margin-bottom:8px">Per partita — esclusi infortunati</p>';
   const marcPartite=[
@@ -464,9 +473,9 @@ async function pageClassifica(){
   html+='</div></div>';
   // DESTRA: Marcatori
   html+='<div>';
-  html+='<div class="card" style="padding:12px"><h3 style="margin-bottom:6px">Top 10 Marcatori</h3>';
+  html+='<div class="card" style="padding:10px"><h3 style="margin-bottom:6px;font-size:1rem">Top 10 Marcatori</h3>';
   (data.marcatori||[]).slice(0,10).forEach(m=>{
-    html+=`<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1f3460"><span style="width:22px;font-weight:700;color:${m.pos<=3?"var(--green)":"var(--muted)"};font-size:.85rem">${m.pos}</span><div style="flex:1"><strong style="font-size:.8rem">${m.giocatore}</strong> <span style="color:var(--muted);font-size:.7rem">${m.squadra}</span></div><span style="font-weight:800;color:var(--green);font-size:.9rem">${m.gol}</span></div>`;
+    html+=`<div style="display:flex;align-items:center;padding:5px 4px;border-bottom:1px solid #1f3460"><span style="width:20px;font-weight:700;color:${m.pos<=3?"var(--green)":"var(--muted)"};font-size:.8rem">${m.pos}</span><span style="flex:1"><strong style="font-size:.85rem">${m.giocatore}</strong> <span style="color:var(--muted);font-size:.7rem">${m.squadra}</span></span><span style="font-weight:800;color:var(--green);font-size:.9rem">${m.gol}</span></div>`;
   });
   html+='</div>';
   html+='</div></div></div>';
@@ -587,6 +596,7 @@ async function pageNotizie(){
 }
 
 function pagePricing(){
+  if(userPlan==="pro") return `<div class="container" style="text-align:center"><div class="card" style="padding:40px;border-color:var(--green)"><h1 style="color:var(--green)">Sei gia' Pro!</h1><p style="color:var(--muted);margin:16px 0;font-size:1.1rem">Hai accesso completo a tutte le funzionalita' di PronoSerie A.</p><div style="font-size:3rem;margin:20px 0">⭐</div><p style="color:var(--text)">Il tuo abbonamento e' attivo. Grazie per il supporto!</p><a href="#home" class="btn btn-green" style="margin-top:20px">Torna alla Home</a></div></div>`;
   return `<div class="container" style="text-align:center">
     <h1>Piani e Prezzi</h1><p class="sub">Scegli il piano adatto a te</p>
     <div class="grid2" style="max-width:700px;margin:32px auto">
