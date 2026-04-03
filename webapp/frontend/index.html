@@ -574,7 +574,10 @@ async function loadSq(nome){
       const gg=d.rosa.filter(g=>g.ruolo===r);
       if(!gg.length)continue;
       html+=`<div class="card" style="padding:12px"><h3 style="color:${info.c}">${info.n}</h3>`;
-      gg.forEach(g=>{html+=`<div style="display:flex;padding:4px 0;border-bottom:1px solid #1f3460"><span style="width:30px;font-weight:700;color:${info.c}">${g.numero}</span><span>${g.nome}</span></div>`});
+      gg.forEach(g=>{
+        const ini=(g.nome||"").split(" ").map(w=>w[0]||"").join("").slice(0,2).toUpperCase();
+        html+=`<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1f3460"><div style="width:28px;height:28px;border-radius:50%;background:${info.c};display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:#fff;margin-right:6px;flex-shrink:0">${ini}</div><span style="width:26px;font-weight:700;color:${info.c};font-size:.8rem">${g.numero}</span><span style="font-size:.85rem">${g.nome}</span></div>`;
+      });
       html+='</div>';
     }
   }
