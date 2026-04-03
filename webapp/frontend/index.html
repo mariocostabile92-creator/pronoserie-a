@@ -28,7 +28,7 @@ h1{font-size:2rem;margin-bottom:8px}h2{font-size:1.4rem;margin-bottom:12px}
 select{background:#0d1b2a;color:var(--text);border:1px solid #1f3460;padding:10px 16px;border-radius:8px;font-size:1rem;min-width:180px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}.nav{gap:6px;padding:8px 12px}.nav a{font-size:.75rem;padding:4px 8px}.nav .logo{font-size:1rem}table{font-size:.7rem}th,td{padding:4px 2px}.box1x2 .pct{font-size:1.3rem}.hero h1{font-size:1.5rem}.container{padding:12px 8px}.card{padding:14px}.stat-box .num{font-size:1.5rem}}
+@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}.nav{gap:4px;padding:6px 10px}.nav a{font-size:.7rem;padding:3px 6px}.nav .logo{font-size:.9rem}.nav .logo img{height:24px!important;width:24px!important}table{font-size:.7rem}th,td{padding:3px 2px}.box1x2{padding:10px}.box1x2 .pct{font-size:1.2rem}.hero{padding:40px 16px}.hero h1{font-size:1.4rem}.hero img{height:60px!important}.container{padding:10px 6px}.card{padding:12px;margin-bottom:10px}.stat-box .num{font-size:1.4rem}.stat-box{padding:12px}.btn{padding:10px 20px;font-size:.9rem}.match-btn{padding:8px 10px;font-size:.85rem}}
 .box1x2{text-align:center;padding:16px;border-radius:12px;background:#0d1b2a;border:2px solid #1f3460}
 .box1x2.best{border-color:var(--green);box-shadow:0 0 20px rgba(46,204,113,.2)}
 .box1x2 .pct{font-size:2rem;font-weight:800}.box1x2 .quota{color:var(--muted);font-size:.85rem}
@@ -75,14 +75,24 @@ let userEmail = localStorage.getItem("userEmail") || "";
 let freeUsed = parseInt(localStorage.getItem("freeUsed")||"0");
 const FREE_LIMIT = 2;
 
-async function fetchAPI(ep) {
+// Cache API per evitare chiamate ripetute
+const _apiCache={};
+const CACHE_TTL=300000; // 5 minuti
+
+async function fetchAPI(ep, noCache) {
+  // Usa cache se disponibile e non scaduta
+  if(!noCache && _apiCache[ep] && (Date.now()-_apiCache[ep].t < CACHE_TTL)){
+    return _apiCache[ep].d;
+  }
   try {
     const sep = ep.includes("?") ? "&" : "?";
     const headers = {};
     if(userToken) headers["Authorization"] = "Bearer " + userToken;
     const r = await fetch(API+ep+sep+"_t="+Date.now(), {headers});
     if(!r.ok) throw new Error(r.status);
-    return await r.json();
+    const data = await r.json();
+    _apiCache[ep]={d:data,t:Date.now()};
+    return data;
   } catch(e) { console.error("API:",ep,e); return null; }
 }
 
@@ -98,7 +108,7 @@ async function postAPI(ep, body) {
 function $(id){return document.getElementById(id)}
 function opts(){return SQ.map(s=>`<option value="${s}">${s}</option>`).join("")}
 
-//  -  - &euro; HOME  -  - &euro;
+//  -- HOME  -  - &euro;
 function pageHome(){
   return `<div class="hero" style="background:linear-gradient(135deg,rgba(13,27,42,.95),rgba(22,36,71,.9),rgba(13,59,30,.9)),url('/logo.png') center/300px no-repeat;position:relative">
     <img src="/logo.png" style="height:80px;margin-bottom:16px;filter:drop-shadow(0 4px 20px rgba(46,204,113,.4))">
@@ -196,7 +206,7 @@ async function loadSchedina(){
   el.innerHTML=html;
 }
 
-//  -  - &euro; PRONOSTICI (2 gratis/giorno)  -  - &euro;
+//  -- PRONOSTICI (2 gratis/giorno)  -  - &euro;
 function pagePronostici(){
   return `<div class="container">
     <div class="card" style="text-align:center;padding:32px">
@@ -320,7 +330,7 @@ async function calcPronostico(){
   </div>`;
 }
 
-//  -  - &euro; CALENDARIO (layout 2 colonne: principale sx, altre dx)  -  - &euro;
+//  -- CALENDARIO (layout 2 colonne: principale sx, altre dx)  -  - &euro;
 async function pageCalendario(){
   const cal=await fetchAPI("/api/calendario");
   if(!cal||!cal.giornate||!cal.giornate.length)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>';
@@ -451,7 +461,7 @@ async function showMatch(h,a){
   </div>`;
 }
 
-//  -  - &euro; CLASSIFICA (Pro only)  -  - &euro;
+//  -- CLASSIFICA (Pro only)  -  - &euro;
 async function pageClassifica(){
   if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Classifica Serie A</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   const data=await fetchAPI("/api/classifica");
@@ -505,7 +515,7 @@ async function pageClassifica(){
   return html;
 }
 
-//  -  - &euro; SQUADRE (Pro only, con campo formazioni)  -  - &euro;
+//  -- SQUADRE (Pro only, con campo formazioni)  -  - &euro;
 async function pageSquadre(){
   if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Squadre Serie A</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   return `<div class="container">
@@ -607,8 +617,8 @@ async function loadSq(nome){
   det.innerHTML=html;
 }
 
-//  -  - &euro; PRICING  -  - &euro;
-//  -  - &euro; NOTIZIE LIVE  -  - &euro;
+//  -- PRICING  -  - &euro;
+//  -- NOTIZIE LIVE  -  - &euro;
 async function pageNotizie(){
   if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Notizie dal Calcio</h2><p style="margin:16px 0">Le notizie live dal mondo del calcio sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   const data=await fetchAPI("/api/notizie");
@@ -641,7 +651,7 @@ function pagePricing(){
   </div>`;
 }
 
-//  -  - &euro; LOGIN / REGISTRAZIONE  -  - &euro;
+//  -- LOGIN / REGISTRAZIONE  -  - &euro;
 function pageLogin(){
   if(userToken){
     return `<div class="container"><div class="card" style="text-align:center;padding:32px">
@@ -767,7 +777,7 @@ function updateNavAuth(){
   }
 }
 
-//  -  - &euro; STRIPE CHECKOUT  -  - &euro;
+//  -- STRIPE CHECKOUT  -  - &euro;
 async function abbonarPro(){
   const btn = event.target;
   btn.textContent = "Caricamento...";
@@ -789,7 +799,7 @@ async function abbonarPro(){
   }
 }
 
-//  -  - &euro; ROUTER  -  - &euro;
+//  -- ROUTER  -  - &euro;
 const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,pricing:pagePricing,login:pageLogin};
 
 async function navigate(){
@@ -803,11 +813,15 @@ async function navigate(){
     else{app.innerHTML=result}
   }catch(e){app.innerHTML='<div class="container card" style="color:var(--red)">Errore: '+e.message+'</div>'}
   if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq("Inter"),200);
-  if(hash==="home")setTimeout(()=>loadSchedina(),300);
+  if(hash==="home"){
+    setTimeout(()=>loadSchedina(),300);
+    // Pre-carica dati in background per navigazione istantanea
+    setTimeout(()=>{fetchAPI("/api/calendario");fetchAPI("/api/classifica")},1000);
+  }
   updateNavAuth();
 }
 
-//  -  - &euro; GESTIONE RITORNO DA STRIPE  -  - &euro;
+//  -- GESTIONE RITORNO DA STRIPE  -  - &euro;
 async function checkPaidReturn(){
   if(window.location.search.includes("paid=1")){
     // L'utente torna da Stripe dopo il pagamento
