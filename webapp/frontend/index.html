@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -98,7 +98,7 @@ async function postAPI(ep, body) {
 function $(id){return document.getElementById(id)}
 function opts(){return SQ.map(s=>`<option value="${s}">${s}</option>`).join("")}
 
-// â”€â”€ HOME â”€â”€
+//  - &euro; - &euro; HOME  - &euro; - &euro;
 function pageHome(){
   return `<div class="hero">
     <h1>Pronostici Serie A con IA</h1>
@@ -158,7 +158,7 @@ function pageHome(){
           </p>
         </div>
       </div>
-      <div style="text-align:center;margin-top:16px">${userPlan==="pro"?'<span style="color:var(--green);font-weight:700">&#11088; Tutte le funzionalita sono attive sul tuo account</span>':'<button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro â€” Solo 9.99/mese</button>'}</div>
+      <div style="text-align:center;margin-top:16px">${userPlan==="pro"?'<span style="color:var(--green);font-weight:700">&#11088; Tutte le funzionalita sono attive sul tuo account</span>':'<button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro &euro; -  Solo 9.99/mese</button>'}</div>
     </div>
     <div id="schedina-home"></div>
   </div>`;
@@ -170,13 +170,13 @@ async function loadSchedina(){
   if(!el)return;
   const d=await fetchAPI("/api/schedina");
   if(!d||!d.giocate||!d.giocate.length)return;
-  let html='<div class="card" style="border-color:var(--green);border-width:2px"><h2 style="color:var(--green);text-align:center">Schedina del Giorno â€” G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:16px">'+d.tipo+'</p>';
+  let html='<div class="card" style="border-color:var(--green);border-width:2px"><h2 style="color:var(--green);text-align:center">Schedina del Giorno &euro; -  G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:16px">'+d.tipo+'</p>';
   const maxShow = userPlan==="pro" ? d.giocate.length : 2;
   d.giocate.slice(0,maxShow).forEach((g,i)=>{
     html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f3460"><div><strong>${g.home}</strong> vs <strong>${g.away}</strong><br><span style="color:var(--muted);font-size:.8rem">Conf. ${Math.round(g.confidence*100)}% | ${g.over_under} | ${g.goal}</span></div><div style="text-align:right"><span class="tag tag-green" style="font-size:1rem;padding:6px 16px">${g.tip}</span><br><span style="color:var(--muted);font-size:.85rem">Quota ${g.quota}</span></div></div>`;
   });
   if(userPlan!=="pro"&&d.giocate.length>2){
-    html+=`<div style="text-align:center;padding:16px;color:var(--muted)"><p>+ ${d.giocate.length-2} altre giocate SICURE</p><button class="btn btn-green" style="margin-top:8px" onclick="abbonarPro()">Sblocca tutto con Pro â€” 9.99â‚¬/mese</button></div>`;
+    html+=`<div style="text-align:center;padding:16px;color:var(--muted)"><p>+ ${d.giocate.length-2} altre giocate SICURE</p><button class="btn btn-green" style="margin-top:8px" onclick="abbonarPro()">Sblocca tutto con Pro &euro; -  9.99‚¬/mese</button></div>`;
   }
   if(userPlan==="pro"){
     html+=`<div style="text-align:center;margin-top:16px;padding:16px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted)">Quota totale schedina:</span><br><span style="font-size:2rem;font-weight:800;color:var(--green)">${d.quota_totale}</span></div>`;
@@ -185,7 +185,7 @@ async function loadSchedina(){
   el.innerHTML=html;
 }
 
-// â”€â”€ PRONOSTICI (2 gratis/giorno) â”€â”€
+//  - &euro; - &euro; PRONOSTICI (2 gratis/giorno)  - &euro; - &euro;
 function pagePronostici(){
   return `<div class="container">
     <div class="card" style="text-align:center;padding:32px">
@@ -207,7 +207,7 @@ async function calcPronostico(){
   if(h===a){res.innerHTML='<div class="card" style="color:var(--red)">Scegli due squadre diverse!</div>';return}
   // Limite Free
   if(userPlan!=="pro" && freeUsed>=FREE_LIMIT){
-    res.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati, Over/Under, Goal, Risultato Esatto e molto altro.</p><button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro â€” 9.99â‚¬/mese</button></div>';
+    res.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati, Over/Under, Goal, Risultato Esatto e molto altro.</p><button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro &euro; -  9.99‚¬/mese</button></div>';
     return;
   }
   res.innerHTML='<div class="spinner"></div>';
@@ -268,8 +268,8 @@ async function calcPronostico(){
     // Marcatori consigliati
     if(d.marcatori_casa||d.marcatori_ospite){
       extra+=`<div style="margin-top:12px;padding:12px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--green);margin-bottom:8px">Probabili Marcatori</h4>`;
-      if(d.marcatori_casa&&d.marcatori_casa.length)extra+=`<p style="color:var(--text);font-size:.9rem"><strong style="color:var(--green)">${h}:</strong> ${d.marcatori_casa.join(" Â· ")}</p>`;
-      if(d.marcatori_ospite&&d.marcatori_ospite.length)extra+=`<p style="color:var(--text);font-size:.9rem;margin-top:4px"><strong style="color:var(--red)">${a}:</strong> ${d.marcatori_ospite.join(" Â· ")}</p>`;
+      if(d.marcatori_casa&&d.marcatori_casa.length)extra+=`<p style="color:var(--text);font-size:.9rem"><strong style="color:var(--green)">${h}:</strong> ${d.marcatori_casa.join(" &middot; ")}</p>`;
+      if(d.marcatori_ospite&&d.marcatori_ospite.length)extra+=`<p style="color:var(--text);font-size:.9rem;margin-top:4px"><strong style="color:var(--red)">${a}:</strong> ${d.marcatori_ospite.join(" &middot; ")}</p>`;
       extra+=`</div>`;
     }
     // Formazioni con campo
@@ -296,7 +296,7 @@ async function calcPronostico(){
       <div class="box1x2 ${best==="X"?"best":""}"><div style="color:var(--yellow);font-weight:700">X Pareggio</div><div class="pct">${d.prob_x}%</div><div class="quota">Quota ${d.quota_x}</div></div>
       <div class="box1x2 ${best==="2"?"best":""}"><div style="color:var(--red);font-weight:700">2 Ospite</div><div class="pct">${d.prob_2}%</div><div class="quota">Quota ${d.quota_2}</div></div>
     </div>
-    <div style="text-align:center"><span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best} â€” ${d.sugg_label||""}</span>${d.sicura?' <span class="tag" style="background:#ff6b35;color:#fff;font-size:.8rem;padding:4px 12px;margin-left:8px">SICURA</span>':''}</div>
+    <div style="text-align:center"><span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best} &euro; -  ${d.sugg_label||""}</span>${d.sicura?' <span class="tag" style="background:#ff6b35;color:#fff;font-size:.8rem;padding:4px 12px;margin-left:8px">SICURA</span>':''}</div>
     <div style="text-align:center;margin:12px 0"><span style="color:${cc};font-weight:700">Affidabilita': ${d.confidence_label} (${cp}%)</span>
       <div class="bar" style="max-width:300px;margin:8px auto"><div class="bar-fill" style="width:${cp}%;background:${cc}"></div></div>
     </div>
@@ -305,7 +305,7 @@ async function calcPronostico(){
   </div>`;
 }
 
-// â”€â”€ CALENDARIO (layout 2 colonne: principale sx, altre dx) â”€â”€
+//  - &euro; - &euro; CALENDARIO (layout 2 colonne: principale sx, altre dx)  - &euro; - &euro;
 async function pageCalendario(){
   const cal=await fetchAPI("/api/calendario");
   if(!cal||!cal.giornate||!cal.giornate.length)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>';
@@ -314,11 +314,11 @@ async function pageCalendario(){
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
   // SINISTRA: giornata principale
   html+='<div>';
-  html+=`<div class="card"><h2 style="color:var(--green)">Giornata ${g0.giornata} â€” ${g0.data||""}</h2>`;
+  html+=`<div class="card"><h2 style="color:var(--green)">Giornata ${g0.giornata} &euro; -  ${g0.data||""}</h2>`;
   if(userPlan==="pro"){
     html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata(${g0.giornata})">Simula Pronostici Giornata</button>`;
   } else {
-    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem;opacity:.7" onclick="abbonarPro()">Simula Giornata â€” Solo Pro</button>`;
+    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem;opacity:.7" onclick="abbonarPro()">Simula Giornata &euro; -  Solo Pro</button>`;
   }
   g0.partite.forEach(p=>{
     html+=`<div class="match-btn" style="cursor:default"><span><strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong></span></div>`;
@@ -376,9 +376,9 @@ async function simulaGiornata(gNum){
   // Legenda colori e abbreviazioni
   html+=`<div style="margin-top:10px;padding:10px;background:#0d1b2a;border-radius:8px;font-size:.7rem;color:var(--muted)">
     <strong style="color:var(--text)">Legenda:</strong>
-    <span style="color:var(--green)"> â— Verde</span> = alta probabilita' (>50%)
-    <span style="color:var(--yellow)"> â— Giallo</span> = media (35-50%)
-    <span style="color:var(--red)"> â— Rosso</span> = bassa (<35%)
+    <span style="color:var(--green)">  -  Verde</span> = alta probabilita' (>50%)
+    <span style="color:var(--yellow)">  -  Giallo</span> = media (35-50%)
+    <span style="color:var(--red)">  -  Rosso</span> = bassa (<35%)
     | <strong>Tip</strong> = consiglio 1X2
     | <strong>O/U</strong> = Over/Under 2.5
     | <strong>Aff.</strong> = Affidabilita' del pronostico
@@ -392,7 +392,7 @@ async function showMatch(h,a){
   const app=$("app");
   // Limite Free
   if(userPlan!=="pro" && freeUsed>=FREE_LIMIT){
-    app.innerHTML='<div class="container"><div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati su tutte le partite e giornate.</p><button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro â€” 9.99â‚¬/mese</button><br><br><a href="javascript:void(0)" onclick="location.hash=\'\';setTimeout(()=>location.hash=\'#calendario\',50)" style="color:var(--accent)">â† Torna al Calendario</a></div></div>';
+    app.innerHTML='<div class="container"><div class="card" style="text-align:center;padding:32px"><h2 style="color:var(--yellow)">Hai usato i tuoi 2 pronostici gratuiti!</h2><p style="color:var(--muted);margin:16px 0">Passa a Pro per pronostici illimitati su tutte le partite e giornate.</p><button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro &euro; -  9.99‚¬/mese</button><br><br><a href="javascript:void(0)" onclick="location.hash=\'\';setTimeout(()=>location.hash=\'#calendario\',50)" style="color:var(--accent)">† Torna al Calendario</a></div></div>';
     return;
   }
   app.innerHTML='<div class="spinner"></div>';
@@ -421,7 +421,7 @@ async function showMatch(h,a){
     }
   }
   app.innerHTML=`<div class="container">
-    <a href="javascript:void(0)" onclick="location.hash='';setTimeout(()=>location.hash='#calendario',50)" style="color:var(--accent);display:inline-block;margin-bottom:16px">â† Torna al Calendario</a>
+    <a href="javascript:void(0)" onclick="location.hash='';setTimeout(()=>location.hash='#calendario',50)" style="color:var(--accent);display:inline-block;margin-bottom:16px">† Torna al Calendario</a>
     <div class="card" style="text-align:center">
       <h1>${h} vs ${a}</h1>
       <div class="grid3" style="margin:20px 0">
@@ -429,19 +429,19 @@ async function showMatch(h,a){
         <div class="box1x2 ${best==="X"?"best":""}"><div style="color:var(--yellow)">X</div><div class="pct">${d.prob_x}%</div><div class="quota">Q. ${d.quota_x}</div></div>
         <div class="box1x2 ${best==="2"?"best":""}"><div style="color:var(--red)">2</div><div class="pct">${d.prob_2}%</div><div class="quota">Q. ${d.quota_2}</div></div>
       </div>
-      <span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best} â€” ${d.sugg_label||""}</span>
+      <span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best} &euro; -  ${d.sugg_label||""}</span>
       <div style="margin:12px 0"><span style="color:${cc};font-weight:700">Affidabilita': ${d.confidence_label} (${cp}%)</span></div>
       ${extra}
     </div>
   </div>`;
 }
 
-// â”€â”€ CLASSIFICA (Pro only) â”€â”€
+//  - &euro; - &euro; CLASSIFICA (Pro only)  - &euro; - &euro;
 async function pageClassifica(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Classifica Serie A</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro â€” 9.99â‚¬/mese</button></div></div>`;
+  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Classifica Serie A</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro &euro; -  9.99‚¬/mese</button></div></div>`;
   const data=await fetchAPI("/api/classifica");
   if(!data||!data.classifica)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento classifica. Riprova.</div></div>';
-  let html='<div class="container"><h1>Classifica Serie A 2025-2026</h1><p class="sub">Giornata 30 â€” Aggiornamento live</p>';
+  let html='<div class="container"><h1>Classifica Serie A 2025-2026</h1><p class="sub">Giornata 30 &euro; -  Aggiornamento live</p>';
   // Layout 2 colonne: classifica SX, marcatori DX
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
   // SINISTRA: Classifica
@@ -460,9 +460,9 @@ async function pageClassifica(){
       <span style="width:28px;font-weight:800;font-size:.85rem;text-align:right">${r.Punti}</span>
     </div>`;
   });
-  html+='<div style="margin-top:6px;display:flex;gap:8px;justify-content:center;font-size:.7rem;flex-wrap:wrap"><span style="color:var(--green)">â— UCL</span><span style="color:var(--yellow)">â— UEL</span><span style="color:#9b59b6">â— Conf.</span><span style="color:var(--red)">â— Retr.</span></div></div>';
+  html+='<div style="margin-top:6px;display:flex;gap:8px;justify-content:center;font-size:.7rem;flex-wrap:wrap"><span style="color:var(--green)"> -  UCL</span><span style="color:var(--yellow)"> -  UEL</span><span style="color:#9b59b6"> -  Conf.</span><span style="color:var(--red)"> -  Retr.</span></div></div>';
   // Marcatori consigliati PER PARTITA della giornata 31
-  html+='<div class="card" style="margin-top:12px;border-color:var(--green);padding:10px"><h3 style="color:var(--green);font-size:1rem;margin-bottom:6px">Marcatori Consigliati G.31</h3><p style="color:var(--muted);font-size:.7rem;margin-bottom:8px">Per partita â€” esclusi infortunati</p>';
+  html+='<div class="card" style="margin-top:12px;border-color:var(--green);padding:10px"><h3 style="color:var(--green);font-size:1rem;margin-bottom:6px">Marcatori Consigliati G.31</h3><p style="color:var(--muted);font-size:.7rem;margin-bottom:8px">Per partita &euro; -  esclusi infortunati</p>';
   const marcPartite=[
     {partita:"Sassuolo - Cagliari",casa:"Berardi (7 gol), Pinamonti (7)",ospite:"Esposito (5), Kilicsoy (4)"},
     {partita:"Verona - Fiorentina",casa:"Tengstedt (5), Henry (4)",ospite:"Kean (8), Gudmundsson (5)"},
@@ -490,9 +490,9 @@ async function pageClassifica(){
   return html;
 }
 
-// â”€â”€ SQUADRE (Pro only, con campo formazioni) â”€â”€
+//  - &euro; - &euro; SQUADRE (Pro only, con campo formazioni)  - &euro; - &euro;
 async function pageSquadre(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Squadre Serie A</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro â€” 9.99â‚¬/mese</button></div></div>`;
+  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Squadre Serie A</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro &euro; -  9.99‚¬/mese</button></div></div>`;
   return `<div class="container">
     <h1>Squadre Serie A 2025-2026</h1><p class="sub">Rose, formazioni e infortunati live</p>
     <select id="sel-sq" onchange="loadSq(this.value)" style="margin-bottom:16px">${opts()}</select>
@@ -568,7 +568,7 @@ async function loadSq(nome){
     html+=`<div class="card" style="border-color:var(--red)"><h3 style="color:var(--red)">ðŸ¥ Indisponibili (${d.infortunati.length})</h3>`;
     d.infortunati.forEach(inj=>{
       const c=inj.tipo==="infortunio"?"var(--red)":"var(--yellow)";
-      html+=`<div style="padding:6px 0;border-bottom:1px solid #1f3460"><span style="color:${c};font-weight:700">${inj.tipo==="infortunio"?"âœ•":"?"} ${inj.nome}</span><br><span style="color:var(--muted);font-size:.85rem">${inj.dettaglio||""}</span></div>`;
+      html+=`<div style="padding:6px 0;border-bottom:1px solid #1f3460"><span style="color:${c};font-weight:700">${inj.tipo==="infortunio"?"œ•":"?"} ${inj.nome}</span><br><span style="color:var(--muted);font-size:.85rem">${inj.dettaglio||""}</span></div>`;
     });
     html+='</div>';
   }
@@ -592,13 +592,13 @@ async function loadSq(nome){
   det.innerHTML=html;
 }
 
-// â”€â”€ PRICING â”€â”€
-// â”€â”€ NOTIZIE LIVE â”€â”€
+//  - &euro; - &euro; PRICING  - &euro; - &euro;
+//  - &euro; - &euro; NOTIZIE LIVE  - &euro; - &euro;
 async function pageNotizie(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Notizie Live Serie A</h2><p style="margin:16px 0">Le notizie live della Serie A sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro â€” 9.99â‚¬/mese</button></div></div>`;
+  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Notizie Live Serie A</h2><p style="margin:16px 0">Le notizie live della Serie A sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro &euro; -  9.99‚¬/mese</button></div></div>`;
   const data=await fetchAPI("/api/notizie");
   if(!data)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento notizie</div></div>';
-  let html='<div class="container"><h1>Notizie Serie A</h1><p class="sub">Aggiornamento live â€” '+( data.aggiornamento||"In tempo reale")+'</p>';
+  let html='<div class="container"><h1>Notizie Serie A</h1><p class="sub">Aggiornamento live &euro; -  '+( data.aggiornamento||"In tempo reale")+'</p>';
   (data.notizie||[]).forEach(n=>{
     html+=`<a href="${n.url||'#'}" ${n.url&&n.url.startsWith('http')?'target="_blank"':''} style="text-decoration:none"><div class="card" style="cursor:pointer;transition:.2s;padding:16px" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#1f3460'"><h3 style="color:var(--text);font-size:1rem;margin-bottom:4px">${n.titolo}</h3><span style="color:var(--muted);font-size:.8rem">${n.fonte||"Serie A"}</span></div></a>`;
   });
@@ -612,28 +612,28 @@ function pagePricing(){
     <h1>Piani e Prezzi</h1><p class="sub">Scegli il piano adatto a te</p>
     <div class="grid2" style="max-width:700px;margin:32px auto">
       <div class="price-card">
-        <h2>Free</h2><div class="price" style="color:var(--muted)">0â‚¬</div><p style="color:var(--muted)">per sempre</p>
-        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>âœ… 2 pronostici al giorno</li><li>âœ… 1X2 con probabilita'</li><li>âœ… Visualizza 2 giornate calendario</li><li>âŒ Simula Pronostici Giornata</li><li>âŒ Classifica Serie A</li><li>âŒ Classifica Marcatori</li><li>âŒ Marcatori Consigliati IA</li><li>âŒ Rose complete 20 squadre</li><li>âŒ Probabili formazioni live</li><li>âŒ Infortunati aggiornati</li><li>âŒ Notizie Live Serie A</li><li>âŒ Schedina del Giorno completa</li><li>âŒ Badge SICURA</li><li>âŒ Risultato esatto</li></ul>
+        <h2>Free</h2><div class="price" style="color:var(--muted)">0‚¬</div><p style="color:var(--muted)">per sempre</p>
+        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>&#10004; 2 pronostici al giorno</li><li>&#10004; 1X2 con probabilita'</li><li>&#10004; Visualizza 2 giornate calendario</li><li>Œ Simula Pronostici Giornata</li><li>Œ Classifica Serie A</li><li>Œ Classifica Marcatori</li><li>Œ Marcatori Consigliati IA</li><li>Œ Rose complete 20 squadre</li><li>Œ Probabili formazioni live</li><li>Œ Infortunati aggiornati</li><li>Œ Notizie Live Serie A</li><li>Œ Schedina del Giorno completa</li><li>Œ Badge SICURA</li><li>Œ Risultato esatto</li></ul>
         <a href="#pronostici" class="btn btn-blue">Inizia Gratis</a>
       </div>
       <div class="price-card pro">
         <div class="tag tag-green" style="margin-bottom:12px">PIU' POPOLARE</div>
-        <h2>Pro</h2><div class="price">9.99â‚¬</div><p style="color:var(--muted)">/mese</p>
-        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>âœ… Pronostici illimitati</li><li>âœ… Tutte le 8 giornate</li><li>âœ… Classifica + Marcatori</li><li>âœ… Rose complete 20 squadre</li><li>âœ… Probabili formazioni live</li><li>âœ… Infortunati aggiornati</li><li>âœ… Notizie Live Serie A</li><li>âœ… Marcatori Consigliati IA</li><li>âœ… Schedina del Giorno</li><li>âœ… Badge SICURA</li></ul>
+        <h2>Pro</h2><div class="price">9.99‚¬</div><p style="color:var(--muted)">/mese</p>
+        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>&#10004; Pronostici illimitati</li><li>&#10004; Tutte le 8 giornate</li><li>&#10004; Classifica + Marcatori</li><li>&#10004; Rose complete 20 squadre</li><li>&#10004; Probabili formazioni live</li><li>&#10004; Infortunati aggiornati</li><li>&#10004; Notizie Live Serie A</li><li>&#10004; Marcatori Consigliati IA</li><li>&#10004; Schedina del Giorno</li><li>&#10004; Badge SICURA</li></ul>
         <button class="btn btn-green" onclick="abbonarPro()">Abbonati Ora</button>
       </div>
     </div>
   </div>`;
 }
 
-// â”€â”€ LOGIN / REGISTRAZIONE â”€â”€
+//  - &euro; - &euro; LOGIN / REGISTRAZIONE  - &euro; - &euro;
 function pageLogin(){
   if(userToken){
     return `<div class="container"><div class="card" style="text-align:center;padding:32px">
       <h2>Il tuo Account</h2>
       <p style="color:var(--muted);margin:12px 0">Email: <strong>${userEmail}</strong></p>
       <p>Piano: <span class="tag ${userPlan==="pro"?"tag-green":"tag-blue"}">${userPlan==="pro"?"PRO":"FREE"}</span></p>
-      ${userPlan!=="pro"?'<div style="margin:20px 0"><button class="btn btn-green" onclick="abbonarPro()">Passa a Pro â€” 9.99â‚¬/mese</button></div>':'<p style="color:var(--green);margin-top:16px;font-weight:700">Hai accesso completo a tutte le funzionalita!</p>'}
+      ${userPlan!=="pro"?'<div style="margin:20px 0"><button class="btn btn-green" onclick="abbonarPro()">Passa a Pro &euro; -  9.99‚¬/mese</button></div>':'<p style="color:var(--green);margin-top:16px;font-weight:700">Hai accesso completo a tutte le funzionalita!</p>'}
       <button class="btn btn-blue" style="margin-top:16px" onclick="doLogout()">Esci</button>
     </div></div>`;
   }
@@ -664,7 +664,7 @@ function pageLogin(){
         <p style="color:var(--muted);margin-bottom:16px;font-size:.9rem">Inserisci la tua email. Se l'account esiste, riceverai una nuova password.</p>
         <input id="recover-email" type="email" placeholder="La tua email" style="width:100%;padding:12px;border-radius:8px;border:1px solid #1f3460;background:#0d1b2a;color:var(--text);margin-bottom:12px;font-size:1rem">
         <button class="btn btn-blue" style="width:100%;font-size:1rem" onclick="doRecover()">Recupera Password</button>
-        <div style="text-align:center;margin-top:12px"><a href="javascript:void(0)" onclick="showLoginTab('login')" style="font-size:.85rem;color:var(--accent)">â† Torna al login</a></div>
+        <div style="text-align:center;margin-top:12px"><a href="javascript:void(0)" onclick="showLoginTab('login')" style="font-size:.85rem;color:var(--accent)">† Torna al login</a></div>
       </div>
       <div id="auth-msg" style="margin-top:12px;text-align:center"></div>
     </div>
@@ -752,7 +752,7 @@ function updateNavAuth(){
   }
 }
 
-// â”€â”€ STRIPE CHECKOUT â”€â”€
+//  - &euro; - &euro; STRIPE CHECKOUT  - &euro; - &euro;
 async function abbonarPro(){
   const btn = event.target;
   btn.textContent = "Caricamento...";
@@ -774,7 +774,7 @@ async function abbonarPro(){
   }
 }
 
-// â”€â”€ ROUTER â”€â”€
+//  - &euro; - &euro; ROUTER  - &euro; - &euro;
 const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,pricing:pagePricing,login:pageLogin};
 
 async function navigate(){
@@ -792,7 +792,7 @@ async function navigate(){
   updateNavAuth();
 }
 
-// â”€â”€ GESTIONE RITORNO DA STRIPE â”€â”€
+//  - &euro; - &euro; GESTIONE RITORNO DA STRIPE  - &euro; - &euro;
 async function checkPaidReturn(){
   if(window.location.search.includes("paid=1")){
     // L'utente torna da Stripe dopo il pagamento
