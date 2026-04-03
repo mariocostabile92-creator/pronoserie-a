@@ -41,7 +41,7 @@ from api_payments import router as payments_router
 # ─────────────────────────────
 # APP
 # ─────────────────────────────
-app = FastAPI(title="Pronostici API", version="2.0")
+app = FastAPI(title="MatchIQ API", version="2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -148,6 +148,10 @@ FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 @app.get("/", include_in_schema=False)
 async def root():
     return RedirectResponse("/app")
+
+@app.get("/logo.png", include_in_schema=False)
+async def serve_logo():
+    return FileResponse(os.path.join(FRONTEND_DIR, "logo.png"), media_type="image/png")
 
 @app.get("/manifest.json", include_in_schema=False)
 async def serve_manifest():
