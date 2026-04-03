@@ -165,7 +165,7 @@ function pageHome(){
             <strong style="color:var(--green)">5.</strong> Over/Under, Goal/NoGoal e Risultato Esatto per ogni partita<br>
             <strong style="color:var(--green)">6.</strong> Marcatori consigliati dall'IA basati su xG e storico<br>
             <strong style="color:var(--green)">7.</strong> Badge SICURA sulle giocate con massima affidabilita'<br>
-            <strong style="color:var(--green)">8.</strong> Notizie Serie A live da Sky Sport e Gazzetta
+            <strong style="color:var(--green)">8.</strong> Notizie dal Calcio live
           </p>
         </div>
       </div>
@@ -302,14 +302,18 @@ async function calcPronostico(){
   const remaining = userPlan==="pro" ? "" : `<p style="color:var(--muted);text-align:center;margin-top:12px;font-size:.85rem">Pronostici gratuiti rimanenti: ${Math.max(0,FREE_LIMIT-freeUsed)}/${FREE_LIMIT}</p>`;
   res.innerHTML=`<div class="card">
     <h2 style="text-align:center">${h} vs ${a}</h2>
-    <div class="grid3" style="margin:20px 0">
+    <div style="text-align:center;margin:16px 0;padding:16px;background:linear-gradient(135deg,#0d3b1e,#162447);border-radius:12px;border:2px solid var(--green)">
+      <div style="font-size:.85rem;color:var(--muted);margin-bottom:4px">Consiglio MatchIQ</div>
+      <span style="font-size:1.8rem;font-weight:800;color:var(--green)">${best}</span>
+      <span style="font-size:1.1rem;color:var(--text);margin-left:8px">${d.sugg_label||""}</span>
+      ${d.sicura?' <span class="tag" style="background:#ff6b35;color:#fff;font-size:.8rem;padding:4px 12px;margin-left:8px">SICURA</span>':''}
+      <div style="margin-top:8px"><span style="color:${cc};font-weight:700">Affidabilita: ${d.confidence_label} (${cp}%)</span></div>
+      <div class="bar" style="max-width:250px;margin:6px auto 0"><div class="bar-fill" style="width:${cp}%;background:${cc}"></div></div>
+    </div>
+    <div class="grid3" style="margin:16px 0">
       <div class="box1x2 ${best==="1"?"best":""}"><div style="color:var(--green);font-weight:700">1 Casa</div><div class="pct">${d.prob_1}%</div><div class="quota">Quota ${d.quota_1}</div></div>
       <div class="box1x2 ${best==="X"?"best":""}"><div style="color:var(--yellow);font-weight:700">X Pareggio</div><div class="pct">${d.prob_x}%</div><div class="quota">Quota ${d.quota_x}</div></div>
       <div class="box1x2 ${best==="2"?"best":""}"><div style="color:var(--red);font-weight:700">2 Ospite</div><div class="pct">${d.prob_2}%</div><div class="quota">Quota ${d.quota_2}</div></div>
-    </div>
-    <div style="text-align:center"><span class="tag tag-green" style="font-size:1rem;padding:8px 20px">Consiglio: ${best}  -  ${d.sugg_label||""}</span>${d.sicura?' <span class="tag" style="background:#ff6b35;color:#fff;font-size:.8rem;padding:4px 12px;margin-left:8px">SICURA</span>':''}</div>
-    <div style="text-align:center;margin:12px 0"><span style="color:${cc};font-weight:700">Affidabilita': ${d.confidence_label} (${cp}%)</span>
-      <div class="bar" style="max-width:300px;margin:8px auto"><div class="bar-fill" style="width:${cp}%;background:${cc}"></div></div>
     </div>
     ${extra}
     ${remaining}
@@ -606,10 +610,10 @@ async function loadSq(nome){
 //  -  - &euro; PRICING  -  - &euro;
 //  -  - &euro; NOTIZIE LIVE  -  - &euro;
 async function pageNotizie(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Notizie Live Serie A</h2><p style="margin:16px 0">Le notizie live della Serie A sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
+  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Notizie dal Calcio</h2><p style="margin:16px 0">Le notizie live dal mondo del calcio sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   const data=await fetchAPI("/api/notizie");
   if(!data)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento notizie</div></div>';
-  let html='<div class="container"><h1>Notizie Serie A</h1><p class="sub">Aggiornamento live  -  '+( data.aggiornamento||"In tempo reale")+'</p>';
+  let html='<div class="container"><h1>Notizie dal Calcio</h1><p class="sub">Aggiornamento live  -  '+( data.aggiornamento||"In tempo reale")+'</p>';
   (data.notizie||[]).forEach(n=>{
     html+=`<a href="${n.url||'#'}" ${n.url&&n.url.startsWith('http')?'target="_blank"':''} style="text-decoration:none"><div class="card" style="cursor:pointer;transition:.2s;padding:16px" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#1f3460'"><h3 style="color:var(--text);font-size:1rem;margin-bottom:4px">${n.titolo}</h3><span style="color:var(--muted);font-size:.8rem">${n.fonte||"Serie A"}</span></div></a>`;
   });
@@ -624,13 +628,13 @@ function pagePricing(){
     <div class="grid2" style="max-width:700px;margin:32px auto">
       <div class="price-card">
         <h2>Free</h2><div class="price" style="color:var(--muted)">0&euro;</div><p style="color:var(--muted)">per sempre</p>
-        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>&#10004; 2 pronostici al giorno</li><li>&#10004; 1X2 con probabilita'</li><li>&#10004; Visualizza 2 giornate calendario</li><li>&#10060; Simula Pronostici Giornata</li><li>&#10060; Classifica Serie A</li><li>&#10060; Classifica Marcatori</li><li>&#10060; Marcatori Consigliati IA</li><li>&#10060; Rose complete 20 squadre</li><li>&#10060; Probabili formazioni live</li><li>&#10060; Infortunati aggiornati</li><li>&#10060; Notizie Live Serie A</li><li>&#10060; Schedina del Giorno completa</li><li>&#10060; Badge SICURA</li><li>&#10060; Risultato esatto</li></ul>
+        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>&#10004; 2 pronostici al giorno</li><li>&#10004; 1X2 con probabilita'</li><li>&#10004; Visualizza 2 giornate calendario</li><li>&#10060; Simula Pronostici Giornata</li><li>&#10060; Classifica Serie A</li><li>&#10060; Classifica Marcatori</li><li>&#10060; Marcatori Consigliati IA</li><li>&#10060; Rose complete 20 squadre</li><li>&#10060; Probabili formazioni live</li><li>&#10060; Infortunati aggiornati</li><li>&#10060; Notizie dal Calcio</li><li>&#10060; Schedina del Giorno completa</li><li>&#10060; Badge SICURA</li><li>&#10060; Risultato esatto</li></ul>
         <a href="#pronostici" class="btn btn-blue">Inizia Gratis</a>
       </div>
       <div class="price-card pro">
         <div class="tag tag-green" style="margin-bottom:12px">PIU' POPOLARE</div>
         <h2>Pro</h2><div class="price">9.99&euro;</div><p style="color:var(--muted)">/mese</p>
-        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>&#10004; Pronostici illimitati</li><li>&#10004; Tutte le 8 giornate</li><li>&#10004; Classifica + Marcatori</li><li>&#10004; Rose complete 20 squadre</li><li>&#10004; Probabili formazioni live</li><li>&#10004; Infortunati aggiornati</li><li>&#10004; Notizie Live Serie A</li><li>&#10004; Marcatori Consigliati IA</li><li>&#10004; Schedina del Giorno</li><li>&#10004; Badge SICURA</li></ul>
+        <ul style="text-align:left;list-style:none;margin:20px 0;line-height:2"><li>&#10004; Pronostici illimitati</li><li>&#10004; Tutte le 8 giornate</li><li>&#10004; Classifica + Marcatori</li><li>&#10004; Rose complete 20 squadre</li><li>&#10004; Probabili formazioni live</li><li>&#10004; Infortunati aggiornati</li><li>&#10004; Notizie dal Calcio</li><li>&#10004; Marcatori Consigliati IA</li><li>&#10004; Schedina del Giorno</li><li>&#10004; Badge SICURA</li></ul>
         <button class="btn btn-green" onclick="abbonarPro()">Abbonati Ora</button>
       </div>
     </div>
