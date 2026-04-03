@@ -62,7 +62,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
   <a href="#squadre">Squadre</a>
   <a href="#notizie">Notizie</a>
   <a href="#pricing">Pricing</a>
-  <a href="#login" id="nav-auth" style="margin-left:auto;background:#1f3460;display:flex;align-items:center;gap:6px">ðŸ‘¤ Accedi</a>
+  <a href="#login" id="nav-auth" style="margin-left:auto;background:#1f3460;display:flex;align-items:center;gap:6px">&#128100; Accedi</a>
 </nav>
 <div id="app"><div class="spinner"></div></div>
 
@@ -742,11 +742,11 @@ function updateNavAuth(){
   const el=$("nav-auth");
   if(!el)return;
   if(userToken){
-    el.innerHTML=userPlan==="pro"?"&#11088; Pro":"ðŸ‘¤ Free";
+    el.innerHTML=userPlan==="pro"?"&#11088; Pro":"&#128100; Free";
     el.style.background=userPlan==="pro"?"var(--green)":"#1f3460";
     el.style.color=userPlan==="pro"?"#000":"var(--text)";
   }else{
-    el.innerHTML="ðŸ‘¤ Accedi";
+    el.innerHTML="&#128100; Accedi";
     el.style.background="#1f3460";
     el.style.color="var(--muted)";
   }

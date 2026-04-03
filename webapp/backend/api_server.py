@@ -963,7 +963,7 @@ def _scrape_notizie():
 @app.get("/api/notizie")
 async def notizie():
     """Ritorna le ultime notizie Serie A."""
-    if not NOTIZIE_CACHE:
+    if not NOTIZIE_CACHE or len(NOTIZIE_CACHE) < 4:
         return {"notizie":[
             {"titolo":"Probabili formazioni Serie A Giornata 31: le scelte dei tecnici","fonte":"Fantacalcio.it","url":"https://www.fantacalcio.it/probabili-formazioni-serie-a"},
             {"titolo":"Calciomercato Serie A: tutti i trasferimenti di gennaio 2026","fonte":"Sky Sport","url":"https://sport.sky.it/calciomercato/serie-a"},
