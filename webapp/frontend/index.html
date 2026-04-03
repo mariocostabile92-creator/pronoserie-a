@@ -439,6 +439,7 @@ async function pageClassifica(){
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
   // SINISTRA: Classifica
   html+='<div class="card" style="overflow-x:auto;padding:8px"><h2 style="margin-bottom:8px;font-size:1.1rem">Classifica</h2>';
+  html+=`<div style="display:flex;padding:4px 4px 6px;border-bottom:2px solid #1f3460;color:var(--muted);font-size:.65rem;font-weight:700"><span style="width:22px">#</span><span style="flex:1">Squadra</span><span style="width:22px">PG</span><span style="width:22px">V</span><span style="width:22px">N</span><span style="width:22px">P</span><span style="width:30px">DR</span><span style="width:28px;text-align:right">PT</span></div>`;
   (data.classifica||[]).forEach((r,i)=>{
     const c=i<4?"var(--green)":i<6?"var(--yellow)":i===6?"#9b59b6":i>=17?"var(--red)":"transparent";
     html+=`<div style="display:flex;align-items:center;padding:6px 4px;border-bottom:1px solid #1f3460;border-left:3px solid ${c}">
