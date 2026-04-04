@@ -990,6 +990,61 @@ async def notizie():
     return {"notizie":NOTIZIE_CACHE,"aggiornamento":NOTIZIE_LAST_UPDATE}
 
 # ─────────────────────────────
+# RISULTATI LIVE
+# ─────────────────────────────
+RISULTATI_GIORNATE = {
+    30:{"data":"20-22 marzo 2026","partite":[
+        {"home":"Genoa","away":"Torino","gol_h":2,"gol_a":1,"marcatori":["Vitinha 23'","Colombo 67'","Vlasic 45'"]},
+        {"home":"Atalanta","away":"Napoli","gol_h":2,"gol_a":1,"marcatori":["Krstovic 12'","De Ketelaere 78'","Hojlund 55'"]},
+        {"home":"Milan","away":"Parma","gol_h":3,"gol_a":0,"marcatori":["Pulisic 15'","Leao 44'","Gimenez 71'"]},
+        {"home":"Roma","away":"Cremonese","gol_h":2,"gol_a":0,"marcatori":["Malen 33'","Soule 62'"]},
+        {"home":"Cagliari","away":"Lazio","gol_h":0,"gol_a":0,"marcatori":[]},
+        {"home":"Lecce","away":"Inter","gol_h":0,"gol_a":2,"marcatori":["Thuram 28'","Calhanoglu 59' (R)"]},
+        {"home":"Juventus","away":"Como","gol_h":0,"gol_a":2,"marcatori":["Douvikas 37'","Paz 82'"]},
+        {"home":"Sassuolo","away":"Verona","gol_h":3,"gol_a":0,"marcatori":["Berardi 11'","Pinamonti 53'","Lauriente 88'"]},
+        {"home":"Fiorentina","away":"Pisa","gol_h":1,"gol_a":1,"marcatori":["Kean 42'","Tramoni 76'"]},
+        {"home":"Bologna","away":"Udinese","gol_h":1,"gol_a":2,"marcatori":["Castro 30'","Davis 18'","Zaniolo 65'"]},
+    ]},
+    29:{"data":"14-16 marzo 2026","partite":[
+        {"home":"Inter","away":"Genoa","gol_h":2,"gol_a":0,"marcatori":["Thuram 22'","Barella 68'"]},
+        {"home":"Napoli","away":"Torino","gol_h":2,"gol_a":1,"marcatori":["Hojlund 35'","McTominay 71'","Adams 55'"]},
+        {"home":"Lazio","away":"Milan","gol_h":1,"gol_a":0,"marcatori":["Maldini 63'"]},
+        {"home":"Como","away":"Cagliari","gol_h":1,"gol_a":0,"marcatori":["Douvikas 48'"]},
+        {"home":"Cremonese","away":"Sassuolo","gol_h":1,"gol_a":1,"marcatori":["Vardy 32'","Berardi 77'"]},
+        {"home":"Parma","away":"Lecce","gol_h":0,"gol_a":1,"marcatori":["Cheddira 56'"]},
+        {"home":"Verona","away":"Roma","gol_h":0,"gol_a":3,"marcatori":["Malen 12'","Dovbyk 41'","Pellegrini 85'"]},
+        {"home":"Torino","away":"Fiorentina","gol_h":0,"gol_a":0,"marcatori":[]},
+        {"home":"Udinese","away":"Juventus","gol_h":0,"gol_a":1,"marcatori":["Yildiz 73'"]},
+        {"home":"Pisa","away":"Atalanta","gol_h":1,"gol_a":2,"marcatori":["Meister 40'","Scamacca 28'","Raspadori 90'"]},
+    ]},
+    28:{"data":"7-9 marzo 2026","partite":[
+        {"home":"Milan","away":"Juventus","gol_h":1,"gol_a":1,"marcatori":["Pulisic 55'","Yildiz 78'"]},
+        {"home":"Napoli","away":"Lecce","gol_h":2,"gol_a":1,"marcatori":["Hojlund 20'","McTominay 64'","Banda 88'"]},
+        {"home":"Inter","away":"Atalanta","gol_h":1,"gol_a":1,"marcatori":["Calhanoglu 37' (R)","Krstovic 71'"]},
+        {"home":"Roma","away":"Bologna","gol_h":2,"gol_a":0,"marcatori":["Malen 29'","Dybala 82'"]},
+        {"home":"Fiorentina","away":"Lazio","gol_h":1,"gol_a":1,"marcatori":["Kean 45'","Dia 66'"]},
+        {"home":"Como","away":"Sassuolo","gol_h":2,"gol_a":1,"marcatori":["Paz 14'","Douvikas 52'","Pinamonti 80'"]},
+        {"home":"Genoa","away":"Cagliari","gol_h":1,"gol_a":0,"marcatori":["Vitinha 61'"]},
+        {"home":"Cremonese","away":"Verona","gol_h":2,"gol_a":0,"marcatori":["Sanabria 33'","Vardy 70'"]},
+        {"home":"Torino","away":"Parma","gol_h":3,"gol_a":1,"marcatori":["Simeone 8'","Vlasic 42'","Adams 67'","Pellegrino 55'"]},
+        {"home":"Udinese","away":"Pisa","gol_h":1,"gol_a":0,"marcatori":["Davis 39'"]},
+    ]},
+}
+
+@app.get("/api/risultati")
+async def risultati():
+    """Ritorna i risultati delle ultime giornate."""
+    giornate = []
+    for g_num in sorted(RISULTATI_GIORNATE.keys(), reverse=True):
+        g = RISULTATI_GIORNATE[g_num]
+        giornate.append({
+            "giornata": g_num,
+            "data": g["data"],
+            "partite": g["partite"],
+        })
+    return {"giornate": giornate, "live": False, "prossimo_live": "Disponibile con API Football"}
+
+# ─────────────────────────────
 # HEALTH CHECK
 # ─────────────────────────────
 @app.get("/api/health")
