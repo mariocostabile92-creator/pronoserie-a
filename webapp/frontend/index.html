@@ -390,10 +390,10 @@ async function pageCalendario(){
   const cal=await fetchAPI(calUrl, true);
   if(!cal||!cal.giornate||!cal.giornate.length)return `<div class="container">${leagueTabs()}<div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>`;
 
-  const gc = cal.giornata_corrente || cal.giornate[0].giornata;
-  const gCorrente = cal.giornate.find(x=>x.giornata===gc) || cal.giornate[0];
+  const gc = String(cal.giornata_corrente || cal.giornate[0].giornata);
+  const gCorrente = cal.giornate.find(x=>String(x.giornata)===gc) || cal.giornate[0];
   const completate = cal.giornate.filter(g=>g.stato==="completata");
-  const prossime = cal.giornate.filter(g=>g.stato!=="completata" && g.giornata!==gc);
+  const prossime = cal.giornate.filter(g=>g.stato!=="completata" && String(g.giornata)!==gc);
 
   let html='<div class="container"><h1>Calendario '+leagueLabel+'</h1>';
   html+=leagueTabs();
@@ -453,10 +453,11 @@ async function pageCalendario(){
     html+='</div>';
   }
 
-  // Giornate completate (archivio)
-  if(completate.length>0){
-    html+='<div class="card" style="padding:8px"><h4 style="color:var(--muted);margin-bottom:6px">Archivio risultati</h4>';
-    completate.forEach(g=>{
+  // Giornate completate (solo ultime 3, non tutte)
+  const ultimeCompletate = completate.slice(-3);
+  if(ultimeCompletate.length>0){
+    html+='<div class="card" style="padding:8px"><h4 style="color:var(--muted);margin-bottom:6px">Ultime giornate</h4>';
+    ultimeCompletate.forEach(g=>{
       html+=`<div style="padding:6px 0;border-bottom:1px solid #1f3460"><strong style="color:var(--green);font-size:.85rem">G.${g.giornata}</strong> <span style="color:var(--muted);font-size:.75rem">${g.data||""}</span> <span style="color:var(--green);font-size:.65rem">COMPLETATA</span>`;
       g.partite.forEach(p=>{
         const colH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
@@ -489,14 +490,17 @@ async function simulaGiornata(gNum){
   const det=$("sim-result-main");
   if(!det)return;
   det.innerHTML='<div class="spinner"></div>';
-  const cal=await fetchAPI("/api/calendario");
+  const calUrl = currentLeague==="serie-a" ? "/api/calendario" : "/api/"+currentLeague+"/calendario";
+  const cal=await fetchAPI(calUrl);
   if(!cal)return;
-  const g=cal.giornate.find(x=>x.giornata===gNum);
+  const g=cal.giornate.find(x=>x.giornata===gNum || x.giornata===String(gNum));
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
-  let html='<div class="card"><h3 style="margin-bottom:12px">Pronostici Giornata '+gNum+'</h3>';
+  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  let html='<div class="card"><h3 style="margin-bottom:12px">Pronostici Giornata '+gNum+' - '+leagueLabel+'</h3>';
   html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.75rem;white-space:nowrap"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U</th><th>Goal</th><th>Gol</th><th>Aff.</th></tr></thead><tbody>';
   for(const p of g.partite){
-    const d=await fetchAPI("/api/pronostico/"+p.home+"/"+p.away);
+    const pronoUrl = "/api"+leagueApiPrefix()+"/pronostico/"+encodeURIComponent(p.home)+"/"+encodeURIComponent(p.away);
+    const d=await fetchAPI(pronoUrl);
     if(!d)continue;
     const tipCol=d.suggerimento==="1"?"var(--green)":d.suggerimento==="X"?"var(--yellow)":"var(--red)";
     const ouLbl=d.over_25>50?"Over":"Under";
