@@ -1696,20 +1696,83 @@ def _get_last_lineup(team_name):
         pass
     return None
 
+_ROSA_CACHE_OD = {}  # Cache rosa on-demand
+
+def _get_squad_ondemand(team_name):
+    """Scarica la rosa di una squadra on-demand da API Football."""
+    if team_name in _ROSA_CACHE_OD:
+        return _ROSA_CACHE_OD[team_name]
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name)
+    if not team_id:
+        return []
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/players/squads?team={team_id}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read().decode())
+        if data.get("response") and len(data["response"]) > 0:
+            players = data["response"][0].get("players", [])
+            rosa = []
+            for p in players:
+                ruolo = _RUOLO_MAP.get(p.get("position", ""), "C")
+                rosa.append({"nome": p.get("name", "?"), "ruolo": ruolo, "numero": p.get("number", 0) or 0, "foto": p.get("photo", "")})
+            if rosa:
+                _ROSA_CACHE_OD[team_name] = rosa
+                return rosa
+    except Exception:
+        pass
+    return []
+
+def _get_injuries_ondemand(team_name):
+    """Scarica infortunati di una squadra on-demand."""
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name)
+    if not team_id:
+        return []
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/injuries?team={team_id}&season=2025",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read().decode())
+        if data.get("response"):
+            seen = {}
+            for item in data["response"]:
+                player = item.get("player", {})
+                name = player.get("name", "?")
+                reason = player.get("reason", "") or ""
+                ptype = player.get("type", "") or ""
+                fix_date = item.get("fixture", {}).get("date", "")
+                if name in seen and fix_date <= seen[name]["date"]:
+                    continue
+                seen[name] = {"date": fix_date, "nome": name, "tipo": "squalifica" if "Suspended" in reason or "Red" in reason else "infortunio", "dettaglio": reason or ptype or "Indisponibile"}
+            return [{"nome": v["nome"], "tipo": v["tipo"], "dettaglio": v["dettaglio"]} for v in list(seen.values())[:8]]
+    except Exception:
+        pass
+    return []
+
 @app.get("/api/squadra/{nome}")
 async def squadra(nome: str):
     n = nome.strip().title()
-    # Priorita': dati live API Football > hardcoded > fetch on-demand
+    # Formazione: live > hardcoded > on-demand
     form = LIVE_FORMAZIONI.get(n) or FORMAZIONI.get(n)
     if not form:
         form = _get_last_lineup(n)
+    # Infortunati: live cache > hardcoded > on-demand
     inj = INFORTUNATI_LIVE.get(n) if INFORTUNATI_LIVE.get(n) else (LIVE_INFORTUNATI.get(n) if LIVE_INFORTUNATI.get(n) is not None else INFORTUNATI.get(n, []))
+    if not inj and (n in PL_TEAM_IDS or not INFORTUNATI.get(n)):
+        inj = _get_injuries_ondemand(n)
+    # Allenatore
     allenatore = ALLENATORI_LIVE.get(n) or ALLENATORI.get(n, "N/D")
-    # Rosa: API Football live > hardcoded
+    # Rosa: live cache > hardcoded > on-demand
     if ROSE_LIVE.get(n):
         rosa = ROSE_LIVE[n]
+    elif ROSE.get(n):
+        rosa = [{"nome":g[0],"ruolo":g[1],"numero":g[2]} for g in ROSE[n]]
     else:
-        rosa = [{"nome":g[0],"ruolo":g[1],"numero":g[2]} for g in ROSE.get(n, [])]
+        rosa = _get_squad_ondemand(n)
     return {
         "nome": n,
         "allenatore": allenatore,
