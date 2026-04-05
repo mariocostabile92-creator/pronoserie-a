@@ -547,10 +547,14 @@ def genera_pronostico(home, away):
         except Exception as e:
             print("❌ ERRORE PREDICTOR:", e)
 
-    # Calcolo Poisson AVANZATO con 26 anni CSV + xG + H2H + forma
+    # Calcolo Poisson AVANZATO
     from scipy.stats import poisson as pdist
+    try:
+        from api_football_stats import get_team_real_stats
+    except ImportError:
+        get_team_real_stats = lambda x: None
 
-    # Carica statistiche pre-calcolate dai CSV (26 anni)
+    # Carica statistiche pre-calcolate dai CSV
     _stats_path = os.path.join(os.path.dirname(__file__), "team_stats.json")
     _h2h_path = os.path.join(os.path.dirname(__file__), "h2h_stats.json")
     _avg_path = os.path.join(os.path.dirname(__file__), "league_averages.json")
@@ -569,7 +573,57 @@ def genera_pronostico(home, away):
     sh = TEAM_STATS.get(h, {})
     sa = TEAM_STATS.get(a, {})
 
-    if not sh or not sa:
+    # ── FASE 2: USA STATS REALI API FOOTBALL SE DISPONIBILI ──
+    api_h = get_team_real_stats(h)
+    api_a = get_team_real_stats(a)
+    has_api = api_h and api_a and api_h.get("played", 0) >= 10 and api_a.get("played", 0) >= 10
+
+    if has_api:
+        # Lambda da statistiche REALI casa/trasferta (API Football)
+        avg_gs_away = sum(get_team_real_stats(t).get("gs_away_pg", 1.2) for t in _TEAM_IDS if get_team_real_stats(t)) / max(1, sum(1 for t in _TEAM_IDS if get_team_real_stats(t)))
+        avg_gs_home = sum(get_team_real_stats(t).get("gs_home_pg", 1.0) for t in _TEAM_IDS if get_team_real_stats(t)) / max(1, sum(1 for t in _TEAM_IDS if get_team_real_stats(t)))
+
+        lh_api = api_h["gf_home_pg"] * (api_a["gs_away_pg"] / max(0.5, avg_gs_away))
+        la_api = api_a["gf_away_pg"] * (api_h["gs_home_pg"] / max(0.5, avg_gs_home))
+
+        # Forma API Football (ultimi 5: W=3, D=1, L=0, max 15)
+        form_h = api_h.get("form_score", 7)
+        form_a = api_a.get("form_score", 7)
+        form_diff = (form_h - form_a) / 15  # Normalizzato [-1, 1]
+
+        if sh and sa:
+            # Blend: 40% storico CSV + 40% API reale + 20% classifica
+            avg_gc = LEAGUE_AVG.get("media_gol_casa", 1.5)
+            avg_gt = LEAGUE_AVG.get("media_gol_trasferta", 1.17)
+            lh_hist = sh["forza_att_casa"] * sa["forza_dif_trasf"] * avg_gc
+            la_hist = sa["forza_att_trasf"] * sh["forza_dif_casa"] * avg_gt
+
+            CLASSIFICA_PTS = {r["Squadra"]: r["Punti"] for r in CLASS_FALLBACK}
+            pts_diff = (CLASSIFICA_PTS.get(h, 35) - CLASSIFICA_PTS.get(a, 35)) / 100
+            lh_cls = avg_gc * (1 + pts_diff * 0.5)
+            la_cls = avg_gt * (1 - pts_diff * 0.5)
+
+            lh = 0.35 * lh_hist + 0.45 * lh_api + 0.20 * lh_cls
+            la = 0.35 * la_hist + 0.45 * la_api + 0.20 * la_cls
+        else:
+            lh = lh_api
+            la = la_api
+
+        # Correzione forma API (piu' forte perche' basata su dati reali)
+        ff = 1.0 + 0.15 * form_diff
+        lh *= ff
+        la *= (2.0 - ff)
+
+        # H2H anche nel percorso API
+        h2h_key = f"{h}_vs_{a}"
+        h2h = H2H_DATA.get(h2h_key, {})
+        h2h_n = h2h.get("n_partite", 0)
+        if h2h_n >= 3:
+            adv = h2h["h2h_advantage"]
+            lh *= (1.0 + 0.08 * adv)
+            la *= (1.0 - 0.08 * adv)
+
+    elif not sh or not sa:
         # Squadra non trovata nei CSV, usa solo xG
         XG = {"Inter":{"xG":2.40,"xGA":0.84},"Milan":{"xG":1.83,"xGA":1.12},"Napoli":{"xG":1.56,"xGA":1.10},"Como":{"xG":1.80,"xGA":1.08},"Juventus":{"xG":1.97,"xGA":0.97},"Roma":{"xG":1.54,"xGA":1.20},"Atalanta":{"xG":1.86,"xGA":1.38},"Lazio":{"xG":1.21,"xGA":1.34},"Bologna":{"xG":1.34,"xGA":1.39},"Sassuolo":{"xG":1.19,"xGA":1.63},"Udinese":{"xG":1.19,"xGA":1.56},"Parma":{"xG":1.00,"xGA":1.62},"Genoa":{"xG":1.30,"xGA":1.45},"Torino":{"xG":1.33,"xGA":1.57},"Cagliari":{"xG":1.01,"xGA":1.65},"Fiorentina":{"xG":1.52,"xGA":1.53},"Cremonese":{"xG":1.03,"xGA":1.87},"Lecce":{"xG":0.93,"xGA":1.67},"Verona":{"xG":1.03,"xGA":1.40},"Pisa":{"xG":1.14,"xGA":1.82}}
         xh = XG.get(h, {"xG":1.3,"xGA":1.3})
@@ -692,11 +746,19 @@ def genera_pronostico(home, away):
     else:
         ov25 = ov25_model
     gsi_raw = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
-    # Calibrazione Goal: Serie A ha 57% Goal Si in media
-    # Solo leggera correzione per difese top (xGA < 0.9)
+    # Calibrazione Goal con clean sheet reali API Football
     xga_min = min(sh.get("xGA_pg", 1.3) if sh else 1.3, sa.get("xGA_pg", 1.3) if sa else 1.3)
-    if xga_min < 0.9:
-        gsi = gsi_raw * 0.95  # Solo -5% per difese top (Inter 0.84)
+    if has_api:
+        # Usa clean sheet % reale per calibrare Goal/NoGoal
+        cs_h = api_h.get("cs_pct", 0)
+        cs_a = api_a.get("cs_pct", 0)
+        cs_avg = (cs_h + cs_a) / 2
+        if cs_avg > 30:  # Almeno una squadra tiene spesso la porta inviolata
+            gsi = gsi_raw * (1.0 - (cs_avg - 30) * 0.005)  # Riduce Goal Si
+        else:
+            gsi = gsi_raw
+    elif xga_min < 0.9:
+        gsi = gsi_raw * 0.95
     else:
         gsi = gsi_raw
     scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
