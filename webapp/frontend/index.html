@@ -632,30 +632,88 @@ async function pageNotizie(){
   return html;
 }
 
-// ── RISULTATI ──
+// ── RISULTATI LIVE ──
+let _liveRefreshTimer = null;
+
 async function pageRisultati(){
   if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Risultati Serie A</h2><p style="margin:16px 0">I risultati live e lo storico delle partite sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro - 9.99&euro;/mese</button></div></div>`;
-  const data=await fetchAPI("/api/risultati");
+  // Pulisci timer precedente
+  if(_liveRefreshTimer){clearInterval(_liveRefreshTimer);_liveRefreshTimer=null}
+  const data=await fetchAPI("/api/risultati", true);
   if(!data||!data.giornate)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento risultati</div></div>';
-  let html='<div class="container"><h1>Risultati Serie A 2025-2026</h1><p class="sub">Ultime giornate - Aggiornamento dopo ogni turno</p>';
+  const hasLive = data.live;
+  let html='<div class="container">';
+  // Header con indicatore LIVE
+  html+=`<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px">
+    <div><h1 style="margin-bottom:4px">Risultati Serie A 2025-2026</h1><p class="sub" style="margin-bottom:0">Aggiornamento: ${data.aggiornamento||"In tempo reale"}</p></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      ${hasLive?'<div style="display:flex;align-items:center;gap:6px;background:#e74c3c;padding:6px 16px;border-radius:20px;animation:pulse 1.5s infinite"><div style="width:10px;height:10px;border-radius:50%;background:#fff"></div><span style="color:#fff;font-weight:800;font-size:.9rem">LIVE</span></div>':'<span style="color:var(--muted);font-size:.85rem">Nessuna partita in corso</span>'}
+      <button class="btn btn-blue" style="padding:8px 16px;font-size:.85rem" onclick="refreshRisultati()">Aggiorna</button>
+    </div>
+  </div>`;
+  // Stile pulsante LIVE
+  html+=`<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}@keyframes liveDot{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,.7)}70%{box-shadow:0 0 0 8px rgba(231,76,60,0)}}</style>`;
+
   data.giornate.forEach(g=>{
-    html+=`<div class="card" style="padding:10px"><h3 style="margin-bottom:8px">Giornata ${g.giornata} - <span style="color:var(--muted)">${g.data}</span></h3>`;
+    const isLiveG = g.live;
+    html+=`<div class="card" style="padding:12px${isLiveG?';border-color:#e74c3c;border-width:2px':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h3>Giornata ${g.giornata} <span style="color:var(--muted);font-size:.85rem">${g.data}</span></h3>
+        ${isLiveG?'<span style="background:#e74c3c;color:#fff;padding:3px 10px;border-radius:10px;font-size:.75rem;font-weight:700;animation:pulse 1.5s infinite">IN CORSO</span>':''}
+      </div>`;
     g.partite.forEach(p=>{
       const colH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
       const colA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
-      html+=`<div style="padding:8px 4px;border-bottom:1px solid #1f3460">
-        <div style="display:flex;align-items:center;justify-content:space-between">
+      const isLive = p.live;
+      const statusIt = p.status_it || p.status || "";
+      // Badge status
+      let statusBadge = "";
+      if(isLive){
+        const minTxt = p.minuto ? p.minuto+"'" : statusIt;
+        statusBadge = `<span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:700;animation:pulse 1.5s infinite">${minTxt}</span>`;
+      } else if(p.status==="NS"){
+        statusBadge = `<span style="color:var(--muted);font-size:.75rem">${p.ora||"Da giocare"}</span>`;
+      } else if(p.status==="FT"||p.status==="AET"){
+        statusBadge = `<span style="color:var(--muted);font-size:.7rem">FT</span>`;
+      } else if(p.status==="HT"){
+        statusBadge = `<span style="background:var(--yellow);color:#000;padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:700">Intervallo</span>`;
+      } else {
+        statusBadge = `<span style="color:var(--muted);font-size:.7rem">${statusIt}</span>`;
+      }
+      html+=`<div style="padding:8px 4px;border-bottom:1px solid #1f3460${isLive?';background:rgba(231,76,60,.08);border-radius:6px;margin:2px 0':''}">
+        <div style="display:flex;align-items:center;justify-content:center;gap:4px">
           <span style="flex:1;text-align:right;font-weight:700;font-size:.9rem">${p.home}</span>
-          <span style="padding:4px 14px;font-size:1.2rem;font-weight:800;min-width:60px;text-align:center"><span style="color:${colH}">${p.gol_h}</span> - <span style="color:${colA}">${p.gol_a}</span></span>
+          <div style="text-align:center;min-width:80px">
+            <span style="font-size:${isLive?'1.5rem':'1.2rem'};font-weight:800"><span style="color:${colH}">${p.gol_h}</span> - <span style="color:${colA}">${p.gol_a}</span></span>
+            <div>${statusBadge}</div>
+          </div>
           <span style="flex:1;font-weight:700;font-size:.9rem">${p.away}</span>
         </div>
-        ${p.marcatori&&p.marcatori.length?`<div style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:2px">&#9917; ${p.marcatori.join(" | ")}</div>`:''}
+        ${p.marcatori&&p.marcatori.length?`<div style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:4px">${p.marcatori.map(m=>'&#9917; '+m).join(' &nbsp; ')}</div>`:''}
+        ${(p.rossi_home&&p.rossi_home.length)||(p.rossi_away&&p.rossi_away.length)?`<div style="text-align:center;font-size:.7rem;margin-top:2px;color:#e74c3c">${[...(p.rossi_home||[]),...(p.rossi_away||[])].map(r=>'&#128997; '+r).join(' &nbsp; ')}</div>`:''}
       </div>`;
     });
     html+='</div>';
   });
+  html+='<div id="live-refresh-info" style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px"></div>';
   html+='</div>';
+
+  // Auto-refresh ogni 60 secondi se ci sono partite live
+  if(hasLive){
+    _liveRefreshTimer = setInterval(()=>{refreshRisultati()}, 60000);
+    setTimeout(()=>{
+      const info=$("live-refresh-info");
+      if(info) info.innerHTML="Auto-aggiornamento ogni 60 secondi durante le partite live";
+    },300);
+  }
   return html;
+}
+
+async function refreshRisultati(){
+  const app=$("app");
+  if(!app || !location.hash.includes("risultati")) return;
+  const result = await pageRisultati();
+  if(result) app.innerHTML = result;
 }
 
 function pagePricing(){
@@ -831,6 +889,8 @@ const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,
 
 async function navigate(){
   const hash=(location.hash||"#home").replace("#","");
+  // Pulisci timer live se si esce dalla pagina risultati
+  if(hash!=="risultati" && _liveRefreshTimer){clearInterval(_liveRefreshTimer);_liveRefreshTimer=null}
   const page=routes[hash]||routes.home;
   document.querySelectorAll(".nav a:not(#nav-auth)").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+hash));
   const app=$("app");
