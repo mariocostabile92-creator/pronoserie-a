@@ -70,9 +70,9 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
 <script>
 const API = window.location.origin;
 const SQ = ["Inter","Milan","Napoli","Como","Juventus","Roma","Atalanta","Lazio","Bologna","Sassuolo","Udinese","Parma","Genoa","Torino","Cagliari","Fiorentina","Cremonese","Lecce","Verona","Pisa"];
-const SQ_PL = ["Arsenal","Aston Villa","Bournemouth","Brentford","Brighton","Chelsea","Crystal Palace","Everton","Fulham","Ipswich","Leicester","Liverpool","Man City","Man United","Newcastle","Nott. Forest","Southampton","Tottenham","West Ham","Wolves"];
+const SQ_PL = ["Arsenal","Aston Villa","Bournemouth","Brentford","Brighton","Burnley","Chelsea","Crystal Palace","Everton","Fulham","Leeds","Liverpool","Man City","Man United","Newcastle","Nott. Forest","Sunderland","Tottenham","West Ham","Wolves"];
 const TEAM_IDS = {Inter:505,Milan:489,Napoli:492,Como:895,Juventus:496,Roma:497,Atalanta:499,Lazio:487,Bologna:500,Sassuolo:488,Udinese:494,Parma:523,Genoa:495,Torino:503,Cagliari:490,Fiorentina:502,Cremonese:520,Lecce:867,Verona:504,Pisa:801};
-const TEAM_IDS_PL = {Arsenal:42,"Aston Villa":66,Bournemouth:35,Brentford:55,Brighton:51,Chelsea:49,"Crystal Palace":52,Everton:45,Fulham:36,Ipswich:57,Leicester:46,Liverpool:40,"Man City":50,"Man United":33,Newcastle:34,"Nott. Forest":65,Southampton:41,Tottenham:47,"West Ham":48,Wolves:39};
+const TEAM_IDS_PL = {Arsenal:42,"Aston Villa":66,Bournemouth:35,Brentford:55,Brighton:51,Burnley:44,Chelsea:49,"Crystal Palace":52,Everton:45,Fulham:36,Leeds:63,Liverpool:40,"Man City":50,"Man United":33,Newcastle:34,"Nott. Forest":65,Sunderland:746,Tottenham:47,"West Ham":48,Wolves:39};
 let currentLeague = "serie-a";
 function badge(name,size){size=size||20;const ids=currentLeague==="premier-league"?TEAM_IDS_PL:TEAM_IDS;const id=ids[name];if(!id)return'';return `<img src="https://media.api-sports.io/football/teams/${id}.png" alt="${name}" style="width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px">`}
 function getSQ(){return currentLeague==="premier-league"?SQ_PL:SQ}

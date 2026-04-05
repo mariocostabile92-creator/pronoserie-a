@@ -61,27 +61,32 @@ LIMITE_FREE = 2
 
 LEAGUES = {
     "serie-a": {"id": 135, "season": 2025, "name": "Serie A", "country": "Italy"},
-    "premier-league": {"id": 39, "season": 2024, "name": "Premier League", "country": "England"},
+    "premier-league": {"id": 39, "season": 2025, "name": "Premier League", "country": "England"},
 }
 
 # Mapping nomi API Football -> nomi nostri (per ogni league)
 PL_NOME_MAP = {
     "Manchester United": "Man United", "Manchester City": "Man City",
-    "Newcastle United": "Newcastle", "AFC Bournemouth": "Bournemouth",
-    "Wolverhampton Wanderers": "Wolves", "Nottingham Forest": "Nott. Forest",
-    "Tottenham Hotspur": "Tottenham", "West Ham United": "West Ham",
-    "Brighton and Hove Albion": "Brighton", "Crystal Palace": "Crystal Palace",
-    "Leicester City": "Leicester", "Ipswich Town": "Ipswich",
+    "Newcastle United": "Newcastle", "Newcastle": "Newcastle",
+    "AFC Bournemouth": "Bournemouth", "Bournemouth": "Bournemouth",
+    "Wolverhampton Wanderers": "Wolves", "Wolves": "Wolves",
+    "Nottingham Forest": "Nott. Forest",
+    "Tottenham Hotspur": "Tottenham", "Tottenham": "Tottenham",
+    "West Ham United": "West Ham", "West Ham": "West Ham",
+    "Brighton and Hove Albion": "Brighton", "Brighton": "Brighton",
+    "Crystal Palace": "Crystal Palace",
     "Arsenal": "Arsenal", "Liverpool": "Liverpool", "Chelsea": "Chelsea",
     "Aston Villa": "Aston Villa", "Fulham": "Fulham", "Everton": "Everton",
-    "Brentford": "Brentford", "Southampton": "Southampton",
+    "Brentford": "Brentford", "Burnley": "Burnley",
+    "Leeds United": "Leeds", "Leeds": "Leeds",
+    "Sunderland": "Sunderland",
 }
 
 PL_TEAM_IDS = {
     "Arsenal":42,"Aston Villa":66,"Bournemouth":35,"Brentford":55,"Brighton":51,
-    "Chelsea":49,"Crystal Palace":52,"Everton":45,"Fulham":36,"Ipswich":57,
-    "Leicester":46,"Liverpool":40,"Man City":50,"Man United":33,"Newcastle":34,
-    "Nott. Forest":65,"Southampton":41,"Tottenham":47,"West Ham":48,"Wolves":39,
+    "Burnley":44,"Chelsea":49,"Crystal Palace":52,"Everton":45,"Fulham":36,
+    "Leeds":63,"Liverpool":40,"Man City":50,"Man United":33,"Newcastle":34,
+    "Nott. Forest":65,"Sunderland":746,"Tottenham":47,"West Ham":48,"Wolves":39,
 }
 
 def _get_nome_map(league_key):
