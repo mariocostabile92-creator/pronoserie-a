@@ -1430,6 +1430,7 @@ async def risultati():
                 "rossi_away": p.get("rossi_away", []),
                 "gialli": p.get("gialli", []),
                 "stats": p.get("stats", {}),
+                "fixture_id": p.get("fixture_id"),
             })
 
     # Raggruppa per data
@@ -1463,6 +1464,150 @@ async def risultati():
         "live": any(g.get("live") for g in giornate_live),
         "aggiornamento": LIVE_RESULTS_TIME or "Storico",
     }
+
+# ─────────────────────────────
+# DETTAGLIO PARTITA LIVE (API Football completo)
+# ─────────────────────────────
+@app.get("/api/fixture/{fixture_id}")
+async def fixture_detail(fixture_id: int):
+    """Scarica dettagli completi di una partita: eventi, statistiche, formazioni."""
+    result = {"fixture_id": fixture_id}
+
+    # 1. Fixture base + eventi
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?id={fixture_id}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        if data.get("response") and len(data["response"]) > 0:
+            fix = data["response"][0]
+            teams = fix.get("teams", {})
+            goals = fix.get("goals", {})
+            fixture = fix.get("fixture", {})
+            status = fixture.get("status", {})
+            events = fix.get("events", [])
+            score = fix.get("score", {})
+
+            home_name = FOOTBALL_NOME_MAP.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
+            away_name = FOOTBALL_NOME_MAP.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
+            home_id = teams.get("home", {}).get("id")
+
+            status_map = {"FT":"Terminata","1H":"1T","2H":"2T","HT":"Intervallo","NS":"Non iniziata","ET":"Supplementari","P":"Rigori"}
+
+            result["home"] = home_name
+            result["away"] = away_name
+            result["gol_h"] = goals.get("home", 0) or 0
+            result["gol_a"] = goals.get("away", 0) or 0
+            result["status"] = status.get("short", "")
+            result["status_it"] = status_map.get(status.get("short", ""), status.get("short", ""))
+            result["minuto"] = status.get("elapsed")
+            result["live"] = status.get("short", "") in ("1H", "2H", "HT", "ET", "P")
+            result["data"] = fixture.get("date", "")[:10]
+            result["ora"] = fixture.get("date", "")[11:16] if len(fixture.get("date", "")) > 15 else ""
+            result["arbitro"] = fixture.get("referee", "")
+            result["stadio"] = fixture.get("venue", {}).get("name", "")
+            result["citta"] = fixture.get("venue", {}).get("city", "")
+
+            # Parziali
+            ht = score.get("halftime", {})
+            result["primo_tempo"] = f"{ht.get('home', '-')}-{ht.get('away', '-')}" if ht else ""
+
+            # Eventi dettagliati
+            eventi = []
+            for ev in events:
+                nome = ev.get("player", {}).get("name", "?")
+                assist = ev.get("assist", {}).get("name", "")
+                minuto = ev.get("time", {}).get("elapsed", "?")
+                extra = ev.get("time", {}).get("extra")
+                min_str = f"{minuto}'+{extra}" if extra else f"{minuto}'"
+                tipo = ev.get("type", "")
+                detail = ev.get("detail", "")
+                team_id = ev.get("team", {}).get("id")
+                is_home = team_id == home_id
+
+                evento = {
+                    "minuto": min_str,
+                    "tipo": tipo,
+                    "dettaglio": detail,
+                    "giocatore": nome,
+                    "assist": assist,
+                    "squadra": "home" if is_home else "away",
+                }
+                eventi.append(evento)
+            result["eventi"] = eventi
+    except Exception as e:
+        result["errore_fixture"] = str(e)
+
+    # 2. Statistiche partita
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures/statistics?fixture={fixture_id}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        stats = {}
+        if data.get("response") and len(data["response"]) >= 2:
+            for side, idx in [("home", 0), ("away", 1)]:
+                for s in data["response"][idx].get("statistics", []):
+                    tipo = s.get("type", "")
+                    val = s.get("value")
+                    key_map = {
+                        "Ball Possession": "possesso",
+                        "Total Shots": "tiri",
+                        "Shots on Goal": "tiri_porta",
+                        "Shots off Goal": "tiri_fuori",
+                        "Blocked Shots": "tiri_bloccati",
+                        "Corner Kicks": "corner",
+                        "Fouls": "falli",
+                        "Offsides": "fuorigioco",
+                        "Yellow Cards": "gialli",
+                        "Red Cards": "rossi",
+                        "Goalkeeper Saves": "parate",
+                        "Total passes": "passaggi",
+                        "Passes accurate": "passaggi_riusciti",
+                        "Passes %": "passaggi_pct",
+                        "expected_goals": "xg",
+                    }
+                    for api_name, our_name in key_map.items():
+                        if tipo == api_name:
+                            stats[f"{our_name}_{side}"] = val
+        result["stats"] = stats
+    except Exception as e:
+        result["stats"] = {}
+
+    # 3. Formazioni
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures/lineups?fixture={fixture_id}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        lineups = {}
+        if data.get("response") and len(data["response"]) >= 2:
+            for idx, side in enumerate(["home", "away"]):
+                team_data = data["response"][idx]
+                formazione = team_data.get("formation", "")
+                coach = team_data.get("coach", {}).get("name", "")
+                titolari = [p.get("player", {}).get("name", "?") for p in team_data.get("startXI", [])]
+                panchina = [p.get("player", {}).get("name", "?") for p in team_data.get("substitutes", [])]
+                lineups[side] = {
+                    "modulo": formazione,
+                    "allenatore": coach,
+                    "titolari": titolari,
+                    "panchina": panchina[:7],
+                }
+        result["formazioni"] = lineups
+    except Exception as e:
+        result["formazioni"] = {}
+
+    return result
 
 # ─────────────────────────────
 # HEALTH CHECK
