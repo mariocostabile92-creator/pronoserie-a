@@ -611,7 +611,7 @@ def genera_pronostico(home, away):
             aw = get_team_stats(_df, away, opponent=home)
             return get_prediction(hs, aw, df=_df)
         except Exception as e:
-            print("❌ ERRORE PREDICTOR:", e)
+            print(f"❌ ERRORE PREDICTOR: {e}")
 
     # Calcolo Poisson AVANZATO
     from scipy.stats import poisson as pdist
@@ -639,10 +639,101 @@ def genera_pronostico(home, away):
     sh = TEAM_STATS.get(h, {})
     sa = TEAM_STATS.get(a, {})
 
-    # ── FASE 2: USA STATS REALI API FOOTBALL SE DISPONIBILI ──
+    # ── USA STATS REALI API FOOTBALL (Serie A + Premier League) ──
     api_h = get_team_real_stats(h)
     api_a = get_team_real_stats(a)
     has_api = api_h and api_a and api_h.get("played", 0) >= 10 and api_a.get("played", 0) >= 10
+
+    # ── SE NON HA API STATS, COSTRUISCI DA CLASSIFICA LIVE ──
+    if not has_api:
+        # Cerca nella classifica live (funziona per PL e Serie A)
+        for league_key in ["serie-a", "premier-league"]:
+            cl = CLASSIFICA_CACHE.get(league_key) or []
+            data_h = next((r for r in cl if r["Squadra"] == h), None)
+            data_a = next((r for r in cl if r["Squadra"] == a), None)
+            if data_h and data_a:
+                # Costruisci lambda dalla classifica reale
+                g_h = max(1, data_h["G"])
+                g_a = max(1, data_a["G"])
+                gf_h = data_h["GF"] / g_h  # Gol fatti per partita
+                gs_h = data_h["GS"] / g_h  # Gol subiti per partita
+                gf_a = data_a["GF"] / g_a
+                gs_a = data_a["GS"] / g_a
+                # Media campionato
+                avg_gf = sum(r["GF"] for r in cl) / sum(max(1, r["G"]) for r in cl)
+                avg_gs = sum(r["GS"] for r in cl) / sum(max(1, r["G"]) for r in cl)
+                # Forza attacco/difesa relativa
+                att_h = gf_h / max(0.3, avg_gf)
+                dif_h = gs_h / max(0.3, avg_gs)
+                att_a = gf_a / max(0.3, avg_gf)
+                dif_a = gs_a / max(0.3, avg_gs)
+                # Lambda: attacco casa * difesa trasferta * media
+                avg_gc = sum(r["GF"] for r in cl) / (sum(max(1, r["G"]) for r in cl) / 2)
+                lh = att_h * dif_a * 1.45  # Bonus casa
+                la = att_a * dif_h * 1.10
+                # Correzione classifica
+                pts_h = data_h["Punti"]
+                pts_a = data_a["Punti"]
+                pts_diff = (pts_h - pts_a) / 100
+                lh *= (1 + pts_diff * 0.3)
+                la *= (1 - pts_diff * 0.3)
+                # Forma (ultime partite dal rapporto V/G)
+                form_h = data_h["V"] / g_h
+                form_a = data_a["V"] / g_a
+                form_diff = form_h - form_a
+                lh *= (1 + form_diff * 0.2)
+                la *= (1 - form_diff * 0.2)
+                # Clamp
+                lh = max(0.4, min(lh, 3.0))
+                la = max(0.3, min(la, 2.2))
+                # Poisson + Dixon-Coles
+                p1 = px = p2 = 0.0
+                for i in range(11):
+                    for j in range(11):
+                        p = pdist.pmf(i, lh) * pdist.pmf(j, la)
+                        rho = -0.10
+                        if i==0 and j==0: p *= (1 - lh*la*rho)
+                        elif i==1 and j==0: p *= (1 + la*rho)
+                        elif i==0 and j==1: p *= (1 + lh*rho)
+                        elif i==1 and j==1: p *= (1 - rho)
+                        p = max(0, p)
+                        if i > j: p1 += p
+                        elif i == j: px += p
+                        else: p2 += p
+                px *= 1.10  # Draw boost leggero
+                ratio = min(lh,la)/max(lh,la) if max(lh,la)>0 else 0
+                if ratio > 0.85: px *= 1 + (ratio-0.85)*0.5
+                tot = p1 + px + p2
+                if tot > 0: p1/=tot; px/=tot; p2/=tot
+                # Blend con bookmaker live se disponibili
+                bk_odds = get_bookmaker_odds(h, a)
+                if bk_odds:
+                    bp1 = bk_odds["prob_1"]/100; bpx = bk_odds["prob_x"]/100; bp2 = bk_odds["prob_2"]/100
+                    p1 = 0.60*p1 + 0.40*bp1; px = 0.60*px + 0.40*bpx; p2 = 0.60*p2 + 0.40*bp2
+                    tot = p1+px+p2
+                    if tot>0: p1/=tot; px/=tot; p2/=tot
+                ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
+                gsi = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
+                scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
+                mp = max(p1, px, p2)
+                sg = "1" if mp==p1 else ("X" if mp==px else "2")
+                sl = "Vittoria Casa" if sg=="1" else ("Pareggio" if sg=="X" else "Vittoria Ospite")
+                sp = sorted([p1,px,p2], reverse=True)
+                spread = sp[0] - sp[1]
+                cf = min(1.0, 0.40*(min(spread/0.35,1.0)) + 0.30*(min(g_h/30,1.0)) + 0.30*(min(abs(pts_diff)*3,1.0)))
+                cl_label = "Alta" if cf>=0.82 else ("Media" if cf>=0.50 else "Bassa")
+                sicura = cf >= 0.82 and sp[0] > 0.45
+                return {
+                    "prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),
+                    "quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,
+                    "suggerimento":sg,"sugg_label":sl,"confidence":round(cf,3),"confidence_label":cl_label,
+                    "sicura":bool(sicura),
+                    "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
+                    "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
+                    "gol_attesi":round(lh+la,2),
+                    "risultati_esatti":_filtra_esatti(scores, ov25, sg),
+                    "bookmaker_used":bk_odds is not None,
+                }
 
     if has_api:
         # Lambda da statistiche REALI casa/trasferta (API Football)
