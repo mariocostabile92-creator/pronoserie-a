@@ -152,12 +152,12 @@ function pageHome(){
     </div>
     <h2 style="text-align:center;margin:32px 0 16px">Risultati testati su partite REALI</h2>
     <div class="grid3">
-      <div class="stat-box card"><div class="num">57%</div><div class="lbl">1X2</div></div>
-      <div class="stat-box card"><div class="num">58%</div><div class="lbl">Over/Under</div></div>
-      <div class="stat-box card" style="border-color:var(--green)"><div class="num" style="color:var(--green)">65%</div><div class="lbl">Giocate SICURE</div></div>
+      <div class="stat-box card"><div class="num">52.5%</div><div class="lbl">1X2 (299 partite)</div></div>
+      <div class="stat-box card"><div class="num">53.8%</div><div class="lbl">Goal/NoGoal</div></div>
+      <div class="stat-box card" style="border-color:var(--green)"><div class="num" style="color:var(--green)">58.5%</div><div class="lbl">Giocate Confidenza ALTA</div></div>
     </div>
     <div class="card" style="margin-top:16px;padding:20px;text-align:center;background:#0d1b2a;border-color:var(--accent)">
-      <p style="color:var(--text);font-size:1rem;line-height:1.6">Questi numeri non sono inventati: sono il risultato di un <strong>backtesting su 299 partite reali</strong> della stagione 2025-2026. Quando l'IA e' sicura del pronostico (badge SICURA), centra il risultato <strong style="color:var(--green)">65 volte su 100</strong>.</p>
+      <p style="color:var(--text);font-size:1rem;line-height:1.6">Questi numeri non sono inventati: sono il risultato di un <strong>backtesting su 299 partite reali</strong> della stagione 2025-2026. Quando l'IA ha confidenza Alta, centra il risultato 1X2 <strong style="color:var(--green)">quasi 6 volte su 10</strong>.</p>
     </div>
     <div class="card" style="margin-top:24px;padding:24px;border-color:var(--green)">
       ${userPlan==="pro"?'<div style="text-align:center;margin-bottom:12px"><span style="font-size:2rem">&#11088;</span><br><span style="color:var(--green);font-weight:800;font-size:1.1rem">Sei gia abbonato Pro!</span><br><span style="color:var(--muted);font-size:.9rem">Hai accesso completo a tutte le funzionalita</span></div>':''}
@@ -467,7 +467,8 @@ async function pageClassifica(){
   if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Classifica Serie A</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   const data=await fetchAPI("/api/classifica");
   if(!data||!data.classifica)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento classifica. Riprova.</div></div>';
-  let html='<div class="container"><h1>Classifica Serie A 2025-2026</h1><p class="sub">Giornata 30  -  Aggiornamento live</p>';
+  const aggLive = data.live ? `<span style="color:var(--green);font-size:.85rem">Aggiornamento automatico: ${data.aggiornamento||""}</span>` : '<span style="color:var(--muted);font-size:.85rem">Dati base</span>';
+  let html='<div class="container"><h1>Classifica Serie A 2025-2026</h1><p class="sub">'+aggLive+'</p>';
   // Layout 2 colonne: classifica SX, marcatori DX
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
   // SINISTRA: Classifica

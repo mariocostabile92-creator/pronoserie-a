@@ -106,6 +106,8 @@ def _live_updater():
             _scrape_notizie()
             _scrape_odds()
             _fetch_live_results()
+            _fetch_classifica_live()
+            _fetch_marcatori_live()
         except Exception:
             pass
         # Se ci sono partite in corso, aggiorna ogni 2 minuti
@@ -147,7 +149,9 @@ async def startup():
 
     # Fetch risultati live subito allo startup
     threading.Thread(target=_fetch_live_results, daemon=True).start()
-    print("✅ RISULTATI LIVE: primo fetch in corso...")
+    threading.Thread(target=_fetch_classifica_live, daemon=True).start()
+    threading.Thread(target=_fetch_marcatori_live, daemon=True).start()
+    print("✅ RISULTATI + CLASSIFICA + MARCATORI LIVE: primo fetch in corso...")
 
 # ─────────────────────────────
 # FRONTEND
@@ -727,55 +731,154 @@ async def calendario():
     return {"giornate": giornate}
 
 # ─────────────────────────────
-# CLASSIFICA
+# CLASSIFICA + MARCATORI (AUTO-AGGIORNAMENTO API FOOTBALL)
 # ─────────────────────────────
+CLASSIFICA_CACHE = None
+MARCATORI_CACHE = None
+CLASSIFICA_LAST_UPDATE = ""
+
+# Fallback hardcoded (usato solo se API non disponibile)
+CLASS_FALLBACK = [
+    {"Squadra":"Inter","Punti":69,"G":30,"V":22,"N":3,"P":5,"GF":66,"GS":24,"DR":42},
+    {"Squadra":"Milan","Punti":63,"G":30,"V":18,"N":9,"P":3,"GF":47,"GS":23,"DR":24},
+    {"Squadra":"Napoli","Punti":62,"G":30,"V":19,"N":5,"P":6,"GF":46,"GS":30,"DR":16},
+    {"Squadra":"Como","Punti":57,"G":30,"V":16,"N":9,"P":5,"GF":53,"GS":22,"DR":31},
+    {"Squadra":"Juventus","Punti":54,"G":30,"V":15,"N":9,"P":6,"GF":52,"GS":29,"DR":23},
+    {"Squadra":"Roma","Punti":54,"G":30,"V":17,"N":3,"P":10,"GF":40,"GS":23,"DR":17},
+    {"Squadra":"Atalanta","Punti":50,"G":30,"V":13,"N":11,"P":6,"GF":41,"GS":27,"DR":14},
+    {"Squadra":"Lazio","Punti":43,"G":30,"V":11,"N":10,"P":9,"GF":31,"GS":28,"DR":3},
+    {"Squadra":"Bologna","Punti":42,"G":30,"V":12,"N":6,"P":12,"GF":38,"GS":36,"DR":2},
+    {"Squadra":"Sassuolo","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":36,"GS":40,"DR":-4},
+    {"Squadra":"Udinese","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":35,"GS":42,"DR":-7},
+    {"Squadra":"Parma","Punti":34,"G":30,"V":8,"N":10,"P":12,"GF":21,"GS":38,"DR":-17},
+    {"Squadra":"Genoa","Punti":33,"G":30,"V":8,"N":9,"P":13,"GF":36,"GS":42,"DR":-6},
+    {"Squadra":"Torino","Punti":33,"G":30,"V":9,"N":6,"P":15,"GF":34,"GS":53,"DR":-19},
+    {"Squadra":"Cagliari","Punti":30,"G":30,"V":7,"N":9,"P":14,"GF":31,"GS":42,"DR":-11},
+    {"Squadra":"Fiorentina","Punti":29,"G":30,"V":6,"N":11,"P":13,"GF":35,"GS":44,"DR":-9},
+    {"Squadra":"Cremonese","Punti":27,"G":30,"V":6,"N":9,"P":15,"GF":25,"GS":44,"DR":-19},
+    {"Squadra":"Lecce","Punti":27,"G":30,"V":7,"N":6,"P":17,"GF":21,"GS":40,"DR":-19},
+    {"Squadra":"Verona","Punti":18,"G":30,"V":3,"N":9,"P":18,"GF":22,"GS":52,"DR":-30},
+    {"Squadra":"Pisa","Punti":18,"G":30,"V":2,"N":12,"P":16,"GF":23,"GS":54,"DR":-31},
+]
+
+MARC_FALLBACK = [
+    {"pos":1,"giocatore":"Lautaro Martinez","squadra":"Inter","gol":14},
+    {"pos":2,"giocatore":"Tasos Douvikas","squadra":"Como","gol":11},
+    {"pos":3,"giocatore":"Keinan Davis","squadra":"Udinese","gol":10},
+    {"pos":4,"giocatore":"Rasmus Hojlund","squadra":"Napoli","gol":10},
+    {"pos":5,"giocatore":"Kenan Yildiz","squadra":"Juventus","gol":10},
+    {"pos":6,"giocatore":"Nico Paz","squadra":"Como","gol":10},
+    {"pos":7,"giocatore":"Rafael Leao","squadra":"Milan","gol":9},
+    {"pos":8,"giocatore":"Hakan Calhanoglu","squadra":"Inter","gol":8},
+    {"pos":9,"giocatore":"Giovanni Simeone","squadra":"Torino","gol":8},
+    {"pos":10,"giocatore":"Christian Pulisic","squadra":"Milan","gol":8},
+    {"pos":11,"giocatore":"Gianluca Scamacca","squadra":"Atalanta","gol":8},
+    {"pos":12,"giocatore":"Nikola Krstovic","squadra":"Atalanta","gol":8},
+    {"pos":13,"giocatore":"Moise Kean","squadra":"Fiorentina","gol":8},
+    {"pos":14,"giocatore":"Mateo Pellegrino","squadra":"Parma","gol":8},
+    {"pos":15,"giocatore":"Domenico Berardi","squadra":"Sassuolo","gol":7},
+    {"pos":16,"giocatore":"Nikola Vlasic","squadra":"Torino","gol":7},
+    {"pos":17,"giocatore":"Scott McTominay","squadra":"Napoli","gol":7},
+    {"pos":18,"giocatore":"Donyell Malen","squadra":"Roma","gol":7},
+    {"pos":19,"giocatore":"Marcus Thuram","squadra":"Inter","gol":7},
+    {"pos":20,"giocatore":"Andrea Pinamonti","squadra":"Sassuolo","gol":7},
+]
+
+def _fetch_classifica_live():
+    """Scarica classifica Serie A aggiornata da API Football."""
+    global CLASSIFICA_CACHE, CLASSIFICA_LAST_UPDATE
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/standings?league=135&season=2025",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        if data.get("response") and len(data["response"]) > 0:
+            standings = data["response"][0].get("league", {}).get("standings", [])
+            if standings and len(standings) > 0:
+                classifica = []
+                for team in standings[0]:
+                    nome_api = team.get("team", {}).get("name", "?")
+                    nome = FOOTBALL_NOME_MAP.get(nome_api, nome_api)
+                    stats = team.get("all", {})
+                    gf = stats.get("goals", {}).get("for", 0)
+                    gs = stats.get("goals", {}).get("against", 0)
+                    classifica.append({
+                        "Squadra": nome,
+                        "Punti": team.get("points", 0),
+                        "G": stats.get("played", 0),
+                        "V": stats.get("win", 0),
+                        "N": stats.get("draw", 0),
+                        "P": stats.get("lose", 0),
+                        "GF": gf,
+                        "GS": gs,
+                        "DR": gf - gs,
+                    })
+                # Ordina per punti (desc), poi differenza reti
+                classifica.sort(key=lambda x: (-x["Punti"], -x["DR"], -x["GF"]))
+                if len(classifica) >= 10:
+                    CLASSIFICA_CACHE = classifica
+                    CLASSIFICA_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
+                    print(f"🏆 CLASSIFICA LIVE: {len(classifica)} squadre aggiornate ({CLASSIFICA_LAST_UPDATE})")
+                    return True
+    except Exception as e:
+        print(f"❌ Errore fetch classifica: {e}")
+    return False
+
+def _fetch_marcatori_live():
+    """Scarica classifica marcatori Serie A da API Football."""
+    global MARCATORI_CACHE
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/players/topscorers?league=135&season=2025",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        if data.get("response") and len(data["response"]) > 0:
+            marcatori = []
+            for i, player in enumerate(data["response"][:20], 1):
+                info = player.get("player", {})
+                stats_list = player.get("statistics", [])
+                gol = 0
+                squadra_api = ""
+                for s in stats_list:
+                    if s.get("league", {}).get("id") == 135:
+                        gol = s.get("goals", {}).get("total", 0) or 0
+                        squadra_api = s.get("team", {}).get("name", "")
+                        break
+                if gol == 0 and stats_list:
+                    gol = stats_list[0].get("goals", {}).get("total", 0) or 0
+                    squadra_api = stats_list[0].get("team", {}).get("name", "")
+
+                squadra = FOOTBALL_NOME_MAP.get(squadra_api, squadra_api)
+                marcatori.append({
+                    "pos": i,
+                    "giocatore": info.get("name", "?"),
+                    "squadra": squadra,
+                    "gol": gol,
+                })
+            if len(marcatori) >= 5:
+                MARCATORI_CACHE = marcatori
+                print(f"⚽ MARCATORI LIVE: {len(marcatori)} giocatori aggiornati")
+                return True
+    except Exception as e:
+        print(f"❌ Errore fetch marcatori: {e}")
+    return False
+
 @app.get("/api/classifica")
 async def classifica():
-    CLASS = [
-        {"Squadra":"Inter","Punti":69,"G":30,"V":22,"N":3,"P":5,"GF":66,"GS":24,"DR":42},
-        {"Squadra":"Milan","Punti":63,"G":30,"V":18,"N":9,"P":3,"GF":47,"GS":23,"DR":24},
-        {"Squadra":"Napoli","Punti":62,"G":30,"V":19,"N":5,"P":6,"GF":46,"GS":30,"DR":16},
-        {"Squadra":"Como","Punti":57,"G":30,"V":16,"N":9,"P":5,"GF":53,"GS":22,"DR":31},
-        {"Squadra":"Juventus","Punti":54,"G":30,"V":15,"N":9,"P":6,"GF":52,"GS":29,"DR":23},
-        {"Squadra":"Roma","Punti":54,"G":30,"V":17,"N":3,"P":10,"GF":40,"GS":23,"DR":17},
-        {"Squadra":"Atalanta","Punti":50,"G":30,"V":13,"N":11,"P":6,"GF":41,"GS":27,"DR":14},
-        {"Squadra":"Lazio","Punti":43,"G":30,"V":11,"N":10,"P":9,"GF":31,"GS":28,"DR":3},
-        {"Squadra":"Bologna","Punti":42,"G":30,"V":12,"N":6,"P":12,"GF":38,"GS":36,"DR":2},
-        {"Squadra":"Sassuolo","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":36,"GS":40,"DR":-4},
-        {"Squadra":"Udinese","Punti":39,"G":30,"V":11,"N":6,"P":13,"GF":35,"GS":42,"DR":-7},
-        {"Squadra":"Parma","Punti":34,"G":30,"V":8,"N":10,"P":12,"GF":21,"GS":38,"DR":-17},
-        {"Squadra":"Genoa","Punti":33,"G":30,"V":8,"N":9,"P":13,"GF":36,"GS":42,"DR":-6},
-        {"Squadra":"Torino","Punti":33,"G":30,"V":9,"N":6,"P":15,"GF":34,"GS":53,"DR":-19},
-        {"Squadra":"Cagliari","Punti":30,"G":30,"V":7,"N":9,"P":14,"GF":31,"GS":42,"DR":-11},
-        {"Squadra":"Fiorentina","Punti":29,"G":30,"V":6,"N":11,"P":13,"GF":35,"GS":44,"DR":-9},
-        {"Squadra":"Cremonese","Punti":27,"G":30,"V":6,"N":9,"P":15,"GF":25,"GS":44,"DR":-19},
-        {"Squadra":"Lecce","Punti":27,"G":30,"V":7,"N":6,"P":17,"GF":21,"GS":40,"DR":-19},
-        {"Squadra":"Verona","Punti":18,"G":30,"V":3,"N":9,"P":18,"GF":22,"GS":52,"DR":-30},
-        {"Squadra":"Pisa","Punti":18,"G":30,"V":2,"N":12,"P":16,"GF":23,"GS":54,"DR":-31},
-    ]
-    MARC = [
-        {"pos":1,"giocatore":"Lautaro Martinez","squadra":"Inter","gol":14},
-        {"pos":2,"giocatore":"Tasos Douvikas","squadra":"Como","gol":11},
-        {"pos":3,"giocatore":"Keinan Davis","squadra":"Udinese","gol":10},
-        {"pos":4,"giocatore":"Rasmus Hojlund","squadra":"Napoli","gol":10},
-        {"pos":5,"giocatore":"Kenan Yildiz","squadra":"Juventus","gol":10},
-        {"pos":6,"giocatore":"Nico Paz","squadra":"Como","gol":10},
-        {"pos":7,"giocatore":"Rafael Leao","squadra":"Milan","gol":9},
-        {"pos":8,"giocatore":"Hakan Calhanoglu","squadra":"Inter","gol":8},
-        {"pos":9,"giocatore":"Giovanni Simeone","squadra":"Torino","gol":8},
-        {"pos":10,"giocatore":"Christian Pulisic","squadra":"Milan","gol":8},
-        {"pos":11,"giocatore":"Gianluca Scamacca","squadra":"Atalanta","gol":8},
-        {"pos":12,"giocatore":"Nikola Krstovic","squadra":"Atalanta","gol":8},
-        {"pos":13,"giocatore":"Moise Kean","squadra":"Fiorentina","gol":8},
-        {"pos":14,"giocatore":"Mateo Pellegrino","squadra":"Parma","gol":8},
-        {"pos":15,"giocatore":"Domenico Berardi","squadra":"Sassuolo","gol":7},
-        {"pos":16,"giocatore":"Nikola Vlasic","squadra":"Torino","gol":7},
-        {"pos":17,"giocatore":"Scott McTominay","squadra":"Napoli","gol":7},
-        {"pos":18,"giocatore":"Donyell Malen","squadra":"Roma","gol":7},
-        {"pos":19,"giocatore":"Marcus Thuram","squadra":"Inter","gol":7},
-        {"pos":20,"giocatore":"Andrea Pinamonti","squadra":"Sassuolo","gol":7},
-    ]
-    return {"classifica": CLASS, "marcatori": MARC}
+    cl = CLASSIFICA_CACHE if CLASSIFICA_CACHE else CLASS_FALLBACK
+    mc = MARCATORI_CACHE if MARCATORI_CACHE else MARC_FALLBACK
+    return {
+        "classifica": cl,
+        "marcatori": mc,
+        "aggiornamento": CLASSIFICA_LAST_UPDATE or "Dati base",
+        "live": CLASSIFICA_CACHE is not None,
+    }
 
 # ─────────────────────────────
 # MARCATORI
