@@ -246,36 +246,46 @@ def _live_updater():
 async def startup():
     global _df
 
-    print("\n🚀 AVVIO SERVER PRONOSERIE A\n")
+    print("\n🚀 AVVIO SERVER MATCHIQ\n")
 
     # DB
     try:
         init_db()
         print("✅ DATABASE OK")
     except Exception as e:
-        print("❌ ERRORE DATABASE:", e)
+        print("⚠️ DATABASE:", e)
 
-    # DATI
+    # DATI CSV (opzionali - il server funziona anche senza)
     if MOTORE_DISPONIBILE:
         try:
             _df = load_all_data()
-            print("✅ DATI CARICATI:", len(_df))
+            print(f"✅ DATI CARICATI: {len(_df)} partite")
         except Exception as e:
-            print("❌ ERRORE DATI:", e)
+            print(f"⚠️ DATI NON DISPONIBILI: {e}")
+            _df = None
     else:
-        print("⚠️ MOTORE NON DISPONIBILE")
+        print("⚠️ MOTORE NON DISPONIBILE - il server usa dati hardcoded")
 
     # AVVIA AGGIORNAMENTO LIVE (ritardato per non sovraccaricare lo startup)
     def _delayed_start():
-        time.sleep(10)  # Aspetta 10 secondi dopo l'avvio
-        _fetch_live_results()
-        _fetch_classifica_live()
-        _fetch_marcatori_live()
+        time.sleep(15)
+        try:
+            _fetch_live_results()
+        except Exception:
+            pass
+        try:
+            _fetch_classifica_live()
+        except Exception:
+            pass
+        try:
+            _fetch_marcatori_live()
+        except Exception:
+            pass
         print("✅ PRIMO FETCH COMPLETATO")
     t = threading.Thread(target=_live_updater, daemon=True)
     t.start()
     threading.Thread(target=_delayed_start, daemon=True).start()
-    print("✅ LIVE UPDATER AVVIATO")
+    print("✅ SERVER PRONTO\n")
 
 # ─────────────────────────────
 # FRONTEND

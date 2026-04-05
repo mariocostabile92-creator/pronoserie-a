@@ -107,6 +107,12 @@ def load_all_data() -> pd.DataFrame:
     dati["Date"] = pd.to_datetime(dati["Date"], dayfirst=True, format="mixed", errors="coerce")
     dati = dati.sort_values("Date", ascending=True).reset_index(drop=True)
 
+    # Filtra ultimi 15 anni (dal 2011) - dati piu' recenti sono piu' rilevanti
+    cutoff = pd.Timestamp("2011-01-01")
+    dati_recenti = dati[dati["Date"] >= cutoff].copy()
+    if len(dati_recenti) >= 500:
+        dati = dati_recenti.reset_index(drop=True)
+
     return dati
 
 
