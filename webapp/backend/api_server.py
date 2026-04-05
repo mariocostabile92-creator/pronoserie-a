@@ -1190,7 +1190,7 @@ def _fetch_live_results():
     """Scarica risultati live dalla API Football (ultimi 30 + oggi)."""
     global LIVE_RESULTS_CACHE, LIVE_RESULTS_TIME, LIVE_IN_CORSO
     try:
-        # Scarica ultime 30 partite giocate
+        # Scarica ultime 30 partite giocate (con eventi e statistiche)
         req = urllib.request.Request(
             f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season=2025&last=30",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
@@ -1209,32 +1209,83 @@ def _fetch_live_results():
                 status = fixture.get("status", {})
                 events = fix.get("events", [])
 
-                # Marcatori con dettagli
+                # Marcatori con dettagli + squadra
                 marcatori = []
+                marcatori_home = []
+                marcatori_away = []
+                home_id = teams.get("home", {}).get("id")
+                away_id = teams.get("away", {}).get("id")
                 for ev in events:
                     if ev.get("type") == "Goal":
                         nome = ev.get("player", {}).get("name", "?")
                         minuto = ev.get("time", {}).get("elapsed", "?")
                         detail = ev.get("detail", "")
+                        team_id = ev.get("team", {}).get("id")
                         if detail == "Penalty":
-                            marcatori.append(f"{nome} {minuto}' (R)")
+                            gol_str = f"{nome} {minuto}' (R)"
                         elif detail == "Own Goal":
-                            marcatori.append(f"{nome} {minuto}' (aut.)")
+                            gol_str = f"{nome} {minuto}' (aut.)"
                         else:
-                            marcatori.append(f"{nome} {minuto}'")
+                            gol_str = f"{nome} {minuto}'"
+                        marcatori.append(gol_str)
+                        if team_id == home_id:
+                            marcatori_home.append(gol_str)
+                        else:
+                            marcatori_away.append(gol_str)
 
-                # Cartellini rossi
+                # Cartellini
+                cartellini_gialli = []
                 rossi_home = []
                 rossi_away = []
                 for ev in events:
-                    if ev.get("type") == "Card" and ev.get("detail") == "Red Card":
+                    if ev.get("type") == "Card":
                         nome = ev.get("player", {}).get("name", "?")
                         minuto = ev.get("time", {}).get("elapsed", "?")
                         team_id = ev.get("team", {}).get("id")
-                        if team_id == teams.get("home", {}).get("id"):
-                            rossi_home.append(f"{nome} {minuto}'")
-                        else:
-                            rossi_away.append(f"{nome} {minuto}'")
+                        if ev.get("detail") == "Red Card":
+                            if team_id == home_id:
+                                rossi_home.append(f"{nome} {minuto}'")
+                            else:
+                                rossi_away.append(f"{nome} {minuto}'")
+                        elif ev.get("detail") == "Yellow Card":
+                            cartellini_gialli.append(f"{nome} {minuto}'")
+
+                # Statistiche partita (se disponibili nell'oggetto fixture)
+                stats_list = fix.get("statistics", [])
+                stats = {}
+                if stats_list and len(stats_list) >= 2:
+                    home_stats_raw = stats_list[0].get("statistics", []) if stats_list[0] else []
+                    away_stats_raw = stats_list[1].get("statistics", []) if stats_list[1] else []
+                    for s in home_stats_raw:
+                        tipo = s.get("type", "")
+                        val = s.get("value")
+                        if tipo == "Ball Possession":
+                            stats["possesso_home"] = val
+                        elif tipo == "Total Shots":
+                            stats["tiri_home"] = val
+                        elif tipo == "Shots on Goal":
+                            stats["tiri_porta_home"] = val
+                        elif tipo == "Corner Kicks":
+                            stats["corner_home"] = val
+                        elif tipo == "Fouls":
+                            stats["falli_home"] = val
+                        elif tipo == "Offsides":
+                            stats["fuorigioco_home"] = val
+                    for s in away_stats_raw:
+                        tipo = s.get("type", "")
+                        val = s.get("value")
+                        if tipo == "Ball Possession":
+                            stats["possesso_away"] = val
+                        elif tipo == "Total Shots":
+                            stats["tiri_away"] = val
+                        elif tipo == "Shots on Goal":
+                            stats["tiri_porta_away"] = val
+                        elif tipo == "Corner Kicks":
+                            stats["corner_away"] = val
+                        elif tipo == "Fouls":
+                            stats["falli_away"] = val
+                        elif tipo == "Offsides":
+                            stats["fuorigioco_away"] = val
 
                 status_short = status.get("short", "FT")
                 is_live = status_short in ("1H", "2H", "HT", "ET", "P", "BT", "INT")
@@ -1269,8 +1320,13 @@ def _fetch_live_results():
                     "minuto": status.get("elapsed"),
                     "live": is_live,
                     "marcatori": marcatori,
+                    "marcatori_home": marcatori_home,
+                    "marcatori_away": marcatori_away,
                     "rossi_home": rossi_home,
                     "rossi_away": rossi_away,
+                    "gialli": cartellini_gialli,
+                    "stats": stats,
+                    "fixture_id": fixture.get("id"),
                     "data": fixture.get("date", "")[:10],
                     "ora": fixture.get("date", "")[11:16] if len(fixture.get("date", "")) > 15 else "",
                 })
@@ -1362,6 +1418,8 @@ async def risultati():
                 "gol_h": p["gol_h"],
                 "gol_a": p["gol_a"],
                 "marcatori": p["marcatori"],
+                "marcatori_home": p.get("marcatori_home", []),
+                "marcatori_away": p.get("marcatori_away", []),
                 "status": p["status"],
                 "status_it": p.get("status_it", p["status"]),
                 "minuto": p["minuto"],
@@ -1370,6 +1428,8 @@ async def risultati():
                 "ora": p.get("ora", ""),
                 "rossi_home": p.get("rossi_home", []),
                 "rossi_away": p.get("rossi_away", []),
+                "gialli": p.get("gialli", []),
+                "stats": p.get("stats", {}),
             })
 
     # Raggruppa per data
