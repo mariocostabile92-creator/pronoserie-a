@@ -13,10 +13,10 @@ from live_data import get_impatto_infortunati, get_n_indisponibili
 
 # Costanti del modello (ottimizzate da backtesting su 299 partite)
 MAX_GOL = 10
-ALPHA_H2H = 0.12         # H2H ha forte valore predittivo
-ALPHA_FORMA = 0.10        # Forma recente
-ALPHA_XG = 0.25           # xG stagione attuale
-DIXON_COLES_RHO = -0.13   # Correzione Dixon-Coles standard
+ALPHA_H2H = 0.12         # H2H contributo moderato
+ALPHA_FORMA = 0.18        # Forma recente pesata (ottimizzato da 0.10)
+ALPHA_XG = 0.45           # xG stagione attuale - peso alto (ottimizzato da 0.25)
+DIXON_COLES_RHO = -0.10   # Correzione Dixon-Coles (ottimizzato da -0.13)
 DRAW_BOOST = 1.12         # Boost pareggio: Serie A ha ~28% pareggi, Poisson ne sottostima
 MARGINE_BK = 1.05
 
