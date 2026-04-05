@@ -50,7 +50,7 @@ TEAM_IDS = {
     "Juventus": 496, "Roma": 497, "Atalanta": 499, "Lazio": 487,
     "Bologna": 500, "Sassuolo": 488, "Udinese": 494, "Parma": 523,
     "Genoa": 495, "Torino": 503, "Cagliari": 490, "Fiorentina": 502,
-    "Cremonese": 511, "Lecce": 867, "Verona": 504, "Pisa": 514,
+    "Cremonese": 520, "Lecce": 867, "Verona": 504, "Pisa": 801,
 }
 
 
