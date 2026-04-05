@@ -786,6 +786,13 @@ async function refreshRisultati(){
   if(result) app.innerHTML = result;
 }
 
+async function backToRisultati(){
+  const app=$("app");
+  app.innerHTML='<div class="spinner"></div>';
+  const result = await pageRisultati();
+  if(result) app.innerHTML = result;
+}
+
 async function showFixtureDetail(fixtureId, home, away){
   if(!fixtureId) return;
   const app=$("app");
@@ -805,7 +812,7 @@ async function showFixtureDetail(fixtureId, home, away){
   const fm=d.formazioni||{};
 
   let html='<div class="container">';
-  html+=`<a href="#risultati" style="color:var(--accent);display:inline-block;margin-bottom:12px">&larr; Torna ai Risultati</a>`;
+  html+=`<a href="javascript:void(0)" onclick="backToRisultati()" style="color:var(--accent);display:inline-block;margin-bottom:12px">&larr; Torna ai Risultati</a>`;
 
   // Header partita
   html+=`<div class="card" style="text-align:center;padding:24px${isLive?';border-color:#e74c3c;border-width:2px':''}">
