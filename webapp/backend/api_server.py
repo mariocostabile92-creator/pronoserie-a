@@ -34,7 +34,7 @@ except Exception as e:
 # ─────────────────────────────
 # IMPORT BACKEND
 # ─────────────────────────────
-from database import init_db, log_api_call, count_daily_calls, get_user_by_email, create_user
+from database import init_db, log_api_call, count_daily_calls, get_user_by_email, create_user, save_prediction, verify_predictions, get_tracking_stats
 from api_auth import get_optional_user, hash_password, verify_password, create_token
 from api_payments import router as payments_router
 
@@ -250,6 +250,9 @@ def _live_updater():
             _fetch_classifica_live()
             _fetch_marcatori_live()
             _fetch_infortunati_live()
+            # Verifica predizioni con risultati reali
+            if LIVE_RESULTS_CACHE:
+                verify_predictions(LIVE_RESULTS_CACHE)
             # Rose e storico ogni 6 cicli (~3 ore)
             if _updater_count % 6 == 0:
                 _fetch_rose_live()
@@ -623,6 +626,17 @@ def genera_pronostico(home, away):
             lh *= (1.0 + 0.08 * adv)
             la *= (1.0 - 0.08 * adv)
 
+        # ── FASE 4: FATTORE CAMPO AVANZATO ──
+        # Usa win% reali casa/trasferta per correggere i lambda
+        win_h_pct = api_h.get("win_home_pct", 50)
+        win_a_pct = api_a.get("win_away_pct", 30)
+        # Media Serie A: casa vince ~45%, trasferta ~30%
+        home_strength = win_h_pct / 45.0  # >1 = forte in casa, <1 = debole
+        away_strength = win_a_pct / 30.0  # >1 = forte fuori, <1 = debole
+        # Applica con peso leggero per non sovrapporre ad altre correzioni
+        lh *= (0.90 + 0.10 * home_strength)
+        la *= (0.90 + 0.10 * away_strength)
+
     elif not sh or not sa:
         # Squadra non trovata nei CSV, usa solo xG
         XG = {"Inter":{"xG":2.40,"xGA":0.84},"Milan":{"xG":1.83,"xGA":1.12},"Napoli":{"xG":1.56,"xGA":1.10},"Como":{"xG":1.80,"xGA":1.08},"Juventus":{"xG":1.97,"xGA":0.97},"Roma":{"xG":1.54,"xGA":1.20},"Atalanta":{"xG":1.86,"xGA":1.38},"Lazio":{"xG":1.21,"xGA":1.34},"Bologna":{"xG":1.34,"xGA":1.39},"Sassuolo":{"xG":1.19,"xGA":1.63},"Udinese":{"xG":1.19,"xGA":1.56},"Parma":{"xG":1.00,"xGA":1.62},"Genoa":{"xG":1.30,"xGA":1.45},"Torino":{"xG":1.33,"xGA":1.57},"Cagliari":{"xG":1.01,"xGA":1.65},"Fiorentina":{"xG":1.52,"xGA":1.53},"Cremonese":{"xG":1.03,"xGA":1.87},"Lecce":{"xG":0.93,"xGA":1.67},"Verona":{"xG":1.03,"xGA":1.40},"Pisa":{"xG":1.14,"xGA":1.82}}
@@ -993,6 +1007,12 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "bookmaker_live": bk_used_live,
         "bookmaker_live_data": bk_live if bk_used_live else None,
     }
+
+    # Salva predizione per tracking (in background)
+    import threading as _th
+    _th.Thread(target=save_prediction, args=(home, away, None, response_data, bk_used_live), daemon=True).start()
+
+    return response_data
 
 # ─────────────────────────────
 # CALENDARIO (FIX DEFINITIVO)

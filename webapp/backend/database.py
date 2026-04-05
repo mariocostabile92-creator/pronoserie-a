@@ -40,6 +40,29 @@ def init_db():
             timestamp TEXT NOT NULL
         )
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS predictions_tracking (
+            id SERIAL PRIMARY KEY,
+            home TEXT NOT NULL,
+            away TEXT NOT NULL,
+            data_partita TEXT,
+            prob_1 REAL, prob_x REAL, prob_2 REAL,
+            suggerimento TEXT,
+            confidence REAL,
+            confidence_label TEXT,
+            over_25 REAL, goal_si REAL,
+            gol_attesi REAL,
+            bookmaker_live BOOLEAN DEFAULT FALSE,
+            risultato_reale TEXT,
+            gol_home_reale INTEGER,
+            gol_away_reale INTEGER,
+            corretto_1x2 BOOLEAN,
+            corretto_ou BOOLEAN,
+            corretto_goal BOOLEAN,
+            created_at TEXT NOT NULL,
+            verificato BOOLEAN DEFAULT FALSE
+        )
+    """)
     conn.commit()
     cur.close()
     conn.close()
@@ -129,3 +152,116 @@ def count_daily_calls(user_id):
     cur.close()
     conn.close()
     return row[0] if row else 0
+
+
+# ── TRACKING PREDIZIONI ──
+
+def save_prediction(home, away, data_partita, pred, bk_live=False):
+    """Salva un pronostico nel DB per verifica futura."""
+    try:
+        conn = _get_conn()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO predictions_tracking
+            (home, away, data_partita, prob_1, prob_x, prob_2, suggerimento,
+             confidence, confidence_label, over_25, goal_si, gol_attesi,
+             bookmaker_live, created_at)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            ON CONFLICT DO NOTHING
+        """, (
+            home, away, data_partita,
+            pred.get("prob_1"), pred.get("prob_x"), pred.get("prob_2"),
+            pred.get("suggerimento"), pred.get("confidence"),
+            pred.get("confidence_label"),
+            pred.get("over_25"), pred.get("goal_si"),
+            pred.get("gol_attesi"), bk_live,
+            datetime.now(timezone.utc).isoformat()
+        ))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception:
+        pass
+
+
+def verify_predictions(risultati_live):
+    """Verifica le predizioni passate con i risultati reali."""
+    try:
+        conn = _get_conn()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # Prendi predizioni non ancora verificate
+        cur.execute("SELECT * FROM predictions_tracking WHERE verificato = FALSE")
+        rows = cur.fetchall()
+
+        verificate = 0
+        for row in rows:
+            home, away = row["home"], row["away"]
+            # Cerca il risultato reale
+            for ris in risultati_live:
+                if ris["home"] == home and ris["away"] == away and ris.get("status") == "FT":
+                    gol_h = ris["gol_h"]
+                    gol_a = ris["gol_a"]
+                    # Determina risultato
+                    if gol_h > gol_a:
+                        ris_reale = "1"
+                    elif gol_h == gol_a:
+                        ris_reale = "X"
+                    else:
+                        ris_reale = "2"
+                    # Verifica
+                    corretto_1x2 = row["suggerimento"] == ris_reale
+                    gol_tot = gol_h + gol_a
+                    pred_over = (row["over_25"] or 50) > 50
+                    corretto_ou = (gol_tot > 2.5) == pred_over
+                    pred_goal = (row["goal_si"] or 50) > 50
+                    corretto_goal = (gol_h >= 1 and gol_a >= 1) == pred_goal
+
+                    cur.execute("""
+                        UPDATE predictions_tracking SET
+                            risultato_reale=%s, gol_home_reale=%s, gol_away_reale=%s,
+                            corretto_1x2=%s, corretto_ou=%s, corretto_goal=%s,
+                            verificato=TRUE
+                        WHERE id=%s
+                    """, (ris_reale, gol_h, gol_a, corretto_1x2, corretto_ou, corretto_goal, row["id"]))
+                    verificate += 1
+                    break
+
+        conn.commit()
+        cur.close()
+        conn.close()
+        if verificate > 0:
+            print(f"✅ TRACKING: {verificate} predizioni verificate")
+    except Exception as e:
+        print(f"⚠️ Errore tracking: {e}")
+
+
+def get_tracking_stats():
+    """Ritorna le statistiche di accuratezza delle predizioni tracciate."""
+    try:
+        conn = _get_conn()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""
+            SELECT
+                COUNT(*) as totale,
+                SUM(CASE WHEN corretto_1x2 THEN 1 ELSE 0 END) as ok_1x2,
+                SUM(CASE WHEN corretto_ou THEN 1 ELSE 0 END) as ok_ou,
+                SUM(CASE WHEN corretto_goal THEN 1 ELSE 0 END) as ok_goal,
+                SUM(CASE WHEN corretto_1x2 AND confidence_label='Alta' THEN 1 ELSE 0 END) as ok_alta,
+                SUM(CASE WHEN confidence_label='Alta' THEN 1 ELSE 0 END) as tot_alta
+            FROM predictions_tracking WHERE verificato = TRUE
+        """)
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        if row and row["totale"] > 0:
+            return {
+                "totale": row["totale"],
+                "acc_1x2": round(row["ok_1x2"] / row["totale"] * 100, 1),
+                "acc_ou": round(row["ok_ou"] / row["totale"] * 100, 1),
+                "acc_goal": round(row["ok_goal"] / row["totale"] * 100, 1),
+                "acc_alta": round(row["ok_alta"] / row["tot_alta"] * 100, 1) if row["tot_alta"] > 0 else 0,
+                "tot_alta": row["tot_alta"],
+            }
+    except Exception:
+        pass
+    return None

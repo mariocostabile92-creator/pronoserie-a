@@ -421,6 +421,10 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     lambda_home *= (1.0 + ALPHA_CLASSIFICA * class_diff * 5)
     lambda_away *= (1.0 - ALPHA_CLASSIFICA * class_diff * 5)
 
+    # ── FASE 4: FATTORE CAMPO AVANZATO ──
+    # Applicato solo in produzione con dati API Football reali (win_home_pct live)
+    # Nel backtesting la classifica statica non aggiunge valore
+
     # ── IMPATTO INFORTUNATI ──
     imp_home = get_impatto_infortunati(home_name)
     imp_away = get_impatto_infortunati(away_name)
