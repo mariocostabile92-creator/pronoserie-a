@@ -184,8 +184,37 @@ function pageHome(){
       </div>
       <div style="text-align:center;margin-top:16px">${userPlan==="pro"?'<span style="color:var(--green);font-weight:700">&#11088; Tutte le funzionalita sono attive sul tuo account</span>':'<button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro  -  Solo 9.99&euro;/mese</button>'}</div>
     </div>
+    <div id="partite-oggi-home"></div>
     <div id="schedina-home"></div>
   </div>`;
+}
+
+// Carica partite di oggi nella home
+async function loadPartiteOggi(){
+  const el=$("partite-oggi-home");
+  if(!el)return;
+  try{
+    const cal=await fetchAPI("/api/calendario");
+    if(!cal||!cal.giornate)return;
+    const gc=cal.giornata_corrente;
+    const g=cal.giornate.find(x=>x.giornata===gc);
+    if(!g||!g.partite)return;
+    const hasResults=g.partite.some(p=>p.gol_h!==null&&p.gol_h!==undefined);
+    if(!hasResults&&!g.live)return;
+    let html=`<div class="card" style="border-color:${g.live?'#e74c3c':'var(--accent)'}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h2>Giornata ${gc}</h2>${g.live?'<span style="background:#e74c3c;color:#fff;padding:4px 12px;border-radius:10px;font-size:.75rem;font-weight:700;animation:pulse 1.5s infinite">LIVE</span>':''}</div>`;
+    g.partite.forEach(p=>{
+      if(p.gol_h!==null&&p.gol_h!==undefined){
+        const cH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
+        const cA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
+        let st=p.status==="FT"?"FT":p.live?(p.minuto+"'"):(p.status==="HT"?"INT":(p.ora||""));
+        html+=`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460"><span style="flex:1;text-align:right;font-size:.9rem;font-weight:700">${badge(p.home,16)}${p.home}</span><div style="min-width:70px;text-align:center"><span style="font-weight:800;font-size:1.1rem"><span style="color:${cH}">${p.gol_h}</span>-<span style="color:${cA}">${p.gol_a}</span></span><div style="font-size:.65rem;color:var(--muted)">${st}</div></div><span style="flex:1;font-size:.9rem;font-weight:700">${p.away}${badge(p.away,16)}</span></div>`;
+      } else {
+        html+=`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460"><span style="flex:1;text-align:right;font-size:.85rem">${badge(p.home,16)}${p.home}</span><span style="min-width:70px;text-align:center;color:var(--muted);font-size:.8rem">${p.ora||"vs"}</span><span style="flex:1;font-size:.85rem">${p.away}${badge(p.away,16)}</span></div>`;
+      }
+    });
+    html+=`</div>`;
+    el.innerHTML=html;
+  }catch(e){}
 }
 
 // Carica schedina nella home (con timeout per non bloccare)
@@ -1200,9 +1229,9 @@ async function navigate(){
   }catch(e){app.innerHTML='<div class="container card" style="color:var(--red)">Errore: '+e.message+'</div>'}
   if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq("Inter"),200);
   if(hash==="home"){
+    setTimeout(()=>loadPartiteOggi(),500);
     setTimeout(()=>loadSchedina(),2000);
-    // Pre-carica dati in background per navigazione istantanea (ritardato)
-    setTimeout(()=>{fetchAPI("/api/calendario");fetchAPI("/api/classifica")},5000);
+    setTimeout(()=>{fetchAPI("/api/classifica")},5000);
   }
   updateNavAuth();
 }

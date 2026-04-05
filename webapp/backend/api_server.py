@@ -61,10 +61,24 @@ LIMITE_FREE = 2
 
 # Dati live (aggiornati automaticamente)
 import threading, time, urllib.request, re as regex_module
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 LIVE_FORMAZIONI = {}
 LIVE_INFORTUNATI = {}
 LIVE_LAST_UPDATE = ""
+
+def _utc_to_rome(utc_str):
+    """Converte orario UTC dall'API in ora italiana (CET/CEST)."""
+    try:
+        if not utc_str or len(utc_str) < 16:
+            return ""
+        h = int(utc_str[11:13])
+        m = utc_str[14:16]
+        # Italia = UTC+2 (CEST, estate) o UTC+1 (CET, inverno)
+        # Da fine marzo a fine ottobre = +2
+        h_it = (h + 2) % 24
+        return f"{h_it:02d}:{m}"
+    except Exception:
+        return utc_str[11:16] if len(utc_str) > 15 else ""
 
 def _scrape_live_data():
     """Scarica formazioni e infortunati aggiornati dal web."""
@@ -1163,9 +1177,10 @@ def _fetch_rose_live():
         print(f"❌ Errore fetch rose: {e}")
 
 def _fetch_infortunati_live():
-    """Scarica infortunati da API Football."""
+    """Scarica infortunati ATTUALI da API Football (solo quelli non recuperati)."""
     global INFORTUNATI_LIVE
     try:
+        # Prendi solo infortuni recenti (ultimi fixture)
         req = urllib.request.Request(
             f"https://{FOOTBALL_API_HOST}/injuries?league=135&season=2025",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
@@ -1175,25 +1190,51 @@ def _fetch_infortunati_live():
 
         if data.get("response"):
             inj_per_team = {}
+            seen_players = {}  # Per evitare duplicati: {team_nome_giocatore: ultimo_infortunio}
             for item in data["response"]:
                 team_name = FOOTBALL_NOME_MAP.get(
                     item.get("team", {}).get("name", ""),
                     item.get("team", {}).get("name", "")
                 )
                 player = item.get("player", {})
-                injury = item.get("player", {}).get("reason", "") or item.get("player", {}).get("type", "")
-                if not team_name:
+                player_name = player.get("name", "?")
+                reason = player.get("reason", "") or ""
+                ptype = player.get("type", "") or ""
+                fixture_date = item.get("fixture", {}).get("date", "")
+
+                if not team_name or not player_name:
                     continue
-                if team_name not in inj_per_team:
-                    inj_per_team[team_name] = []
-                inj_per_team[team_name].append({
-                    "nome": player.get("name", "?"),
-                    "tipo": "infortunio",
-                    "dettaglio": injury or "Indisponibile",
-                })
+
+                # Chiave univoca: squadra + giocatore
+                key = f"{team_name}_{player_name}"
+                # Tieni solo l'infortunio piu' recente per ogni giocatore
+                if key in seen_players:
+                    if fixture_date <= seen_players[key]["date"]:
+                        continue
+                seen_players[key] = {
+                    "date": fixture_date,
+                    "team": team_name,
+                    "nome": player_name,
+                    "tipo": "squalifica" if "Suspended" in reason or "Red" in reason else "infortunio",
+                    "dettaglio": reason or ptype or "Indisponibile",
+                }
+
+            # Raggruppa per squadra, max 8 per squadra
+            for key, inj in seen_players.items():
+                team = inj["team"]
+                if team not in inj_per_team:
+                    inj_per_team[team] = []
+                if len(inj_per_team[team]) < 8:
+                    inj_per_team[team].append({
+                        "nome": inj["nome"],
+                        "tipo": inj["tipo"],
+                        "dettaglio": inj["dettaglio"],
+                    })
+
             if inj_per_team:
                 INFORTUNATI_LIVE = inj_per_team
-                print(f"🏥 INFORTUNATI LIVE: {sum(len(v) for v in inj_per_team.values())} giocatori")
+                tot = sum(len(v) for v in inj_per_team.values())
+                print(f"🏥 INFORTUNATI LIVE: {tot} giocatori in {len(inj_per_team)} squadre")
     except Exception as e:
         print(f"❌ Errore fetch infortunati: {e}")
 
@@ -1662,7 +1703,7 @@ def _fetch_live_results():
                     "stats": stats,
                     "fixture_id": fixture.get("id"),
                     "data": fixture.get("date", "")[:10],
-                    "ora": fixture.get("date", "")[11:16] if len(fixture.get("date", "")) > 15 else "",
+                    "ora": _utc_to_rome(fixture.get("date", "")),
                 })
 
         # Prova anche a prendere le partite di OGGI (potrebbero non essere nelle ultime 30)
@@ -1726,7 +1767,7 @@ def _fetch_live_results():
                         "rossi_home": [],
                         "rossi_away": [],
                         "data": fixture.get("date", "")[:10],
-                        "ora": fixture.get("date", "")[11:16] if len(fixture.get("date", "")) > 15 else "",
+                        "ora": _utc_to_rome(fixture.get("date", "")),
                     })
         except Exception as e:
             print(f"⚠️ Fetch partite oggi: {e}")
@@ -1840,7 +1881,7 @@ async def fixture_detail(fixture_id: int):
             result["minuto"] = status.get("elapsed")
             result["live"] = status.get("short", "") in ("1H", "2H", "HT", "ET", "P")
             result["data"] = fixture.get("date", "")[:10]
-            result["ora"] = fixture.get("date", "")[11:16] if len(fixture.get("date", "")) > 15 else ""
+            result["ora"] = _utc_to_rome(fixture.get("date", ""))
             result["arbitro"] = fixture.get("referee", "")
             result["stadio"] = fixture.get("venue", {}).get("name", "")
             result["citta"] = fixture.get("venue", {}).get("city", "")
