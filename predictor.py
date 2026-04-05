@@ -105,8 +105,9 @@ def calcola_mercati_extra(lambda_home: float, lambda_away: float,
     # Goal/NoGoal (entrambe segnano almeno 1)
     goal_si = sum(p for (i, j), p in matrice.items() if i >= 1 and j >= 1)
 
-    # Risultato esatto piu' probabile (top 5)
-    top_esatti = sorted(matrice.items(), key=lambda x: -x[1])[:5]
+    # Risultato esatto piu' probabile (top 5, max 4 gol per squadra)
+    esatti_realistici = {k: v for k, v in matrice.items() if k[0] <= 4 and k[1] <= 4}
+    top_esatti = sorted(esatti_realistici.items(), key=lambda x: -x[1])[:5]
     risultati_esatti = [
         {"score": f"{i}-{j}", "prob": round(p * 100, 1)}
         for (i, j), p in top_esatti

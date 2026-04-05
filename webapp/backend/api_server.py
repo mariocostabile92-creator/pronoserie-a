@@ -329,26 +329,39 @@ def _filtra_marcatori(marcatori, infortunati):
     return filtrati
 
 def _filtra_esatti(scores, ov25, suggerimento="1"):
-    """Filtra risultati esatti coerenti con 1X2 e Over/Under."""
-    # Prima filtra per coerenza con il suggerimento 1X2
+    """Filtra risultati esatti coerenti con 1X2 e Over/Under, mantenendo ordine per probabilita'."""
     def get_segno(score):
         parts = score.split("-")
         h, a = int(parts[0]), int(parts[1])
         if h > a: return "1"
         elif h == a: return "X"
         else: return "2"
-    
-    # Risultati coerenti con il suggerimento
+
+    def get_totale(score):
+        parts = score.split("-")
+        return int(parts[0]) + int(parts[1])
+
+    # Filtra per coerenza con il suggerimento 1X2
     coerenti = [s for s in scores if get_segno(s["score"]) == suggerimento]
     altri = [s for s in scores if get_segno(s["score"]) != suggerimento]
-    
-    # Poi filtra per Over/Under dentro i coerenti
+
+    # Filtra per coerenza Over/Under (senza cambiare l'ordine di probabilita')
     if ov25 > 0.50:
-        coerenti_ou = sorted(coerenti, key=lambda s: -sum(int(x) for x in s["score"].split("-")))
+        # Over: prendi solo risultati con 3+ gol totali, ordinati per probabilita'
+        coerenti_ou = [s for s in coerenti if get_totale(s["score"]) >= 3]
+        # Se non ci sono abbastanza, aggiungi anche quelli con 2 gol
+        if len(coerenti_ou) < 3:
+            coerenti_ou += [s for s in coerenti if get_totale(s["score"]) == 2]
     else:
-        coerenti_ou = sorted(coerenti, key=lambda s: sum(int(x) for x in s["score"].split("-")))
-    
-    # Top 3 coerenti + top 2 altri
+        # Under: prendi solo risultati con max 2 gol totali, ordinati per probabilita'
+        coerenti_ou = [s for s in coerenti if get_totale(s["score"]) <= 2]
+        if len(coerenti_ou) < 3:
+            coerenti_ou += [s for s in coerenti if get_totale(s["score"]) == 3]
+
+    # Escludi risultati irrealistici (max 4 gol per squadra)
+    coerenti_ou = [s for s in coerenti_ou if all(int(x) <= 4 for x in s["score"].split("-"))]
+
+    # Top 3 coerenti + top 2 altri (per probabilita')
     result = coerenti_ou[:3] + altri[:2]
     return result[:5]
 
@@ -513,7 +526,7 @@ def genera_pronostico(home, away):
         gsi = gsi_raw * 0.95  # Solo -5% per difese top (Inter 0.84)
     else:
         gsi = gsi_raw
-    scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(6) for j in range(6)], key=lambda x:-x["prob"])
+    scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
 
     mp = max(p1, px, p2)
     sg = "1" if mp==p1 else ("X" if mp==px else "2")
