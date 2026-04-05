@@ -546,10 +546,10 @@ def genera_pronostico(home, away):
     c_class = min(abs(pts_diff) * 3, 1.0) if sh else 0.3
     cf = 0.40*c_spread + 0.25*c_dati + 0.20*c_h2h + 0.15*c_class
     cf = round(min(max(cf, 0), 1.0), 3)
-    cl = "Alta" if cf>=0.65 else ("Media" if cf>=0.40 else "Bassa")
+    cl = "Alta" if cf>=0.82 else ("Media" if cf>=0.50 else "Bassa")
 
-    # PUNTO 5: Badge sicura
-    sicura = cf >= 0.65 and sp[0] > 0.45
+    # PUNTO 5: Badge sicura (solo quando confidenza Alta)
+    sicura = cf >= 0.82 and sp[0] > 0.45
 
     return {
         "prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),

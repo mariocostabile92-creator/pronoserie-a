@@ -240,10 +240,10 @@ def _calcola_confidence(probs: dict, n_home: int, n_away: int,
     confidence = 0.40 * sep_score + 0.25 * data_score + 0.20 * h2h_score + 0.15 * conv_score
     confidence = round(min(max(confidence, 0), 1.0), 3)
 
-    if confidence >= 0.65:
+    if confidence >= 0.82:
         label = "Alta"
         color = "#2ecc71"
-    elif confidence >= 0.40:
+    elif confidence >= 0.50:
         label = "Media"
         color = "#f39c12"
     else:
