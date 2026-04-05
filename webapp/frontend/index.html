@@ -188,12 +188,20 @@ function pageHome(){
   </div>`;
 }
 
-// Carica schedina nella home
+// Carica schedina nella home (con timeout per non bloccare)
 async function loadSchedina(){
   const el=$("schedina-home");
   if(!el)return;
-  const d=await fetchAPI("/api/schedina");
-  if(!d||!d.giocate||!d.giocate.length)return;
+  try{
+    const controller = new AbortController();
+    const timeoutId = setTimeout(()=>controller.abort(), 8000);
+    const headers = {};
+    if(userToken) headers["Authorization"] = "Bearer " + userToken;
+    const r = await fetch(API+"/api/schedina?_t="+Date.now(), {headers, signal:controller.signal});
+    clearTimeout(timeoutId);
+    if(!r.ok) return;
+    const d = await r.json();
+    if(!d||!d.giocate||!d.giocate.length)return;
   let html='<div class="card" style="border-color:var(--green);border-width:2px"><h2 style="color:var(--green);text-align:center">Schedina del Giorno  -  G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:16px">'+d.tipo+'</p>';
   const maxShow = userPlan==="pro" ? d.giocate.length : 2;
   d.giocate.slice(0,maxShow).forEach((g,i)=>{
@@ -207,6 +215,7 @@ async function loadSchedina(){
   }
   html+='</div>';
   el.innerHTML=html;
+  }catch(e){/* schedina timeout/errore - non blocca la home */}
 }
 
 //  -- PRONOSTICI (2 gratis/giorno)  -  - &euro;
