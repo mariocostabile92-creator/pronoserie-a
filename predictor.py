@@ -25,11 +25,11 @@ MAX_GOL = 10
 ALPHA_H2H = 0.12         # H2H contributo moderato
 ALPHA_FORMA = 0.18        # Forma recente pesata (ottimizzato)
 ALPHA_XG = 0.45           # xG stagione attuale - peso alto (ottimizzato)
-ALPHA_CLASSIFICA = 0.08   # Peso posizione in classifica reale
+ALPHA_CLASSIFICA = 0.08   # Classifica reale
 DIXON_COLES_RHO = -0.10   # Correzione Dixon-Coles (ottimizzato)
 DRAW_BOOST = 1.12         # Boost pareggio
 MARGINE_BK = 1.05
-ALPHA_BK_BLEND = 0.30     # Blend con quote bookmaker storiche
+ALPHA_BK_BLEND = 0.35     # Blend con quote bookmaker
 
 # Coppie bookmaker (Home, Draw, Away)
 BOOKMAKER_COLS = [
@@ -194,61 +194,84 @@ def calcola_mercati_extra(lambda_home: float, lambda_away: float,
 def _get_bookmaker_reference(df: pd.DataFrame, home: str, away: str) -> dict | None:
     """
     Recupera le quote bookmaker storiche e le converte in probabilita' implicite.
-    Usa la media di tutti i bookmaker disponibili.
-    Ritorna None se nessuna quota disponibile.
+    1. Prima cerca le quote H2H dirette (piu' precise)
+    2. Se non trovate, stima dalle quote recenti di ciascuna squadra
     """
     if df is None:
         return None
 
-    # Cerca ultima partita H2H con quote
+    def _extract_quotes(row):
+        """Estrae le quote medie da una riga."""
+        qh, qd, qa = [], [], []
+        for col_h, col_d, col_a in BOOKMAKER_COLS:
+            h = row.get(col_h, np.nan)
+            d = row.get(col_d, np.nan)
+            a = row.get(col_a, np.nan)
+            if pd.notna(h) and pd.notna(d) and pd.notna(a) and h > 1 and d > 1 and a > 1:
+                qh.append(h)
+                qd.append(d)
+                qa.append(a)
+        return qh, qd, qa
+
+    # 1. Cerca H2H diretto (piu' preciso)
     mask = (
         ((df["HomeTeam"] == home) & (df["AwayTeam"] == away)) |
         ((df["HomeTeam"] == away) & (df["AwayTeam"] == home))
     )
     h2h = df[mask].sort_values("Date", ascending=False)
 
-    if len(h2h) == 0:
-        return None
-
-    # Cerca la prima riga con quote valide
     for _, row in h2h.iterrows():
-        quote_h = []
-        quote_d = []
-        quote_a = []
-
-        for col_h, col_d, col_a in BOOKMAKER_COLS:
-            qh = row.get(col_h, np.nan)
-            qd = row.get(col_d, np.nan)
-            qa = row.get(col_a, np.nan)
-            if pd.notna(qh) and pd.notna(qd) and pd.notna(qa) and qh > 1 and qd > 1 and qa > 1:
-                quote_h.append(qh)
-                quote_d.append(qd)
-                quote_a.append(qa)
-
-        if len(quote_h) > 0:
-            # Media quote su tutti i bookmaker disponibili
-            avg_h = np.mean(quote_h)
-            avg_d = np.mean(quote_d)
-            avg_a = np.mean(quote_a)
-
-            # Converti in probabilita' (rimuovi overround)
-            p_raw_h = 1.0 / avg_h
-            p_raw_d = 1.0 / avg_d
-            p_raw_a = 1.0 / avg_a
-            overround = p_raw_h + p_raw_d + p_raw_a
-
+        qh, qd, qa = _extract_quotes(row)
+        if len(qh) > 0:
+            avg_h, avg_d, avg_a = np.mean(qh), np.mean(qd), np.mean(qa)
+            p_h, p_d, p_a = 1.0/avg_h, 1.0/avg_d, 1.0/avg_a
+            overround = p_h + p_d + p_a
             if overround > 0:
-                # Normalizza la prospettiva: se era home-away invertita, inverti
                 is_inverted = (row["HomeTeam"] == away)
                 if is_inverted:
-                    p_raw_h, p_raw_a = p_raw_a, p_raw_h
-
+                    p_h, p_a = p_a, p_h
                 return {
-                    "book_prob_1": round(p_raw_h / overround * 100, 1),
-                    "book_prob_x": round(p_raw_d / overround * 100, 1),
-                    "book_prob_2": round(p_raw_a / overround * 100, 1),
-                    "n_bookmakers": len(quote_h),
+                    "book_prob_1": round(p_h / overround * 100, 1),
+                    "book_prob_x": round(p_d / overround * 100, 1),
+                    "book_prob_2": round(p_a / overround * 100, 1),
+                    "n_bookmakers": len(qh),
                 }
+
+    # 2. Fallback: stima dalle quote recenti di ciascuna squadra separatamente
+    # Calcola la forza implicita da quote recenti come casa e come ospite
+    home_as_home = df[df["HomeTeam"] == home].sort_values("Date", ascending=False).head(5)
+    away_as_away = df[df["AwayTeam"] == away].sort_values("Date", ascending=False).head(5)
+
+    home_win_probs = []
+    away_win_probs = []
+
+    for _, row in home_as_home.iterrows():
+        qh, qd, qa = _extract_quotes(row)
+        if qh:
+            tot = 1/np.mean(qh) + 1/np.mean(qd) + 1/np.mean(qa)
+            if tot > 0:
+                home_win_probs.append((1/np.mean(qh)) / tot)
+
+    for _, row in away_as_away.iterrows():
+        qh, qd, qa = _extract_quotes(row)
+        if qh:
+            tot = 1/np.mean(qh) + 1/np.mean(qd) + 1/np.mean(qa)
+            if tot > 0:
+                away_win_probs.append((1/np.mean(qa)) / tot)
+
+    if len(home_win_probs) >= 2 and len(away_win_probs) >= 2:
+        avg_home_win = np.mean(home_win_probs)
+        avg_away_win = np.mean(away_win_probs)
+        # Stima pareggio come complemento
+        est_draw = max(0.15, 1.0 - avg_home_win - avg_away_win)
+        # Normalizza
+        tot = avg_home_win + est_draw + avg_away_win
+        return {
+            "book_prob_1": round(avg_home_win / tot * 100, 1),
+            "book_prob_x": round(est_draw / tot * 100, 1),
+            "book_prob_2": round(avg_away_win / tot * 100, 1),
+            "n_bookmakers": min(len(home_win_probs), len(away_win_probs)),
+        }
 
     return None
 
