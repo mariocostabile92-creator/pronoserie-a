@@ -615,14 +615,6 @@ async function pageClassifica(){
     </div>`;
   });
   html+='<div style="margin-top:6px;display:flex;gap:8px;justify-content:center;font-size:.7rem;flex-wrap:wrap"><span style="color:var(--green)"> - &#9679; UCL</span><span style="color:var(--yellow)"> - &#9679; UEL</span><span style="color:#9b59b6"> - &#9679; Conf.</span><span style="color:var(--red)"> - &#9679; Retr.</span></div></div>';
-  // Top marcatori dal campionato selezionato (dall'API)
-  if(data.marcatori && data.marcatori.length > 10){
-    html+='<div class="card" style="margin-top:12px;border-color:var(--green);padding:10px"><h3 style="color:var(--green);font-size:1rem;margin-bottom:6px">Top Marcatori '+leagueLabel+'</h3><p style="color:var(--muted);font-size:.7rem;margin-bottom:8px">Classifica marcatori aggiornata</p>';
-    (data.marcatori||[]).slice(10,20).forEach(m=>{
-      html+=`<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1f3460"><span style="width:18px;font-weight:700;color:var(--muted);font-size:.75rem">${m.pos}</span>${badge(m.squadra,14)}<span style="flex:1;font-size:.8rem"><strong>${m.giocatore}</strong></span><span style="font-weight:800;color:var(--green);font-size:.85rem">${m.gol}</span></div>`;
-    });
-    html+='</div>';
-  }
   html+='</div>';
   // DESTRA: Marcatori
   html+='<div>';
