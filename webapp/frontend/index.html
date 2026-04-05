@@ -333,36 +333,105 @@ async function calcPronostico(){
   </div>`;
 }
 
-//  -- CALENDARIO (layout 2 colonne: principale sx, altre dx)  -  - &euro;
+//  -- CALENDARIO (auto-aggiornato con risultati live)  -  - &euro;
+let _calRefreshTimer = null;
+
 async function pageCalendario(){
-  const cal=await fetchAPI("/api/calendario");
+  if(_calRefreshTimer){clearInterval(_calRefreshTimer);_calRefreshTimer=null}
+  const cal=await fetchAPI("/api/calendario", true);
   if(!cal||!cal.giornate||!cal.giornate.length)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>';
-  const g0=cal.giornate[0]; // giornata principale (31)
-  let html='<div class="container"><h1>Calendario Serie A 2025-2026</h1><p class="sub">Giornata corrente + prossime giornate</p>';
+
+  const gc = cal.giornata_corrente || cal.giornate[0].giornata;
+  const gCorrente = cal.giornate.find(x=>x.giornata===gc) || cal.giornate[0];
+  const completate = cal.giornate.filter(g=>g.stato==="completata");
+  const prossime = cal.giornate.filter(g=>g.stato!=="completata" && g.giornata!==gc);
+
+  let html='<div class="container"><h1>Calendario Serie A 2025-2026</h1>';
+  html+=`<p class="sub">${cal.live?'<span style="color:#e74c3c;font-weight:700">LIVE</span> - ':''}Giornata ${gc}${gCorrente.live?' in corso':''}</p>`;
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
-  // SINISTRA: giornata principale
+
+  // SINISTRA: giornata corrente con risultati live
   html+='<div>';
-  html+=`<div class="card"><h2 style="color:var(--green)">Giornata ${g0.giornata}  -  ${g0.data||""}</h2>`;
-  if(userPlan==="pro"){
-    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata(${g0.giornata})">Simula Pronostici Giornata</button>`;
-  } else {
-    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem;opacity:.7" onclick="abbonarPro()">Simula Giornata  -  Solo Pro</button>`;
+  html+=`<div class="card" style="${gCorrente.live?'border-color:#e74c3c;border-width:2px':''}">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <h2 style="color:${gCorrente.live?'#e74c3c':'var(--green)'}">Giornata ${gc}</h2>
+      ${gCorrente.live?'<span style="background:#e74c3c;color:#fff;padding:4px 12px;border-radius:10px;font-size:.75rem;font-weight:700;animation:pulse 1.5s infinite">LIVE</span>':''}
+    </div>
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:12px">${gCorrente.data||""}</p>`;
+
+  if(userPlan==="pro" && !gCorrente.live && gCorrente.stato!=="completata"){
+    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata(${gc})">Simula Pronostici Giornata</button>`;
   }
-  g0.partite.forEach(p=>{
-    html+=`<div class="match-btn" style="cursor:default"><span>${badge(p.home,18)}<strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong>${badge(p.away,18)}</span></div>`;
+
+  gCorrente.partite.forEach(p=>{
+    const hasResult = p.gol_h !== null && p.gol_h !== undefined;
+    if(hasResult){
+      // Partita con risultato (live o finita)
+      const colH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
+      const colA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
+      let statusBadge="";
+      if(p.live){statusBadge=`<span style="background:#e74c3c;color:#fff;padding:2px 6px;border-radius:6px;font-size:.65rem;font-weight:700;animation:pulse 1.5s infinite">${p.minuto||""}'</span>`}
+      else if(p.status==="FT"){statusBadge='<span style="color:var(--muted);font-size:.65rem">FT</span>'}
+      else if(p.status==="HT"){statusBadge='<span style="background:var(--yellow);color:#000;padding:2px 6px;border-radius:6px;font-size:.65rem;font-weight:700">INT</span>'}
+      html+=`<div style="display:flex;align-items:center;padding:8px;border-bottom:1px solid #1f3460${p.live?';background:rgba(231,76,60,.08);border-radius:6px':''};cursor:${p.fixture_id?'pointer':'default'}" ${p.fixture_id?'onclick="showFixtureDetail('+p.fixture_id+',\\''+p.home+'\\',\\''+p.away+'\\')"':''}>
+        <span style="flex:1;text-align:right;font-weight:700;font-size:.9rem">${badge(p.home,18)}${p.home}</span>
+        <div style="text-align:center;min-width:70px">
+          <span style="font-size:1.1rem;font-weight:800"><span style="color:${colH}">${p.gol_h}</span> - <span style="color:${colA}">${p.gol_a}</span></span>
+          <div>${statusBadge}</div>
+        </div>
+        <span style="flex:1;font-weight:700;font-size:.9rem">${p.away}${badge(p.away,18)}</span>
+      </div>`;
+    } else {
+      // Partita da giocare
+      html+=`<div class="match-btn" style="cursor:default"><span>${badge(p.home,18)}<strong>${p.home}</strong> <span style="color:var(--muted)">vs</span> <strong>${p.away}</strong>${badge(p.away,18)}</span></div>`;
+    }
   });
-  html+=`<p style="color:var(--muted);font-size:.85rem;margin-top:8px;text-align:center">Per il pronostico di una partita singola vai su <a href="#pronostici" style="color:var(--accent)">Pronostici</a> e seleziona le squadre</p>`;
-  html+='</div><div id="sim-result-main"></div></div>';
-  // DESTRA: altre giornate
+  html+=`</div><div id="sim-result-main"></div></div>`;
+
+  // DESTRA: archivio + prossime
   html+='<div>';
-  cal.giornate.slice(1).forEach((g,idx)=>{
-    const locked=userPlan!=="pro"&&idx>=1;
-    html+=`<div class="card" style="padding:12px${locked?";opacity:.4":""}"><h3>G.${g.giornata} <span style="color:var(--muted);font-size:.8rem">${g.data||""}</span>${locked?' <span class="tag tag-red" style="font-size:.7rem">PRO</span>':''}</h3>`;
-    if(locked){html+=`<p style="color:var(--muted);font-size:.8rem">Sblocca con Pro</p>`}
-    else{g.partite.forEach(p=>{html+=`<p style="font-size:.85rem;padding:2px 0;color:var(--text)">${p.home} - ${p.away}</p>`})}
+
+  // Prossime giornate
+  if(prossime.length>0){
+    html+='<div class="card" style="padding:8px;margin-bottom:8px"><h4 style="color:var(--muted);margin-bottom:6px">Prossime giornate</h4>';
+    prossime.forEach((g,idx)=>{
+      const locked=userPlan!=="pro"&&idx>=1;
+      html+=`<div style="padding:6px 0;border-bottom:1px solid #1f3460${locked?';opacity:.4':''}"><strong style="color:var(--accent);font-size:.85rem">G.${g.giornata}</strong> <span style="color:var(--muted);font-size:.75rem">${g.data||""}</span>${locked?' <span class="tag tag-red" style="font-size:.6rem">PRO</span>':''}`;
+      if(!locked){g.partite.forEach(p=>{html+=`<div style="font-size:.8rem;padding:1px 0;color:var(--text)">${badge(p.home,14)}${p.home} - ${p.away}${badge(p.away,14)}</div>`})}
+      html+=`</div>`;
+    });
     html+='</div>';
-  });
-  html+='</div></div></div>';
+  }
+
+  // Giornate completate (archivio)
+  if(completate.length>0){
+    html+='<div class="card" style="padding:8px"><h4 style="color:var(--muted);margin-bottom:6px">Archivio risultati</h4>';
+    completate.forEach(g=>{
+      html+=`<div style="padding:6px 0;border-bottom:1px solid #1f3460"><strong style="color:var(--green);font-size:.85rem">G.${g.giornata}</strong> <span style="color:var(--muted);font-size:.75rem">${g.data||""}</span> <span style="color:var(--green);font-size:.65rem">COMPLETATA</span>`;
+      g.partite.forEach(p=>{
+        const colH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
+        const colA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
+        html+=`<div style="font-size:.8rem;padding:1px 0;display:flex;align-items:center">${badge(p.home,12)}<span style="flex:1">${p.home}</span><span style="font-weight:700"><span style="color:${colH}">${p.gol_h}</span>-<span style="color:${colA}">${p.gol_a}</span></span><span style="flex:1;text-align:right">${p.away}</span>${badge(p.away,12)}</div>`;
+      });
+      html+=`</div>`;
+    });
+    html+='</div>';
+  }
+
+  html+='</div></div>';
+
+  // Auto-refresh se partite live
+  if(cal.live){
+    html+=`<div style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px">Auto-aggiornamento ogni 60 secondi</div>`;
+    _calRefreshTimer = setInterval(async()=>{
+      if(location.hash!=="#calendario") return;
+      const app=$("app");
+      const result = await pageCalendario();
+      if(result) app.innerHTML = result;
+    }, 60000);
+  }
+
+  html+='</div>';
   return html;
 }
 
@@ -1103,6 +1172,7 @@ async function navigate(){
   const hash=(location.hash||"#home").replace("#","");
   // Pulisci stato quando si cambia pagina
   if(hash!=="risultati" && _liveRefreshTimer){clearInterval(_liveRefreshTimer);_liveRefreshTimer=null}
+  if(hash!=="calendario" && _calRefreshTimer){clearInterval(_calRefreshTimer);_calRefreshTimer=null}
   _viewingFixtureDetail = false;
   const page=routes[hash]||routes.home;
   document.querySelectorAll(".nav a:not(#nav-auth)").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+hash));

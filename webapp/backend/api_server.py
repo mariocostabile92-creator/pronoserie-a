@@ -844,14 +844,86 @@ CAL_HARDCODED = {
 
 @app.get("/api/calendario")
 async def calendario():
-    # Usa dati hardcoded (funziona SEMPRE, anche senza CSV)
+    """Calendario con risultati live integrati da API Football."""
     giornate = []
+    giornata_corrente = None
+
     for num in range(31, 39):
         info = CAL_HARDCODED.get(num)
-        if info:
-            partite = [{"home": h, "away": a} for h, a in info["partite"]]
-            giornate.append({"giornata": num, "data": info["data"], "partite": partite})
-    return {"giornate": giornate}
+        if not info:
+            continue
+
+        partite = []
+        tutte_finite = True
+        ha_live = False
+        ha_da_giocare = False
+
+        for h, a in info["partite"]:
+            match_data = {"home": h, "away": a, "gol_h": None, "gol_a": None, "status": "NS", "status_it": "Da giocare", "minuto": None, "live": False, "fixture_id": None}
+
+            # Cerca il risultato nei dati live di API Football
+            if LIVE_RESULTS_CACHE:
+                for p in LIVE_RESULTS_CACHE:
+                    if (p["home"] == h and p["away"] == a) or (p["home"] == a and p["away"] == h):
+                        is_inverted = p["home"] == a
+                        match_data["gol_h"] = p["gol_a"] if is_inverted else p["gol_h"]
+                        match_data["gol_a"] = p["gol_h"] if is_inverted else p["gol_a"]
+                        match_data["status"] = p["status"]
+                        match_data["status_it"] = p.get("status_it", p["status"])
+                        match_data["minuto"] = p.get("minuto")
+                        match_data["live"] = p.get("live", False)
+                        match_data["fixture_id"] = p.get("fixture_id")
+                        match_data["marcatori"] = p.get("marcatori", [])
+                        match_data["marcatori_home"] = p.get("marcatori_home", [])
+                        match_data["marcatori_away"] = p.get("marcatori_away", [])
+                        if is_inverted:
+                            match_data["marcatori_home"], match_data["marcatori_away"] = match_data["marcatori_away"], match_data["marcatori_home"]
+                        break
+
+            if match_data["status"] not in ("FT", "AET", "PEN"):
+                tutte_finite = False
+            if match_data["live"]:
+                ha_live = True
+            if match_data["status"] == "NS":
+                ha_da_giocare = True
+
+            partite.append(match_data)
+
+        # Determina stato giornata
+        if tutte_finite:
+            stato = "completata"
+        elif ha_live:
+            stato = "live"
+            giornata_corrente = num
+        elif ha_da_giocare and not tutte_finite:
+            stato = "prossima"
+            if giornata_corrente is None:
+                giornata_corrente = num
+        else:
+            stato = "prossima"
+
+        giornate.append({
+            "giornata": num,
+            "data": info["data"],
+            "partite": partite,
+            "stato": stato,
+            "live": ha_live,
+        })
+
+    # Se non trovata, la prima non completata e' la corrente
+    if giornata_corrente is None:
+        for g in giornate:
+            if g["stato"] != "completata":
+                giornata_corrente = g["giornata"]
+                break
+        if giornata_corrente is None:
+            giornata_corrente = 38
+
+    return {
+        "giornate": giornate,
+        "giornata_corrente": giornata_corrente,
+        "live": any(g.get("live") for g in giornate),
+    }
 
 # ─────────────────────────────
 # CLASSIFICA + MARCATORI (AUTO-AGGIORNAMENTO API FOOTBALL)
