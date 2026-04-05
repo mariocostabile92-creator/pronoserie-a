@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import poisson
 from stats_engine import get_h2h_stats
-from season_2526 import get_xg, get_xg_media_campionato, CLASSIFICA_REALE_30G
+from season_2526 import get_xg, get_xg_media_campionato, CLASSIFICA_REALE_30G, get_team_ou_tendency, get_season_avg_goals
 from live_data import get_impatto_infortunati, get_n_indisponibili
 
 # Costanti del modello (ottimizzate da backtesting su 299 partite)
@@ -310,7 +310,7 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     home_name = home_stats.get("nome", "")
     away_name = away_stats.get("nome", "")
 
-    # ── LAMBDA BASE (storico CSV) ──
+    # ── LAMBDA BASE (storico CSV con peso recenza) ──
     lambda_home_hist = (
         home_stats["forza_att_casa"]
         * away_stats["forza_dif_trasf"]
@@ -322,7 +322,17 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
         * home_stats["media_gol_trasf_campionato"]
     )
 
-    # ── LAMBDA DA xG 2025-2026 ──
+    # ── MIGLIORIA 3: USA MEDIA GOL STAGIONE CORRENTE ──
+    season_avg = get_season_avg_goals()  # Media reale 2025-26
+    # Correggi lambda storico se la media stagione e' diversa dalla media storica
+    hist_avg = home_stats["media_gol_casa_campionato"] + home_stats["media_gol_trasf_campionato"]
+    if hist_avg > 0:
+        season_factor = season_avg / hist_avg
+        # Blend leggero: avvicina i lambda alla media stagione corrente
+        lambda_home_hist *= (0.85 + 0.15 * season_factor)
+        lambda_away_hist *= (0.85 + 0.15 * season_factor)
+
+    # ── LAMBDA DA xG 2025-2026 (MIGLIORIA 4: differenziato) ──
     xg_home = get_xg(home_name)
     xg_away = get_xg(away_name)
     xg_applied = False
@@ -497,6 +507,19 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
             boost_under = min(1.15, 1.0 + (gol_modello - h2h_gol_media) * 0.08)
             extra["under_25"] = round(min(85, extra["under_25"] * boost_under), 1)
             extra["over_25"] = round(100 - extra["under_25"], 1)
+
+    # ── MIGLIORIA 2: TENDENZA O/U SPECIFICA PER SQUADRA ──
+    ou_home = get_team_ou_tendency(home_name)
+    ou_away = get_team_ou_tendency(away_name)
+    avg_gol_coppia = (ou_home["gol_pg"] + ou_away["gol_pg"]) / 2
+    if avg_gol_coppia > 3.0:
+        ou_boost = min(1.10, 1.0 + (avg_gol_coppia - 3.0) * 0.06)
+        extra["over_25"] = round(min(85, extra["over_25"] * ou_boost), 1)
+        extra["under_25"] = round(100 - extra["over_25"], 1)
+    elif avg_gol_coppia < 2.2:
+        ou_boost = min(1.10, 1.0 + (2.2 - avg_gol_coppia) * 0.06)
+        extra["under_25"] = round(min(85, extra["under_25"] * ou_boost), 1)
+        extra["over_25"] = round(100 - extra["under_25"], 1)
 
     result.update(extra)
 

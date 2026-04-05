@@ -249,3 +249,29 @@ def get_risultati_stagione(df) -> list:
         })
 
     return giornate
+
+
+def get_team_ou_tendency(team_name: str) -> dict:
+    """
+    Ritorna la tendenza Over/Under della squadra nella stagione corrente.
+    Basato su gol reali (GF+GS dalla classifica).
+    """
+    for r in CLASSIFICA_REALE_30G:
+        if r["Squadra"] == team_name:
+            g = r["G"]
+            if g == 0:
+                return {"gol_pg": 2.6, "over_pct": 50}
+            gol_pg = (r["GF"] + r["GS"]) / g
+            # % partite con 3+ gol totali (stimata dalla media)
+            over_pct = min(80, max(20, 50 + (gol_pg - 2.6) * 20))
+            return {"gol_pg": round(gol_pg, 2), "over_pct": round(over_pct, 1)}
+    return {"gol_pg": 2.6, "over_pct": 50}
+
+
+def get_season_avg_goals() -> float:
+    """Media gol per partita della stagione corrente (dalla classifica reale)."""
+    tot_gol = sum(r["GF"] for r in CLASSIFICA_REALE_30G)
+    tot_partite = sum(r["G"] for r in CLASSIFICA_REALE_30G) / 2  # Ogni partita conta 2 volte
+    if tot_partite == 0:
+        return 2.6
+    return round(tot_gol / tot_partite, 2)

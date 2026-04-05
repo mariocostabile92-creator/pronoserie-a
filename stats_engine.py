@@ -9,6 +9,26 @@ import numpy as np
 
 DECAY_ALPHA = 0.15  # Decadimento piu' rapido: partite recenti contano molto di piu'
 FORM_N = 20  # Ultime 20 partite (circa 1 stagione)
+SEASON_DECAY = 0.25  # Decadimento per stagione: ogni stagione passata pesa il 25% in meno
+
+
+def _weighted_mean(series, dates, ref_year=2026):
+    """Media pesata per anno: stagioni recenti contano di piu'."""
+    if len(series) == 0:
+        return None
+    weights = []
+    for d in dates:
+        try:
+            year = d.year if hasattr(d, 'year') else int(str(d)[:4])
+            years_ago = max(0, ref_year - year)
+            w = np.exp(-SEASON_DECAY * years_ago)
+        except Exception:
+            w = 0.1
+        weights.append(w)
+    weights = np.array(weights)
+    if weights.sum() == 0:
+        return series.mean()
+    return np.average(series, weights=weights)
 
 
 def get_league_averages(df: pd.DataFrame) -> dict:
@@ -157,15 +177,24 @@ def get_team_stats(df: pd.DataFrame, team_name: str, opponent: str = None) -> di
         mgf_casa = medie["media_gol_casa"]
         mgs_casa = medie["media_gol_trasferta"]
     else:
-        mgf_casa = casa["FTHG"].mean()
-        mgs_casa = casa["FTAG"].mean()
+        # Media pesata: partite recenti contano di piu'
+        mgf_casa = _weighted_mean(casa["FTHG"], casa["Date"])
+        mgs_casa = _weighted_mean(casa["FTAG"], casa["Date"])
+        if mgf_casa is None:
+            mgf_casa = casa["FTHG"].mean()
+        if mgs_casa is None:
+            mgs_casa = casa["FTAG"].mean()
 
     if n_trasf < 5:
         mgf_trasf = medie["media_gol_trasferta"]
         mgs_trasf = medie["media_gol_casa"]
     else:
-        mgf_trasf = trasf["FTAG"].mean()
-        mgs_trasf = trasf["FTHG"].mean()
+        mgf_trasf = _weighted_mean(trasf["FTAG"], trasf["Date"])
+        mgs_trasf = _weighted_mean(trasf["FTHG"], trasf["Date"])
+        if mgf_trasf is None:
+            mgf_trasf = trasf["FTAG"].mean()
+        if mgs_trasf is None:
+            mgs_trasf = trasf["FTHG"].mean()
 
     forza_att_casa = mgf_casa / medie["media_gol_casa"] if medie["media_gol_casa"] > 0 else 1.0
     forza_dif_casa = mgs_casa / medie["media_gol_trasferta"] if medie["media_gol_trasferta"] > 0 else 1.0
