@@ -1200,9 +1200,9 @@ async function navigate(){
   }catch(e){app.innerHTML='<div class="container card" style="color:var(--red)">Errore: '+e.message+'</div>'}
   if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq("Inter"),200);
   if(hash==="home"){
-    setTimeout(()=>loadSchedina(),300);
-    // Pre-carica dati in background per navigazione istantanea
-    setTimeout(()=>{fetchAPI("/api/calendario");fetchAPI("/api/classifica")},1000);
+    setTimeout(()=>loadSchedina(),2000);
+    // Pre-carica dati in background per navigazione istantanea (ritardato)
+    setTimeout(()=>{fetchAPI("/api/calendario");fetchAPI("/api/classifica")},5000);
   }
   updateNavAuth();
 }
@@ -1248,8 +1248,9 @@ async function checkPaidReturn(){
 
 window.addEventListener("hashchange",navigate);
 if(!location.hash)location.hash="#home";
-checkPaidReturn();
+// Avvia navigazione senza attendere checkPaidReturn
 navigate();
+checkPaidReturn();
 
 // PWA Service Worker
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}
