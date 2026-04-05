@@ -58,7 +58,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
   <a href="#home">Home</a>
   <a href="#pronostici">Pronostici</a>
   <a href="#calendario">Calendario</a>
-  <a href="#classifica">Classifica</a>
+  <a href="#classifica">Classifiche</a>
   <a href="#squadre">Squadre</a>
   <a href="#notizie">Notizie</a>
   <a href="#risultati">Risultati Live</a>
@@ -608,24 +608,15 @@ async function pageClassifica(){
     </div>`;
   });
   html+='<div style="margin-top:6px;display:flex;gap:8px;justify-content:center;font-size:.7rem;flex-wrap:wrap"><span style="color:var(--green)"> - &#9679; UCL</span><span style="color:var(--yellow)"> - &#9679; UEL</span><span style="color:#9b59b6"> - &#9679; Conf.</span><span style="color:var(--red)"> - &#9679; Retr.</span></div></div>';
-  // Marcatori consigliati PER PARTITA della giornata 31
-  html+='<div class="card" style="margin-top:12px;border-color:var(--green);padding:10px"><h3 style="color:var(--green);font-size:1rem;margin-bottom:6px">Marcatori Consigliati G.31</h3><p style="color:var(--muted);font-size:.7rem;margin-bottom:8px">Per partita  -  esclusi infortunati</p>';
-  const marcPartite=[
-    {partita:"Sassuolo - Cagliari",casa:"Berardi (7 gol), Pinamonti (7)",ospite:"Esposito (5), Kilicsoy (4)"},
-    {partita:"Verona - Fiorentina",casa:"Tengstedt (5), Henry (4)",ospite:"Kean (8), Gudmundsson (5)"},
-    {partita:"Lazio - Parma",casa:"Maldini (6), Dia (5)",ospite:"Pellegrino (8), Strefezza (4)"},
-    {partita:"Cremonese - Bologna",casa:"Vardy (5), Sanabria (4)",ospite:"Castro (6), Orsolini (5)"},
-    {partita:"Pisa - Torino",casa:"Meister (5), Tramoni (4)",ospite:"Simeone (8), Vlasic (7)"},
-    {partita:"Inter - Roma",casa:"Thuram (7), Calhanoglu (8)",ospite:"Malen (7), Soule (4)"},
-    {partita:"Udinese - Como",casa:"Davis (10), Zaniolo (5)",ospite:"Douvikas (11), Paz (10)"},
-    {partita:"Lecce - Atalanta",casa:"Cheddira (4), Banda (3)",ospite:"Krstovic (8), Scamacca (8)"},
-    {partita:"Juventus - Genoa",casa:"Yildiz (10), Vlahovic (6)",ospite:"Vitinha (5), Colombo (4)"},
-    {partita:"Napoli - Milan",casa:"Hojlund (10), McTominay (7)",ospite:"Pulisic (8), Gimenez (5)"},
-  ];
-  marcPartite.forEach(m=>{
-    html+=`<div style="padding:5px 0;border-bottom:1px solid #1f3460"><strong style="font-size:.8rem;color:var(--text)">${m.partita}</strong><div style="display:flex;justify-content:space-between;font-size:.7rem;margin-top:2px"><span style="color:var(--green)">${m.casa}</span><span style="color:var(--red)">${m.ospite}</span></div></div>`;
-  });
-  html+='</div></div>';
+  // Top marcatori dal campionato selezionato (dall'API)
+  if(data.marcatori && data.marcatori.length > 10){
+    html+='<div class="card" style="margin-top:12px;border-color:var(--green);padding:10px"><h3 style="color:var(--green);font-size:1rem;margin-bottom:6px">Top Marcatori '+leagueLabel+'</h3><p style="color:var(--muted);font-size:.7rem;margin-bottom:8px">Classifica marcatori aggiornata</p>';
+    (data.marcatori||[]).slice(10,20).forEach(m=>{
+      html+=`<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1f3460"><span style="width:18px;font-weight:700;color:var(--muted);font-size:.75rem">${m.pos}</span>${badge(m.squadra,14)}<span style="flex:1;font-size:.8rem"><strong>${m.giocatore}</strong></span><span style="font-weight:800;color:var(--green);font-size:.85rem">${m.gol}</span></div>`;
+    });
+    html+='</div>';
+  }
+  html+='</div>';
   // DESTRA: Marcatori
   html+='<div>';
   html+='<div class="card" style="padding:10px"><h3 style="margin-bottom:6px;font-size:1rem">Top 10 Marcatori</h3>';
