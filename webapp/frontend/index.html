@@ -635,6 +635,7 @@ async function pageNotizie(){
 
 // ── RISULTATI LIVE ──
 let _liveRefreshTimer = null;
+let _viewingFixtureDetail = false;
 
 async function pageRisultati(){
   if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Risultati Serie A</h2><p style="margin:16px 0">I risultati live e lo storico delle partite sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro - 9.99&euro;/mese</button></div></div>`;
@@ -781,12 +782,13 @@ async function pageRisultati(){
 
 async function refreshRisultati(){
   const app=$("app");
-  if(!app || !location.hash.includes("risultati")) return;
+  if(!app || !location.hash.includes("risultati") || _viewingFixtureDetail) return;
   const result = await pageRisultati();
   if(result) app.innerHTML = result;
 }
 
 async function backToRisultati(){
+  _viewingFixtureDetail = false;
   const app=$("app");
   app.innerHTML='<div class="spinner"></div>';
   const result = await pageRisultati();
@@ -795,6 +797,7 @@ async function backToRisultati(){
 
 async function showFixtureDetail(fixtureId, home, away){
   if(!fixtureId) return;
+  _viewingFixtureDetail = true;
   const app=$("app");
   app.innerHTML='<div class="container"><div class="spinner"></div><p style="text-align:center;color:var(--muted);margin-top:12px">Caricamento dettagli partita...</p></div>';
 
@@ -910,10 +913,12 @@ async function showFixtureDetail(fixtureId, home, away){
     html+=`</div></div>`;
   }
 
-  // Auto-refresh se live
+  // Auto-refresh se live (solo se ancora sulla pagina risultati)
   if(isLive){
     html+=`<div style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px">Aggiornamento automatico ogni 30 secondi</div>`;
-    setTimeout(()=>showFixtureDetail(fixtureId,home,away), 30000);
+    setTimeout(()=>{
+      if(location.hash==="#risultati") showFixtureDetail(fixtureId,home,away);
+    }, 30000);
   }
 
   html+='</div>';
@@ -1093,8 +1098,9 @@ const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,
 
 async function navigate(){
   const hash=(location.hash||"#home").replace("#","");
-  // Pulisci timer live se si esce dalla pagina risultati
+  // Pulisci stato quando si cambia pagina
   if(hash!=="risultati" && _liveRefreshTimer){clearInterval(_liveRefreshTimer);_liveRefreshTimer=null}
+  _viewingFixtureDetail = false;
   const page=routes[hash]||routes.home;
   document.querySelectorAll(".nav a:not(#nav-auth)").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+hash));
   const app=$("app");
