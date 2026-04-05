@@ -308,6 +308,7 @@ def _live_updater():
             # Rose e storico ogni 6 cicli (~3 ore)
             if _updater_count % 6 == 0:
                 _fetch_rose_live()
+                _fetch_rose_live(PL_TEAM_IDS)  # Rose Premier League
                 _fetch_risultati_stagione()
                 _fetch_league_data("premier-league")
         except Exception:
@@ -371,6 +372,10 @@ async def startup():
             pass
         try:
             _fetch_rose_live()
+        except Exception:
+            pass
+        try:
+            _fetch_rose_live(PL_TEAM_IDS)
         except Exception:
             pass
         # Premier League
@@ -1321,11 +1326,13 @@ _TEAM_IDS = {
 }
 _RUOLO_MAP = {"Goalkeeper":"P","Defender":"D","Midfielder":"C","Attacker":"A"}
 
-def _fetch_rose_live():
+def _fetch_rose_live(team_ids=None):
     """Scarica rose complete di tutte le squadre da API Football."""
     global ROSE_LIVE, ALLENATORI_LIVE, ROSE_LAST_UPDATE
+    if team_ids is None:
+        team_ids = _TEAM_IDS
     try:
-        for nome, team_id in _TEAM_IDS.items():
+        for nome, team_id in team_ids.items():
             try:
                 # Rosa
                 req = urllib.request.Request(

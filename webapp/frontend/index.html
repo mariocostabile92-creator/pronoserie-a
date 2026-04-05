@@ -614,9 +614,11 @@ async function pageClassifica(){
 
 //  -- SQUADRE (Pro only, con campo formazioni)  -  - &euro;
 async function pageSquadre(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Squadre Serie A</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
+  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Squadre ${leagueLabel}</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   return `<div class="container">
-    <h1>Squadre Serie A 2025-2026</h1><p class="sub">Rose, formazioni e infortunati live</p>
+    ${leagueTabs()}
+    <h1>Squadre ${leagueLabel}</h1><p class="sub">Rose, formazioni e infortunati live</p>
     <select id="sel-sq" onchange="loadSq(this.value)" style="margin-bottom:16px">${opts()}</select>
     <div id="sq-det"><div class="spinner"></div></div>
   </div>`;
@@ -1214,7 +1216,7 @@ async function navigate(){
     if(result&&typeof result.then==="function"){app.innerHTML='<div class="spinner"></div>';app.innerHTML=await result}
     else{app.innerHTML=result}
   }catch(e){app.innerHTML='<div class="container card" style="color:var(--red)">Errore: '+e.message+'</div>'}
-  if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq("Inter"),200);
+  if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq(getSQ()[0]),200);
   if(hash==="home"){
     setTimeout(()=>loadPartiteOggi(),500);
     setTimeout(()=>loadSchedina(),2000);
