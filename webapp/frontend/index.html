@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.json">
-<title>MatchIQ - Pronostici Serie A con IA</title>
+<title>MatchIQ - Pronostici Calcistici con IA</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0f1a;--card:#162447;--accent:#3498db;--green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;--text:#e8eaf6;--muted:#8892b0}
@@ -76,7 +76,7 @@ const TEAM_IDS_PL = {Arsenal:42,"Aston Villa":66,Bournemouth:35,Brentford:55,Bri
 let currentLeague = "serie-a";
 function badge(name,size){size=size||20;const ids=currentLeague==="premier-league"?TEAM_IDS_PL:TEAM_IDS;const id=ids[name];if(!id)return'';return `<img src="https://media.api-sports.io/football/teams/${id}.png" alt="${name}" style="width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px">`}
 function getSQ(){return currentLeague==="premier-league"?SQ_PL:SQ}
-function leagueTabs(){return `<div style="display:flex;gap:0;margin-bottom:16px"><button style="flex:1;padding:10px;border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:10px 0 0 10px;${currentLeague==='serie-a'?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('serie-a')">Serie A</button><button style="flex:1;padding:10px;border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:0 10px 10px 0;${currentLeague==='premier-league'?'background:var(--accent);color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('premier-league')">Premier League</button></div>`}
+function leagueTabs(){return `<div style="display:flex;gap:0;margin-bottom:16px"><button style="flex:1;padding:10px;border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:10px 0 0 10px;${currentLeague==='serie-a'?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('serie-a')">Campionato Italiano</button><button style="flex:1;padding:10px;border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:0 10px 10px 0;${currentLeague==='premier-league'?'background:var(--accent);color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('premier-league')">Campionato Inglese</button></div>`}
 function switchLeague(l){currentLeague=l;navigate()}
 function opts(){return getSQ().map(s=>`<option value="${s}">${s}</option>`).join('')}
 function leagueApiPrefix(){return currentLeague==="serie-a"?"":"/"+currentLeague}
@@ -256,7 +256,7 @@ async function loadSchedina(){
 
 //  -- PRONOSTICI (2 gratis/giorno)  -  - &euro;
 function pagePronostici(){
-  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":"Campionato Italiano";
   return `<div class="container">
     ${leagueTabs()}
     <div class="card" style="text-align:center;padding:32px">
@@ -385,7 +385,7 @@ let _calRefreshTimer = null;
 
 async function pageCalendario(){
   if(_calRefreshTimer){clearInterval(_calRefreshTimer);_calRefreshTimer=null}
-  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":"Campionato Italiano";
   const calUrl = currentLeague==="serie-a" ? "/api/calendario" : "/api/"+currentLeague+"/calendario";
   const cal=await fetchAPI(calUrl, true);
   if(!cal||!cal.giornate||!cal.giornate.length)return `<div class="container">${leagueTabs()}<div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>`;
@@ -480,8 +480,8 @@ async function simulaGiornata(gNum){
   if(!cal)return;
   const g=cal.giornate.find(x=>x.giornata===gNum || x.giornata===String(gNum));
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
-  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
-  let html='<div class="card"><h3 style="margin-bottom:12px">Pronostici Giornata '+gNum+' - '+leagueLabel+'</h3>';
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":"Campionato Italiano";
+  let html='<div class="container"><h3 style="margin-bottom:12px">Pronostici Giornata '+gNum+' - '+leagueLabel+'</h3>';
   html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.75rem;white-space:nowrap"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U</th><th>Goal</th><th>Gol</th><th>Aff.</th></tr></thead><tbody>';
   for(const p of g.partite){
     const pronoUrl = "/api"+leagueApiPrefix()+"/pronostico/"+encodeURIComponent(p.home)+"/"+encodeURIComponent(p.away);
@@ -574,7 +574,7 @@ async function showMatch(h,a){
 
 //  -- CLASSIFICA (Pro only)  -  - &euro;
 async function pageClassifica(){
-  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":"Campionato Italiano";
   if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Classifica ${leagueLabel}</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   const data=await fetchAPI("/api"+leagueApiPrefix()+"/classifica", true);
   if(!data||!data.classifica||data.classifica.length===0)return `<div class="container">${leagueTabs()}<div class="card" style="text-align:center;padding:32px"><h2>Classifica ${leagueLabel}</h2><p style="color:var(--muted);margin:16px 0">Dati in caricamento... Riprova tra qualche secondo.</p><button class="btn btn-blue" onclick="navigate()">Ricarica</button></div></div>`;
@@ -614,7 +614,7 @@ async function pageClassifica(){
 
 //  -- SQUADRE (Pro only, con campo formazioni)  -  - &euro;
 async function pageSquadre(){
-  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":"Campionato Italiano";
   if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Squadre ${leagueLabel}</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   return `<div class="container">
     ${leagueTabs()}
@@ -735,7 +735,7 @@ let _liveRefreshTimer = null;
 let _viewingFixtureDetail = false;
 
 async function pageRisultati(){
-  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":"Campionato Italiano";
   if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Risultati Live ${leagueLabel}</h2><p style="margin:16px 0">I risultati live e lo storico delle partite sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro - 9.99&euro;/mese</button></div></div>`;
   // Pulisci timer precedente
   if(_liveRefreshTimer){clearInterval(_liveRefreshTimer);_liveRefreshTimer=null}
