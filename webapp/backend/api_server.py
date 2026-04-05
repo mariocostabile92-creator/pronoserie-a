@@ -2434,6 +2434,120 @@ async def classifica_league(league: str):
     mc = MARCATORI_CACHE.get(league)
     return {"classifica": cl or [], "marcatori": mc or [], "aggiornamento": CLASSIFICA_LAST_UPDATE.get(league, ""), "live": cl is not None}
 
+@app.get("/api/{league}/calendario")
+async def calendario_league(league: str):
+    """Calendario per qualsiasi campionato - prossime giornate + risultati da API Football."""
+    if league not in LEAGUES:
+        raise HTTPException(404, "Campionato non trovato")
+    lg = LEAGUES[league]
+    lid = lg["id"]
+    season = lg["season"]
+    nome_map = _get_nome_map(league)
+
+    giornate = []
+    giornata_corrente = None
+
+    try:
+        # Prendi TUTTE le fixtures della stagione (giocate + da giocare)
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league={lid}&season={season}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode())
+
+        if data.get("response"):
+            from collections import defaultdict
+            per_round = defaultdict(list)
+
+            for fix in data["response"]:
+                teams = fix.get("teams", {})
+                goals = fix.get("goals", {})
+                fixture = fix.get("fixture", {})
+                status = fixture.get("status", {})
+                lg_data = fix.get("league", {})
+                events = fix.get("events", [])
+
+                home_name = nome_map.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
+                away_name = nome_map.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
+
+                ss = status.get("short", "NS")
+                is_live = ss in ("1H", "2H", "HT", "ET", "P")
+                has_result = ss in ("FT", "AET", "PEN", "1H", "2H", "HT")
+
+                marcatori = []
+                for ev in events:
+                    if ev.get("type") == "Goal":
+                        nome = ev.get("player", {}).get("name", "?")
+                        minuto = ev.get("time", {}).get("elapsed", "?")
+                        detail = ev.get("detail", "")
+                        marcatori.append(f"{nome} {minuto}'" + (" (R)" if detail == "Penalty" else " (aut.)" if detail == "Own Goal" else ""))
+
+                match_data = {
+                    "home": home_name, "away": away_name,
+                    "gol_h": goals.get("home") if has_result else None,
+                    "gol_a": goals.get("away") if has_result else None,
+                    "status": ss,
+                    "status_it": {"FT": "Terminata", "NS": "Da giocare", "1H": "1T", "2H": "2T", "HT": "Intervallo"}.get(ss, ss),
+                    "minuto": status.get("elapsed"),
+                    "live": is_live,
+                    "fixture_id": fixture.get("id"),
+                    "ora": _utc_to_rome(fixture.get("date", "")),
+                    "data": fixture.get("date", "")[:10],
+                    "marcatori": marcatori,
+                }
+
+                rd = lg_data.get("round", "")
+                per_round[rd].append(match_data)
+
+            # Ordina i round per numero
+            def round_num(r):
+                try:
+                    return int(r.split(" - ")[-1])
+                except:
+                    return 0
+
+            for rd in sorted(per_round.keys(), key=round_num):
+                partite = per_round[rd]
+                g_num = rd.split(" - ")[-1] if " - " in rd else rd
+
+                tutte_finite = all(p["status"] in ("FT", "AET", "PEN") for p in partite)
+                ha_live = any(p["live"] for p in partite)
+                ha_da_giocare = any(p["status"] == "NS" for p in partite)
+
+                if tutte_finite:
+                    stato = "completata"
+                elif ha_live:
+                    stato = "live"
+                    giornata_corrente = g_num
+                else:
+                    stato = "prossima"
+                    if giornata_corrente is None and ha_da_giocare:
+                        giornata_corrente = g_num
+
+                giornate.append({
+                    "giornata": g_num,
+                    "data": partite[0]["data"] if partite else "",
+                    "partite": partite,
+                    "stato": stato,
+                    "live": ha_live,
+                })
+
+    except Exception as e:
+        print(f"⚠️ Calendario {league}: {e}")
+
+    if giornata_corrente is None and giornate:
+        for g in giornate:
+            if g["stato"] != "completata":
+                giornata_corrente = g["giornata"]
+                break
+
+    return {
+        "giornate": giornate,
+        "giornata_corrente": giornata_corrente or (giornate[-1]["giornata"] if giornate else "1"),
+        "live": any(g.get("live") for g in giornate),
+    }
+
 @app.get("/api/{league}/risultati")
 async def risultati_league(league: str):
     if league not in LEAGUES:

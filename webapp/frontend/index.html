@@ -385,15 +385,18 @@ let _calRefreshTimer = null;
 
 async function pageCalendario(){
   if(_calRefreshTimer){clearInterval(_calRefreshTimer);_calRefreshTimer=null}
-  const cal=await fetchAPI("/api/calendario", true);
-  if(!cal||!cal.giornate||!cal.giornate.length)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>';
+  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  const calUrl = currentLeague==="serie-a" ? "/api/calendario" : "/api/"+currentLeague+"/calendario";
+  const cal=await fetchAPI(calUrl, true);
+  if(!cal||!cal.giornate||!cal.giornate.length)return `<div class="container">${leagueTabs()}<div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>`;
 
   const gc = cal.giornata_corrente || cal.giornate[0].giornata;
   const gCorrente = cal.giornate.find(x=>x.giornata===gc) || cal.giornate[0];
   const completate = cal.giornate.filter(g=>g.stato==="completata");
   const prossime = cal.giornate.filter(g=>g.stato!=="completata" && g.giornata!==gc);
 
-  let html='<div class="container"><h1>Calendario Serie A 2025-2026</h1>';
+  let html='<div class="container"><h1>Calendario '+leagueLabel+'</h1>';
+  html+=leagueTabs();
   html+=`<p class="sub">${cal.live?'<span style="color:#e74c3c;font-weight:700">LIVE</span> - ':''}Giornata ${gc}${gCorrente.live?' in corso':''}</p>`;
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
 
