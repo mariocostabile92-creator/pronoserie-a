@@ -2296,6 +2296,7 @@ def _fetch_league_data(league_key):
     lid = league["id"]
     season = league["season"]
     nome_map = _get_nome_map(league_key)
+    print(f"📡 Fetch {league['name']} (league={lid}, season={season})...")
 
     # Classifica
     try:

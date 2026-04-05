@@ -591,8 +591,8 @@ async function showMatch(h,a){
 async function pageClassifica(){
   const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
   if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Classifica ${leagueLabel}</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
-  const data=await fetchAPI("/api"+leagueApiPrefix()+"/classifica");
-  if(!data||!data.classifica)return `<div class="container">${leagueTabs()}<div class="card" style="color:var(--red)">Errore caricamento classifica. Riprova.</div></div>`;
+  const data=await fetchAPI("/api"+leagueApiPrefix()+"/classifica", true);
+  if(!data||!data.classifica||data.classifica.length===0)return `<div class="container">${leagueTabs()}<div class="card" style="text-align:center;padding:32px"><h2>Classifica ${leagueLabel}</h2><p style="color:var(--muted);margin:16px 0">Dati in caricamento... Riprova tra qualche secondo.</p><button class="btn btn-blue" onclick="navigate()">Ricarica</button></div></div>`;
   const aggLive = data.live ? `<span style="color:var(--green);font-size:.85rem">Aggiornamento automatico: ${data.aggiornamento||""}</span>` : '<span style="color:var(--muted);font-size:.85rem">Dati base</span>';
   let html='<div class="container">'+leagueTabs()+'<h1>Classifica '+leagueLabel+'</h1><p class="sub">'+aggLive+'</p>';
   // Layout 2 colonne: classifica SX, marcatori DX
