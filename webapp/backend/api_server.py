@@ -1167,9 +1167,7 @@ async def calendario():
 # ─────────────────────────────
 # CLASSIFICA + MARCATORI (AUTO-AGGIORNAMENTO API FOOTBALL)
 # ─────────────────────────────
-CLASSIFICA_CACHE = None
-MARCATORI_CACHE = None
-CLASSIFICA_LAST_UPDATE = ""
+# CLASSIFICA_CACHE e MARCATORI_CACHE sono definiti sopra come dict multi-league
 
 # Fallback hardcoded (usato solo se API non disponibile)
 CLASS_FALLBACK = [
@@ -1220,7 +1218,6 @@ MARC_FALLBACK = [
 
 def _fetch_classifica_live():
     """Scarica classifica Serie A aggiornata da API Football."""
-    global CLASSIFICA_CACHE, CLASSIFICA_LAST_UPDATE
     try:
         req = urllib.request.Request(
             f"https://{FOOTBALL_API_HOST}/standings?league=135&season=2025",
@@ -1263,7 +1260,6 @@ def _fetch_classifica_live():
 
 def _fetch_marcatori_live():
     """Scarica classifica marcatori Serie A da API Football."""
-    global MARCATORI_CACHE
     try:
         req = urllib.request.Request(
             f"https://{FOOTBALL_API_HOST}/players/topscorers?league=135&season=2025",
