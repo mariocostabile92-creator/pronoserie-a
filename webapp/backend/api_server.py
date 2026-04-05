@@ -265,16 +265,17 @@ async def startup():
     else:
         print("⚠️ MOTORE NON DISPONIBILE")
 
-    # AVVIA AGGIORNAMENTO LIVE
+    # AVVIA AGGIORNAMENTO LIVE (ritardato per non sovraccaricare lo startup)
+    def _delayed_start():
+        time.sleep(10)  # Aspetta 10 secondi dopo l'avvio
+        _fetch_live_results()
+        _fetch_classifica_live()
+        _fetch_marcatori_live()
+        print("✅ PRIMO FETCH COMPLETATO")
     t = threading.Thread(target=_live_updater, daemon=True)
     t.start()
-    print("✅ LIVE UPDATER AVVIATO (ogni 30 min)")
-
-    # Fetch risultati live subito allo startup
-    threading.Thread(target=_fetch_live_results, daemon=True).start()
-    threading.Thread(target=_fetch_classifica_live, daemon=True).start()
-    threading.Thread(target=_fetch_marcatori_live, daemon=True).start()
-    print("✅ RISULTATI + CLASSIFICA + MARCATORI LIVE: primo fetch in corso...")
+    threading.Thread(target=_delayed_start, daemon=True).start()
+    print("✅ LIVE UPDATER AVVIATO")
 
 # ─────────────────────────────
 # FRONTEND
