@@ -846,32 +846,90 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
 
     raw = genera_pronostico(home, away)
 
+    # ── BLEND CON QUOTE BOOKMAKER LIVE (the-odds-api) ──
+    p1 = raw.get("prob_1", 0)
+    px = raw.get("prob_x", 0)
+    p2 = raw.get("prob_2", 0)
+    bk_live = get_bookmaker_odds(home.strip().title(), away.strip().title())
+    bk_used_live = False
+    if bk_live and bk_live.get("prob_1"):
+        bk_used_live = True
+        # Blend 65% modello + 35% bookmaker live (le quote live sono molto accurate)
+        ALPHA_LIVE = 0.35
+        bp1 = bk_live["prob_1"] / 100
+        bpx = bk_live["prob_x"] / 100
+        bp2 = bk_live["prob_2"] / 100
+        p1 = (1 - ALPHA_LIVE) * (p1 / 100) + ALPHA_LIVE * bp1
+        px = (1 - ALPHA_LIVE) * (px / 100) + ALPHA_LIVE * bpx
+        p2 = (1 - ALPHA_LIVE) * (p2 / 100) + ALPHA_LIVE * bp2
+        # Normalizza
+        tot = p1 + px + p2
+        if tot > 0:
+            p1 = round(p1 / tot * 100, 1)
+            px = round(px / tot * 100, 1)
+            p2 = round(p2 / tot * 100, 1)
+        # Ricalcola suggerimento
+        mp = max(p1, px, p2)
+        if mp == p1:
+            sugg, sugg_label = "1", "Vittoria Casa"
+        elif mp == px:
+            sugg, sugg_label = "X", "Pareggio"
+        else:
+            sugg, sugg_label = "2", "Vittoria Ospite"
+        # Ricalcola quote
+        q1 = round(1.05 / (p1/100), 2) if p1 > 0 else 99
+        qx = round(1.05 / (px/100), 2) if px > 0 else 99
+        q2 = round(1.05 / (p2/100), 2) if p2 > 0 else 99
+        # Ricalcola confidence (boost se modello e bookmaker concordano)
+        conf_raw = raw.get("confidence", 0.5)
+        if sugg == raw.get("suggerimento", ""):
+            conf_raw = min(1.0, conf_raw * 1.08)  # +8% se concordano
+        conf_label = "Alta" if conf_raw >= 0.82 else ("Media" if conf_raw >= 0.50 else "Bassa")
+        # Blend Over/Under con bookmaker live
+        ov25 = raw.get("over_25", 50)
+        un25 = raw.get("under_25", 50)
+        if bk_live.get("bk_over_25"):
+            ov25 = round(0.65 * ov25 + 0.35 * bk_live["bk_over_25"], 1)
+            un25 = round(100 - ov25, 1)
+    else:
+        sugg = raw.get("suggerimento", "")
+        sugg_label = raw.get("sugg_label", "")
+        q1 = raw.get("quota_1", 0)
+        qx = raw.get("quota_x", 0)
+        q2 = raw.get("quota_2", 0)
+        conf_raw = raw.get("confidence", 0)
+        conf_label = raw.get("confidence_label", "")
+        ov25 = raw.get("over_25")
+        un25 = raw.get("under_25")
+
     return {
         "home": home,
         "away": away,
-        "prob_1": raw.get("prob_1", 0),
-        "prob_x": raw.get("prob_x", 0),
-        "prob_2": raw.get("prob_2", 0),
-        "quota_1": raw.get("quota_1", 0),
-        "quota_x": raw.get("quota_x", 0),
-        "quota_2": raw.get("quota_2", 0),
-        "suggerimento": raw.get("suggerimento", ""),
-        "sugg_label": raw.get("sugg_label", ""),
-        "confidence": raw.get("confidence", 0),
-        "confidence_label": raw.get("confidence_label", ""),
-        "over_25": raw.get("over_25"),
-        "under_25": raw.get("under_25"),
+        "prob_1": p1,
+        "prob_x": px,
+        "prob_2": p2,
+        "quota_1": q1,
+        "quota_x": qx,
+        "quota_2": q2,
+        "suggerimento": sugg,
+        "sugg_label": sugg_label,
+        "confidence": conf_raw,
+        "confidence_label": conf_label,
+        "over_25": ov25,
+        "under_25": un25,
         "goal_si": raw.get("goal_si"),
         "goal_no": raw.get("goal_no"),
         "gol_attesi": raw.get("gol_attesi"),
         "risultati_esatti": raw.get("risultati_esatti", []),
-        "sicura": bool(raw.get("sicura", False)),
+        "sicura": bool(conf_raw >= 0.82 and max(p1,px,p2) > 45),
         "marcatori_casa": raw.get("marcatori_casa") or _filtra_marcatori(TOP_SCORER.get(home.strip().title(), []), INFORTUNATI.get(home.strip().title(), [])),
         "marcatori_ospite": raw.get("marcatori_ospite") or _filtra_marcatori(TOP_SCORER.get(away.strip().title(), []), INFORTUNATI.get(away.strip().title(), [])),
         "formazione_casa": raw.get("formazione_casa") or FORMAZIONI.get(home.strip().title()),
         "formazione_ospite": raw.get("formazione_ospite") or FORMAZIONI.get(away.strip().title()),
         "h2h_applicato": bool(raw.get("h2h_applicato", False)),
         "h2h_partite": int(raw.get("h2h_partite", 0)),
+        "bookmaker_live": bk_used_live,
+        "bookmaker_live_data": bk_live if bk_used_live else None,
     }
 
 # ─────────────────────────────
