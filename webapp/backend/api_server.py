@@ -2521,9 +2521,11 @@ async def calendario_league(league: str):
 
                 tutte_finite = all(p["status"] in ("FT", "AET", "PEN") for p in partite)
                 ha_live = any(p["live"] for p in partite)
-                ha_da_giocare = any(p["status"] == "NS" for p in partite)
+                ha_da_giocare = any(p["status"] in ("NS", "TBD") for p in partite)
+                # Se nessuna partita da giocare e nessuna live -> completata
+                nessuna_futura = not ha_da_giocare and not ha_live
 
-                if tutte_finite:
+                if tutte_finite or nessuna_futura:
                     stato = "completata"
                 elif ha_live:
                     stato = "live"
