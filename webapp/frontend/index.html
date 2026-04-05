@@ -438,32 +438,17 @@ async function pageCalendario(){
   });
   html+=`</div><div id="sim-result-main"></div></div>`;
 
-  // DESTRA: archivio + prossime
+  // DESTRA: solo prossime giornate (dopo la corrente)
   html+='<div>';
 
-  // Prossime giornate
-  if(prossime.length>0){
+  // Filtra solo giornate FUTURE (non completate, non la corrente)
+  const future = prossime.filter(g=>g.stato==="prossima");
+  if(future.length>0){
     html+='<div class="card" style="padding:8px;margin-bottom:8px"><h4 style="color:var(--muted);margin-bottom:6px">Prossime giornate</h4>';
-    prossime.forEach((g,idx)=>{
+    future.forEach((g,idx)=>{
       const locked=userPlan!=="pro"&&idx>=1;
       html+=`<div style="padding:6px 0;border-bottom:1px solid #1f3460${locked?';opacity:.4':''}"><strong style="color:var(--accent);font-size:.85rem">G.${g.giornata}</strong> <span style="color:var(--muted);font-size:.75rem">${g.data||""}</span>${locked?' <span class="tag tag-red" style="font-size:.6rem">PRO</span>':''}`;
       if(!locked){g.partite.forEach(p=>{html+=`<div style="font-size:.8rem;padding:1px 0;color:var(--text)">${badge(p.home,14)}${p.home} - ${p.away}${badge(p.away,14)}</div>`})}
-      html+=`</div>`;
-    });
-    html+='</div>';
-  }
-
-  // Giornate completate (solo ultime 3, non tutte)
-  const ultimeCompletate = completate.slice(-3);
-  if(ultimeCompletate.length>0){
-    html+='<div class="card" style="padding:8px"><h4 style="color:var(--muted);margin-bottom:6px">Ultime giornate</h4>';
-    ultimeCompletate.forEach(g=>{
-      html+=`<div style="padding:6px 0;border-bottom:1px solid #1f3460"><strong style="color:var(--green);font-size:.85rem">G.${g.giornata}</strong> <span style="color:var(--muted);font-size:.75rem">${g.data||""}</span> <span style="color:var(--green);font-size:.65rem">COMPLETATA</span>`;
-      g.partite.forEach(p=>{
-        const colH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
-        const colA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
-        html+=`<div style="font-size:.8rem;padding:1px 0;display:flex;align-items:center">${badge(p.home,12)}<span style="flex:1">${p.home}</span><span style="font-weight:700"><span style="color:${colH}">${p.gol_h}</span>-<span style="color:${colA}">${p.gol_a}</span></span><span style="flex:1;text-align:right">${p.away}</span>${badge(p.away,12)}</div>`;
-      });
       html+=`</div>`;
     });
     html+='</div>';
