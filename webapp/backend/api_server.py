@@ -54,10 +54,57 @@ app.add_middleware(
 app.include_router(payments_router)
 
 # ─────────────────────────────
-# GLOBAL
+# GLOBAL + MULTI-LEAGUE CONFIG
 # ─────────────────────────────
 _df = None
 LIMITE_FREE = 2
+
+LEAGUES = {
+    "serie-a": {"id": 135, "season": 2025, "name": "Serie A", "country": "Italy"},
+    "premier-league": {"id": 39, "season": 2024, "name": "Premier League", "country": "England"},
+}
+
+# Mapping nomi API Football -> nomi nostri (per ogni league)
+PL_NOME_MAP = {
+    "Manchester United": "Man United", "Manchester City": "Man City",
+    "Newcastle United": "Newcastle", "AFC Bournemouth": "Bournemouth",
+    "Wolverhampton Wanderers": "Wolves", "Nottingham Forest": "Nott. Forest",
+    "Tottenham Hotspur": "Tottenham", "West Ham United": "West Ham",
+    "Brighton and Hove Albion": "Brighton", "Crystal Palace": "Crystal Palace",
+    "Leicester City": "Leicester", "Ipswich Town": "Ipswich",
+    "Arsenal": "Arsenal", "Liverpool": "Liverpool", "Chelsea": "Chelsea",
+    "Aston Villa": "Aston Villa", "Fulham": "Fulham", "Everton": "Everton",
+    "Brentford": "Brentford", "Southampton": "Southampton",
+}
+
+PL_TEAM_IDS = {
+    "Arsenal":42,"Aston Villa":66,"Bournemouth":35,"Brentford":55,"Brighton":51,
+    "Chelsea":49,"Crystal Palace":52,"Everton":45,"Fulham":36,"Ipswich":57,
+    "Leicester":46,"Liverpool":40,"Man City":50,"Man United":33,"Newcastle":34,
+    "Nott. Forest":65,"Southampton":41,"Tottenham":47,"West Ham":48,"Wolves":39,
+}
+
+def _get_nome_map(league_key):
+    if league_key == "premier-league":
+        return PL_NOME_MAP
+    return FOOTBALL_NOME_MAP
+
+def _get_team_ids(league_key):
+    if league_key == "premier-league":
+        return PL_TEAM_IDS
+    return _TEAM_IDS
+
+def _map_team_name(name, league_key):
+    nm = _get_nome_map(league_key)
+    return nm.get(name, name)
+
+# Cache multi-league
+CLASSIFICA_CACHE = {"serie-a": None, "premier-league": None}
+CLASSIFICA_LAST_UPDATE = {"serie-a": "", "premier-league": ""}
+MARCATORI_CACHE = {"serie-a": None, "premier-league": None}
+LIVE_RESULTS_CACHE_ML = {"serie-a": None, "premier-league": None}
+RISULTATI_STAGIONE_CACHE_ML = {"serie-a": None, "premier-league": None}
+LIVE_IN_CORSO_ML = {"serie-a": False, "premier-league": False}
 
 # Dati live (aggiornati automaticamente)
 import threading, time, urllib.request, re as regex_module
@@ -257,6 +304,7 @@ def _live_updater():
             if _updater_count % 6 == 0:
                 _fetch_rose_live()
                 _fetch_risultati_stagione()
+                _fetch_league_data("premier-league")
         except Exception:
             pass
         if LIVE_IN_CORSO:
@@ -318,6 +366,11 @@ async def startup():
             pass
         try:
             _fetch_rose_live()
+        except Exception:
+            pass
+        # Premier League
+        try:
+            _fetch_league_data("premier-league")
         except Exception:
             pass
     t = threading.Thread(target=_live_updater, daemon=True)
@@ -2229,6 +2282,197 @@ async def fixture_detail(fixture_id: int):
         result["formazioni"] = {}
 
     return result
+
+# ─────────────────────────────
+# ENDPOINT MULTI-LEAGUE (Premier League + futuri campionati)
+# ─────────────────────────────
+
+def _fetch_league_data(league_key):
+    """Scarica classifica, marcatori, risultati per un campionato da API Football."""
+    league = LEAGUES.get(league_key)
+    if not league:
+        return
+    lid = league["id"]
+    season = league["season"]
+    nome_map = _get_nome_map(league_key)
+
+    # Classifica
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/standings?league={lid}&season={season}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+        if data.get("response") and len(data["response"]) > 0:
+            standings = data["response"][0].get("league", {}).get("standings", [])
+            if standings and len(standings) > 0:
+                classifica = []
+                for team in standings[0]:
+                    nome_api = team.get("team", {}).get("name", "?")
+                    nome = nome_map.get(nome_api, nome_api)
+                    stats = team.get("all", {})
+                    gf = stats.get("goals", {}).get("for", 0)
+                    gs = stats.get("goals", {}).get("against", 0)
+                    classifica.append({"Squadra":nome,"Punti":team.get("points",0),"G":stats.get("played",0),"V":stats.get("win",0),"N":stats.get("draw",0),"P":stats.get("lose",0),"GF":gf,"GS":gs,"DR":gf-gs})
+                classifica.sort(key=lambda x: (-x["Punti"], -x["DR"]))
+                if len(classifica) >= 10:
+                    CLASSIFICA_CACHE[league_key] = classifica
+                    CLASSIFICA_LAST_UPDATE[league_key] = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
+    except Exception as e:
+        print(f"⚠️ Classifica {league_key}: {e}")
+
+    # Marcatori
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/players/topscorers?league={lid}&season={season}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+        if data.get("response"):
+            marcatori = []
+            for i, player in enumerate(data["response"][:20], 1):
+                info = player.get("player", {})
+                gol = 0
+                squadra_api = ""
+                for s in player.get("statistics", []):
+                    if s.get("league", {}).get("id") == lid:
+                        gol = s.get("goals", {}).get("total", 0) or 0
+                        squadra_api = s.get("team", {}).get("name", "")
+                        break
+                squadra = nome_map.get(squadra_api, squadra_api)
+                marcatori.append({"pos":i,"giocatore":info.get("name","?"),"squadra":squadra,"gol":gol})
+            if marcatori:
+                MARCATORI_CACHE[league_key] = marcatori
+    except Exception as e:
+        print(f"⚠️ Marcatori {league_key}: {e}")
+
+    # Risultati stagione
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league={lid}&season={season}&status=FT-AET-PEN",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode())
+        if data.get("response"):
+            partite = []
+            for fix in data["response"]:
+                teams = fix.get("teams", {})
+                goals = fix.get("goals", {})
+                fixture = fix.get("fixture", {})
+                events = fix.get("events", [])
+                lg = fix.get("league", {})
+                home_name = nome_map.get(teams.get("home",{}).get("name","?"), teams.get("home",{}).get("name","?"))
+                away_name = nome_map.get(teams.get("away",{}).get("name","?"), teams.get("away",{}).get("name","?"))
+                marcatori = []
+                marcatori_home = []
+                marcatori_away = []
+                home_id = teams.get("home",{}).get("id")
+                for ev in events:
+                    if ev.get("type") == "Goal":
+                        nome = ev.get("player",{}).get("name","?")
+                        minuto = ev.get("time",{}).get("elapsed","?")
+                        detail = ev.get("detail","")
+                        gol_str = f"{nome} {minuto}'" + (" (R)" if detail=="Penalty" else " (aut.)" if detail=="Own Goal" else "")
+                        marcatori.append(gol_str)
+                        if ev.get("team",{}).get("id") == home_id:
+                            marcatori_home.append(gol_str)
+                        else:
+                            marcatori_away.append(gol_str)
+                partite.append({"home":home_name,"away":away_name,"gol_h":goals.get("home",0) or 0,"gol_a":goals.get("away",0) or 0,"status":"FT","status_it":"Terminata","live":False,"marcatori":marcatori,"marcatori_home":marcatori_home,"marcatori_away":marcatori_away,"fixture_id":fixture.get("id"),"data":fixture.get("date","")[:10],"ora":_utc_to_rome(fixture.get("date","")),"round":lg.get("round","")})
+            if partite:
+                partite.sort(key=lambda x: x["data"], reverse=True)
+                RISULTATI_STAGIONE_CACHE_ML[league_key] = partite
+    except Exception as e:
+        print(f"⚠️ Risultati {league_key}: {e}")
+
+    # Live results
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league={lid}&season={season}&last=15",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+        if data.get("response"):
+            live_p = []
+            has_live = False
+            for fix in data["response"]:
+                teams = fix.get("teams",{})
+                goals = fix.get("goals",{})
+                fixture = fix.get("fixture",{})
+                status = fixture.get("status",{})
+                events = fix.get("events",[])
+                home_name = nome_map.get(teams.get("home",{}).get("name","?"), teams.get("home",{}).get("name","?"))
+                away_name = nome_map.get(teams.get("away",{}).get("name","?"), teams.get("away",{}).get("name","?"))
+                marcatori=[]
+                for ev in events:
+                    if ev.get("type")=="Goal":
+                        nome=ev.get("player",{}).get("name","?")
+                        minuto=ev.get("time",{}).get("elapsed","?")
+                        detail=ev.get("detail","")
+                        marcatori.append(f"{nome} {minuto}'" + (" (R)" if detail=="Penalty" else " (aut.)" if detail=="Own Goal" else ""))
+                ss = status.get("short","FT")
+                is_live = ss in ("1H","2H","HT","ET","P")
+                if is_live: has_live = True
+                live_p.append({"home":home_name,"away":away_name,"gol_h":goals.get("home",0) or 0,"gol_a":goals.get("away",0) or 0,"status":ss,"minuto":status.get("elapsed"),"live":is_live,"marcatori":marcatori,"fixture_id":fixture.get("id"),"data":fixture.get("date","")[:10],"ora":_utc_to_rome(fixture.get("date",""))})
+            LIVE_RESULTS_CACHE_ML[league_key] = live_p
+            LIVE_IN_CORSO_ML[league_key] = has_live
+    except Exception as e:
+        print(f"⚠️ Live {league_key}: {e}")
+
+    print(f"✅ {league['name']}: dati aggiornati")
+
+@app.get("/api/{league}/classifica")
+async def classifica_league(league: str):
+    if league not in LEAGUES:
+        raise HTTPException(404, "Campionato non trovato")
+    cl = CLASSIFICA_CACHE.get(league)
+    mc = MARCATORI_CACHE.get(league)
+    return {"classifica": cl or [], "marcatori": mc or [], "aggiornamento": CLASSIFICA_LAST_UPDATE.get(league, ""), "live": cl is not None}
+
+@app.get("/api/{league}/risultati")
+async def risultati_league(league: str):
+    if league not in LEAGUES:
+        raise HTTPException(404, "Campionato non trovato")
+    giornate = []
+    # Live
+    live_p = LIVE_RESULTS_CACHE_ML.get(league) or []
+    live_now = [p for p in live_p if p.get("live")]
+    if live_now:
+        giornate.append({"giornata":"Live","data":live_now[0]["data"],"partite":live_now,"live":True})
+    # Storico
+    storico = RISULTATI_STAGIONE_CACHE_ML.get(league) or []
+    if storico:
+        from collections import defaultdict
+        per_round = defaultdict(list)
+        for p in storico:
+            per_round[p.get("round","")].append(p)
+        for rd in sorted(per_round.keys(), key=lambda r: int(r.split(" - ")[-1]) if " - " in r and r.split(" - ")[-1].isdigit() else 0, reverse=True):
+            g_num = rd.split(" - ")[-1] if " - " in rd else rd
+            giornate.append({"giornata":g_num,"data":per_round[rd][0]["data"],"partite":per_round[rd],"live":False})
+    return {"giornate":giornate,"live":LIVE_IN_CORSO_ML.get(league,False),"aggiornamento":CLASSIFICA_LAST_UPDATE.get(league,"")}
+
+@app.get("/api/{league}/pronostico/{home}/{away}")
+async def pronostico_league(league: str, home: str, away: str):
+    if league not in LEAGUES:
+        raise HTTPException(404, "Campionato non trovato")
+    # Per PL usa il modello Poisson fallback (senza CSV)
+    raw = genera_pronostico(home, away)
+    return {
+        "home":home,"away":away,
+        "prob_1":raw.get("prob_1",0),"prob_x":raw.get("prob_x",0),"prob_2":raw.get("prob_2",0),
+        "quota_1":raw.get("quota_1",0),"quota_x":raw.get("quota_x",0),"quota_2":raw.get("quota_2",0),
+        "suggerimento":raw.get("suggerimento",""),"sugg_label":raw.get("sugg_label",""),
+        "confidence":raw.get("confidence",0),"confidence_label":raw.get("confidence_label",""),
+        "over_25":raw.get("over_25"),"under_25":raw.get("under_25"),
+        "goal_si":raw.get("goal_si"),"goal_no":raw.get("goal_no"),
+        "gol_attesi":raw.get("gol_attesi"),
+        "risultati_esatti":raw.get("risultati_esatti",[]),
+        "sicura":bool(raw.get("sicura",False)),
+    }
 
 # ─────────────────────────────
 # HEALTH CHECK

@@ -70,8 +70,16 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
 <script>
 const API = window.location.origin;
 const SQ = ["Inter","Milan","Napoli","Como","Juventus","Roma","Atalanta","Lazio","Bologna","Sassuolo","Udinese","Parma","Genoa","Torino","Cagliari","Fiorentina","Cremonese","Lecce","Verona","Pisa"];
+const SQ_PL = ["Arsenal","Aston Villa","Bournemouth","Brentford","Brighton","Chelsea","Crystal Palace","Everton","Fulham","Ipswich","Leicester","Liverpool","Man City","Man United","Newcastle","Nott. Forest","Southampton","Tottenham","West Ham","Wolves"];
 const TEAM_IDS = {Inter:505,Milan:489,Napoli:492,Como:895,Juventus:496,Roma:497,Atalanta:499,Lazio:487,Bologna:500,Sassuolo:488,Udinese:494,Parma:523,Genoa:495,Torino:503,Cagliari:490,Fiorentina:502,Cremonese:520,Lecce:867,Verona:504,Pisa:801};
-function badge(name,size){size=size||20;const id=TEAM_IDS[name];if(!id)return'';return `<img src="https://media.api-sports.io/football/teams/${id}.png" alt="${name}" style="width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px">`}
+const TEAM_IDS_PL = {Arsenal:42,"Aston Villa":66,Bournemouth:35,Brentford:55,Brighton:51,Chelsea:49,"Crystal Palace":52,Everton:45,Fulham:36,Ipswich:57,Leicester:46,Liverpool:40,"Man City":50,"Man United":33,Newcastle:34,"Nott. Forest":65,Southampton:41,Tottenham:47,"West Ham":48,Wolves:39};
+let currentLeague = "serie-a";
+function badge(name,size){size=size||20;const ids=currentLeague==="premier-league"?TEAM_IDS_PL:TEAM_IDS;const id=ids[name];if(!id)return'';return `<img src="https://media.api-sports.io/football/teams/${id}.png" alt="${name}" style="width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px">`}
+function getSQ(){return currentLeague==="premier-league"?SQ_PL:SQ}
+function leagueTabs(){return `<div style="display:flex;gap:0;margin-bottom:16px"><button style="flex:1;padding:10px;border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:10px 0 0 10px;${currentLeague==='serie-a'?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('serie-a')">Serie A</button><button style="flex:1;padding:10px;border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:0 10px 10px 0;${currentLeague==='premier-league'?'background:var(--accent);color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('premier-league')">Premier League</button></div>`}
+function switchLeague(l){currentLeague=l;navigate()}
+function opts(){return getSQ().map(s=>`<option value="${s}">${s}</option>`).join('')}
+function leagueApiPrefix(){return currentLeague==="serie-a"?"":"/"+currentLeague}
 let userPlan = localStorage.getItem("userPlan") || "free";
 let userToken = localStorage.getItem("userToken") || "";
 let userEmail = localStorage.getItem("userEmail") || "";
@@ -249,9 +257,11 @@ async function loadSchedina(){
 
 //  -- PRONOSTICI (2 gratis/giorno)  -  - &euro;
 function pagePronostici(){
+  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
   return `<div class="container">
+    ${leagueTabs()}
     <div class="card" style="text-align:center;padding:32px">
-      <h1>Calcola Pronostico</h1>
+      <h1>Calcola Pronostico - ${leagueLabel}</h1>
       <p class="sub">Scegli le squadre e scopri il pronostico dell'IA</p>
       <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin:24px 0">
         <div><label style="color:var(--green);font-weight:700">CASA</label><br><select id="sel-home">${opts()}</select></div>
@@ -273,7 +283,7 @@ async function calcPronostico(){
     return;
   }
   res.innerHTML='<div class="spinner"></div>';
-  const d=await fetchAPI("/api/pronostico/"+encodeURIComponent(h)+"/"+encodeURIComponent(a));
+  const d=await fetchAPI("/api"+leagueApiPrefix()+"/pronostico/"+encodeURIComponent(h)+"/"+encodeURIComponent(a));
   if(!d){res.innerHTML='<div class="card" style="color:var(--red)">Errore. Riprova tra qualche secondo.</div>';return}
   const best=d.suggerimento||"?";
   const cc=d.confidence_label==="Alta"?"var(--green)":d.confidence_label==="Media"?"var(--yellow)":"var(--red)";
@@ -573,11 +583,12 @@ async function showMatch(h,a){
 
 //  -- CLASSIFICA (Pro only)  -  - &euro;
 async function pageClassifica(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Classifica Serie A</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
-  const data=await fetchAPI("/api/classifica");
-  if(!data||!data.classifica)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento classifica. Riprova.</div></div>';
+  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Classifica ${leagueLabel}</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
+  const data=await fetchAPI("/api"+leagueApiPrefix()+"/classifica");
+  if(!data||!data.classifica)return `<div class="container">${leagueTabs()}<div class="card" style="color:var(--red)">Errore caricamento classifica. Riprova.</div></div>`;
   const aggLive = data.live ? `<span style="color:var(--green);font-size:.85rem">Aggiornamento automatico: ${data.aggiornamento||""}</span>` : '<span style="color:var(--muted);font-size:.85rem">Dati base</span>';
-  let html='<div class="container"><h1>Classifica Serie A 2025-2026</h1><p class="sub">'+aggLive+'</p>';
+  let html='<div class="container">'+leagueTabs()+'<h1>Classifica '+leagueLabel+'</h1><p class="sub">'+aggLive+'</p>';
   // Layout 2 colonne: classifica SX, marcatori DX
   html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
   // SINISTRA: Classifica
@@ -748,16 +759,18 @@ let _liveRefreshTimer = null;
 let _viewingFixtureDetail = false;
 
 async function pageRisultati(){
-  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card"><h2>Risultati Serie A</h2><p style="margin:16px 0">I risultati live e lo storico delle partite sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro - 9.99&euro;/mese</button></div></div>`;
+  const leagueLabel = currentLeague==="premier-league"?"Premier League":"Serie A";
+  if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Risultati Live ${leagueLabel}</h2><p style="margin:16px 0">I risultati live e lo storico delle partite sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro - 9.99&euro;/mese</button></div></div>`;
   // Pulisci timer precedente
   if(_liveRefreshTimer){clearInterval(_liveRefreshTimer);_liveRefreshTimer=null}
-  const data=await fetchAPI("/api/risultati", true);
-  if(!data||!data.giornate)return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento risultati</div></div>';
+  const data=await fetchAPI("/api"+leagueApiPrefix()+"/risultati", true);
+  if(!data||!data.giornate)return `<div class="container">${leagueTabs()}<div class="card" style="color:var(--red)">Errore caricamento risultati</div></div>`;
   const hasLive = data.live;
   let html='<div class="container">';
+  html+=leagueTabs();
   // Header con indicatore LIVE
   html+=`<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px">
-    <div><h1 style="margin-bottom:4px">Risultati Serie A 2025-2026</h1><p class="sub" style="margin-bottom:0">Aggiornamento: ${data.aggiornamento||"In tempo reale"}</p></div>
+    <div><h1 style="margin-bottom:4px">Risultati Live ${leagueLabel}</h1><p class="sub" style="margin-bottom:0">Aggiornamento: ${data.aggiornamento||"In tempo reale"}</p></div>
     <div style="display:flex;align-items:center;gap:12px">
       ${hasLive?'<div style="display:flex;align-items:center;gap:6px;background:#e74c3c;padding:6px 16px;border-radius:20px;animation:pulse 1.5s infinite"><div style="width:10px;height:10px;border-radius:50%;background:#fff"></div><span style="color:#fff;font-weight:800;font-size:.9rem">LIVE</span></div>':'<span style="color:var(--muted);font-size:.85rem">Nessuna partita in corso</span>'}
       <button class="btn btn-blue" style="padding:8px 16px;font-size:.85rem" onclick="refreshRisultati()">Aggiorna</button>
