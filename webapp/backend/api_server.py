@@ -98,6 +98,128 @@ def _scrape_live_data():
     except Exception as e:
         print(f"⚠️ Scrape infortunati fallito: {e}")
 
+# ─────────────────────────────
+# NOTIFICHE GOL TELEGRAM (per utenti Pro)
+# ─────────────────────────────
+TELEGRAM_BOT_TOKEN = "8664256029:AAH2dTkgm5Ca8WnwnNurYWW1LfWhoYVna5Q"
+_NOTIFIED_GOALS = set()  # Set di gol gia' notificati: "fixture_id_minuto_giocatore"
+_BOT_DB_PATH = os.path.join(_ROOT, "bot_utenti.db")
+
+def _get_pro_chat_ids():
+    """Recupera tutti gli chat_id degli utenti Pro dal database del bot."""
+    import sqlite3
+    try:
+        if not os.path.exists(_BOT_DB_PATH):
+            return []
+        conn = sqlite3.connect(_BOT_DB_PATH)
+        rows = conn.execute("SELECT chat_id FROM utenti WHERE piano = 'pro'").fetchall()
+        conn.close()
+        return [r[0] for r in rows]
+    except Exception:
+        return []
+
+def _send_telegram_message(chat_id, text):
+    """Invia un messaggio Telegram a un chat_id."""
+    try:
+        import urllib.parse
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        data = urllib.parse.urlencode({
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "HTML",
+            "disable_notification": False,
+        }).encode()
+        req = urllib.request.Request(url, data=data)
+        urllib.request.urlopen(req, timeout=10)
+    except Exception as e:
+        print(f"Errore invio Telegram a {chat_id}: {e}")
+
+def _check_and_notify_goals():
+    """Controlla se ci sono nuovi gol e invia notifiche agli utenti Pro."""
+    global _NOTIFIED_GOALS
+    if not LIVE_RESULTS_CACHE or not LIVE_IN_CORSO:
+        return
+
+    pro_ids = _get_pro_chat_ids()
+    if not pro_ids:
+        return
+
+    for p in LIVE_RESULTS_CACHE:
+        if not p.get("live"):
+            continue
+
+        fixture_id = p.get("fixture_id", 0)
+        home = p["home"]
+        away = p["away"]
+        marcatori_home = p.get("marcatori_home", [])
+        marcatori_away = p.get("marcatori_away", [])
+        rossi_home = p.get("rossi_home", [])
+        rossi_away = p.get("rossi_away", [])
+        gol_h = p["gol_h"]
+        gol_a = p["gol_a"]
+        minuto = p.get("minuto", "")
+
+        # Controlla gol casa
+        for m in marcatori_home:
+            goal_key = f"{fixture_id}_{m}"
+            if goal_key not in _NOTIFIED_GOALS:
+                _NOTIFIED_GOALS.add(goal_key)
+                msg = (
+                    f"&#9917; <b>GOOOL!</b>\n\n"
+                    f"<b>{home} {gol_h} - {gol_a} {away}</b>\n"
+                    f"&#9917; {m} ({home})\n"
+                    f"&#9201; {minuto}'"
+                )
+                for cid in pro_ids:
+                    threading.Thread(target=_send_telegram_message, args=(cid, msg), daemon=True).start()
+                print(f"&#9917; NOTIFICA GOL: {home} - {m}")
+
+        # Controlla gol ospite
+        for m in marcatori_away:
+            goal_key = f"{fixture_id}_{m}"
+            if goal_key not in _NOTIFIED_GOALS:
+                _NOTIFIED_GOALS.add(goal_key)
+                msg = (
+                    f"&#9917; <b>GOOOL!</b>\n\n"
+                    f"<b>{home} {gol_h} - {gol_a} {away}</b>\n"
+                    f"&#9917; {m} ({away})\n"
+                    f"&#9201; {minuto}'"
+                )
+                for cid in pro_ids:
+                    threading.Thread(target=_send_telegram_message, args=(cid, msg), daemon=True).start()
+                print(f"&#9917; NOTIFICA GOL: {away} - {m}")
+
+        # Controlla cartellini rossi
+        for r in rossi_home:
+            red_key = f"{fixture_id}_red_{r}"
+            if red_key not in _NOTIFIED_GOALS:
+                _NOTIFIED_GOALS.add(red_key)
+                msg = (
+                    f"&#128308; <b>ESPULSIONE!</b>\n\n"
+                    f"<b>{home} {gol_h} - {gol_a} {away}</b>\n"
+                    f"&#128308; {r} ({home})\n"
+                    f"&#9201; {minuto}'"
+                )
+                for cid in pro_ids:
+                    threading.Thread(target=_send_telegram_message, args=(cid, msg), daemon=True).start()
+
+        for r in rossi_away:
+            red_key = f"{fixture_id}_red_{r}"
+            if red_key not in _NOTIFIED_GOALS:
+                _NOTIFIED_GOALS.add(red_key)
+                msg = (
+                    f"&#128308; <b>ESPULSIONE!</b>\n\n"
+                    f"<b>{home} {gol_h} - {gol_a} {away}</b>\n"
+                    f"&#128308; {r} ({away})\n"
+                    f"&#9201; {minuto}'"
+                )
+                for cid in pro_ids:
+                    threading.Thread(target=_send_telegram_message, args=(cid, msg), daemon=True).start()
+
+    # Pulisci gol vecchi (partite non piu' live)
+    live_fixture_ids = {str(p.get("fixture_id", 0)) for p in LIVE_RESULTS_CACHE if p.get("live")}
+    _NOTIFIED_GOALS = {g for g in _NOTIFIED_GOALS if any(g.startswith(fid) for fid in live_fixture_ids)} if live_fixture_ids else set()
+
 def _live_updater():
     """Thread che aggiorna i dati. 2 min durante partite live, 30 min altrimenti."""
     while True:
@@ -106,6 +228,7 @@ def _live_updater():
             _scrape_notizie()
             _scrape_odds()
             _fetch_live_results()
+            _check_and_notify_goals()  # Notifiche gol Telegram per utenti Pro
             _fetch_classifica_live()
             _fetch_marcatori_live()
         except Exception:
