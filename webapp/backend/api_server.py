@@ -250,9 +250,10 @@ def _live_updater():
             _fetch_classifica_live()
             _fetch_marcatori_live()
             _fetch_infortunati_live()
-            # Rose e allenatori ogni 6 cicli (~3 ore)
+            # Rose e storico ogni 6 cicli (~3 ore)
             if _updater_count % 6 == 0:
                 _fetch_rose_live()
+                _fetch_risultati_stagione()
         except Exception:
             pass
         if LIVE_IN_CORSO:
@@ -307,7 +308,11 @@ async def startup():
         except Exception:
             pass
         print("✅ PRIMO FETCH COMPLETATO")
-        # Rose e allenatori caricati dopo (piu' lento, 20 squadre)
+        # Rose, storico stagione caricati dopo
+        try:
+            _fetch_risultati_stagione()
+        except Exception:
+            pass
         try:
             _fetch_rose_live()
         except Exception:
@@ -1490,8 +1495,82 @@ async def notizie():
     return {"notizie":NOTIZIE_CACHE,"aggiornamento":NOTIZIE_LAST_UPDATE}
 
 # ─────────────────────────────
-# RISULTATI LIVE
+# RISULTATI LIVE + STORICO COMPLETO
 # ─────────────────────────────
+RISULTATI_STAGIONE_CACHE = None  # Tutte le partite della stagione da API Football
+RISULTATI_STAGIONE_TIME = ""
+
+def _fetch_risultati_stagione():
+    """Scarica TUTTI i risultati della stagione da API Football."""
+    global RISULTATI_STAGIONE_CACHE, RISULTATI_STAGIONE_TIME
+    try:
+        # Tutte le partite giocate (FT = Full Time)
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season=2025&status=FT-AET-PEN",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode())
+
+        if data.get("response"):
+            partite = []
+            for fix in data["response"]:
+                teams = fix.get("teams", {})
+                goals = fix.get("goals", {})
+                fixture = fix.get("fixture", {})
+                events = fix.get("events", [])
+                league = fix.get("league", {})
+
+                home_name = FOOTBALL_NOME_MAP.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
+                away_name = FOOTBALL_NOME_MAP.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
+
+                marcatori = []
+                marcatori_home = []
+                marcatori_away = []
+                home_id = teams.get("home", {}).get("id")
+                for ev in events:
+                    if ev.get("type") == "Goal":
+                        nome = ev.get("player", {}).get("name", "?")
+                        minuto = ev.get("time", {}).get("elapsed", "?")
+                        detail = ev.get("detail", "")
+                        team_id = ev.get("team", {}).get("id")
+                        if detail == "Penalty":
+                            gol_str = f"{nome} {minuto}' (R)"
+                        elif detail == "Own Goal":
+                            gol_str = f"{nome} {minuto}' (aut.)"
+                        else:
+                            gol_str = f"{nome} {minuto}'"
+                        marcatori.append(gol_str)
+                        if team_id == home_id:
+                            marcatori_home.append(gol_str)
+                        else:
+                            marcatori_away.append(gol_str)
+
+                partite.append({
+                    "home": home_name,
+                    "away": away_name,
+                    "gol_h": goals.get("home", 0) or 0,
+                    "gol_a": goals.get("away", 0) or 0,
+                    "status": "FT",
+                    "status_it": "Terminata",
+                    "live": False,
+                    "marcatori": marcatori,
+                    "marcatori_home": marcatori_home,
+                    "marcatori_away": marcatori_away,
+                    "fixture_id": fixture.get("id"),
+                    "data": fixture.get("date", "")[:10],
+                    "ora": _utc_to_rome(fixture.get("date", "")),
+                    "round": league.get("round", ""),
+                })
+
+            if partite:
+                # Ordina per data (piu' recente prima)
+                partite.sort(key=lambda x: x["data"], reverse=True)
+                RISULTATI_STAGIONE_CACHE = partite
+                RISULTATI_STAGIONE_TIME = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
+                print(f"📊 STORICO STAGIONE: {len(partite)} partite caricate")
+    except Exception as e:
+        print(f"❌ Errore fetch storico stagione: {e}")
 RISULTATI_GIORNATE = {
     30:{"data":"20-22 marzo 2026","partite":[
         {"home":"Genoa","away":"Torino","gol_h":2,"gol_a":1,"marcatori":["Vitinha 23'","Colombo 67'","Vlasic 45'"]},
@@ -1782,62 +1861,89 @@ def _fetch_live_results():
 
 @app.get("/api/risultati")
 async def risultati():
-    """Ritorna risultati: live da API Football + storico hardcoded."""
-    # Se abbiamo dati live, usali
+    """Ritorna risultati: live + storico completo da API Football."""
+    giornate = []
+
+    # 1. Partite LIVE (in corso adesso)
     live_partite = []
     if LIVE_RESULTS_CACHE:
         for p in LIVE_RESULTS_CACHE:
-            live_partite.append({
-                "home": p["home"],
-                "away": p["away"],
-                "gol_h": p["gol_h"],
-                "gol_a": p["gol_a"],
-                "marcatori": p["marcatori"],
-                "marcatori_home": p.get("marcatori_home", []),
-                "marcatori_away": p.get("marcatori_away", []),
-                "status": p["status"],
-                "status_it": p.get("status_it", p["status"]),
-                "minuto": p["minuto"],
-                "live": p["live"],
-                "data": p["data"],
-                "ora": p.get("ora", ""),
-                "rossi_home": p.get("rossi_home", []),
-                "rossi_away": p.get("rossi_away", []),
-                "gialli": p.get("gialli", []),
-                "stats": p.get("stats", {}),
-                "fixture_id": p.get("fixture_id"),
+            if p.get("live"):
+                live_partite.append({
+                    "home": p["home"], "away": p["away"],
+                    "gol_h": p["gol_h"], "gol_a": p["gol_a"],
+                    "marcatori": p["marcatori"],
+                    "marcatori_home": p.get("marcatori_home", []),
+                    "marcatori_away": p.get("marcatori_away", []),
+                    "status": p["status"],
+                    "status_it": p.get("status_it", p["status"]),
+                    "minuto": p["minuto"], "live": True,
+                    "data": p["data"], "ora": p.get("ora", ""),
+                    "rossi_home": p.get("rossi_home", []),
+                    "rossi_away": p.get("rossi_away", []),
+                    "fixture_id": p.get("fixture_id"),
+                })
+    if live_partite:
+        giornate.append({
+            "giornata": "Live",
+            "data": live_partite[0]["data"],
+            "partite": live_partite,
+            "live": True,
+        })
+
+    # 2. Storico completo da API Football (raggruppato per round/giornata)
+    if RISULTATI_STAGIONE_CACHE:
+        from collections import defaultdict
+        per_round = defaultdict(list)
+        for p in RISULTATI_STAGIONE_CACHE:
+            # Raggruppa per round (es. "Regular Season - 30")
+            rd = p.get("round", "")
+            per_round[rd].append(p)
+
+        # Ordina i round dal piu' recente
+        rounds_sorted = sorted(per_round.keys(), key=lambda r: int(r.split(" - ")[-1]) if " - " in r and r.split(" - ")[-1].isdigit() else 0, reverse=True)
+
+        for rd in rounds_sorted:
+            partite = per_round[rd]
+            # Estrai numero giornata dal round
+            g_num = rd.split(" - ")[-1] if " - " in rd else rd
+            # Data = data della prima partita
+            data_str = partite[0]["data"] if partite else ""
+            giornate.append({
+                "giornata": g_num,
+                "data": data_str,
+                "partite": partite,
+                "live": False,
+            })
+    elif LIVE_RESULTS_CACHE:
+        # Fallback: usa le ultime 30 partite raggruppate per data
+        from collections import defaultdict
+        per_data = defaultdict(list)
+        for p in LIVE_RESULTS_CACHE:
+            if not p.get("live"):
+                per_data[p["data"]].append({
+                    "home": p["home"], "away": p["away"],
+                    "gol_h": p["gol_h"], "gol_a": p["gol_a"],
+                    "marcatori": p.get("marcatori", []),
+                    "marcatori_home": p.get("marcatori_home", []),
+                    "marcatori_away": p.get("marcatori_away", []),
+                    "status": "FT", "status_it": "Terminata",
+                    "live": False, "data": p["data"],
+                    "ora": p.get("ora", ""),
+                    "fixture_id": p.get("fixture_id"),
+                })
+        for data_str in sorted(per_data.keys(), reverse=True):
+            giornate.append({
+                "giornata": data_str,
+                "data": data_str,
+                "partite": per_data[data_str],
+                "live": False,
             })
 
-    # Raggruppa per data
-    from collections import defaultdict
-    per_data = defaultdict(list)
-    for p in live_partite:
-        per_data[p["data"]].append(p)
-
-    giornate_live = []
-    for data_str in sorted(per_data.keys(), reverse=True)[:5]:
-        giornate_live.append({
-            "giornata": "Live",
-            "data": data_str,
-            "partite": per_data[data_str],
-            "live": any(p["live"] for p in per_data[data_str]),
-        })
-
-    # Aggiungi storico hardcoded
-    giornate_storico = []
-    for g_num in sorted(RISULTATI_GIORNATE.keys(), reverse=True):
-        g = RISULTATI_GIORNATE[g_num]
-        giornate_storico.append({
-            "giornata": g_num,
-            "data": g["data"],
-            "partite": g["partite"],
-            "live": False,
-        })
-
     return {
-        "giornate": giornate_live + giornate_storico,
-        "live": any(g.get("live") for g in giornate_live),
-        "aggiornamento": LIVE_RESULTS_TIME or "Storico",
+        "giornate": giornate,
+        "live": any(g.get("live") for g in giornate),
+        "aggiornamento": RISULTATI_STAGIONE_TIME or LIVE_RESULTS_TIME or "In caricamento...",
     }
 
 # ─────────────────────────────
