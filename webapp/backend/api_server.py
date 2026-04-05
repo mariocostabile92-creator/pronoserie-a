@@ -1562,11 +1562,56 @@ ROSE = {
     "Como":[("Butez","P",1),("Tornqvist","P",21),("Cavlina","P",44),("Diego Carlos","D",34),("Kempf","D",2),("Goldaniga","D",5),("Valle","D",3),("Moreno","D",18),("Van der Brempt","D",77),("Vojvoda","D",31),("Smolcic","D",28),("Ramon","D",14),("Perrone","C",23),("Da Cunha","C",33),("Caqueret","C",6),("Ladho","C",15),("Sergi Roberto","C",8),("Paz","C",10),("Baturina","C",20),("Diao","A",38),("Kuhn","A",19),("Douvikas","A",11),("Morata","A",7),("Jesus Rodriguez","A",17)],
 }
 
+_FORMAZIONE_CACHE = {}  # Cache formazioni on-demand
+
+def _get_last_lineup(team_name):
+    """Scarica la formazione dall'ultima partita giocata da una squadra."""
+    if team_name in _FORMAZIONE_CACHE:
+        return _FORMAZIONE_CACHE[team_name]
+    # Cerca team_id in entrambi i campionati
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name)
+    if not team_id:
+        return None
+    try:
+        # Ultima partita giocata
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?team={team_id}&last=1",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read().decode())
+        if not data.get("response"):
+            return None
+        fix_id = data["response"][0].get("fixture", {}).get("id")
+        if not fix_id:
+            return None
+        # Lineup di quella partita
+        req2 = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures/lineups?fixture={fix_id}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req2, timeout=10) as r:
+            data2 = json.loads(r.read().decode())
+        if data2.get("response"):
+            for lineup in data2["response"]:
+                if lineup.get("team", {}).get("id") == team_id:
+                    formazione = lineup.get("formation", "4-4-2")
+                    titolari = [p.get("player", {}).get("name", "?") for p in lineup.get("startXI", [])]
+                    if titolari:
+                        result = {"modulo": formazione, "titolari": titolari}
+                        _FORMAZIONE_CACHE[team_name] = result
+                        return result
+    except Exception:
+        pass
+    return None
+
 @app.get("/api/squadra/{nome}")
 async def squadra(nome: str):
     n = nome.strip().title()
-    # Priorita': dati live API Football > hardcoded
+    # Priorita': dati live API Football > hardcoded > fetch on-demand
     form = LIVE_FORMAZIONI.get(n) or FORMAZIONI.get(n)
+    if not form:
+        form = _get_last_lineup(n)
     inj = INFORTUNATI_LIVE.get(n) if INFORTUNATI_LIVE.get(n) else (LIVE_INFORTUNATI.get(n) if LIVE_INFORTUNATI.get(n) is not None else INFORTUNATI.get(n, []))
     allenatore = ALLENATORI_LIVE.get(n) or ALLENATORI.get(n, "N/D")
     # Rosa: API Football live > hardcoded
