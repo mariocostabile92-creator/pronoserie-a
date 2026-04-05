@@ -1253,9 +1253,9 @@ def _fetch_classifica_live():
                 # Ordina per punti (desc), poi differenza reti
                 classifica.sort(key=lambda x: (-x["Punti"], -x["DR"], -x["GF"]))
                 if len(classifica) >= 10:
-                    CLASSIFICA_CACHE = classifica
-                    CLASSIFICA_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
-                    print(f"🏆 CLASSIFICA LIVE: {len(classifica)} squadre aggiornate ({CLASSIFICA_LAST_UPDATE})")
+                    CLASSIFICA_CACHE["serie-a"] = classifica
+                    CLASSIFICA_LAST_UPDATE["serie-a"] = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
+                    print(f"🏆 CLASSIFICA LIVE: {len(classifica)} squadre aggiornate")
                     return True
     except Exception as e:
         print(f"❌ Errore fetch classifica: {e}")
@@ -1296,7 +1296,7 @@ def _fetch_marcatori_live():
                     "gol": gol,
                 })
             if len(marcatori) >= 5:
-                MARCATORI_CACHE = marcatori
+                MARCATORI_CACHE["serie-a"] = marcatori
                 print(f"⚽ MARCATORI LIVE: {len(marcatori)} giocatori aggiornati")
                 return True
     except Exception as e:
@@ -1438,13 +1438,13 @@ def _fetch_infortunati_live():
 
 @app.get("/api/classifica")
 async def classifica():
-    cl = CLASSIFICA_CACHE if CLASSIFICA_CACHE else CLASS_FALLBACK
-    mc = MARCATORI_CACHE if MARCATORI_CACHE else MARC_FALLBACK
+    cl = CLASSIFICA_CACHE.get("serie-a") or CLASS_FALLBACK
+    mc = MARCATORI_CACHE.get("serie-a") or MARC_FALLBACK
     return {
         "classifica": cl,
         "marcatori": mc,
-        "aggiornamento": CLASSIFICA_LAST_UPDATE or "Dati base",
-        "live": CLASSIFICA_CACHE is not None,
+        "aggiornamento": CLASSIFICA_LAST_UPDATE.get("serie-a", "") or "Dati base",
+        "live": CLASSIFICA_CACHE.get("serie-a") is not None,
     }
 
 # ─────────────────────────────
