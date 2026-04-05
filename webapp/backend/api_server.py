@@ -220,24 +220,31 @@ def _check_and_notify_goals():
     live_fixture_ids = {str(p.get("fixture_id", 0)) for p in LIVE_RESULTS_CACHE if p.get("live")}
     _NOTIFIED_GOALS = {g for g in _NOTIFIED_GOALS if any(g.startswith(fid) for fid in live_fixture_ids)} if live_fixture_ids else set()
 
+_updater_count = 0
+
 def _live_updater():
     """Thread che aggiorna i dati. 2 min durante partite live, 30 min altrimenti."""
+    global _updater_count
     while True:
+        _updater_count += 1
         try:
             _scrape_live_data()
             _scrape_notizie()
             _scrape_odds()
             _fetch_live_results()
-            _check_and_notify_goals()  # Notifiche gol Telegram per utenti Pro
+            _check_and_notify_goals()
             _fetch_classifica_live()
             _fetch_marcatori_live()
+            _fetch_infortunati_live()
+            # Rose e allenatori ogni 6 cicli (~3 ore)
+            if _updater_count % 6 == 0:
+                _fetch_rose_live()
         except Exception:
             pass
-        # Se ci sono partite in corso, aggiorna ogni 2 minuti
         if LIVE_IN_CORSO:
-            time.sleep(120)  # 2 minuti durante live
+            time.sleep(120)
         else:
-            time.sleep(1800)  # 30 minuti normalmente
+            time.sleep(1800)
 
 # ─────────────────────────────
 # STARTUP
@@ -281,7 +288,16 @@ async def startup():
             _fetch_marcatori_live()
         except Exception:
             pass
+        try:
+            _fetch_infortunati_live()
+        except Exception:
+            pass
         print("✅ PRIMO FETCH COMPLETATO")
+        # Rose e allenatori caricati dopo (piu' lento, 20 squadre)
+        try:
+            _fetch_rose_live()
+        except Exception:
+            pass
     t = threading.Thread(target=_live_updater, daemon=True)
     t.start()
     threading.Thread(target=_delayed_start, daemon=True).start()
@@ -1075,6 +1091,112 @@ def _fetch_marcatori_live():
         print(f"❌ Errore fetch marcatori: {e}")
     return False
 
+# ─────────────────────────────
+# ROSE, ALLENATORI, INFORTUNATI LIVE (API Football)
+# ─────────────────────────────
+ROSE_LIVE = {}
+ALLENATORI_LIVE = {}
+INFORTUNATI_LIVE = {}
+ROSE_LAST_UPDATE = ""
+
+# Team IDs per API Football
+_TEAM_IDS = {
+    "Inter":505,"Milan":489,"Napoli":492,"Como":895,"Juventus":496,
+    "Roma":497,"Atalanta":499,"Lazio":487,"Bologna":500,"Sassuolo":488,
+    "Udinese":494,"Parma":523,"Genoa":495,"Torino":503,"Cagliari":490,
+    "Fiorentina":502,"Cremonese":520,"Lecce":867,"Verona":504,"Pisa":801,
+}
+_RUOLO_MAP = {"Goalkeeper":"P","Defender":"D","Midfielder":"C","Attacker":"A"}
+
+def _fetch_rose_live():
+    """Scarica rose complete di tutte le squadre da API Football."""
+    global ROSE_LIVE, ALLENATORI_LIVE, ROSE_LAST_UPDATE
+    try:
+        for nome, team_id in _TEAM_IDS.items():
+            try:
+                # Rosa
+                req = urllib.request.Request(
+                    f"https://{FOOTBALL_API_HOST}/players/squads?team={team_id}",
+                    headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+                )
+                with urllib.request.urlopen(req, timeout=15) as r:
+                    data = json.loads(r.read().decode())
+                if data.get("response") and len(data["response"]) > 0:
+                    players = data["response"][0].get("players", [])
+                    rosa = []
+                    for p in players:
+                        ruolo_en = p.get("position", "")
+                        ruolo = _RUOLO_MAP.get(ruolo_en, "C")
+                        rosa.append({
+                            "nome": p.get("name", "?"),
+                            "ruolo": ruolo,
+                            "numero": p.get("number", 0) or 0,
+                            "foto": p.get("photo", ""),
+                        })
+                    if rosa:
+                        ROSE_LIVE[nome] = rosa
+
+                # Allenatore
+                req2 = urllib.request.Request(
+                    f"https://{FOOTBALL_API_HOST}/coachs?team={team_id}",
+                    headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+                )
+                with urllib.request.urlopen(req2, timeout=15) as r:
+                    data2 = json.loads(r.read().decode())
+                if data2.get("response") and len(data2["response"]) > 0:
+                    # Prendi l'allenatore attuale (ultimo nella lista)
+                    for coach in data2["response"]:
+                        career = coach.get("career", [])
+                        for c in career:
+                            if c.get("team", {}).get("id") == team_id and c.get("end") is None:
+                                ALLENATORI_LIVE[nome] = coach.get("name", "N/D")
+                                break
+
+                time.sleep(0.5)  # Rate limiting
+            except Exception:
+                pass
+
+        if ROSE_LIVE:
+            ROSE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
+            print(f"👕 ROSE LIVE: {len(ROSE_LIVE)} squadre aggiornate")
+    except Exception as e:
+        print(f"❌ Errore fetch rose: {e}")
+
+def _fetch_infortunati_live():
+    """Scarica infortunati da API Football."""
+    global INFORTUNATI_LIVE
+    try:
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/injuries?league=135&season=2025",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        if data.get("response"):
+            inj_per_team = {}
+            for item in data["response"]:
+                team_name = FOOTBALL_NOME_MAP.get(
+                    item.get("team", {}).get("name", ""),
+                    item.get("team", {}).get("name", "")
+                )
+                player = item.get("player", {})
+                injury = item.get("player", {}).get("reason", "") or item.get("player", {}).get("type", "")
+                if not team_name:
+                    continue
+                if team_name not in inj_per_team:
+                    inj_per_team[team_name] = []
+                inj_per_team[team_name].append({
+                    "nome": player.get("name", "?"),
+                    "tipo": "infortunio",
+                    "dettaglio": injury or "Indisponibile",
+                })
+            if inj_per_team:
+                INFORTUNATI_LIVE = inj_per_team
+                print(f"🏥 INFORTUNATI LIVE: {sum(len(v) for v in inj_per_team.values())} giocatori")
+    except Exception as e:
+        print(f"❌ Errore fetch infortunati: {e}")
+
 @app.get("/api/classifica")
 async def classifica():
     cl = CLASSIFICA_CACHE if CLASSIFICA_CACHE else CLASS_FALLBACK
@@ -1196,16 +1318,22 @@ ROSE = {
 @app.get("/api/squadra/{nome}")
 async def squadra(nome: str):
     n = nome.strip().title()
-    # Usa dati live se disponibili, altrimenti hardcoded
+    # Priorita': dati live API Football > hardcoded
     form = LIVE_FORMAZIONI.get(n) or FORMAZIONI.get(n)
-    inj = LIVE_INFORTUNATI.get(n) if LIVE_INFORTUNATI.get(n) is not None else INFORTUNATI.get(n, [])
+    inj = INFORTUNATI_LIVE.get(n) if INFORTUNATI_LIVE.get(n) else (LIVE_INFORTUNATI.get(n) if LIVE_INFORTUNATI.get(n) is not None else INFORTUNATI.get(n, []))
+    allenatore = ALLENATORI_LIVE.get(n) or ALLENATORI.get(n, "N/D")
+    # Rosa: API Football live > hardcoded
+    if ROSE_LIVE.get(n):
+        rosa = ROSE_LIVE[n]
+    else:
+        rosa = [{"nome":g[0],"ruolo":g[1],"numero":g[2]} for g in ROSE.get(n, [])]
     return {
         "nome": n,
-        "allenatore": ALLENATORI.get(n, "N/D"),
+        "allenatore": allenatore,
         "formazione": form,
         "infortunati": inj,
-        "rosa": [{"nome":g[0],"ruolo":g[1],"numero":g[2]} for g in ROSE.get(n, [])],
-        "ultimo_aggiornamento": LIVE_LAST_UPDATE or "Dati base",
+        "rosa": rosa,
+        "ultimo_aggiornamento": ROSE_LAST_UPDATE or LIVE_LAST_UPDATE or "Dati base",
     }
 
 # ─────────────────────────────
