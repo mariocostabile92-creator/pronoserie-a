@@ -11,6 +11,15 @@ from stats_engine import get_h2h_stats
 from season_2526 import get_xg, get_xg_media_campionato, CLASSIFICA_REALE_30G, get_team_ou_tendency, get_season_avg_goals
 from live_data import get_impatto_infortunati, get_n_indisponibili
 
+# Import statistiche API Football (opzionale, non blocca se non disponibili)
+try:
+    from api_football_stats import get_team_real_stats
+    _HAS_API_STATS = True
+except ImportError:
+    _HAS_API_STATS = False
+    def get_team_real_stats(name):
+        return None
+
 # Costanti del modello (ottimizzate da backtesting su 299 partite)
 MAX_GOL = 10
 ALPHA_H2H = 0.12         # H2H contributo moderato
@@ -323,14 +332,8 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     )
 
     # ── MIGLIORIA 3: USA MEDIA GOL STAGIONE CORRENTE ──
-    season_avg = get_season_avg_goals()  # Media reale 2025-26
-    # Correggi lambda storico se la media stagione e' diversa dalla media storica
-    hist_avg = home_stats["media_gol_casa_campionato"] + home_stats["media_gol_trasf_campionato"]
-    if hist_avg > 0:
-        season_factor = season_avg / hist_avg
-        # Blend leggero: avvicina i lambda alla media stagione corrente
-        lambda_home_hist *= (0.85 + 0.15 * season_factor)
-        lambda_away_hist *= (0.85 + 0.15 * season_factor)
+    # Solo per calibrare i mercati extra (O/U, Goal), NON per 1X2
+    # (evita di alterare i lambda base che peggiorano l'1X2)
 
     # ── LAMBDA DA xG 2025-2026 (MIGLIORIA 4: differenziato) ──
     xg_home = get_xg(home_name)
@@ -354,6 +357,22 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     else:
         lambda_home = lambda_home_hist
         lambda_away = lambda_away_hist
+
+    # ── STATISTICHE REALI API FOOTBALL (gol casa/trasferta specifici) ──
+    try:
+        api_home = get_team_real_stats(home_name) if _HAS_API_STATS else None
+        api_away = get_team_real_stats(away_name) if _HAS_API_STATS else None
+    except Exception:
+        api_home = None
+        api_away = None
+    if api_home and api_away and api_home.get("played", 0) >= 10 and api_away.get("played", 0) >= 10:
+        lambda_api_h = api_home["gf_home_pg"] * (api_away["gs_away_pg"] / max(0.5, (api_home["gs_home_pg"] + api_away["gs_away_pg"]) / 2))
+        lambda_api_a = api_away["gf_away_pg"] * (api_home["gs_home_pg"] / max(0.5, (api_home["gs_home_pg"] + api_away["gs_away_pg"]) / 2))
+        lambda_api_h = max(0.4, min(lambda_api_h, 3.5))
+        lambda_api_a = max(0.2, min(lambda_api_a, 2.5))
+        ALPHA_API = 0.15
+        lambda_home = (1 - ALPHA_API) * lambda_home + ALPHA_API * lambda_api_h
+        lambda_away = (1 - ALPHA_API) * lambda_away + ALPHA_API * lambda_api_a
 
     # ── CORREZIONE H2H ──
     h2h = home_stats.get("h2h")
