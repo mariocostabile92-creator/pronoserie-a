@@ -8,17 +8,19 @@ import numpy as np
 import pandas as pd
 from scipy.stats import poisson
 from stats_engine import get_h2h_stats
-from season_2526 import get_xg, get_xg_media_campionato
+from season_2526 import get_xg, get_xg_media_campionato, CLASSIFICA_REALE_30G
 from live_data import get_impatto_infortunati, get_n_indisponibili
 
 # Costanti del modello (ottimizzate da backtesting su 299 partite)
 MAX_GOL = 10
 ALPHA_H2H = 0.12         # H2H contributo moderato
-ALPHA_FORMA = 0.18        # Forma recente pesata (ottimizzato da 0.10)
-ALPHA_XG = 0.45           # xG stagione attuale - peso alto (ottimizzato da 0.25)
-DIXON_COLES_RHO = -0.10   # Correzione Dixon-Coles (ottimizzato da -0.13)
-DRAW_BOOST = 1.12         # Boost pareggio: Serie A ha ~28% pareggi, Poisson ne sottostima
+ALPHA_FORMA = 0.18        # Forma recente pesata (ottimizzato)
+ALPHA_XG = 0.45           # xG stagione attuale - peso alto (ottimizzato)
+ALPHA_CLASSIFICA = 0.08   # Peso posizione in classifica reale
+DIXON_COLES_RHO = -0.10   # Correzione Dixon-Coles (ottimizzato)
+DRAW_BOOST = 1.12         # Boost pareggio
 MARGINE_BK = 1.05
+ALPHA_BK_BLEND = 0.30     # Blend con quote bookmaker storiche
 
 # Coppie bookmaker (Home, Draw, Away)
 BOOKMAKER_COLS = [
@@ -28,6 +30,43 @@ BOOKMAKER_COLS = [
     ("LBH", "LBD", "LBA"),
     ("SBH", "SBD", "SBA"),
 ]
+
+# Mappa classifica reale -> punti (per correzione forza)
+_CLASSIFICA_PTS = {}
+for _r in CLASSIFICA_REALE_30G:
+    _CLASSIFICA_PTS[_r["Squadra"]] = _r["Punti"]
+_MEDIA_PTS = sum(_CLASSIFICA_PTS.values()) / len(_CLASSIFICA_PTS) if _CLASSIFICA_PTS else 40
+
+
+def _get_classifica_factor(home: str, away: str) -> float:
+    """
+    Ritorna un fattore di correzione basato sulla differenza in classifica.
+    Positivo = casa piu' forte, negativo = ospite piu' forte.
+    Range circa [-0.15, +0.15].
+    """
+    pts_h = _CLASSIFICA_PTS.get(home, _MEDIA_PTS)
+    pts_a = _CLASSIFICA_PTS.get(away, _MEDIA_PTS)
+    diff = (pts_h - pts_a) / 100.0  # Normalizzato [-0.5, +0.5]
+    return diff
+
+
+def _get_h2h_gol_media(df: pd.DataFrame, home: str, away: str) -> tuple:
+    """
+    Ritorna la media gol negli scontri diretti recenti (ultimi 10).
+    Usata per calibrare Over/Under.
+    Ritorna (media_gol_totali, n_partite) oppure (None, 0).
+    """
+    if df is None:
+        return None, 0
+    mask = (
+        ((df["HomeTeam"] == home) & (df["AwayTeam"] == away)) |
+        ((df["HomeTeam"] == away) & (df["AwayTeam"] == home))
+    )
+    h2h = df[mask].sort_values("Date", ascending=False).head(10)
+    if len(h2h) < 3:
+        return None, 0
+    gol_totali = (h2h["FTHG"] + h2h["FTAG"]).mean()
+    return round(gol_totali, 2), len(h2h)
 
 
 def _dixon_coles_tau(i: int, j: int, lh: float, la: float, rho: float) -> float:
@@ -325,6 +364,11 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     lambda_home *= forma_factor
     lambda_away *= (2.0 - forma_factor)  # Inverso
 
+    # ── MIGLIORIA 3: CORREZIONE CLASSIFICA REALE ──
+    class_diff = _get_classifica_factor(home_name, away_name)
+    lambda_home *= (1.0 + ALPHA_CLASSIFICA * class_diff * 5)
+    lambda_away *= (1.0 - ALPHA_CLASSIFICA * class_diff * 5)
+
     # ── IMPATTO INFORTUNATI ──
     imp_home = get_impatto_infortunati(home_name)
     imp_away = get_impatto_infortunati(away_name)
@@ -355,11 +399,7 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
             return 99.0
         return round(MARGINE_BK / p, 2)
 
-    q1 = quota(probs["prob_1"])
-    qx = quota(probs["prob_x"])
-    q2 = quota(probs["prob_2"])
-
-    # Suggerimento
+    # Suggerimento (calcolo provvisorio, ricalcolato dopo blend)
     max_prob = max(probs["prob_1"], probs["prob_x"], probs["prob_2"])
     if max_prob == probs["prob_1"]:
         suggerimento = "1"
@@ -375,6 +415,36 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     bk = None
     if df is not None:
         bk = _get_bookmaker_reference(df, home_stats["nome"], away_stats["nome"])
+
+    # ── MIGLIORIA 4: BLENDING CON QUOTE BOOKMAKER ──
+    if bk is not None:
+        bk_p1 = bk["book_prob_1"] / 100.0
+        bk_px = bk["book_prob_x"] / 100.0
+        bk_p2 = bk["book_prob_2"] / 100.0
+        # Blend: (1-alpha) modello + alpha bookmaker
+        probs["prob_1"] = (1 - ALPHA_BK_BLEND) * probs["prob_1"] + ALPHA_BK_BLEND * bk_p1
+        probs["prob_x"] = (1 - ALPHA_BK_BLEND) * probs["prob_x"] + ALPHA_BK_BLEND * bk_px
+        probs["prob_2"] = (1 - ALPHA_BK_BLEND) * probs["prob_2"] + ALPHA_BK_BLEND * bk_p2
+        # Rinormalizza
+        tot_bk = probs["prob_1"] + probs["prob_x"] + probs["prob_2"]
+        if tot_bk > 0:
+            probs = {k: v / tot_bk for k, v in probs.items()}
+        # Ricalcola suggerimento dopo blend
+        max_prob = max(probs["prob_1"], probs["prob_x"], probs["prob_2"])
+        if max_prob == probs["prob_1"]:
+            suggerimento = "1"
+            sugg_label = "Vittoria Casa"
+        elif max_prob == probs["prob_x"]:
+            suggerimento = "X"
+            sugg_label = "Pareggio"
+        else:
+            suggerimento = "2"
+            sugg_label = "Vittoria Ospite"
+
+    # Quote finali (dopo blend)
+    q1 = quota(probs["prob_1"])
+    qx = quota(probs["prob_x"])
+    q2 = quota(probs["prob_2"])
 
     # Confidence
     conf = _calcola_confidence(
@@ -410,6 +480,24 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
 
     # Mercati extra: Over/Under, Goal/NoGoal, Risultato Esatto
     extra = calcola_mercati_extra(lambda_home, lambda_away)
+
+    # ── MIGLIORIA 1: CALIBRAZIONE O/U CON MEDIA GOL H2H ──
+    h2h_gol_media, h2h_gol_n = _get_h2h_gol_media(df, home_name, away_name)
+    if h2h_gol_media is not None and h2h_gol_n >= 5:
+        # Se la media gol H2H e' molto diversa da quella del modello, correggi
+        gol_modello = lambda_home + lambda_away
+        # Se H2H dice piu' gol del modello, alza Over
+        if h2h_gol_media > gol_modello + 0.3:
+            boost_over = min(1.15, 1.0 + (h2h_gol_media - gol_modello) * 0.08)
+            extra["over_25"] = round(min(85, extra["over_25"] * boost_over), 1)
+            extra["under_25"] = round(100 - extra["over_25"], 1)
+            extra["over_15"] = round(min(95, extra["over_15"] * boost_over), 1)
+            extra["under_15"] = round(100 - extra["over_15"], 1)
+        elif h2h_gol_media < gol_modello - 0.3:
+            boost_under = min(1.15, 1.0 + (gol_modello - h2h_gol_media) * 0.08)
+            extra["under_25"] = round(min(85, extra["under_25"] * boost_under), 1)
+            extra["over_25"] = round(100 - extra["under_25"], 1)
+
     result.update(extra)
 
     # Aggiungi confronto bookmaker se disponibile

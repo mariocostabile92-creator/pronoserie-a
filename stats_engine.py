@@ -7,8 +7,8 @@ Include: H2H, forma pesata con decadimento, indici forza attacco/difesa.
 import pandas as pd
 import numpy as np
 
-DECAY_ALPHA = 0.10
-FORM_N = 15
+DECAY_ALPHA = 0.15  # Decadimento piu' rapido: partite recenti contano molto di piu'
+FORM_N = 20  # Ultime 20 partite (circa 1 stagione)
 
 
 def get_league_averages(df: pd.DataFrame) -> dict:
