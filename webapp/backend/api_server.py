@@ -2854,6 +2854,21 @@ async def pronostico_league(league: str, home: str, away: str):
             raw = genera_pronostico(home, away)
     else:
         raw = genera_pronostico(home, away)
+    # Formazioni e marcatori (fetch on-demand per PL)
+    h_title = home.strip().title()
+    a_title = away.strip().title()
+    form_casa = _get_last_lineup(h_title)
+    form_ospite = _get_last_lineup(a_title)
+    # Marcatori: prendi i top scorer dal campionato
+    marc_casa = []
+    marc_ospite = []
+    mc = MARCATORI_CACHE.get(league) or []
+    for m in mc:
+        if m.get("squadra") == h_title:
+            marc_casa.append(f"{m['giocatore']} ({m['gol']} gol)")
+        elif m.get("squadra") == a_title:
+            marc_ospite.append(f"{m['giocatore']} ({m['gol']} gol)")
+
     return {
         "home":home,"away":away,
         "prob_1":raw.get("prob_1",0),"prob_x":raw.get("prob_x",0),"prob_2":raw.get("prob_2",0),
@@ -2865,6 +2880,10 @@ async def pronostico_league(league: str, home: str, away: str):
         "gol_attesi":raw.get("gol_attesi"),
         "risultati_esatti":raw.get("risultati_esatti",[]),
         "sicura":bool(raw.get("sicura",False)),
+        "formazione_casa": form_casa,
+        "formazione_ospite": form_ospite,
+        "marcatori_casa": marc_casa[:3],
+        "marcatori_ospite": marc_ospite[:3],
     }
 
 # ─────────────────────────────
