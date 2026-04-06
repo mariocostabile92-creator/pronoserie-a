@@ -396,6 +396,51 @@ async def startup():
     threading.Thread(target=_delayed_start, daemon=True).start()
     print("✅ SERVER PRONTO\n")
 
+    # Avvia Bot Telegram in background
+    def _start_telegram_bot():
+        try:
+            import asyncio
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+            # Import bot components
+            sys.path.insert(0, _ROOT)
+            from telegram import Update
+            from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+            from telegram_bot import (
+                cmd_start, cmd_help, cmd_pronostico, cmd_giornata,
+                cmd_classifica, cmd_pro, callback_handler, init_bot_db,
+                invio_giornaliero
+            )
+            from telegram_bot import DF as _bot_df
+            import telegram_bot
+
+            # Init DB bot
+            init_bot_db()
+
+            # Passa i dati al bot
+            if _df is not None:
+                telegram_bot.DF = _df
+            elif _df_pl is not None:
+                telegram_bot.DF = _df_pl
+
+            # Crea app bot
+            bot_app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
+            bot_app.add_handler(CommandHandler("start", cmd_start))
+            bot_app.add_handler(CommandHandler("help", cmd_help))
+            bot_app.add_handler(CommandHandler("pronostico", cmd_pronostico))
+            bot_app.add_handler(CommandHandler("giornata", cmd_giornata))
+            bot_app.add_handler(CommandHandler("classifica", cmd_classifica))
+            bot_app.add_handler(CommandHandler("pro", cmd_pro))
+            bot_app.add_handler(CallbackQueryHandler(callback_handler))
+
+            print("🤖 BOT TELEGRAM ATTIVO!")
+            bot_app.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
+        except Exception as e:
+            print(f"⚠️ Bot Telegram non avviato: {e}")
+
+    threading.Thread(target=_start_telegram_bot, daemon=True).start()
+
 # ─────────────────────────────
 # FRONTEND
 # ─────────────────────────────
