@@ -1034,6 +1034,57 @@ def send_welcome_email(to_email):
         print(f"⚠️ Errore invio email a {to_email}: {e}")
 
 # ─────────────────────────────
+# NOTIFICHE ADMIN (nuova iscrizione)
+# ─────────────────────────────
+ADMIN_EMAIL = "mario.costabile92@outlook.it"
+ADMIN_TELEGRAM_USERNAME = "Soanator"
+ADMIN_CHAT_ID = None  # Si auto-imposta quando l'admin scrive /start al bot
+
+def _notify_admin_new_user(email, piano):
+    """Notifica l'admin quando un nuovo utente si registra."""
+    # 1. Email
+    try:
+        import urllib.request as ur
+        body = json.dumps({
+            "from": "MatchIQ <onboarding@resend.dev>",
+            "to": [ADMIN_EMAIL],
+            "subject": f"Nuovo iscritto MatchIQ: {email}",
+            "html": f"""
+            <div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px">
+                <h2 style="color:#2ecc71">Nuovo iscritto!</h2>
+                <p><strong>Email:</strong> {email}</p>
+                <p><strong>Piano:</strong> {piano}</p>
+                <p><strong>Data:</strong> {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M UTC')}</p>
+                <hr style="border:1px solid #1f3460">
+                <p style="color:#8892b0;font-size:.85rem">MatchIQ - Notifica automatica</p>
+            </div>
+            """
+        }).encode()
+        req = ur.Request("https://api.resend.com/emails", data=body, headers={
+            "Authorization": f"Bearer {RESEND_API_KEY}",
+            "Content-Type": "application/json"
+        })
+        ur.urlopen(req, timeout=10)
+        print(f"📧 Notifica admin: nuovo utente {email}")
+    except Exception as e:
+        print(f"⚠️ Errore notifica email admin: {e}")
+
+    # 2. Telegram (se chat_id disponibile)
+    try:
+        # Cerca chat_id admin dal database bot
+        import sqlite3
+        if os.path.exists(_BOT_DB_PATH):
+            conn = sqlite3.connect(_BOT_DB_PATH)
+            row = conn.execute("SELECT chat_id FROM utenti WHERE username = ?", (ADMIN_TELEGRAM_USERNAME,)).fetchone()
+            conn.close()
+            if row:
+                chat_id = row[0]
+                msg = f"🆕 <b>Nuovo iscritto MatchIQ!</b>\n\n📧 {email}\n📋 Piano: {piano}\n⏰ {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')}"
+                _send_telegram_message(chat_id, msg)
+    except Exception:
+        pass
+
+# ─────────────────────────────
 # AUTH
 # ─────────────────────────────
 @app.post("/api/auth/register")
@@ -1048,6 +1099,9 @@ async def register(data: dict):
 
     # Invia email di benvenuto (in background, non blocca la risposta)
     threading.Thread(target=send_welcome_email, args=(email,), daemon=True).start()
+
+    # Notifica admin (in background)
+    threading.Thread(target=_notify_admin_new_user, args=(email, user["piano"]), daemon=True).start()
 
     return {"access_token": token, "piano": user["piano"]}
 
