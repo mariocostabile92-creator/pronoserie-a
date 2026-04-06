@@ -57,6 +57,7 @@ app.include_router(payments_router)
 # GLOBAL + MULTI-LEAGUE CONFIG
 # ─────────────────────────────
 _df = None
+_df_pl = None
 LIMITE_FREE = 2
 
 LEAGUES = {
@@ -323,7 +324,7 @@ def _live_updater():
 # ─────────────────────────────
 @app.on_event("startup")
 async def startup():
-    global _df
+    global _df, _df_pl
 
     print("\n🚀 AVVIO SERVER MATCHIQ\n")
 
@@ -338,10 +339,17 @@ async def startup():
     if MOTORE_DISPONIBILE:
         try:
             _df = load_all_data()
-            print(f"✅ DATI CARICATI: {len(_df)} partite")
+            print(f"✅ DATI SERIE A: {len(_df)} partite")
         except Exception as e:
-            print(f"⚠️ DATI NON DISPONIBILI: {e}")
+            print(f"⚠️ DATI SERIE A NON DISPONIBILI: {e}")
             _df = None
+        # Carica anche Premier League
+        try:
+            _df_pl = load_all_data(league="E0")
+            print(f"✅ DATI PREMIER LEAGUE: {len(_df_pl)} partite")
+        except Exception as e:
+            print(f"⚠️ DATI PL NON DISPONIBILI: {e}")
+            _df_pl = None
     else:
         print("⚠️ MOTORE NON DISPONIBILE - il server usa dati hardcoded")
 
@@ -2836,8 +2844,16 @@ async def risultati_league(league: str):
 async def pronostico_league(league: str, home: str, away: str):
     if league not in LEAGUES:
         raise HTTPException(404, "Campionato non trovato")
-    # Per PL usa il modello Poisson fallback (senza CSV)
-    raw = genera_pronostico(home, away)
+    # Per PL usa dati CSV PL se disponibili, altrimenti fallback
+    if league == "premier-league" and _df_pl is not None and len(_df_pl) > 100:
+        try:
+            hs = get_team_stats(_df_pl, home, opponent=away)
+            aw = get_team_stats(_df_pl, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_pl)
+        except Exception:
+            raw = genera_pronostico(home, away)
+    else:
+        raw = genera_pronostico(home, away)
     return {
         "home":home,"away":away,
         "prob_1":raw.get("prob_1",0),"prob_x":raw.get("prob_x",0),"prob_2":raw.get("prob_2",0),

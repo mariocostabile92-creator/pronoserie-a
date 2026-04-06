@@ -1,7 +1,7 @@
 """
 data_loader.py
-Carica e unifica tutti i CSV storici dalla cartella Mariocalcio.
-Filtra per Serie A italiana (Div == "I1").
+Carica e unifica tutti i CSV storici.
+Supporta Serie A (I1) e Premier League (E0).
 """
 
 import os
@@ -13,6 +13,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
 CARTELLA_CSV = r"C:\Users\Mario\Desktop\Mariocalcio"
+CARTELLA_PL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_pl")
 
 COLONNE_NECESSARIE = [
     "Div", "Date", "HomeTeam", "AwayTeam",
@@ -29,19 +30,26 @@ COLONNE_QUOTE = [
 ]
 
 
-def load_all_data() -> pd.DataFrame:
+def load_all_data(league="I1") -> pd.DataFrame:
     """
-    Scansiona la cartella Mariocalcio, legge tutti i .csv,
-    li unisce in un unico DataFrame e filtra Serie A (I1).
-    Ritorna il DataFrame pulito.
+    Carica CSV storici.
+    league="I1" per Serie A, league="E0" per Premier League.
     """
-    if not os.path.exists(CARTELLA_CSV):
+    # Determina cartella e divisione
+    if league == "E0":
+        cartella = CARTELLA_PL
+    else:
+        cartella = CARTELLA_CSV
+
+    if not os.path.exists(cartella):
+        if league == "E0":
+            raise FileNotFoundError(f"Cartella PL non trovata: {cartella}")
         raise FileNotFoundError(
-            f"Cartella non trovata: {CARTELLA_CSV}\n"
+            f"Cartella non trovata: {cartella}\n"
             "Controlla che la cartella 'Mariocalcio' sia sul Desktop."
         )
 
-    pattern = os.path.join(CARTELLA_CSV, "**", "*.csv")
+    pattern = os.path.join(cartella, "**", "*.csv")
     files = glob.glob(pattern, recursive=True)
     # Rimuovi duplicati (normalizza i path)
     files = list(set(os.path.normpath(f) for f in files))
@@ -79,9 +87,9 @@ def load_all_data() -> pd.DataFrame:
     frames = [f for f in frames if len(f) > 0]
     dati = pd.concat(frames, ignore_index=True, sort=False)
 
-    # Filtra Serie A
+    # Filtra per campionato
     if "Div" in dati.columns:
-        dati = dati[dati["Div"] == "I1"].copy()
+        dati = dati[dati["Div"] == league].copy()
 
     # Pulisce colonne numeriche
     for col in ["FTHG", "FTAG", "HTHG", "HTAG"]:
