@@ -1902,9 +1902,36 @@ async def squadra(nome: str):
 # ─────────────────────────────
 @app.get("/api/schedina")
 async def schedina_del_giorno():
-    """L'IA seleziona le 3-5 giocate piu' sicure della giornata 31."""
+    """L'IA seleziona le 3-5 giocate piu' sicure della PROSSIMA giornata Serie A."""
+    # Trova la prossima giornata da giocare automaticamente
+    prossima_g = None
+    for g_num in range(31, 39):
+        cal = CAL_HARDCODED.get(g_num)
+        if not cal:
+            continue
+        # Controlla se la giornata e' gia' stata giocata (tutte le partite nei risultati live)
+        tutte_giocate = True
+        if LIVE_RESULTS_CACHE:
+            for h, a in cal["partite"]:
+                trovata = False
+                for p in LIVE_RESULTS_CACHE:
+                    if (p["home"] == h and p["away"] == a) or (p["home"] == a and p["away"] == h):
+                        if p.get("status") in ("FT", "AET", "PEN"):
+                            trovata = True
+                            break
+                if not trovata:
+                    tutte_giocate = False
+                    break
+        else:
+            tutte_giocate = False
+        if not tutte_giocate:
+            prossima_g = g_num
+            break
+    if prossima_g is None:
+        prossima_g = 38
+
     giocate = []
-    cal = CAL_HARDCODED.get(31, {})
+    cal = CAL_HARDCODED.get(prossima_g, {})
     partite = cal.get("partite", [])
 
     for home, away in partite:
@@ -1924,24 +1951,90 @@ async def schedina_del_giorno():
         except Exception:
             continue
 
-    # Ordina per confidence e prendi top 5
     giocate.sort(key=lambda x: -x["confidence"])
     top = giocate[:5]
-
-    # Calcola quota totale schedina
     quota_tot = 1.0
     for g in top:
         q = g.get("quota", 1.5)
         if q > 1: quota_tot *= q
 
     return {
-        "giornata": 31,
+        "giornata": prossima_g,
         "data": cal.get("data", ""),
         "giocate": top,
         "n_giocate": len(top),
         "quota_totale": round(quota_tot, 2),
         "tipo": "Schedina SICURA — Solo giocate ad alta confidenza",
     }
+
+@app.get("/api/schedina-pl")
+async def schedina_pl():
+    """Schedina del giorno Premier League - prossima giornata."""
+    # Prendi il calendario PL per trovare la prossima giornata
+    try:
+        cal_data = LIVE_RESULTS_CACHE_ML.get("premier-league") or []
+        cl_pl = CLASSIFICA_CACHE.get("premier-league") or []
+        if not cl_pl:
+            _fetch_league_data("premier-league")
+            cl_pl = CLASSIFICA_CACHE.get("premier-league") or []
+
+        # Prendi fixtures future dalla cache
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=39&season=2025&next=10",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        if not data.get("response"):
+            return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": "Nessuna partita disponibile"}
+
+        nome_map = _get_nome_map("premier-league")
+        giornata_num = ""
+        giocate = []
+
+        for fix in data["response"][:10]:
+            teams = fix.get("teams", {})
+            lg = fix.get("league", {})
+            home = nome_map.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
+            away = nome_map.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
+            if not giornata_num:
+                giornata_num = lg.get("round", "").split(" - ")[-1] if " - " in lg.get("round", "") else "?"
+
+            try:
+                raw = genera_pronostico(home, away)
+                mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
+                conf = raw.get("confidence", 0)
+                if conf >= 0.70 or mp > 50:
+                    giocate.append({
+                        "home": home, "away": away,
+                        "tip": raw.get("suggerimento", "?"),
+                        "tip_label": raw.get("sugg_label", ""),
+                        "prob": mp,
+                        "quota": raw.get(f"quota_{raw.get('suggerimento','1').lower()}", 1.5),
+                        "confidence": conf,
+                        "over_under": ("Over 2.5 " + str(raw.get("over_25",50)) + "%") if raw.get("over_25",0) > 50 else ("Under 2.5 " + str(raw.get("under_25",50)) + "%"),
+                        "goal": ("Goal Si " + str(raw.get("goal_si",50)) + "%") if raw.get("goal_si",0) > 50 else ("Goal No " + str(raw.get("goal_no",50)) + "%"),
+                    })
+            except Exception:
+                continue
+
+        giocate.sort(key=lambda x: -x["confidence"])
+        top = giocate[:5]
+        quota_tot = 1.0
+        for g in top:
+            q = g.get("quota", 1.5)
+            if q > 1: quota_tot *= q
+
+        return {
+            "giornata": giornata_num,
+            "giocate": top,
+            "n_giocate": len(top),
+            "quota_totale": round(quota_tot, 2),
+            "tipo": "Schedina Campionato Inglese - Giocate ad alta confidenza",
+        }
+    except Exception as e:
+        return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
 
 # ─────────────────────────────
 # NOTIZIE LIVE SERIE A
