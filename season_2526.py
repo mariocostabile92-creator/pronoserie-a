@@ -70,6 +70,47 @@ XG_2526 = {
 }
 
 # ──────────────────────────────────────────────
+# Expected Goals (xG) Premier League 2025-2026
+# Fonte: API Football (gol medi casa/trasferta pesati)
+# ──────────────────────────────────────────────
+XG_PL = {
+    "Arsenal": {"xG_pg": 1.98, "xGA_pg": 0.69},
+    "Aston Villa": {"xG_pg": 1.35, "xGA_pg": 1.17},
+    "Bournemouth": {"xG_pg": 1.45, "xGA_pg": 1.55},
+    "Brentford": {"xG_pg": 1.52, "xGA_pg": 1.33},
+    "Brighton": {"xG_pg": 1.32, "xGA_pg": 1.19},
+    "Burnley": {"xG_pg": 1.05, "xGA_pg": 1.91},
+    "Chelsea": {"xG_pg": 1.68, "xGA_pg": 1.19},
+    "Crystal Palace": {"xG_pg": 1.08, "xGA_pg": 1.16},
+    "Everton": {"xG_pg": 1.21, "xGA_pg": 1.16},
+    "Fulham": {"xG_pg": 1.43, "xGA_pg": 1.43},
+    "Leeds": {"xG_pg": 1.22, "xGA_pg": 1.57},
+    "Liverpool": {"xG_pg": 1.62, "xGA_pg": 1.33},
+    "Man City": {"xG_pg": 2.04, "xGA_pg": 0.88},
+    "Man United": {"xG_pg": 1.82, "xGA_pg": 1.33},
+    "Newcastle": {"xG_pg": 1.44, "xGA_pg": 1.47},
+    "Nott. Forest": {"xG_pg": 0.99, "xGA_pg": 1.39},
+    "Sunderland": {"xG_pg": 1.10, "xGA_pg": 1.12},
+    "Tottenham": {"xG_pg": 1.28, "xGA_pg": 1.67},
+    "West Ham": {"xG_pg": 1.16, "xGA_pg": 1.85},
+    "Wolves": {"xG_pg": 0.83, "xGA_pg": 1.72},
+}
+
+def get_xg_pl(team_name: str) -> dict:
+    """Ritorna xG per partita di una squadra PL."""
+    return XG_PL.get(team_name)
+
+def get_xg_media_pl() -> dict:
+    """Media xG del campionato PL."""
+    n = len(XG_PL)
+    if n == 0:
+        return {"xG_pg_medio": 1.35, "xGA_pg_medio": 1.35}
+    return {
+        "xG_pg_medio": round(sum(v["xG_pg"] for v in XG_PL.values()) / n, 2),
+        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in XG_PL.values()) / n, 2),
+    }
+
+# ──────────────────────────────────────────────
 # Calendario ufficiale giornate 31-38
 # Fonte: legaseriea.it + transfermarkt.it
 # ──────────────────────────────────────────────
