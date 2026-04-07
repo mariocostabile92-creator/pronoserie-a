@@ -1073,6 +1073,24 @@ def genera_pronostico(home, away):
     # PUNTO 5: Badge sicura (solo quando confidenza Alta)
     sicura = cf >= 0.82 and sp[0] > 0.45
 
+    # Marcatori live da API Football
+    marc_h = []
+    marc_a = []
+    for lk in ["serie-a", "premier-league", "la-liga"]:
+        mc = MARCATORI_CACHE.get(lk) or []
+        for m in mc:
+            if m.get("squadra") == h:
+                marc_h.append(f"{m['giocatore']} ({m['gol']} gol)")
+            elif m.get("squadra") == a:
+                marc_a.append(f"{m['giocatore']} ({m['gol']} gol)")
+    if not marc_h:
+        marc_h = _filtra_marcatori(TOP_SCORER.get(h, []), INFORTUNATI.get(h, []))
+    if not marc_a:
+        marc_a = _filtra_marcatori(TOP_SCORER.get(a, []), INFORTUNATI.get(a, []))
+    # Formazioni live
+    form_h = LIVE_FORMAZIONI.get(h) or FORMAZIONI.get(h) or _get_last_lineup(h)
+    form_a = LIVE_FORMAZIONI.get(a) or FORMAZIONI.get(a) or _get_last_lineup(a)
+
     return {
         "prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),
         "quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,
@@ -1081,13 +1099,11 @@ def genera_pronostico(home, away):
         "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
         "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
         "gol_attesi":round(lh+la,2),
-        # Risultati esatti coerenti con Over/Under
         "risultati_esatti": _filtra_esatti(scores, ov25, sg),
-        # Marcatori senza infortunati
-        "marcatori_casa": _filtra_marcatori(TOP_SCORER.get(h, []), INFORTUNATI.get(h, [])),
-        "marcatori_ospite": _filtra_marcatori(TOP_SCORER.get(a, []), INFORTUNATI.get(a, [])),
-        "formazione_casa": FORMAZIONI.get(h),
-        "formazione_ospite": FORMAZIONI.get(a),
+        "marcatori_casa": marc_h[:3],
+        "marcatori_ospite": marc_a[:3],
+        "formazione_casa": form_h,
+        "formazione_ospite": form_a,
         "h2h_applicato": h2h_n >= 3 if sh else False,
         "h2h_partite": h2h_n if sh else 0,
         "bookmaker_used": bool(bk_used),
@@ -1367,10 +1383,10 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "gol_attesi": raw.get("gol_attesi"),
         "risultati_esatti": raw.get("risultati_esatti", []),
         "sicura": bool(conf_raw >= 0.82 and max(p1,px,p2) > 45),
-        "marcatori_casa": raw.get("marcatori_casa") or _filtra_marcatori(TOP_SCORER.get(home.strip().title(), []), INFORTUNATI.get(home.strip().title(), [])),
-        "marcatori_ospite": raw.get("marcatori_ospite") or _filtra_marcatori(TOP_SCORER.get(away.strip().title(), []), INFORTUNATI.get(away.strip().title(), [])),
-        "formazione_casa": raw.get("formazione_casa") or FORMAZIONI.get(home.strip().title()),
-        "formazione_ospite": raw.get("formazione_ospite") or FORMAZIONI.get(away.strip().title()),
+        "marcatori_casa": raw.get("marcatori_casa") or [],
+        "marcatori_ospite": raw.get("marcatori_ospite") or [],
+        "formazione_casa": raw.get("formazione_casa") or _get_last_lineup(home.strip().title()),
+        "formazione_ospite": raw.get("formazione_ospite") or _get_last_lineup(away.strip().title()),
         "h2h_applicato": bool(raw.get("h2h_applicato", False)),
         "h2h_partite": int(raw.get("h2h_partite", 0)),
         "bookmaker_live": bk_used_live,
