@@ -1874,7 +1874,7 @@ def _get_last_lineup(team_name):
     if team_name in _FORMAZIONE_CACHE:
         return _FORMAZIONE_CACHE[team_name]
     # Cerca team_id in entrambi i campionati
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name)
     if not team_id:
         return None
     try:
@@ -1919,7 +1919,7 @@ def _get_coach_ondemand(team_name):
     """Scarica l'allenatore attuale da API Football."""
     if team_name in _COACH_CACHE:
         return _COACH_CACHE[team_name]
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name)
     if not team_id:
         return None
     try:
@@ -1952,7 +1952,7 @@ def _get_squad_ondemand(team_name):
     """Scarica la rosa di una squadra on-demand da API Football."""
     if team_name in _ROSA_CACHE_OD:
         return _ROSA_CACHE_OD[team_name]
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name)
     if not team_id:
         return []
     try:
@@ -1977,7 +1977,7 @@ def _get_squad_ondemand(team_name):
 
 def _get_injuries_ondemand(team_name):
     """Scarica SOLO infortunati attuali di una squadra (ultimi 2 fixture)."""
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name)
     if not team_id:
         return []
     try:
