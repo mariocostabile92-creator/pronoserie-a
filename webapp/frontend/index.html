@@ -703,7 +703,7 @@ async function simulaGiornata(gNum){
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
   const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":"Campionato Italiano";
   let html='<div class="container"><h3 style="margin-bottom:12px">Pronostici Giornata '+gNum+' - '+leagueLabel+'</h3>';
-  html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.75rem;white-space:nowrap"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U</th><th>Goal</th><th>Gol</th><th>Aff.</th></tr></thead><tbody>';
+  html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.75rem;white-space:nowrap"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U</th><th>Goal</th><th>Doppio</th><th>Aff.</th></tr></thead><tbody>';
   for(const p of g.partite){
     const pronoUrl = "/api"+leagueApiPrefix()+"/pronostico/"+encodeURIComponent(p.home)+"/"+encodeURIComponent(p.away);
     const d=await fetchAPI(pronoUrl);
@@ -724,8 +724,23 @@ async function simulaGiornata(gNum){
       <td style="color:${pCol(d.prob_2)};font-weight:${d.prob_2>40?'800':'400'}">${d.prob_2}%</td>
       <td><span style="color:${tipCol};font-weight:800">${d.suggerimento}</span>${d.sicura?'<span style="background:#ff6b35;color:#fff;font-size:.6rem;padding:1px 4px;border-radius:4px;margin-left:2px">!</span>':''}</td>
       <td><span style="color:${ouCol}">${ouLbl} ${ouVal}%</span></td>
-      <td><span style="color:${glCol}">${glLbl} ${glVal}%</span></td>
-      <td style="color:var(--muted)">${d.gol_attesi||"-"}</td>
+      <td><span style="color:${glCol}">${glLbl} ${glVal}%</span></td>`;
+    // Doppio pronostico combinato
+    const tip = d.suggerimento;
+    const ou = d.over_25>50 ? "Over" : "Under";
+    const gl = d.goal_si>50 ? "Goal" : "NoGoal";
+    // Scegli il doppio migliore in base alle probabilita'
+    const combos = [];
+    if(tip!=="X"){
+      combos.push({nome:tip+" + "+ou, prob: Math.min(d.suggerimento==="1"?d.prob_1:d.prob_2, d.over_25>50?d.over_25:d.under_25)});
+      combos.push({nome:tip+" + "+gl, prob: Math.min(d.suggerimento==="1"?d.prob_1:d.prob_2, d.goal_si>50?d.goal_si:d.goal_no)});
+    } else {
+      combos.push({nome:"X + "+ou, prob: Math.min(d.prob_x, d.over_25>50?d.over_25:d.under_25)});
+      combos.push({nome:"X + "+gl, prob: Math.min(d.prob_x, d.goal_si>50?d.goal_si:d.goal_no)});
+    }
+    combos.sort((a,b)=>b.prob-a.prob);
+    const best = combos[0];
+    html+=`<td><span style="color:var(--accent);font-weight:700;font-size:.7rem">${best.nome}</span></td>
       <td><span style="color:${d.confidence_label==="Alta"?"var(--green)":d.confidence_label==="Media"?"var(--yellow)":"var(--red)"};font-weight:700">${Math.round((d.confidence||0)*100)}%</span></td>
     </tr>`;
   }
