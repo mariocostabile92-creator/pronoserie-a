@@ -372,27 +372,18 @@ function pagePronostici(){
       </div>
       <button class="btn btn-green" style="font-size:1.1rem;padding:16px 48px" onclick="calcPronostico()">CALCOLA PRONOSTICO</button>
     </div>
-    <div class="card" style="padding:20px;margin-top:16px;background:#0d1b2a;border-color:var(--accent)">
-      <h3 style="color:var(--accent);margin-bottom:12px;text-align:center">Come leggere il pronostico</h3>
-      <div class="grid3" style="gap:16px">
-        <div style="text-align:center;padding:12px">
-          <div style="font-size:1.5rem;margin-bottom:6px">1️ X 2️</div>
-          <strong style="color:var(--text);font-size:.9rem">Pronostico 1X2</strong>
-          <p style="color:var(--muted);font-size:.8rem;margin-top:4px">1 = vince la squadra di casa, X = pareggio, 2 = vince la squadra ospite. Segui il consiglio con la percentuale piu alta.</p>
-        </div>
-        <div style="text-align:center;padding:12px">
-          <div style="font-size:1.5rem;margin-bottom:6px">🟢</div>
-          <strong style="color:var(--text);font-size:.9rem">Confidenza Alta</strong>
-          <p style="color:var(--muted);font-size:.8rem;margin-top:4px">Quando l'IA mostra confidenza <strong style="color:var(--green)">Alta</strong>, il pronostico e piu affidabile. G.31: 4 su 4 corretti (100%).</p>
-        </div>
-        <div style="text-align:center;padding:12px">
-          <div style="font-size:1.5rem;margin-bottom:6px">⚽</div>
-          <strong style="color:var(--text);font-size:.9rem">Over/Under e Goal</strong>
-          <p style="color:var(--muted);font-size:.8rem;margin-top:4px">Over 2.5 = piu di 2 gol nella partita. Goal Si = entrambe le squadre segnano almeno 1 gol.</p>
-        </div>
+    <div class="card" style="padding:12px;margin-top:12px;background:#0d1b2a;border-color:var(--accent)">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var d=document.getElementById('guida-pronostico');d.style.display=d.style.display==='none'?'block':'none'">
+        <h4 style="color:var(--accent);margin:0;font-size:.9rem">Come leggere il pronostico</h4>
+        <span style="color:var(--accent);font-size:1.2rem">&#9660;</span>
       </div>
-      <div style="margin-top:12px;padding:12px;background:var(--card);border-radius:8px">
-        <p style="color:var(--muted);font-size:.8rem;text-align:center;line-height:1.6"><strong style="color:var(--yellow)">Consiglio:</strong> concentrati sulle giocate con confidenza <strong style="color:var(--green)">Alta</strong> e probabilita sopra il 55%. Evita le partite con confidenza Bassa: sono troppo incerte. Per la schedina, combina 3-4 giocate sicure invece di tante rischiose.</p>
+      <div id="guida-pronostico" style="display:none;margin-top:12px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+          <div style="text-align:center;flex:1;min-width:150px;padding:8px"><strong style="color:var(--text);font-size:.85rem">1 X 2</strong><p style="color:var(--muted);font-size:.75rem;margin-top:4px">1 = casa vince, X = pareggio, 2 = ospite vince</p></div>
+          <div style="text-align:center;flex:1;min-width:150px;padding:8px"><strong style="color:var(--green);font-size:.85rem">Confidenza Alta</strong><p style="color:var(--muted);font-size:.75rem;margin-top:4px">Pronostico piu affidabile. G.31: 4/4 corretti</p></div>
+          <div style="text-align:center;flex:1;min-width:150px;padding:8px"><strong style="color:var(--text);font-size:.85rem">Over/Under e Goal</strong><p style="color:var(--muted);font-size:.75rem;margin-top:4px">Over 2.5 = 3+ gol. Goal Si = entrambe segnano</p></div>
+        </div>
+        <p style="color:var(--muted);font-size:.75rem;text-align:center;margin-top:8px"><strong style="color:var(--yellow)">Consiglio:</strong> concentrati sulle giocate con confidenza Alta e probabilita sopra il 55%.</p>
       </div>
     </div>
     <div id="result"></div>
