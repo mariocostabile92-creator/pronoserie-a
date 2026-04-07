@@ -1207,13 +1207,39 @@ function pagePricing(){
 //  -- LOGIN / REGISTRAZIONE  -  - &euro;
 function pageLogin(){
   if(userToken){
-    return `<div class="container"><div class="card" style="text-align:center;padding:32px">
-      <h2>Il tuo Account</h2>
-      <p style="color:var(--muted);margin:12px 0">Email: <strong>${userEmail}</strong></p>
-      <p>Piano: <span class="tag ${userPlan==="pro"?"tag-green":"tag-blue"}">${userPlan==="pro"?"PRO":"FREE"}</span></p>
-      ${userPlan!=="pro"?'<div style="margin:20px 0"><button class="btn btn-green" onclick="abbonarPro()">Passa a Pro  -  9.99&euro;/mese</button></div>':'<p style="color:var(--green);margin-top:16px;font-weight:700">Hai accesso completo a tutte le funzionalita!</p>'}
-      <button class="btn btn-blue" style="margin-top:16px" onclick="doLogout()">Esci</button>
-    </div></div>`;
+    return `<div class="container">
+      <h1>Il tuo Account</h1>
+      <div class="grid2" style="grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div class="card" style="padding:24px">
+            <h3 style="margin-bottom:12px">Profilo</h3>
+            <p style="color:var(--muted);margin:8px 0">Email</p>
+            <p style="font-weight:700;font-size:1.1rem">${userEmail}</p>
+            <p style="color:var(--muted);margin:12px 0 4px">Piano attuale</p>
+            <p><span class="tag ${userPlan==="pro"?"tag-green":"tag-blue"}" style="font-size:1rem;padding:6px 20px">${userPlan==="pro"?"PRO":"FREE"}</span></p>
+            ${userPlan!=="pro"?'<div style="margin-top:16px"><button class="btn btn-green" style="width:100%" onclick="abbonarPro()">Passa a Pro - 9.99&euro;/mese</button></div>':'<p style="color:var(--green);margin-top:16px;font-weight:700">Accesso completo attivo</p>'}
+          </div>
+          <div class="card" style="padding:24px;margin-top:16px">
+            <h3 style="margin-bottom:12px">Pronostici utilizzati</h3>
+            <p style="color:var(--muted)">Oggi: <strong style="color:var(--text)">${freeUsed}/${userPlan==="pro"?"Illimitati":FREE_LIMIT}</strong></p>
+            ${userPlan!=="pro"?'<div class="bar" style="margin-top:8px"><div class="bar-fill" style="width:'+(freeUsed/FREE_LIMIT*100)+'%;background:var(--accent)"></div></div>':''}
+          </div>
+        </div>
+        <div>
+          <div class="card" style="padding:24px">
+            <h3 style="margin-bottom:12px">Cambia Password</h3>
+            <input id="old-pass" type="password" placeholder="Password attuale" style="width:100%;padding:10px;border-radius:8px;border:1px solid #1f3460;background:#0d1b2a;color:var(--text);margin-bottom:10px;font-size:.95rem">
+            <input id="new-pass" type="password" placeholder="Nuova password (min 6 caratteri)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #1f3460;background:#0d1b2a;color:var(--text);margin-bottom:10px;font-size:.95rem">
+            <input id="new-pass2" type="password" placeholder="Conferma nuova password" style="width:100%;padding:10px;border-radius:8px;border:1px solid #1f3460;background:#0d1b2a;color:var(--text);margin-bottom:12px;font-size:.95rem">
+            <button class="btn btn-blue" style="width:100%" onclick="doChangePassword()">Aggiorna Password</button>
+            <div id="change-pass-msg" style="margin-top:8px;text-align:center"></div>
+          </div>
+          <div class="card" style="padding:24px;margin-top:16px;text-align:center">
+            <button class="btn" style="background:var(--red);color:#fff;width:100%" onclick="doLogout()">Esci dall'account</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
   }
   return `<div class="container">
     <div class="card" style="max-width:450px;margin:40px auto;padding:32px">
@@ -1272,7 +1298,7 @@ async function doRecover(){
   msg.innerHTML='<div class="spinner" style="margin:8px auto"></div>';
   try{
     const d=await postAPI("/api/auth/reset-password",{email});
-    msg.innerHTML='<span style="color:var(--green)">Nuova password generata! Controlla qui sotto.</span><br><div class="card" style="margin-top:12px;padding:16px;text-align:center"><p style="color:var(--muted)">La tua nuova password e\':</p><p style="font-size:1.3rem;font-weight:800;color:var(--green);margin:8px 0;letter-spacing:2px">' + d.new_password + '</p><p style="color:var(--muted);font-size:.85rem">Usala per accedere, poi cambiala dal tuo account.</p></div>';
+    msg.innerHTML='<span style="color:var(--green)">Password inviata alla tua email!</span><br><div class="card" style="margin-top:12px;padding:16px;text-align:center"><p style="color:var(--text)">Controlla la tua casella di posta (anche lo spam).</p><p style="color:var(--muted);font-size:.85rem;margin-top:8px">Troverai la nuova password provvisoria. Usala per accedere e poi cambiala dalle impostazioni del tuo account.</p></div>';
   }catch(e){msg.innerHTML=`<span style="color:var(--red)">${e.message}</span>`}
 }
 
@@ -1303,6 +1329,19 @@ async function doRegister(){
     localStorage.setItem("userEmail",userEmail);
     updateNavAuth();
     location.hash="#home";
+  }catch(e){msg.innerHTML=`<span style="color:var(--red)">${e.message}</span>`}
+}
+
+async function doChangePassword(){
+  const old_p=$("old-pass").value, new_p=$("new-pass").value, new_p2=$("new-pass2").value, msg=$("change-pass-msg");
+  if(!old_p||!new_p){msg.innerHTML='<span style="color:var(--red)">Compila tutti i campi</span>';return}
+  if(new_p.length<6){msg.innerHTML='<span style="color:var(--red)">Min 6 caratteri</span>';return}
+  if(new_p!==new_p2){msg.innerHTML='<span style="color:var(--red)">Le password non coincidono</span>';return}
+  msg.innerHTML='<div class="spinner" style="margin:4px auto"></div>';
+  try{
+    await postAPI("/api/auth/change-password",{old_password:old_p,new_password:new_p});
+    msg.innerHTML='<span style="color:var(--green)">Password aggiornata!</span>';
+    $("old-pass").value=""; $("new-pass").value=""; $("new-pass2").value="";
   }catch(e){msg.innerHTML=`<span style="color:var(--red)">${e.message}</span>`}
 }
 

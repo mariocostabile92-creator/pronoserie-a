@@ -1180,7 +1180,45 @@ async def reset_password(data: dict):
     conn.commit()
     cur.close()
     conn.close()
-    return {"new_password": new_pass}
+    # Invia via email
+    try:
+        import urllib.request as ur
+        body = json.dumps({
+            "from": "MatchIQ <onboarding@resend.dev>",
+            "to": [email],
+            "subject": "MatchIQ - La tua nuova password",
+            "html": f'<div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px"><h2 style="color:#2ecc71">Recupero Password</h2><p>La tua nuova password provvisoria e\':</p><div style="background:#162447;padding:16px;border-radius:8px;text-align:center;margin:16px 0"><span style="font-size:1.5rem;font-weight:800;color:#2ecc71;letter-spacing:2px">{new_pass}</span></div><p>Accedi con questa password e poi cambiala dalle impostazioni del tuo account.</p><hr style="border:1px solid #1f3460"><p style="color:#8892b0;font-size:.85rem">MatchIQ - Pronostici Calcistici con IA</p></div>'
+        }).encode()
+        req = ur.Request("https://api.resend.com/emails", data=body, headers={
+            "Authorization": f"Bearer {RESEND_API_KEY}",
+            "Content-Type": "application/json"
+        })
+        ur.urlopen(req, timeout=10)
+    except Exception:
+        pass
+    return {"sent": True}
+
+@app.post("/api/auth/change-password")
+async def change_password(data: dict, user: Optional[dict] = Depends(get_optional_user)):
+    if not user:
+        raise HTTPException(401, "Devi essere loggato")
+    old_pass = data.get("old_password", "")
+    new_pass = data.get("new_password", "")
+    if not old_pass or not new_pass:
+        raise HTTPException(400, "Compila tutti i campi")
+    if len(new_pass) < 6:
+        raise HTTPException(400, "La nuova password deve avere almeno 6 caratteri")
+    db_user = get_user_by_email(user.get("email", ""))
+    if not db_user or not verify_password(old_pass, db_user["password_hash"]):
+        raise HTTPException(401, "Password attuale errata")
+    from database import _get_conn
+    conn = _get_conn()
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET password_hash = %s WHERE id = %s", (hash_password(new_pass), db_user["id"]))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"status": "ok"}
 
 # ─────────────────────────────
 # PRONOSTICO
