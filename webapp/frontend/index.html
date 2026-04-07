@@ -740,7 +740,8 @@ async function simulaGiornata(gNum){
     }
     combos.sort((a,b)=>b.prob-a.prob);
     const best = combos[0];
-    html+=`<td><span style="color:var(--accent);font-weight:700;font-size:.7rem">${best.nome}</span></td>
+    const dCol = best.prob>60?"var(--green)":best.prob>50?"var(--yellow)":"var(--red)";
+    html+=`<td><span style="color:${dCol};font-weight:700;font-size:.7rem">${best.nome}</span></td>
       <td><span style="color:${d.confidence_label==="Alta"?"var(--green)":d.confidence_label==="Media"?"var(--yellow)":"var(--red)"};font-weight:700">${Math.round((d.confidence||0)*100)}%</span></td>
     </tr>`;
   }
