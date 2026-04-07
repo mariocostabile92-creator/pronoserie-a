@@ -255,7 +255,7 @@ function pageHome(){
       <div class="grid2" style="margin-top:16px">
         <div>
           <p style="line-height:2;font-size:.95rem">
-            <strong style="color:var(--green)">1.</strong> La Schedina del Giorno seleziona SOLO i pronostici con confidenza Alta<br>
+            <strong style="color:var(--green)">1.</strong> Il Pronostico del Giorno seleziona SOLO i pronostici con confidenza Alta<br>
             <strong style="color:var(--green)">2.</strong> Accesso a TUTTE le 8 giornate rimanenti con pronostici completi<br>
             <strong style="color:var(--green)">3.</strong> Classifica, marcatori e rose aggiornate in tempo reale<br>
             <strong style="color:var(--green)">4.</strong> Probabili formazioni e infortunati live aggiornati ogni 30 min
@@ -352,7 +352,7 @@ async function loadSchedina(){
     if(!d||!d.giocate||!d.giocate.length)return;
   const oldL = currentLeague;
   currentLeague = "serie-a";
-  let html='<div class="card" style="border-color:var(--green);border-width:2px"><h2 style="color:var(--green);text-align:center;font-size:1.1rem">Schedina Campionato Italiano - G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:12px;font-size:.8rem">'+d.tipo+'</p>';
+  let html='<div class="card" style="border-color:var(--green);border-width:2px"><h2 style="color:var(--green);text-align:center;font-size:1.1rem">Pronostico del Giorno - Campionato Italiano G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:12px;font-size:.8rem">'+d.tipo+'</p>';
   const maxShow = userPlan==="pro" ? d.giocate.length : 2;
   d.giocate.slice(0,maxShow).forEach((g,i)=>{
     html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><div style="font-size:.85rem">${badge(g.home,16)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,16)}<br><span style="color:var(--muted);font-size:.7rem">Conf. ${Math.round(g.confidence*100)}% | ${g.over_under} | ${g.goal}</span></div><div style="text-align:right"><span class="tag tag-green" style="font-size:.9rem;padding:4px 12px">${g.tip}</span><br><span style="color:var(--muted);font-size:.75rem">Quota ${g.quota}</span></div></div>`;
@@ -385,7 +385,7 @@ async function loadSchedinaPL(){
     if(!d||!d.giocate||!d.giocate.length)return;
     const oldLeague = currentLeague;
     currentLeague = "premier-league";
-    let html='<div class="card" style="border-color:var(--accent);border-width:2px"><h2 style="color:var(--accent);text-align:center">Schedina Campionato Inglese - G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:16px">'+d.tipo+'</p>';
+    let html='<div class="card" style="border-color:var(--accent);border-width:2px"><h2 style="color:var(--accent);text-align:center">Pronostico del Giorno - Campionato Inglese G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:16px">'+d.tipo+'</p>';
     const maxShow = userPlan==="pro" ? d.giocate.length : 2;
     d.giocate.slice(0,maxShow).forEach((g,i)=>{
       html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f3460"><div>${badge(g.home,18)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,18)}<br><span style="color:var(--muted);font-size:.8rem">Conf. ${Math.round(g.confidence*100)}% | ${g.over_under} | ${g.goal}</span></div><div style="text-align:right"><span class="tag tag-blue" style="font-size:1rem;padding:6px 16px">${g.tip}</span><br><span style="color:var(--muted);font-size:.85rem">Quota ${g.quota}</span></div></div>`;
@@ -394,7 +394,7 @@ async function loadSchedinaPL(){
       html+=`<div style="text-align:center;padding:16px;color:var(--muted)"><p>+ ${d.giocate.length-2} altri pronostici</p><button class="btn btn-green" style="margin-top:8px" onclick="abbonarPro()">Sblocca tutto con Pro</button></div>`;
     }
     if(userPlan==="pro"){
-      html+=`<div style="text-align:center;margin-top:16px;padding:16px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted)">Quota totale schedina:</span><br><span style="font-size:2rem;font-weight:800;color:var(--accent)">${d.quota_totale}</span></div>`;
+      html+=`<div style="text-align:center;margin-top:16px;padding:16px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted)">Quota totale:</span><br><span style="font-size:2rem;font-weight:800;color:var(--accent)">${d.quota_totale}</span></div>`;
     }
     html+='</div>';
     el.innerHTML=html;
@@ -418,7 +418,7 @@ async function loadSchedinaLL(){
     if(!d||!d.giocate||!d.giocate.length)return;
     const oldLeague = currentLeague;
     currentLeague = "la-liga";
-    let html='<div class="card" style="border-color:#f39c12;border-width:2px"><h2 style="color:#f39c12;text-align:center;font-size:1.1rem">Schedina Campionato Spagnolo - G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:12px;font-size:.8rem">'+d.tipo+'</p>';
+    let html='<div class="card" style="border-color:#f39c12;border-width:2px"><h2 style="color:#f39c12;text-align:center;font-size:1.1rem">Pronostico del Giorno - Campionato Spagnolo G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:12px;font-size:.8rem">'+d.tipo+'</p>';
     const maxShow = userPlan==="pro" ? d.giocate.length : 2;
     d.giocate.slice(0,maxShow).forEach((g,i)=>{
       html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><div style="font-size:.85rem">${badge(g.home,16)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,16)}<br><span style="color:var(--muted);font-size:.7rem">Conf. ${Math.round(g.confidence*100)}%${g.over_under?' | '+g.over_under:''}${g.goal?' | '+g.goal:''}</span></div><div style="text-align:right"><span class="tag" style="background:#f39c12;color:#000;font-size:.9rem;padding:4px 12px">${g.tip}</span><br><span style="color:var(--muted);font-size:.7rem">Quota ${g.quota}</span></div></div>`;
@@ -1225,7 +1225,7 @@ function pagePricing(){
     ["Rose complete 40 squadre", false, true],
     ["Probabili formazioni live", false, true],
     ["Infortunati aggiornati", false, true],
-    ["Schedina del Giorno IA", "Solo 2 pronostici", "Completa (5 pronostici)"],
+    ["Pronostico del Giorno IA", "Solo 2 pronostici", "Completa (5 pronostici)"],
     ["Badge SICURA (confidenza Alta)", false, true],
     ["Notizie dal Calcio", false, true],
     ["Notifiche gol Telegram", false, true],
