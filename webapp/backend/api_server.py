@@ -2137,44 +2137,41 @@ NOTIZIE_CACHE = []
 NOTIZIE_LAST_UPDATE = ""
 
 def _scrape_notizie():
-    """Scarica notizie Serie A con link specifici agli articoli."""
+    """Scarica notizie calcio da Google News RSS (affidabile e sempre aggiornato)."""
     global NOTIZIE_CACHE, NOTIZIE_LAST_UPDATE
     import urllib.request as ur
     import re
     notizie = []
-    try:
-        req = ur.Request("https://sport.sky.it/calcio/serie-a", headers={"User-Agent":"Mozilla/5.0"})
-        with ur.urlopen(req, timeout=10) as r:
-            html = r.read().decode("utf-8", errors="replace")
-        # Estrai coppie link+titolo: <a href="/calcio/serie-a/...">Titolo</a>
-        links = re.findall(r'<a[^>]+href="(/calcio/serie-a/[^"]{20,})"[^>]*>([^<]{15,120})</a>', html)
-        seen = set()
-        for url, titolo in links:
-            t = re.sub(r'<[^>]+>','',titolo).strip()
-            if t and t not in seen and len(t)>15:
-                seen.add(t)
-                notizie.append({"titolo":t,"fonte":"Sky Sport","url":"https://sport.sky.it"+url})
-                if len(notizie)>=6: break
-    except Exception as e:
-        print(f"⚠️ Scrape Sky: {e}")
-    try:
-        req = ur.Request("https://www.gazzetta.it/calcio/serie-a/", headers={"User-Agent":"Mozilla/5.0"})
-        with ur.urlopen(req, timeout=10) as r:
-            html = r.read().decode("utf-8", errors="replace")
-        links = re.findall(r'<a[^>]+href="(https?://www\.gazzetta\.it/calcio/serie-a/[^"]{10,})"[^>]*>([^<]{15,120})</a>', html)
-        seen2 = set()
-        for url, titolo in links:
-            t = re.sub(r'<[^>]+>','',titolo).strip()
-            if t and t not in seen2 and len(t)>15:
-                seen2.add(t)
-                notizie.append({"titolo":t,"fonte":"Gazzetta","url":url})
-                if len(notizie)>=12: break
-    except Exception as e:
-        print(f"⚠️ Scrape Gazzetta: {e}")
+    feeds = [
+        ("https://news.google.com/rss/search?q=serie+a+calcio+2026&hl=it&gl=IT&ceid=IT:it", "Serie A"),
+        ("https://news.google.com/rss/search?q=premier+league+football+2026&hl=it&gl=IT&ceid=IT:it", "Premier League"),
+        ("https://news.google.com/rss/search?q=calciomercato+2026&hl=it&gl=IT&ceid=IT:it", "Calciomercato"),
+    ]
+    for feed_url, categoria in feeds:
+        try:
+            req = ur.Request(feed_url, headers={"User-Agent": "Mozilla/5.0"})
+            with ur.urlopen(req, timeout=10) as r:
+                xml = r.read().decode("utf-8", errors="replace")
+            # Parse RSS XML
+            items = re.findall(r'<item>.*?<title>(.*?)</title>.*?<link>(.*?)</link>.*?<source[^>]*>(.*?)</source>.*?</item>', xml, re.DOTALL)
+            for titolo, url, fonte in items[:4]:
+                titolo = re.sub(r'<[^>]+>', '', titolo).strip()
+                titolo = titolo.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&#39;', "'")
+                if titolo and len(titolo) > 15:
+                    notizie.append({"titolo": titolo, "fonte": fonte or categoria, "url": url})
+        except Exception as e:
+            print(f"⚠️ RSS {categoria}: {e}")
     if notizie:
-        NOTIZIE_CACHE = notizie[:12]
+        # Rimuovi duplicati per titolo
+        seen = set()
+        unique = []
+        for n in notizie:
+            if n["titolo"] not in seen:
+                seen.add(n["titolo"])
+                unique.append(n)
+        NOTIZIE_CACHE = unique[:12]
         NOTIZIE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
-        print(f"📰 Notizie: {len(NOTIZIE_CACHE)} articoli con link")
+        print(f"📰 Notizie: {len(NOTIZIE_CACHE)} articoli live da Google News")
 
 @app.get("/api/notizie")
 async def notizie():
