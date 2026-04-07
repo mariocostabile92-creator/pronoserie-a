@@ -1298,7 +1298,7 @@ async function doRecover(){
   msg.innerHTML='<div class="spinner" style="margin:8px auto"></div>';
   try{
     const d=await postAPI("/api/auth/reset-password",{email});
-    msg.innerHTML='<span style="color:var(--green)">Password inviata alla tua email!</span><br><div class="card" style="margin-top:12px;padding:16px;text-align:center"><p style="color:var(--text)">Controlla la tua casella di posta (anche lo spam).</p><p style="color:var(--muted);font-size:.85rem;margin-top:8px">Troverai la nuova password provvisoria. Usala per accedere e poi cambiala dalle impostazioni del tuo account.</p></div>';
+    msg.innerHTML='<span style="color:var(--green)">Nuova password generata!</span><br><div class="card" style="margin-top:12px;padding:16px;text-align:center"><p style="color:var(--muted)">La tua nuova password e\':</p><p style="font-size:1.3rem;font-weight:800;color:var(--green);margin:8px 0;letter-spacing:2px">' + d.new_password + '</p><p style="color:var(--muted);font-size:.85rem">Copiala e usala per accedere. Poi cambiala dalle impostazioni del tuo account.</p></div>';
   }catch(e){msg.innerHTML=`<span style="color:var(--red)">${e.message}</span>`}
 }
 

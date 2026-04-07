@@ -1196,7 +1196,7 @@ async def reset_password(data: dict):
         ur.urlopen(req, timeout=10)
     except Exception:
         pass
-    return {"sent": True}
+    return {"sent": True, "new_password": new_pass}
 
 @app.post("/api/auth/change-password")
 async def change_password(data: dict, user: Optional[dict] = Depends(get_optional_user)):
