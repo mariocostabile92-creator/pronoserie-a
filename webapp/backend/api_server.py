@@ -1363,6 +1363,26 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         ov25 = raw.get("over_25")
         un25 = raw.get("under_25")
 
+    # Marcatori live (cerca in cache API Football + fallback hardcoded)
+    h_t = home.strip().title()
+    a_t = away.strip().title()
+    mc_h = raw.get("marcatori_casa") or []
+    mc_a = raw.get("marcatori_ospite") or []
+    if not mc_h:
+        for lk in ["serie-a", "premier-league", "la-liga"]:
+            for m in (MARCATORI_CACHE.get(lk) or []):
+                if m.get("squadra") == h_t:
+                    mc_h.append(f"{m['giocatore']} ({m['gol']} gol)")
+        if not mc_h:
+            mc_h = _filtra_marcatori(TOP_SCORER.get(h_t, []), INFORTUNATI.get(h_t, []))
+    if not mc_a:
+        for lk in ["serie-a", "premier-league", "la-liga"]:
+            for m in (MARCATORI_CACHE.get(lk) or []):
+                if m.get("squadra") == a_t:
+                    mc_a.append(f"{m['giocatore']} ({m['gol']} gol)")
+        if not mc_a:
+            mc_a = _filtra_marcatori(TOP_SCORER.get(a_t, []), INFORTUNATI.get(a_t, []))
+
     return {
         "home": home,
         "away": away,
@@ -1383,10 +1403,10 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "gol_attesi": raw.get("gol_attesi"),
         "risultati_esatti": raw.get("risultati_esatti", []),
         "sicura": bool(conf_raw >= 0.82 and max(p1,px,p2) > 45),
-        "marcatori_casa": raw.get("marcatori_casa") or [],
-        "marcatori_ospite": raw.get("marcatori_ospite") or [],
-        "formazione_casa": raw.get("formazione_casa") or _get_last_lineup(home.strip().title()),
-        "formazione_ospite": raw.get("formazione_ospite") or _get_last_lineup(away.strip().title()),
+        "marcatori_casa": mc_h[:3],
+        "marcatori_ospite": mc_a[:3],
+        "formazione_casa": raw.get("formazione_casa") or _get_last_lineup(h_t),
+        "formazione_ospite": raw.get("formazione_ospite") or _get_last_lineup(a_t),
         "h2h_applicato": bool(raw.get("h2h_applicato", False)),
         "h2h_partite": int(raw.get("h2h_partite", 0)),
         "bookmaker_live": bk_used_live,
