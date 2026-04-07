@@ -153,16 +153,16 @@ def calcola_mercati_extra(lambda_home: float, lambda_away: float,
     # Goal/NoGoal (entrambe segnano almeno 1)
     goal_si = sum(p for (i, j), p in matrice.items() if i >= 1 and j >= 1)
 
-    # Calibrazione Goal: se gol attesi > 2.5, Goal Si e' piu' probabile
-    # Il Poisson sottostima Goal Si quando i lambda sono sbilanciati
+    # Calibrazione Goal: boost solo se ENTRAMBE le squadre hanno lambda decente
+    # Se una squadra ha lambda < 0.8, il Goal No del Poisson e' probabilmente corretto
     gol_attesi = lambda_home + lambda_away
-    if gol_attesi > 3.0:
-        # Con 3+ gol attesi, Goal Si dovrebbe essere almeno 55%
-        goal_si = max(goal_si, 0.55 + (gol_attesi - 3.0) * 0.05)
-        goal_si = min(goal_si, 0.85)  # Cap a 85%
-    elif gol_attesi > 2.5:
-        # Con 2.5-3 gol attesi, boost leggero
-        goal_si = max(goal_si, 0.50 + (gol_attesi - 2.5) * 0.06)
+    lambda_min = min(lambda_home, lambda_away)
+    if gol_attesi > 3.0 and lambda_min >= 0.8:
+        # Entrambe segnano spesso, boost Goal Si
+        goal_si = max(goal_si, 0.55 + (gol_attesi - 3.0) * 0.04)
+        goal_si = min(goal_si, 0.80)
+    elif gol_attesi > 2.5 and lambda_min >= 0.7:
+        goal_si = max(goal_si, 0.50 + (gol_attesi - 2.5) * 0.04)
 
     # Risultato esatto piu' probabile (top 5, max 4 gol per squadra)
     esatti_realistici = {k: v for k, v in matrice.items() if k[0] <= 4 and k[1] <= 4}
