@@ -58,11 +58,13 @@ app.include_router(payments_router)
 # ─────────────────────────────
 _df = None
 _df_pl = None
+_df_ll = None
 LIMITE_FREE = 2
 
 LEAGUES = {
     "serie-a": {"id": 135, "season": 2025, "name": "Serie A", "country": "Italy"},
     "premier-league": {"id": 39, "season": 2025, "name": "Premier League", "country": "England"},
+    "la-liga": {"id": 140, "season": 2025, "name": "La Liga", "country": "Spain"},
 }
 
 # Mapping nomi API Football -> nomi nostri (per ogni league)
@@ -90,14 +92,49 @@ PL_TEAM_IDS = {
     "Nott. Forest":65,"Sunderland":746,"Tottenham":47,"West Ham":48,"Wolves":39,
 }
 
+LL_NOME_MAP = {
+    "FC Barcelona": "Barcelona", "Barcelona": "Barcelona",
+    "Atletico Madrid": "Atletico Madrid", "Club Atletico de Madrid": "Atletico Madrid",
+    "Athletic Club": "Athletic Club", "Athletic Bilbao": "Athletic Club",
+    "Real Madrid": "Real Madrid",
+    "Real Sociedad": "Real Sociedad",
+    "Real Betis": "Real Betis",
+    "Villarreal CF": "Villarreal", "Villarreal": "Villarreal",
+    "Sevilla FC": "Sevilla", "Sevilla": "Sevilla",
+    "Valencia CF": "Valencia", "Valencia": "Valencia",
+    "RC Celta de Vigo": "Celta Vigo", "Celta Vigo": "Celta Vigo",
+    "RCD Espanyol": "Espanyol", "Espanyol": "Espanyol",
+    "Deportivo Alaves": "Alaves", "Alaves": "Alaves",
+    "CA Osasuna": "Osasuna", "Osasuna": "Osasuna",
+    "Getafe CF": "Getafe", "Getafe": "Getafe",
+    "Girona FC": "Girona", "Girona": "Girona",
+    "Rayo Vallecano": "Rayo Vallecano",
+    "RCD Mallorca": "Mallorca", "Mallorca": "Mallorca",
+    "Levante UD": "Levante", "Levante": "Levante",
+    "Real Oviedo": "Oviedo", "Oviedo": "Oviedo",
+    "Elche CF": "Elche", "Elche": "Elche",
+}
+
+LL_TEAM_IDS = {
+    "Alaves":542,"Athletic Club":531,"Atletico Madrid":530,"Barcelona":529,
+    "Celta Vigo":538,"Elche":797,"Espanyol":540,"Getafe":546,"Girona":547,
+    "Levante":539,"Mallorca":798,"Osasuna":727,"Oviedo":718,
+    "Rayo Vallecano":728,"Real Betis":543,"Real Madrid":541,
+    "Real Sociedad":548,"Sevilla":536,"Valencia":532,"Villarreal":533,
+}
+
 def _get_nome_map(league_key):
     if league_key == "premier-league":
         return PL_NOME_MAP
+    if league_key == "la-liga":
+        return LL_NOME_MAP
     return FOOTBALL_NOME_MAP
 
 def _get_team_ids(league_key):
     if league_key == "premier-league":
         return PL_TEAM_IDS
+    if league_key == "la-liga":
+        return LL_TEAM_IDS
     return _TEAM_IDS
 
 def _map_team_name(name, league_key):
@@ -105,12 +142,12 @@ def _map_team_name(name, league_key):
     return nm.get(name, name)
 
 # Cache multi-league
-CLASSIFICA_CACHE = {"serie-a": None, "premier-league": None}
-CLASSIFICA_LAST_UPDATE = {"serie-a": "", "premier-league": ""}
-MARCATORI_CACHE = {"serie-a": None, "premier-league": None}
-LIVE_RESULTS_CACHE_ML = {"serie-a": None, "premier-league": None}
-RISULTATI_STAGIONE_CACHE_ML = {"serie-a": None, "premier-league": None}
-LIVE_IN_CORSO_ML = {"serie-a": False, "premier-league": False}
+CLASSIFICA_CACHE = {"serie-a": None, "premier-league": None, "la-liga": None}
+CLASSIFICA_LAST_UPDATE = {"serie-a": "", "premier-league": "", "la-liga": ""}
+MARCATORI_CACHE = {"serie-a": None, "premier-league": None, "la-liga": None}
+LIVE_RESULTS_CACHE_ML = {"serie-a": None, "premier-league": None, "la-liga": None}
+RISULTATI_STAGIONE_CACHE_ML = {"serie-a": None, "premier-league": None, "la-liga": None}
+LIVE_IN_CORSO_ML = {"serie-a": False, "premier-league": False, "la-liga": False}
 
 # Dati live (aggiornati automaticamente)
 import threading, time, urllib.request, re as regex_module
@@ -312,6 +349,7 @@ def _live_updater():
                 _fetch_rose_live(PL_TEAM_IDS)  # Rose Premier League
                 _fetch_risultati_stagione()
                 _fetch_league_data("premier-league")
+                _fetch_league_data("la-liga")
         except Exception:
             pass
         if LIVE_IN_CORSO:
@@ -324,7 +362,7 @@ def _live_updater():
 # ─────────────────────────────
 @app.on_event("startup")
 async def startup():
-    global _df, _df_pl
+    global _df, _df_pl, _df_ll
 
     print("\n🚀 AVVIO SERVER MATCHIQ\n")
 
@@ -350,6 +388,13 @@ async def startup():
         except Exception as e:
             print(f"⚠️ DATI PL NON DISPONIBILI: {e}")
             _df_pl = None
+        # Carica La Liga
+        try:
+            _df_ll = load_all_data(league="SP1")
+            print(f"✅ DATI LA LIGA: {len(_df_ll)} partite")
+        except Exception as e:
+            print(f"⚠️ DATI LA LIGA NON DISPONIBILI: {e}")
+            _df_ll = None
     else:
         print("⚠️ MOTORE NON DISPONIBILE - il server usa dati hardcoded")
 
@@ -386,9 +431,13 @@ async def startup():
             _fetch_rose_live(PL_TEAM_IDS)
         except Exception:
             pass
-        # Premier League
+        # Premier League + La Liga
         try:
             _fetch_league_data("premier-league")
+        except Exception:
+            pass
+        try:
+            _fetch_league_data("la-liga")
         except Exception:
             pass
     t = threading.Thread(target=_live_updater, daemon=True)
@@ -3082,12 +3131,19 @@ async def risultati_league(league: str):
 async def pronostico_league(league: str, home: str, away: str):
     if league not in LEAGUES:
         raise HTTPException(404, "Campionato non trovato")
-    # Per PL usa dati CSV PL se disponibili, altrimenti fallback
+    # Per PL/LL usa dati CSV se disponibili, altrimenti fallback
     if league == "premier-league" and _df_pl is not None and len(_df_pl) > 100:
         try:
             hs = get_team_stats(_df_pl, home, opponent=away)
             aw = get_team_stats(_df_pl, away, opponent=home)
             raw = get_prediction(hs, aw, df=_df_pl)
+        except Exception:
+            raw = genera_pronostico(home, away)
+    elif league == "la-liga" and _df_ll is not None and len(_df_ll) > 100:
+        try:
+            hs = get_team_stats(_df_ll, home, opponent=away)
+            aw = get_team_stats(_df_ll, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_ll)
         except Exception:
             raw = genera_pronostico(home, away)
     else:

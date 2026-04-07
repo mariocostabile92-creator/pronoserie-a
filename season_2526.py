@@ -111,6 +111,44 @@ def get_xg_media_pl() -> dict:
     }
 
 # ──────────────────────────────────────────────
+# Expected Goals (xG) La Liga 2025-2026
+# ──────────────────────────────────────────────
+XG_LALIGA = {
+    "Alaves": {"xG_pg": 1.12, "xGA_pg": 1.43},
+    "Athletic Club": {"xG_pg": 1.12, "xGA_pg": 1.37},
+    "Atletico Madrid": {"xG_pg": 1.71, "xGA_pg": 0.99},
+    "Barcelona": {"xG_pg": 2.70, "xGA_pg": 0.91},
+    "Celta Vigo": {"xG_pg": 1.46, "xGA_pg": 1.27},
+    "Elche": {"xG_pg": 1.29, "xGA_pg": 1.55},
+    "Espanyol": {"xG_pg": 1.20, "xGA_pg": 1.45},
+    "Getafe": {"xG_pg": 0.90, "xGA_pg": 0.97},
+    "Girona": {"xG_pg": 1.06, "xGA_pg": 1.45},
+    "Levante": {"xG_pg": 1.16, "xGA_pg": 1.66},
+    "Mallorca": {"xG_pg": 1.23, "xGA_pg": 1.57},
+    "Osasuna": {"xG_pg": 1.31, "xGA_pg": 1.19},
+    "Oviedo": {"xG_pg": 0.68, "xGA_pg": 1.53},
+    "Rayo Vallecano": {"xG_pg": 0.97, "xGA_pg": 1.10},
+    "Real Betis": {"xG_pg": 1.48, "xGA_pg": 1.24},
+    "Real Madrid": {"xG_pg": 2.17, "xGA_pg": 0.94},
+    "Real Sociedad": {"xG_pg": 1.54, "xGA_pg": 1.49},
+    "Sevilla": {"xG_pg": 1.26, "xGA_pg": 1.68},
+    "Valencia": {"xG_pg": 1.18, "xGA_pg": 1.47},
+    "Villarreal": {"xG_pg": 1.85, "xGA_pg": 1.17},
+}
+
+def get_xg_laliga(team_name: str) -> dict:
+    return XG_LALIGA.get(team_name)
+
+def get_xg_media_laliga() -> dict:
+    n = len(XG_LALIGA)
+    if n == 0:
+        return {"xG_pg_medio": 1.35, "xGA_pg_medio": 1.35}
+    return {
+        "xG_pg_medio": round(sum(v["xG_pg"] for v in XG_LALIGA.values()) / n, 2),
+        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in XG_LALIGA.values()) / n, 2),
+    }
+
+# ──────────────────────────────────────────────
 # Calendario ufficiale giornate 31-38
 # Fonte: legaseriea.it + transfermarkt.it
 # ──────────────────────────────────────────────

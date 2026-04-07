@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import poisson
 from stats_engine import get_h2h_stats
-from season_2526 import get_xg, get_xg_media_campionato, CLASSIFICA_REALE_30G, get_team_ou_tendency, get_season_avg_goals, get_xg_pl, get_xg_media_pl
+from season_2526 import get_xg, get_xg_media_campionato, CLASSIFICA_REALE_30G, get_team_ou_tendency, get_season_avg_goals, get_xg_pl, get_xg_media_pl, get_xg_laliga, get_xg_media_laliga
 from live_data import get_impatto_infortunati, get_n_indisponibili
 
 # Import statistiche API Football (opzionale, non blocca se non disponibili)
@@ -370,8 +370,8 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     # (evita di alterare i lambda base che peggiorano l'1X2)
 
     # ── LAMBDA DA xG 2025-2026 (Serie A + Premier League) ──
-    xg_home = get_xg(home_name) or get_xg_pl(home_name)
-    xg_away = get_xg(away_name) or get_xg_pl(away_name)
+    xg_home = get_xg(home_name) or get_xg_pl(home_name) or get_xg_laliga(home_name)
+    xg_away = get_xg(away_name) or get_xg_pl(away_name) or get_xg_laliga(away_name)
     xg_applied = False
     xg_home_val = None
     xg_away_val = None
@@ -381,8 +381,10 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
         # Usa le medie del campionato corretto
         if get_xg(home_name):
             medie_xg = get_xg_media_campionato()
-        else:
+        elif get_xg_pl(home_name):
             medie_xg = get_xg_media_pl()
+        else:
+            medie_xg = get_xg_media_laliga()
         # xG attacco casa vs xGA difesa ospite, rapportati alla media
         lambda_home_xg = xg_home["xG_pg"] * (xg_away["xGA_pg"] / medie_xg["xGA_pg_medio"])
         lambda_away_xg = xg_away["xG_pg"] * (xg_home["xGA_pg"] / medie_xg["xGA_pg_medio"])
