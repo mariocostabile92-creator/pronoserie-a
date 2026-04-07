@@ -2109,7 +2109,7 @@ async def schedina_del_giorno():
         "giocate": top,
         "n_giocate": len(top),
         "quota_totale": round(quota_tot, 2),
-        "tipo": "Schedina SICURA — Solo giocate ad alta confidenza",
+        "tipo": "Pronostici ad alta confidenza selezionati dall'IA",
     }
 
 @app.get("/api/schedina-pl")
@@ -2176,7 +2176,7 @@ async def schedina_pl():
             "giocate": top,
             "n_giocate": len(top),
             "quota_totale": round(quota_tot, 2),
-            "tipo": "Schedina Campionato Inglese - Giocate ad alta confidenza",
+            "tipo": "Pronostici ad alta confidenza selezionati dall'IA",
         }
     except Exception as e:
         return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
@@ -2240,7 +2240,7 @@ async def schedina_ll():
             "giocate": top,
             "n_giocate": len(top),
             "quota_totale": round(quota_tot, 2),
-            "tipo": "Schedina Campionato Spagnolo",
+            "tipo": "Pronostici ad alta confidenza selezionati dall'IA",
         }
     except Exception as e:
         return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
