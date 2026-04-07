@@ -775,6 +775,10 @@ def genera_pronostico(home, away):
                     if tot>0: p1/=tot; px/=tot; p2/=tot
                 ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
                 gsi = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
+                # Calibrazione Goal con gol attesi
+                ga = lh + la
+                if ga > 3.0: gsi = max(gsi, 0.55 + (ga-3.0)*0.05); gsi = min(gsi, 0.85)
+                elif ga > 2.5: gsi = max(gsi, 0.50 + (ga-2.5)*0.06)
                 scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
                 mp = max(p1, px, p2)
                 sg = "1" if mp==p1 else ("X" if mp==px else "2")
@@ -990,6 +994,13 @@ def genera_pronostico(home, away):
         gsi = gsi_raw * 0.95
     else:
         gsi = gsi_raw
+    # Calibrazione: se gol attesi > 2.5, Goal Si e' piu' probabile
+    gol_att = lh + la
+    if gol_att > 3.0:
+        gsi = max(gsi, 0.55 + (gol_att - 3.0) * 0.05)
+        gsi = min(gsi, 0.85)
+    elif gol_att > 2.5:
+        gsi = max(gsi, 0.50 + (gol_att - 2.5) * 0.06)
     scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
 
     mp = max(p1, px, p2)
