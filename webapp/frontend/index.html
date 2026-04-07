@@ -214,7 +214,6 @@ function pageHome(){
       <div style="text-align:center;margin-top:16px">${userPlan==="pro"?'<span style="color:var(--green);font-weight:700">&#11088; Tutte le funzionalita sono attive sul tuo account</span>':'<button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro  -  Solo 9.99&euro;/mese</button>'}</div>
     </div>
     <div id="partite-oggi-home"></div>
-    <div id="partite-pl-home"></div>
     <div id="schedina-home"></div>
     <div id="schedina-pl-home"></div>
   </div>`;
@@ -1305,7 +1304,6 @@ async function navigate(){
   if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq(getSQ()[0]),200);
   if(hash==="home"){
     setTimeout(()=>loadPartiteOggi(),500);
-    setTimeout(()=>loadPartitePL(),1000);
     setTimeout(()=>loadSchedina(),2000);
     setTimeout(()=>loadSchedinaPL(),3000);
     setTimeout(()=>{fetchAPI("/api/classifica")},5000);
