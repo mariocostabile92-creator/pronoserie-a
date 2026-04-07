@@ -2222,6 +2222,8 @@ async def schedina_ll():
                         "prob": mp,
                         "quota": raw.get(f"quota_{raw.get('suggerimento','1').lower()}", 1.5),
                         "confidence": conf,
+                        "over_under": ("Over 2.5 " + str(raw.get("over_25",50)) + "%") if raw.get("over_25",0) > 50 else ("Under 2.5 " + str(raw.get("under_25",50)) + "%"),
+                        "goal": ("Goal Si " + str(raw.get("goal_si",50)) + "%") if raw.get("goal_si",0) > 50 else ("Goal No " + str(raw.get("goal_no",50)) + "%"),
                     })
             except Exception:
                 continue
