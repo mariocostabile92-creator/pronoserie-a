@@ -333,19 +333,22 @@ async function loadSchedina(){
     if(!r.ok) return;
     const d = await r.json();
     if(!d||!d.giocate||!d.giocate.length)return;
-  let html='<div class="card" style="border-color:var(--green);border-width:2px"><h2 style="color:var(--green);text-align:center">Schedina del Giorno  -  G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:16px">'+d.tipo+'</p>';
+  const oldL = currentLeague;
+  currentLeague = "serie-a";
+  let html='<div class="card" style="border-color:var(--green);border-width:2px"><h2 style="color:var(--green);text-align:center;font-size:1.1rem">Schedina Campionato Italiano - G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:12px;font-size:.8rem">'+d.tipo+'</p>';
   const maxShow = userPlan==="pro" ? d.giocate.length : 2;
   d.giocate.slice(0,maxShow).forEach((g,i)=>{
-    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f3460"><div><strong>${g.home}</strong> vs <strong>${g.away}</strong><br><span style="color:var(--muted);font-size:.8rem">Conf. ${Math.round(g.confidence*100)}% | ${g.over_under} | ${g.goal}</span></div><div style="text-align:right"><span class="tag tag-green" style="font-size:1rem;padding:6px 16px">${g.tip}</span><br><span style="color:var(--muted);font-size:.85rem">Quota ${g.quota}</span></div></div>`;
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><div style="font-size:.85rem">${badge(g.home,16)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,16)}<br><span style="color:var(--muted);font-size:.7rem">Conf. ${Math.round(g.confidence*100)}% | ${g.over_under} | ${g.goal}</span></div><div style="text-align:right"><span class="tag tag-green" style="font-size:.9rem;padding:4px 12px">${g.tip}</span><br><span style="color:var(--muted);font-size:.75rem">Quota ${g.quota}</span></div></div>`;
   });
   if(userPlan!=="pro"&&d.giocate.length>2){
     html+=`<div style="text-align:center;padding:16px;color:var(--muted)"><p>+ ${d.giocate.length-2} altre giocate SICURE</p><button class="btn btn-green" style="margin-top:8px" onclick="abbonarPro()">Sblocca tutto con Pro  -  9.99&euro;/mese</button></div>`;
   }
   if(userPlan==="pro"){
-    html+=`<div style="text-align:center;margin-top:16px;padding:16px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted)">Quota totale schedina:</span><br><span style="font-size:2rem;font-weight:800;color:var(--green)">${d.quota_totale}</span></div>`;
+    html+=`<div style="text-align:center;margin-top:10px;padding:10px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted);font-size:.8rem">Quota totale:</span> <span style="font-size:1.3rem;font-weight:800;color:var(--green)">${d.quota_totale}</span></div>`;
   }
   html+='</div>';
   el.innerHTML=html;
+  currentLeague = oldL;
   }catch(e){/* schedina timeout/errore - non blocca la home */}
 }
 
