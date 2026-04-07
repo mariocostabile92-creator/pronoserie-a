@@ -96,6 +96,28 @@ function showGiornataCal(){
   });
   c.innerHTML=h;
 }
+function showStoricoRis(){
+  var sel=document.getElementById("sel-storico-ris");
+  if(!sel||!window._risultatiStorico)return;
+  var idx=parseInt(sel.value);
+  if(isNaN(idx))return;
+  var g=window._risultatiStorico[idx];
+  if(!g)return;
+  var c=document.getElementById("storico-ris-content");
+  if(!c)return;
+  var h="";
+  g.partite.forEach(function(p){
+    var cH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
+    var cA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
+    h+='<div style="padding:4px 0;border-bottom:1px solid #1f3460;cursor:pointer" onclick="showFixtureDetail('+(p.fixture_id||0)+',\''+(p.home||'')+ '\',\''+(p.away||'')+'\')"> ';
+    h+='<div style="display:flex;align-items:center;gap:2px">';
+    h+='<span style="flex:1;text-align:right;font-size:.8rem;font-weight:600">'+badge(p.home,14)+p.home+'</span>';
+    h+='<span style="min-width:50px;text-align:center;font-weight:800;font-size:.9rem"><span style="color:'+cH+'">'+p.gol_h+'</span>-<span style="color:'+cA+'">'+p.gol_a+'</span></span>';
+    h+='<span style="flex:1;font-size:.8rem;font-weight:600">'+p.away+badge(p.away,14)+'</span>';
+    h+='</div></div>';
+  });
+  c.innerHTML=h;
+}
 function opts(){return getSQ().map(s=>`<option value="${s}">${s}</option>`).join('')}
 function leagueApiPrefix(){return currentLeague==="serie-a"?"":"/"+currentLeague}
 let userPlan = localStorage.getItem("userPlan") || "free";
@@ -888,120 +910,69 @@ async function pageRisultati(){
     </div>
   </div>`;
   // Stile pulsante LIVE
-  html+=`<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}@keyframes liveDot{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,.7)}70%{box-shadow:0 0 0 8px rgba(231,76,60,0)}}</style>`;
+  html+=`<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}</style>`;
 
-  data.giornate.forEach(g=>{
-    const isLiveG = g.live;
-    html+=`<div class="card" style="padding:12px${isLiveG?';border-color:#e74c3c;border-width:2px':''}">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <h3>Giornata ${g.giornata} <span style="color:var(--muted);font-size:.85rem">${g.data}</span></h3>
-        ${isLiveG?'<span style="background:#e74c3c;color:#fff;padding:3px 10px;border-radius:10px;font-size:.75rem;font-weight:700;animation:pulse 1.5s infinite">IN CORSO</span>':''}
+  // Separa giornate
+  const completate = data.giornate.filter(g=>!g.live);
+  const liveG = data.giornate.filter(g=>g.live);
+  const principale = liveG.length>0 ? liveG[0] : (completate.length>0 ? completate[0] : data.giornate[0]);
+  const ultimaComp = completate.length>1 ? completate[1] : (completate.length>0 && completate[0]!==principale ? completate[0] : null);
+  const storico = completate.filter(g=>g!==principale && g!==ultimaComp);
+
+  // Salva storico per menu a tendina
+  window._risultatiStorico = storico;
+
+  // Funzione render partite compatta
+  function rp(partite){
+    let h="";
+    partite.forEach(p=>{
+      const cH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
+      const cA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
+      let sb="";
+      if(p.live)sb=`<span style="background:#e74c3c;color:#fff;padding:1px 5px;border-radius:4px;font-size:.6rem;font-weight:700">${p.minuto||""}'</span>`;
+      else if(p.status==="FT")sb='<span style="color:var(--muted);font-size:.6rem">FT</span>';
+      else sb=`<span style="color:var(--muted);font-size:.6rem">${p.ora||p.status_it||""}</span>`;
+      const mH=p.marcatori_home||[], mA=p.marcatori_away||[];
+      h+=`<div style="padding:6px 2px;border-bottom:1px solid #1f3460;cursor:pointer" onclick="showFixtureDetail(${p.fixture_id||0},'${(p.home||'').replace(/'/g,'')}','${(p.away||'').replace(/'/g,'')}')">
+        <div style="display:flex;align-items:center;gap:2px">
+          <span style="flex:1;text-align:right;font-weight:600;font-size:.8rem">${badge(p.home,16)}${p.home}</span>
+          <div style="text-align:center;min-width:55px"><span style="font-size:1rem;font-weight:800"><span style="color:${cH}">${p.gol_h!=null?p.gol_h:''}</span>${p.gol_h!=null?'-':'vs'}<span style="color:${cA}">${p.gol_a!=null?p.gol_a:''}</span></span><div>${sb}</div></div>
+          <span style="flex:1;font-weight:600;font-size:.8rem">${p.away}${badge(p.away,16)}</span>
+        </div>
+        ${mH.length||mA.length?`<div style="display:flex;gap:8px;margin-top:2px;font-size:.65rem;justify-content:center"><span style="color:var(--muted)">${mH.join(', ')}</span><span style="color:var(--muted)">${mA.join(', ')}</span></div>`:''}
       </div>`;
-    g.partite.forEach(p=>{
-      const colH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
-      const colA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
-      const isLive = p.live;
-      const statusIt = p.status_it || p.status || "";
-      // Badge status
-      let statusBadge = "";
-      if(isLive){
-        const minTxt = p.minuto ? p.minuto+"'" : statusIt;
-        statusBadge = `<span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:700;animation:pulse 1.5s infinite">${minTxt}</span>`;
-      } else if(p.status==="NS"){
-        statusBadge = `<span style="color:var(--muted);font-size:.75rem">${p.ora||"Da giocare"}</span>`;
-      } else if(p.status==="FT"||p.status==="AET"){
-        statusBadge = `<span style="color:var(--muted);font-size:.7rem">FT</span>`;
-      } else if(p.status==="HT"){
-        statusBadge = `<span style="background:var(--yellow);color:#000;padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:700">Intervallo</span>`;
-      } else {
-        statusBadge = `<span style="color:var(--muted);font-size:.7rem">${statusIt}</span>`;
-      }
-      // Marcatori separati per squadra
-      const mH = p.marcatori_home || [];
-      const mA = p.marcatori_away || [];
-      const hasMarcatori = mH.length > 0 || mA.length > 0 || (p.marcatori && p.marcatori.length > 0);
-      // Statistiche
-      const st = p.stats || {};
-      const hasStats = st.possesso_home || st.tiri_home;
-
-      html+=`<div style="padding:10px 8px;border-bottom:1px solid #1f3460${isLive?';background:rgba(231,76,60,.08);border-radius:8px;margin:3px 0':''};cursor:pointer;transition:.2s" onclick="showFixtureDetail(${p.fixture_id||0},'${p.home}','${p.away}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#1f3460'">
-        <div style="display:flex;align-items:center;justify-content:center;gap:4px">
-          <span style="flex:1;text-align:right;font-weight:700;font-size:.95rem">${badge(p.home,22)}${p.home}</span>
-          <div style="text-align:center;min-width:80px">
-            <span style="font-size:${isLive?'1.6rem':'1.3rem'};font-weight:800"><span style="color:${colH}">${p.gol_h}</span> - <span style="color:${colA}">${p.gol_a}</span></span>
-            <div>${statusBadge}</div>
-          </div>
-          <span style="flex:1;font-weight:700;font-size:.95rem">${p.away}${badge(p.away,22)}</span>
-        </div>`;
-
-      // Marcatori per squadra (sinistra casa, destra ospite)
-      if(hasMarcatori){
-        if(mH.length || mA.length){
-          html+=`<div style="display:flex;justify-content:center;gap:16px;margin-top:6px;font-size:.75rem">
-            <div style="flex:1;text-align:right;color:var(--muted)">${mH.map(m=>'&#9917; '+m).join('<br>')}</div>
-            <div style="width:1px;background:#1f3460"></div>
-            <div style="flex:1;text-align:left;color:var(--muted)">${mA.map(m=>'&#9917; '+m).join('<br>')}</div>
-          </div>`;
-        } else if(p.marcatori && p.marcatori.length){
-          html+=`<div style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:4px">${p.marcatori.map(m=>'&#9917; '+m).join(' &nbsp; ')}</div>`;
-        }
-      }
-
-      // Cartellini
-      if((p.rossi_home&&p.rossi_home.length)||(p.rossi_away&&p.rossi_away.length)){
-        html+=`<div style="text-align:center;font-size:.7rem;margin-top:3px;color:#e74c3c">${[...(p.rossi_home||[]),...(p.rossi_away||[])].map(r=>'&#128997; '+r).join(' &nbsp; ')}</div>`;
-      }
-
-      // Statistiche partita (solo se disponibili)
-      if(hasStats){
-        html+=`<div style="margin-top:8px;padding:8px;background:#0d1b2a;border-radius:8px;font-size:.75rem">
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:4px;align-items:center;text-align:center">`;
-        // Possesso
-        if(st.possesso_home){
-          const pH=parseInt(st.possesso_home)||50;
-          const pA=parseInt(st.possesso_away)||50;
-          html+=`<span style="text-align:right;color:${pH>pA?'var(--green)':'var(--muted)'};font-weight:${pH>pA?'700':'400'}">${st.possesso_home}</span>
-            <span style="color:var(--muted);font-size:.65rem">Possesso</span>
-            <span style="text-align:left;color:${pA>pH?'var(--green)':'var(--muted)'};font-weight:${pA>pH?'700':'400'}">${st.possesso_away}</span>`;
-        }
-        // Tiri in porta
-        if(st.tiri_porta_home!=null){
-          html+=`<span style="text-align:right;color:var(--text)">${st.tiri_porta_home}</span>
-            <span style="color:var(--muted);font-size:.65rem">Tiri in porta</span>
-            <span style="text-align:left;color:var(--text)">${st.tiri_porta_away||0}</span>`;
-        }
-        // Tiri totali
-        if(st.tiri_home!=null){
-          html+=`<span style="text-align:right;color:var(--text)">${st.tiri_home}</span>
-            <span style="color:var(--muted);font-size:.65rem">Tiri totali</span>
-            <span style="text-align:left;color:var(--text)">${st.tiri_away||0}</span>`;
-        }
-        // Corner
-        if(st.corner_home!=null){
-          html+=`<span style="text-align:right;color:var(--text)">${st.corner_home}</span>
-            <span style="color:var(--muted);font-size:.65rem">Corner</span>
-            <span style="text-align:left;color:var(--text)">${st.corner_away||0}</span>`;
-        }
-        // Falli
-        if(st.falli_home!=null){
-          html+=`<span style="text-align:right;color:var(--text)">${st.falli_home}</span>
-            <span style="color:var(--muted);font-size:.65rem">Falli</span>
-            <span style="text-align:left;color:var(--text)">${st.falli_away||0}</span>`;
-        }
-        // Fuorigioco
-        if(st.fuorigioco_home!=null){
-          html+=`<span style="text-align:right;color:var(--text)">${st.fuorigioco_home}</span>
-            <span style="color:var(--muted);font-size:.65rem">Fuorigioco</span>
-            <span style="text-align:left;color:var(--text)">${st.fuorigioco_away||0}</span>`;
-        }
-        html+=`</div></div>`;
-      }
-      html+=`</div>`;
     });
-    html+='</div>';
-  });
-  html+='<div id="live-refresh-info" style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px"></div>';
-  html+='</div>';
+    return h;
+  }
+
+  // Layout 2 colonne
+  html+='<div class="grid-cal">';
+  // SX: principale
+  html+=`<div><div class="card" style="padding:10px${principale.live?';border-color:#e74c3c;border-width:2px':''}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <h3 style="margin:0;font-size:1rem">G.${principale.giornata}</h3>
+      ${principale.live?'<span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:6px;font-size:.7rem;font-weight:700;animation:pulse 1.5s infinite">LIVE</span>':'<span style="color:var(--muted);font-size:.75rem">${principale.data||""}</span>'}
+    </div>
+    ${rp(principale.partite)}
+  </div></div>`;
+  // DX: ultima completata + storico
+  html+='<div>';
+  if(ultimaComp){
+    html+=`<div class="card" style="padding:10px"><h3 style="margin:0 0 6px;font-size:1rem">G.${ultimaComp.giornata} <span style="color:var(--muted);font-size:.75rem">${ultimaComp.data||""}</span></h3>${rp(ultimaComp.partite)}</div>`;
+  }
+  if(storico.length>0){
+    html+=`<div class="card" style="padding:10px;margin-top:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h4 style="color:var(--muted);margin:0;font-size:.85rem">Storico</h4>
+        <select id="sel-storico-ris" onchange="showStoricoRis()" style="min-height:38px;font-size:.8rem;padding:4px 6px;min-width:110px">
+          <option value="">Seleziona...</option>
+          ${storico.map((g,i)=>`<option value="${i}">G.${g.giornata}</option>`).join('')}
+        </select>
+      </div>
+      <div id="storico-ris-content"></div>
+    </div>`;
+  }
+  html+='</div></div>';
 
   // Auto-refresh ogni 60 secondi se ci sono partite live
   if(hasLive){
