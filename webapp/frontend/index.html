@@ -244,7 +244,7 @@ function pageHome(){
     <div class="grid3">
       <div class="stat-box card"><div class="num">54.8%</div><div class="lbl">1X2 (299 partite)</div></div>
       <div class="stat-box card"><div class="num">57.5%</div><div class="lbl">Goal/NoGoal</div></div>
-      <div class="stat-box card" style="border-color:var(--green)"><div class="num" style="color:var(--green)">67.3%</div><div class="lbl">Giocate Confidenza ALTA</div></div>
+      <div class="stat-box card" style="border-color:var(--green)"><div class="num" style="color:var(--green)">67.3%</div><div class="lbl">Pronostici Confidenza ALTA</div></div>
     </div>
     <div class="card" style="margin-top:16px;padding:20px;text-align:center;background:#0d1b2a;border-color:var(--accent)">
       <p style="color:var(--text);font-size:1rem;line-height:1.6">Questi numeri non sono inventati: sono il risultato di un <strong>backtesting su 299 partite reali</strong> della stagione 2025-2026. Quando l'IA ha confidenza Alta, centra il risultato 1X2 <strong style="color:var(--green)">2 volte su 3</strong>.</p>
@@ -255,7 +255,7 @@ function pageHome(){
       <div class="grid2" style="margin-top:16px">
         <div>
           <p style="line-height:2;font-size:.95rem">
-            <strong style="color:var(--green)">1.</strong> La Schedina del Giorno seleziona SOLO le giocate con confidenza Alta<br>
+            <strong style="color:var(--green)">1.</strong> La Schedina del Giorno seleziona SOLO i pronostici con confidenza Alta<br>
             <strong style="color:var(--green)">2.</strong> Accesso a TUTTE le 8 giornate rimanenti con pronostici completi<br>
             <strong style="color:var(--green)">3.</strong> Classifica, marcatori e rose aggiornate in tempo reale<br>
             <strong style="color:var(--green)">4.</strong> Probabili formazioni e infortunati live aggiornati ogni 30 min
@@ -265,7 +265,7 @@ function pageHome(){
           <p style="line-height:2;font-size:.95rem">
             <strong style="color:var(--green)">5.</strong> Over/Under, Goal/NoGoal e Risultato Esatto per ogni partita<br>
             <strong style="color:var(--green)">6.</strong> Marcatori consigliati dall'IA basati su xG e storico<br>
-            <strong style="color:var(--green)">7.</strong> Badge SICURA sulle giocate con massima affidabilita'<br>
+            <strong style="color:var(--green)">7.</strong> Badge SICURA sui pronostici con massima affidabilita'<br>
             <strong style="color:var(--green)">8.</strong> Notizie dal Calcio live
           </p>
         </div>
@@ -358,7 +358,7 @@ async function loadSchedina(){
     html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><div style="font-size:.85rem">${badge(g.home,16)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,16)}<br><span style="color:var(--muted);font-size:.7rem">Conf. ${Math.round(g.confidence*100)}% | ${g.over_under} | ${g.goal}</span></div><div style="text-align:right"><span class="tag tag-green" style="font-size:.9rem;padding:4px 12px">${g.tip}</span><br><span style="color:var(--muted);font-size:.75rem">Quota ${g.quota}</span></div></div>`;
   });
   if(userPlan!=="pro"&&d.giocate.length>2){
-    html+=`<div style="text-align:center;padding:16px;color:var(--muted)"><p>+ ${d.giocate.length-2} altre giocate SICURE</p><button class="btn btn-green" style="margin-top:8px" onclick="abbonarPro()">Sblocca tutto con Pro  -  9.99&euro;/mese</button></div>`;
+    html+=`<div style="text-align:center;padding:16px;color:var(--muted)"><p>+ ${d.giocate.length-2} altri pronostici SICURI</p><button class="btn btn-green" style="margin-top:8px" onclick="abbonarPro()">Sblocca tutto con Pro  -  9.99&euro;/mese</button></div>`;
   }
   if(userPlan==="pro"){
     html+=`<div style="text-align:center;margin-top:10px;padding:10px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted);font-size:.8rem">Quota totale:</span> <span style="font-size:1.3rem;font-weight:800;color:var(--green)">${d.quota_totale}</span></div>`;
@@ -391,7 +391,7 @@ async function loadSchedinaPL(){
       html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1f3460"><div>${badge(g.home,18)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,18)}<br><span style="color:var(--muted);font-size:.8rem">Conf. ${Math.round(g.confidence*100)}% | ${g.over_under} | ${g.goal}</span></div><div style="text-align:right"><span class="tag tag-blue" style="font-size:1rem;padding:6px 16px">${g.tip}</span><br><span style="color:var(--muted);font-size:.85rem">Quota ${g.quota}</span></div></div>`;
     });
     if(userPlan!=="pro"&&d.giocate.length>2){
-      html+=`<div style="text-align:center;padding:16px;color:var(--muted)"><p>+ ${d.giocate.length-2} altre giocate</p><button class="btn btn-green" style="margin-top:8px" onclick="abbonarPro()">Sblocca tutto con Pro</button></div>`;
+      html+=`<div style="text-align:center;padding:16px;color:var(--muted)"><p>+ ${d.giocate.length-2} altri pronostici</p><button class="btn btn-green" style="margin-top:8px" onclick="abbonarPro()">Sblocca tutto con Pro</button></div>`;
     }
     if(userPlan==="pro"){
       html+=`<div style="text-align:center;margin-top:16px;padding:16px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted)">Quota totale schedina:</span><br><span style="font-size:2rem;font-weight:800;color:var(--accent)">${d.quota_totale}</span></div>`;
@@ -424,7 +424,7 @@ async function loadSchedinaLL(){
       html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><div style="font-size:.85rem">${badge(g.home,16)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,16)}<br><span style="color:var(--muted);font-size:.7rem">Conf. ${Math.round(g.confidence*100)}%${g.over_under?' | '+g.over_under:''}${g.goal?' | '+g.goal:''}</span></div><div style="text-align:right"><span class="tag" style="background:#f39c12;color:#000;font-size:.9rem;padding:4px 12px">${g.tip}</span><br><span style="color:var(--muted);font-size:.7rem">Quota ${g.quota}</span></div></div>`;
     });
     if(userPlan!=="pro"&&d.giocate.length>2){
-      html+=`<div style="text-align:center;padding:12px;color:var(--muted);font-size:.8rem"><p>+ ${d.giocate.length-2} altre giocate</p><button class="btn btn-green" style="margin-top:6px;font-size:.8rem;padding:8px 16px" onclick="abbonarPro()">Sblocca con Pro</button></div>`;
+      html+=`<div style="text-align:center;padding:12px;color:var(--muted);font-size:.8rem"><p>+ ${d.giocate.length-2} altri pronostici</p><button class="btn btn-green" style="margin-top:6px;font-size:.8rem;padding:8px 16px" onclick="abbonarPro()">Sblocca con Pro</button></div>`;
     }
     if(userPlan==="pro"&&d.quota_totale){
       html+=`<div style="text-align:center;margin-top:10px;padding:10px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted);font-size:.8rem">Quota totale:</span> <span style="font-size:1.3rem;font-weight:800;color:#f39c12">${d.quota_totale}</span></div>`;
@@ -461,7 +461,7 @@ function pagePronostici(){
           <div style="text-align:center;flex:1;min-width:150px;padding:8px"><strong style="color:var(--green);font-size:.85rem">Confidenza Alta</strong><p style="color:var(--muted);font-size:.75rem;margin-top:4px">Pronostico piu affidabile. G.31: 4/4 corretti</p></div>
           <div style="text-align:center;flex:1;min-width:150px;padding:8px"><strong style="color:var(--text);font-size:.85rem">Over/Under e Goal</strong><p style="color:var(--muted);font-size:.75rem;margin-top:4px">Over 2.5 = 3+ gol. Goal Si = entrambe segnano</p></div>
         </div>
-        <p style="color:var(--muted);font-size:.75rem;text-align:center;margin-top:8px"><strong style="color:var(--yellow)">Consiglio:</strong> concentrati sulle giocate con confidenza Alta e probabilita sopra il 55%.</p>
+        <p style="color:var(--muted);font-size:.75rem;text-align:center;margin-top:8px"><strong style="color:var(--yellow)">Consiglio:</strong> concentrati sui pronostici con confidenza Alta e probabilita sopra il 55%.</p>
       </div>
     </div>
     <div id="result"></div>
@@ -525,7 +525,7 @@ async function calcPronostico(){
     ];
     giocate.sort((a,b)=>b.prob-a.prob);
     extra+=`<div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,#0d3b1e,#162447);border-radius:12px;border:2px solid var(--green)">
-      <h4 style="color:var(--green);margin-bottom:8px;text-align:center">Giocata Migliore Consigliata dall'IA</h4>
+      <h4 style="color:var(--green);margin-bottom:8px;text-align:center">Pronostico Migliore Consigliato dall'IA</h4>
       <div style="text-align:center"><span style="font-size:1.5rem;font-weight:800;color:var(--green)">${giocate[0].nome}</span><br><span style="color:var(--muted)">Probabilita': ${giocate[0].prob}% | Quota ~${giocate[0].quota}</span></div>
       <div style="display:flex;justify-content:center;gap:12px;margin-top:8px">
         ${giocate.slice(1).map(g=>`<span style="color:var(--muted);font-size:.85rem">${g.nome}: ${g.prob}%</span>`).join(" | ")}
@@ -731,7 +731,7 @@ async function simulaGiornata(gNum){
     | <strong>Tip</strong> = consiglio 1X2
     | <strong>O/U</strong> = Over/Under 2.5
     | <strong>Aff.</strong> = Affidabilita' del pronostico
-    | <span style="background:#ff6b35;color:#fff;padding:0 4px;border-radius:3px">!</span> = giocata SICURA
+    | <span style="background:#ff6b35;color:#fff;padding:0 4px;border-radius:3px">!</span> = pronostico SICURO
   </div>`;
   html+='</div>';
   det.innerHTML=html;
@@ -1225,7 +1225,7 @@ function pagePricing(){
     ["Rose complete 40 squadre", false, true],
     ["Probabili formazioni live", false, true],
     ["Infortunati aggiornati", false, true],
-    ["Schedina del Giorno IA", "Solo 2 giocate", "Completa (5 giocate)"],
+    ["Schedina del Giorno IA", "Solo 2 pronostici", "Completa (5 pronostici)"],
     ["Badge SICURA (confidenza Alta)", false, true],
     ["Notizie dal Calcio", false, true],
     ["Notifiche gol Telegram", false, true],
@@ -1264,7 +1264,7 @@ function pagePricing(){
       <h3 style="color:var(--green);margin-bottom:8px">Perche' passare a Pro?</h3>
       <div class="grid3" style="margin-top:12px;gap:16px">
         <div style="text-align:center"><div style="font-size:2rem;margin-bottom:4px">&#127942;</div><strong style="font-size:.9rem">G.31: 8/10 azzeccati</strong><p style="color:var(--muted);font-size:.8rem">L'IA ha centrato l'80% dei pronostici</p></div>
-        <div style="text-align:center"><div style="font-size:2rem;margin-bottom:4px">&#127919;</div><strong style="font-size:.9rem">Confidenza Alta: 100%</strong><p style="color:var(--muted);font-size:.8rem">4 giocate sicure su 4 corrette</p></div>
+        <div style="text-align:center"><div style="font-size:2rem;margin-bottom:4px">&#127919;</div><strong style="font-size:.9rem">Confidenza Alta: 100%</strong><p style="color:var(--muted);font-size:.8rem">4 pronostici sicuri su 4 corretti</p></div>
         <div style="text-align:center"><div style="font-size:2rem;margin-bottom:4px">&#9889;</div><strong style="font-size:.9rem">Pronostici illimitati</strong><p style="color:var(--muted);font-size:.8rem">Analizza tutte le partite che vuoi</p></div>
       </div>
       <div style="text-align:center;margin-top:16px"><button class="btn btn-green" style="font-size:1.1rem;padding:14px 40px" onclick="abbonarPro()">Abbonati a Pro - Solo 9.99&euro;/mese</button></div>
@@ -1530,7 +1530,7 @@ function pageTermini(){
           <li>Consulenza finanziaria o di investimento</li>
           <li>Garanzia di vincita</li>
           <li>Invito o incitamento al gioco d'azzardo</li>
-          <li>Suggerimento professionale per scommesse sportive</li>
+          <li>Suggerimento professionale per il gioco d'azzardo</li>
         </ul>
       </div>
 
