@@ -750,13 +750,13 @@ def genera_pronostico(home, away):
     if not has_api:
         # Cerca nella classifica live (funziona per PL e Serie A)
         found = False
-        for league_key in ["serie-a", "premier-league"]:
+        for league_key in ["serie-a", "premier-league", "la-liga"]:
             cl = CLASSIFICA_CACHE.get(league_key) or []
-            # Se cache vuota per PL, prova a caricarla ora
-            if not cl and league_key == "premier-league":
+            # Se cache vuota, prova a caricarla ora
+            if not cl and league_key != "serie-a":
                 try:
-                    _fetch_league_data("premier-league")
-                    cl = CLASSIFICA_CACHE.get("premier-league") or []
+                    _fetch_league_data(league_key)
+                    cl = CLASSIFICA_CACHE.get(league_key) or []
                 except Exception:
                     pass
             data_h = next((r for r in cl if r["Squadra"] == h), None)
