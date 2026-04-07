@@ -1121,7 +1121,7 @@ def send_welcome_email(to_email):
         import urllib.request as ur
         import json as js
         body = js.dumps({
-            "from": "PronoSerie A <onboarding@resend.dev>",
+            "from": "MatchIQ <noreply@matchiq.it.com>",
             "to": [to_email],
             "subject": "Benvenuto su PronoSerie A!",
             "html": f"""
@@ -1169,7 +1169,7 @@ def _notify_admin_new_user(email, piano):
     try:
         import urllib.request as ur
         body = json.dumps({
-            "from": "MatchIQ <onboarding@resend.dev>",
+            "from": "MatchIQ <noreply@matchiq.it.com>",
             "to": [ADMIN_EMAIL],
             "subject": f"Nuovo iscritto MatchIQ: {email}",
             "html": f"""
@@ -1262,7 +1262,7 @@ async def reset_password(data: dict):
     try:
         import urllib.request as ur
         body = json.dumps({
-            "from": "MatchIQ <onboarding@resend.dev>",
+            "from": "MatchIQ <noreply@matchiq.it.com>",
             "to": [email],
             "subject": "MatchIQ - La tua nuova password",
             "html": f'<div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px"><h2 style="color:#2ecc71">Recupero Password</h2><p>La tua nuova password provvisoria e\':</p><div style="background:#162447;padding:16px;border-radius:8px;text-align:center;margin:16px 0"><span style="font-size:1.5rem;font-weight:800;color:#2ecc71;letter-spacing:2px">{new_pass}</span></div><p>Accedi con questa password e poi cambiala dalle impostazioni del tuo account.</p><hr style="border:1px solid #1f3460"><p style="color:#8892b0;font-size:.85rem">MatchIQ - Pronostici Calcistici con IA</p></div>'
