@@ -78,6 +78,23 @@ function badge(name,size){size=size||20;const ids=currentLeague==="premier-leagu
 function getSQ(){return currentLeague==="premier-league"?SQ_PL:SQ}
 function leagueTabs(){return `<div style="display:flex;gap:0;margin-bottom:16px"><button style="flex:1;padding:10px;border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:10px 0 0 10px;${currentLeague==='serie-a'?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('serie-a')">Campionato Italiano</button><button style="flex:1;padding:10px;border:none;cursor:pointer;font-weight:700;font-size:.95rem;border-radius:0 10px 10px 0;${currentLeague==='premier-league'?'background:var(--accent);color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('premier-league')">Campionato Inglese</button></div>`}
 function switchLeague(l){currentLeague=l;navigate()}
+function showGiornataCal(){
+  var sel=document.getElementById("sel-giornata-cal");
+  if(!sel||!window._calFutureData)return;
+  var g=window._calFutureData[parseInt(sel.value)];
+  if(!g)return;
+  var c=document.getElementById("giornata-cal-content");
+  if(!c)return;
+  var h="";
+  g.partite.forEach(function(p){
+    h+='<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460">';
+    h+='<span style="flex:1;text-align:right;font-size:.85rem;font-weight:600">'+badge(p.home,16)+p.home+'</span>';
+    h+='<span style="min-width:60px;text-align:center;color:var(--muted);font-size:.8rem">'+(p.ora||"vs")+'</span>';
+    h+='<span style="flex:1;font-size:.85rem;font-weight:600">'+p.away+badge(p.away,16)+'</span>';
+    h+='</div>';
+  });
+  c.innerHTML=h;
+}
 function opts(){return getSQ().map(s=>`<option value="${s}">${s}</option>`).join('')}
 function leagueApiPrefix(){return currentLeague==="serie-a"?"":"/"+currentLeague}
 let userPlan = localStorage.getItem("userPlan") || "free";
@@ -555,15 +572,29 @@ async function pageCalendario(){
 
   // Filtra solo giornate FUTURE (non completate, non la corrente)
   const future = prossime.filter(g=>g.stato==="prossima");
+
+  // Menu a tendina per selezionare giornata + mostra solo quella selezionata
   if(future.length>0){
-    html+='<div class="card" style="padding:8px;margin-bottom:8px"><h4 style="color:var(--muted);margin-bottom:6px">Prossime giornate</h4>';
-    future.forEach((g,idx)=>{
-      const locked=userPlan!=="pro"&&idx>=1;
-      html+=`<div style="padding:6px 0;border-bottom:1px solid #1f3460${locked?';opacity:.4':''}"><strong style="color:var(--accent);font-size:.85rem">G.${g.giornata}</strong> <span style="color:var(--muted);font-size:.75rem">${g.data||""}</span>${locked?' <span class="tag tag-red" style="font-size:.6rem">PRO</span>':''}`;
-      if(!locked){g.partite.forEach(p=>{html+=`<div style="font-size:.8rem;padding:1px 0;color:var(--text)">${badge(p.home,14)}${p.home} - ${p.away}${badge(p.away,14)}</div>`})}
-      html+=`</div>`;
+    // Salva dati future in window per accesso da onchange
+    window._calFutureData = future;
+    html+=`<div class="card" style="padding:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h4 style="color:var(--muted);margin:0">Prossima giornata</h4>
+        <select id="sel-giornata-cal" onchange="showGiornataCal()" style="min-height:40px;font-size:.9rem;padding:6px 10px;min-width:130px">
+          ${future.map((g,i)=>`<option value="${i}" ${i>0&&userPlan!=="pro"?'disabled':''}>${'G.'+g.giornata+' - '+(g.data||'')}${i>0&&userPlan!=="pro"?' (PRO)':''}</option>`).join('')}
+        </select>
+      </div>
+      <div id="giornata-cal-content">`;
+    // Mostra prima giornata futura
+    const g0 = future[0];
+    g0.partite.forEach(p=>{
+      html+=`<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460">
+        <span style="flex:1;text-align:right;font-size:.85rem;font-weight:600">${badge(p.home,16)}${p.home}</span>
+        <span style="min-width:60px;text-align:center;color:var(--muted);font-size:.8rem">${p.ora||"vs"}</span>
+        <span style="flex:1;font-size:.85rem;font-weight:600">${p.away}${badge(p.away,16)}</span>
+      </div>`;
     });
-    html+='</div>';
+    html+=`</div></div>`;
   }
 
   html+='</div></div>';
