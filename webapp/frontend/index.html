@@ -28,7 +28,8 @@ h1{font-size:2rem;margin-bottom:8px}h2{font-size:1.4rem;margin-bottom:12px}
 select{background:#0d1b2a;color:var(--text);border:1px solid #1f3460;padding:10px 16px;border-radius:8px;font-size:1rem;min-width:180px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}.nav{gap:2px;padding:6px 8px;flex-wrap:wrap;justify-content:center}.nav a{font-size:.65rem;padding:4px 6px}.nav .logo{font-size:.85rem;width:100%;text-align:center;margin-bottom:4px}.nav .logo img{height:22px!important;width:22px!important}table{font-size:.7rem}th,td{padding:3px 2px}.box1x2{padding:10px}.box1x2 .pct{font-size:1.2rem}.hero{padding:30px 12px}.hero h1{font-size:1.3rem}.hero p{font-size:.85rem!important}.hero img{height:50px!important}.hero .btn{font-size:.9rem!important;padding:12px 24px!important}.container{padding:10px 8px}.card{padding:10px;margin-bottom:8px}.stat-box .num{font-size:1.3rem}.stat-box{padding:10px}.btn{padding:10px 18px;font-size:.85rem;min-height:44px}.match-btn{padding:10px;font-size:.85rem;min-height:44px}select{width:100%;min-height:44px;font-size:1rem}input{min-height:44px;font-size:1rem}h1{font-size:1.4rem}h2{font-size:1.1rem}h3{font-size:1rem}.price-card{padding:16px}.sub{font-size:.85rem}}
+.grid-cal{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+@media(max-width:768px){.grid2,.grid3,.grid-cal{grid-template-columns:1fr!important}.nav{gap:2px;padding:6px 8px;flex-wrap:wrap;justify-content:center}.nav a{font-size:.65rem;padding:4px 6px}.nav .logo{font-size:.85rem;width:100%;text-align:center;margin-bottom:4px}.nav .logo img{height:22px!important;width:22px!important}table{font-size:.7rem}th,td{padding:3px 2px}.box1x2{padding:10px}.box1x2 .pct{font-size:1.2rem}.hero{padding:30px 12px}.hero h1{font-size:1.3rem}.hero p{font-size:.85rem!important}.hero img{height:50px!important}.hero .btn{font-size:.9rem!important;padding:12px 24px!important}.container{padding:10px 8px}.card{padding:10px;margin-bottom:8px}.stat-box .num{font-size:1.3rem}.stat-box{padding:10px}.btn{padding:10px 18px;font-size:.85rem;min-height:44px}.match-btn{padding:10px;font-size:.85rem;min-height:44px}select{width:100%;min-height:44px;font-size:1rem}input{min-height:44px;font-size:1rem}h1{font-size:1.4rem}h2{font-size:1.1rem}h3{font-size:1rem}.price-card{padding:16px}.sub{font-size:.85rem}}
 .box1x2{text-align:center;padding:16px;border-radius:12px;background:#0d1b2a;border:2px solid #1f3460}
 .box1x2.best{border-color:var(--green);box-shadow:0 0 20px rgba(46,204,113,.2)}
 .box1x2 .pct{font-size:2rem;font-weight:800}.box1x2 .quota{color:var(--muted);font-size:.85rem}
@@ -523,7 +524,7 @@ async function pageCalendario(){
   let html='<div class="container"><h1>Calendario '+leagueLabel+'</h1>';
   html+=leagueTabs();
   html+=`<p class="sub">${cal.live?'<span style="color:#e74c3c;font-weight:700">LIVE</span> - ':''}Giornata ${gc}${gCorrente.live?' in corso':''}</p>`;
-  html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
+  html+='<div class="grid-cal">';
 
   // SINISTRA: giornata corrente con risultati live
   html+='<div>';
@@ -724,7 +725,7 @@ async function pageClassifica(){
   const aggLive = data.live ? `<span style="color:var(--green);font-size:.85rem">Aggiornamento automatico: ${data.aggiornamento||""}</span>` : '<span style="color:var(--muted);font-size:.85rem">Dati base</span>';
   let html='<div class="container">'+leagueTabs()+'<h1>Classifica '+leagueLabel+'</h1><p class="sub">'+aggLive+'</p>';
   // Layout 2 colonne: classifica SX, marcatori DX
-  html+='<div class="grid2" style="grid-template-columns:3fr 2fr">';
+  html+='<div class="grid-cal">';
   // SINISTRA: Classifica
   html+='<div class="card" style="overflow-x:auto;padding:8px"><h2 style="margin-bottom:8px;font-size:1.1rem">Classifica</h2>';
   html+=`<div style="display:flex;padding:4px 4px 6px;border-bottom:2px solid #1f3460;color:var(--muted);font-size:.65rem;font-weight:700"><span style="width:22px">#</span><span style="flex:1">Squadra</span><span style="width:22px">PG</span><span style="width:22px">V</span><span style="width:22px">N</span><span style="width:22px">P</span><span style="width:30px">DR</span><span style="width:28px;text-align:right">PT</span></div>`;
