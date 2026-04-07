@@ -915,9 +915,11 @@ async function pageRisultati(){
   // Separa giornate
   const completate = data.giornate.filter(g=>!g.live);
   const liveG = data.giornate.filter(g=>g.live);
-  const principale = liveG.length>0 ? liveG[0] : (completate.length>0 ? completate[0] : data.giornate[0]);
-  const ultimaComp = completate.length>1 ? completate[1] : (completate.length>0 && completate[0]!==principale ? completate[0] : null);
-  const storico = completate.filter(g=>g!==principale && g!==ultimaComp);
+  // Prossima giornata (prima non completata o live) = SINISTRA
+  // Ultima completata = DESTRA
+  const ultimaComp = completate.length>0 ? completate[0] : null;
+  const penultComp = completate.length>1 ? completate[1] : null;
+  const storico = completate.slice(1);
 
   // Salva storico per menu a tendina
   window._risultatiStorico = storico;
@@ -945,20 +947,34 @@ async function pageRisultati(){
     return h;
   }
 
-  // Layout 2 colonne
+  // Layout 2 colonne: SX = prossima/live, DX = ultima completata
   html+='<div class="grid-cal">';
-  // SX: principale
-  html+=`<div><div class="card" style="padding:10px${principale.live?';border-color:#e74c3c;border-width:2px':''}">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <h3 style="margin:0;font-size:1rem">G.${principale.giornata}</h3>
-      ${principale.live?'<span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:6px;font-size:.7rem;font-weight:700;animation:pulse 1.5s infinite">LIVE</span>':'<span style="color:var(--muted);font-size:.75rem">${principale.data||""}</span>'}
-    </div>
-    ${rp(principale.partite)}
-  </div></div>`;
-  // DX: ultima completata + storico
+
+  // SINISTRA: prossima giornata o live
+  if(liveG.length>0){
+    const lg=liveG[0];
+    html+=`<div><div class="card" style="padding:10px;border-color:#e74c3c;border-width:2px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h3 style="margin:0;font-size:1rem">G.${lg.giornata} <span style="color:var(--muted);font-size:.75rem">${lg.data||""}</span></h3>
+        <span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:6px;font-size:.7rem;font-weight:700;animation:pulse 1.5s infinite">LIVE</span>
+      </div>
+      ${rp(lg.partite)}
+    </div></div>`;
+  } else {
+    // Nessuna live: mostra messaggio prossima giornata
+    html+=`<div><div class="card" style="padding:16px;text-align:center">
+      <h3 style="color:var(--accent)">Prossima giornata</h3>
+      <p style="color:var(--muted);font-size:.85rem">Nessuna partita in corso. Consulta il <a href="#calendario" style="color:var(--accent)">Calendario</a> per le prossime partite.</p>
+    </div></div>`;
+  }
+
+  // DESTRA: ultima giornata completata + storico menu a tendina
   html+='<div>';
   if(ultimaComp){
-    html+=`<div class="card" style="padding:10px"><h3 style="margin:0 0 6px;font-size:1rem">G.${ultimaComp.giornata} <span style="color:var(--muted);font-size:.75rem">${ultimaComp.data||""}</span></h3>${rp(ultimaComp.partite)}</div>`;
+    html+=`<div class="card" style="padding:10px">
+      <h3 style="margin:0 0 6px;font-size:1rem">G.${ultimaComp.giornata} <span style="color:var(--muted);font-size:.75rem">${ultimaComp.data||""}</span> <span style="color:var(--green);font-size:.65rem">COMPLETATA</span></h3>
+      ${rp(ultimaComp.partite)}
+    </div>`;
   }
   if(storico.length>0){
     html+=`<div class="card" style="padding:10px;margin-top:8px">
