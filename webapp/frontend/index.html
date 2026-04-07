@@ -258,6 +258,7 @@ function pageHome(){
     <div id="partite-oggi-home"></div>
     <div id="schedina-home"></div>
     <div id="schedina-pl-home"></div>
+    <div id="schedina-ll-home"></div>
   </div>`;
 }
 
@@ -374,6 +375,39 @@ async function loadSchedinaPL(){
     }
     if(userPlan==="pro"){
       html+=`<div style="text-align:center;margin-top:16px;padding:16px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted)">Quota totale schedina:</span><br><span style="font-size:2rem;font-weight:800;color:var(--accent)">${d.quota_totale}</span></div>`;
+    }
+    html+='</div>';
+    el.innerHTML=html;
+    currentLeague = oldLeague;
+  }catch(e){/* timeout */}
+}
+
+// Carica schedina La Liga nella home
+async function loadSchedinaLL(){
+  const el=$("schedina-ll-home");
+  if(!el)return;
+  try{
+    const controller = new AbortController();
+    const timeoutId = setTimeout(()=>controller.abort(), 10000);
+    const headers = {};
+    if(userToken) headers["Authorization"] = "Bearer " + userToken;
+    const r = await fetch(API+"/api/schedina-ll?_t="+Date.now(), {headers, signal:controller.signal});
+    clearTimeout(timeoutId);
+    if(!r.ok) return;
+    const d = await r.json();
+    if(!d||!d.giocate||!d.giocate.length)return;
+    const oldLeague = currentLeague;
+    currentLeague = "la-liga";
+    let html='<div class="card" style="border-color:#f39c12;border-width:2px"><h2 style="color:#f39c12;text-align:center;font-size:1.1rem">Schedina Campionato Spagnolo - G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:12px;font-size:.8rem">'+d.tipo+'</p>';
+    const maxShow = userPlan==="pro" ? d.giocate.length : 2;
+    d.giocate.slice(0,maxShow).forEach((g,i)=>{
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><div style="font-size:.85rem">${badge(g.home,16)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,16)}<br><span style="color:var(--muted);font-size:.7rem">Conf. ${Math.round(g.confidence*100)}%</span></div><div style="text-align:right"><span class="tag" style="background:#f39c12;color:#000;font-size:.9rem;padding:4px 12px">${g.tip}</span></div></div>`;
+    });
+    if(userPlan!=="pro"&&d.giocate.length>2){
+      html+=`<div style="text-align:center;padding:12px;color:var(--muted);font-size:.8rem"><p>+ ${d.giocate.length-2} altre giocate</p><button class="btn btn-green" style="margin-top:6px;font-size:.8rem;padding:8px 16px" onclick="abbonarPro()">Sblocca con Pro</button></div>`;
+    }
+    if(userPlan==="pro"&&d.quota_totale){
+      html+=`<div style="text-align:center;margin-top:10px;padding:10px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted);font-size:.8rem">Quota totale:</span> <span style="font-size:1.3rem;font-weight:800;color:#f39c12">${d.quota_totale}</span></div>`;
     }
     html+='</div>';
     el.innerHTML=html;
@@ -1425,6 +1459,7 @@ async function navigate(){
     setTimeout(()=>loadPartiteOggi(),500);
     setTimeout(()=>loadSchedina(),2000);
     setTimeout(()=>loadSchedinaPL(),3000);
+    setTimeout(()=>loadSchedinaLL(),4000);
     setTimeout(()=>{fetchAPI("/api/classifica")},5000);
   }
   updateNavAuth();

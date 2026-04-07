@@ -2179,6 +2179,68 @@ async def schedina_pl():
     except Exception as e:
         return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
 
+@app.get("/api/schedina-ll")
+async def schedina_ll():
+    """Schedina del giorno La Liga - prossima giornata."""
+    try:
+        cl_ll = CLASSIFICA_CACHE.get("la-liga") or []
+        if not cl_ll:
+            _fetch_league_data("la-liga")
+
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=140&season=2025&next=10",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+
+        if not data.get("response"):
+            return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": "Nessuna partita"}
+
+        nome_map = _get_nome_map("la-liga")
+        giornata_num = ""
+        giocate = []
+
+        for fix in data["response"][:10]:
+            teams = fix.get("teams", {})
+            lg = fix.get("league", {})
+            home = nome_map.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
+            away = nome_map.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
+            if not giornata_num:
+                giornata_num = lg.get("round", "").split(" - ")[-1] if " - " in lg.get("round", "") else "?"
+
+            try:
+                raw = genera_pronostico(home, away)
+                mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
+                conf = raw.get("confidence", 0)
+                if conf >= 0.70 or mp > 50:
+                    giocate.append({
+                        "home": home, "away": away,
+                        "tip": raw.get("suggerimento", "?"),
+                        "prob": mp,
+                        "quota": raw.get(f"quota_{raw.get('suggerimento','1').lower()}", 1.5),
+                        "confidence": conf,
+                    })
+            except Exception:
+                continue
+
+        giocate.sort(key=lambda x: -x["confidence"])
+        top = giocate[:5]
+        quota_tot = 1.0
+        for g in top:
+            q = g.get("quota", 1.5)
+            if q > 1: quota_tot *= q
+
+        return {
+            "giornata": giornata_num,
+            "giocate": top,
+            "n_giocate": len(top),
+            "quota_totale": round(quota_tot, 2),
+            "tipo": "Schedina Campionato Spagnolo",
+        }
+    except Exception as e:
+        return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
+
 # ─────────────────────────────
 # NOTIZIE LIVE SERIE A
 # ─────────────────────────────
