@@ -1332,6 +1332,11 @@ function pageLogin(){
           </div>
         </div>
       </div>
+      <div class="card" style="padding:20px;margin-top:16px;border-color:var(--green);background:linear-gradient(135deg,#0d3b1e,#162447)">
+        <h3 style="color:var(--green);margin-bottom:8px">Invita un amico</h3>
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:12px">Condividi il tuo link. Quando un amico si registra, ottieni <strong style="color:var(--green)">1 mese Pro gratis</strong>!</p>
+        <div id="referral-section"><button class="btn btn-green" style="width:100%" onclick="loadReferralCode()">Ottieni il tuo link referral</button></div>
+      </div>
     </div>`;
   }
   return `<div class="container">
@@ -1420,9 +1425,36 @@ async function doRegister(){
     localStorage.setItem("userToken",userToken);
     localStorage.setItem("userPlan",userPlan);
     localStorage.setItem("userEmail",userEmail);
+    // Applica codice referral se presente nell'URL o salvato
+    const refCode = new URLSearchParams(window.location.search).get("ref") || localStorage.getItem("ref_code");
+    if(refCode){try{await postAPI("/api/referral/apply",{code:refCode,email:email})}catch(e){} localStorage.removeItem("ref_code")}
     updateNavAuth();
     location.hash="#home";
   }catch(e){msg.innerHTML=`<span style="color:var(--red)">${e.message}</span>`}
+}
+
+async function loadReferralCode(){
+  const el=$("referral-section");
+  if(!el)return;
+  el.innerHTML='<div class="spinner" style="margin:8px auto"></div>';
+  try{
+    const d=await fetchAPI("/api/referral/my-code");
+    if(!d||!d.code){el.innerHTML='<p style="color:var(--red)">Errore. Riprova.</p>';return}
+    el.innerHTML=`
+      <div style="background:#0d1b2a;padding:12px;border-radius:8px;margin-bottom:8px">
+        <p style="color:var(--muted);font-size:.75rem;margin-bottom:4px">Il tuo codice:</p>
+        <p style="font-size:1.3rem;font-weight:800;color:var(--green);text-align:center;letter-spacing:3px">${d.code}</p>
+      </div>
+      <div style="background:#0d1b2a;padding:10px;border-radius:8px;margin-bottom:10px">
+        <p style="color:var(--muted);font-size:.7rem;margin-bottom:4px">Il tuo link:</p>
+        <input id="ref-link" value="${d.link}" readonly style="width:100%;font-size:.75rem;padding:8px;background:#162447;border:1px solid var(--accent);color:var(--text);border-radius:6px;min-height:40px" onclick="this.select();document.execCommand('copy')">
+        <button class="btn btn-blue" style="width:100%;margin-top:6px;font-size:.8rem;min-height:40px" onclick="navigator.clipboard.writeText('${d.link}');this.textContent='Copiato!'">Copia link</button>
+      </div>
+      <div style="display:flex;gap:12px;text-align:center">
+        <div style="flex:1;background:#0d1b2a;padding:8px;border-radius:8px"><div style="font-size:1.2rem;font-weight:800;color:var(--green)">${d.completati}</div><div style="font-size:.7rem;color:var(--muted)">Amici iscritti</div></div>
+        <div style="flex:1;background:#0d1b2a;padding:8px;border-radius:8px"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">${d.in_attesa}</div><div style="font-size:.7rem;color:var(--muted)">In attesa</div></div>
+      </div>`;
+  }catch(e){el.innerHTML='<p style="color:var(--red)">Errore: '+e.message+'</p>'}
 }
 
 async function doChangePassword(){
@@ -1737,6 +1769,9 @@ async function checkPaidReturn(){
 window.addEventListener("hashchange",navigate);
 if(!location.hash)location.hash="#home";
 // Avvia navigazione senza attendere checkPaidReturn
+// Salva codice referral se presente nell'URL
+const _refParam = new URLSearchParams(window.location.search).get("ref");
+if(_refParam) localStorage.setItem("ref_code", _refParam);
 navigate();
 checkPaidReturn();
 

@@ -63,6 +63,26 @@ def init_db():
             verificato BOOLEAN DEFAULT FALSE
         )
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS referrals (
+            id SERIAL PRIMARY KEY,
+            referrer_id INTEGER NOT NULL,
+            referrer_email TEXT NOT NULL,
+            referral_code TEXT UNIQUE NOT NULL,
+            referred_email TEXT,
+            referred_id INTEGER,
+            status TEXT DEFAULT 'pending',
+            reward_applied BOOLEAN DEFAULT FALSE,
+            created_at TEXT NOT NULL,
+            completed_at TEXT
+        )
+    """)
+    # Aggiungi colonna referral_code a users se non esiste
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code TEXT")
+        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by INTEGER")
+    except Exception:
+        pass
     conn.commit()
     cur.close()
     conn.close()

@@ -2286,6 +2286,95 @@ async def schedina_ll():
         return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
 
 # ─────────────────────────────
+# SISTEMA REFERRAL
+# ─────────────────────────────
+import hashlib
+
+def _generate_referral_code(user_id, email):
+    """Genera un codice referral unico."""
+    raw = f"{user_id}_{email}_{os.urandom(4).hex()}"
+    return hashlib.md5(raw.encode()).hexdigest()[:8].upper()
+
+@app.get("/api/referral/my-code")
+async def get_referral_code(user: Optional[dict] = Depends(get_optional_user)):
+    if not user:
+        raise HTTPException(401, "Devi essere loggato")
+    from database import _get_conn
+    conn = _get_conn()
+    cur = conn.cursor()
+    # Controlla se l'utente ha gia' un codice
+    cur.execute("SELECT referral_code FROM users WHERE id = %s", (user["id"],))
+    row = cur.fetchone()
+    code = row[0] if row and row[0] else None
+    if not code:
+        code = _generate_referral_code(user["id"], user["email"])
+        cur.execute("UPDATE users SET referral_code = %s WHERE id = %s", (code, user["id"]))
+        conn.commit()
+    # Conta referral completati
+    cur.execute("SELECT COUNT(*) FROM referrals WHERE referrer_id = %s AND status = 'completed'", (user["id"],))
+    completed = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM referrals WHERE referrer_id = %s AND status = 'pending'", (user["id"],))
+    pending = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+    return {
+        "code": code,
+        "link": f"https://matchiq.it.com/app#registrati?ref={code}",
+        "completati": completed,
+        "in_attesa": pending,
+    }
+
+@app.post("/api/referral/apply")
+async def apply_referral(data: dict):
+    """Applica un codice referral quando un nuovo utente si registra."""
+    code = data.get("code", "").strip().upper()
+    new_user_email = data.get("email", "").strip().lower()
+    if not code or not new_user_email:
+        return {"status": "skip"}
+    from database import _get_conn
+    conn = _get_conn()
+    cur = conn.cursor()
+    # Trova chi ha il codice
+    cur.execute("SELECT id, email FROM users WHERE referral_code = %s", (code,))
+    referrer = cur.fetchone()
+    if not referrer:
+        cur.close(); conn.close()
+        return {"status": "code_not_found"}
+    referrer_id, referrer_email = referrer
+    # Non puoi invitare te stesso
+    if referrer_email == new_user_email:
+        cur.close(); conn.close()
+        return {"status": "self_referral"}
+    # Registra il referral
+    cur.execute("""
+        INSERT INTO referrals (referrer_id, referrer_email, referral_code, referred_email, status, created_at)
+        VALUES (%s, %s, %s, %s, 'completed', %s)
+    """, (referrer_id, referrer_email, code, new_user_email, datetime.now(timezone.utc).isoformat()))
+    # Premio: attiva Pro per 30 giorni all'invitante
+    cur.execute("UPDATE users SET piano = 'pro' WHERE id = %s", (referrer_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    # Notifica l'invitante via email
+    try:
+        import urllib.request as ur
+        body = json.dumps({
+            "from": "MatchIQ <noreply@matchiq.it.com>",
+            "to": [referrer_email],
+            "subject": "Un amico si e' iscritto con il tuo codice!",
+            "html": f'<div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px"><h2 style="color:#2ecc71">Referral completato!</h2><p><strong>{new_user_email}</strong> si e\' iscritto con il tuo codice referral.</p><p style="color:#2ecc71;font-size:1.2rem;font-weight:700">Hai ottenuto 1 mese Pro gratis!</p><hr style="border:1px solid #1f3460"><p style="color:#8892b0;font-size:.85rem">MatchIQ - Pronostici Calcistici con IA</p></div>'
+        }).encode()
+        req = ur.Request("https://api.resend.com/emails", data=body, headers={
+            "Authorization": f"Bearer {RESEND_API_KEY}",
+            "Content-Type": "application/json",
+            "User-Agent": "MatchIQ/1.0"
+        })
+        ur.urlopen(req, timeout=10)
+    except Exception:
+        pass
+    return {"status": "ok", "reward": "1 mese Pro gratis"}
+
+# ─────────────────────────────
 # DASHBOARD ACCURATEZZA
 # ─────────────────────────────
 @app.get("/api/accuratezza")
