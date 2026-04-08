@@ -1775,8 +1775,19 @@ if(_refParam) localStorage.setItem("ref_code", _refParam);
 navigate();
 checkPaidReturn();
 
-// PWA Service Worker
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}
+// PWA Service Worker + Push Notifications
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').then(reg=>{
+    // Chiedi permesso notifiche dopo 5 secondi
+    setTimeout(()=>{
+      if(Notification.permission==='default' && userToken){
+        Notification.requestPermission().then(p=>{
+          if(p==='granted') console.log('Notifiche attive');
+        });
+      }
+    }, 5000);
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
