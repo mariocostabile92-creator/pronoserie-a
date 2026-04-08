@@ -1149,7 +1149,8 @@ def send_welcome_email(to_email):
         }).encode()
         req = ur.Request("https://api.resend.com/emails", data=body, headers={
             "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "MatchIQ/1.0"
         })
         ur.urlopen(req, timeout=10)
         print(f"📧 Email inviata a {to_email}")
@@ -1185,7 +1186,8 @@ def _notify_admin_new_user(email, piano):
         }).encode()
         req = ur.Request("https://api.resend.com/emails", data=body, headers={
             "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "MatchIQ/1.0"
         })
         ur.urlopen(req, timeout=10)
         print(f"📧 Notifica admin: nuovo utente {email}")
@@ -1269,11 +1271,13 @@ async def reset_password(data: dict):
         }).encode()
         req = ur.Request("https://api.resend.com/emails", data=body, headers={
             "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "MatchIQ/1.0"
         })
         ur.urlopen(req, timeout=10)
-    except Exception:
-        pass
+        print(f"📧 Password reset inviata a {email}")
+    except Exception as e:
+        print(f"❌ Errore invio reset password: {e}")
     return {"sent": True}
 
 @app.post("/api/auth/change-password")
