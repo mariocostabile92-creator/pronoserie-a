@@ -1234,7 +1234,7 @@ async def register(data: dict):
 async def login(data: dict):
     user = get_user_by_email(data["email"].lower().strip())
 
-    if not user or not verify_password(data["password"], user["password_hash"]):
+    if not user or not verify_password(data["password"].strip(), user["password_hash"]):
         raise HTTPException(401, "Credenziali errate")
 
     token = create_token({"sub": str(user["id"])})
@@ -1267,7 +1267,7 @@ async def reset_password(data: dict):
             "from": "MatchIQ <noreply@matchiq.it.com>",
             "to": [email],
             "subject": "MatchIQ - La tua nuova password",
-            "html": f'<div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px"><h2 style="color:#2ecc71">Recupero Password</h2><p>La tua nuova password provvisoria e\':</p><div style="background:#162447;padding:16px;border-radius:8px;text-align:center;margin:16px 0"><span style="font-size:1.5rem;font-weight:800;color:#2ecc71;letter-spacing:2px">{new_pass}</span></div><p>Accedi con questa password e poi cambiala dalle impostazioni del tuo account.</p><hr style="border:1px solid #1f3460"><p style="color:#8892b0;font-size:.85rem">MatchIQ - Pronostici Calcistici con IA</p></div>'
+            "html": f'<div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px"><h2 style="color:#2ecc71">Recupero Password</h2><p>La tua nuova password provvisoria e\':</p><div style="background:#162447;padding:16px;border-radius:8px;text-align:center;margin:16px 0"><code style="font-size:1.5rem;font-weight:800;color:#2ecc71;font-family:Courier New,monospace;user-select:all">{new_pass}</code></div><p style="font-size:.85rem;color:#8892b0">Copia la password qui sopra (toccala per selezionarla) e usala per accedere.</p><p>Poi cambiala dalle impostazioni del tuo account.</p><hr style="border:1px solid #1f3460"><p style="color:#8892b0;font-size:.85rem">MatchIQ - Pronostici Calcistici con IA</p></div>'
         }).encode()
         req = ur.Request("https://api.resend.com/emails", data=body, headers={
             "Authorization": f"Bearer {RESEND_API_KEY}",
