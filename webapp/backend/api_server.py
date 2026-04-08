@@ -2286,6 +2286,67 @@ async def schedina_ll():
         return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
 
 # ─────────────────────────────
+# WEB PUSH NOTIFICATIONS
+# ─────────────────────────────
+VAPID_PUBLIC_KEY = "BBrZeD51wgoA9ITtBo8UPhHUf6o1lu1zwP16tZ9RNoI1F0yhVpMoWshroZI_nQIPqoZ_DRLVR2cu6B-WB9vE8J0"
+VAPID_PRIVATE_KEY_PATH = os.path.join(_ROOT, "vapid_private.pem")
+VAPID_EMAIL = "mailto:mario.costabile92@outlook.it"
+_PUSH_SUBSCRIPTIONS = []  # In-memory, persistito su DB
+
+@app.get("/api/push/vapid-key")
+async def get_vapid_key():
+    return {"publicKey": VAPID_PUBLIC_KEY}
+
+@app.post("/api/push/subscribe")
+async def push_subscribe(data: dict, user: Optional[dict] = Depends(get_optional_user)):
+    """Salva una subscription push per un utente."""
+    sub = data.get("subscription")
+    if not sub:
+        raise HTTPException(400, "Subscription mancante")
+    # Salva in memory (e DB)
+    _PUSH_SUBSCRIPTIONS.append({"subscription": sub, "user_id": user["id"] if user else None})
+    try:
+        from database import _get_conn
+        conn = _get_conn()
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS push_subscriptions (id SERIAL PRIMARY KEY, user_id INTEGER, subscription TEXT NOT NULL, created_at TEXT)")
+        cur.execute("INSERT INTO push_subscriptions (user_id, subscription, created_at) VALUES (%s, %s, %s)",
+                    (user["id"] if user else None, json.dumps(sub), datetime.now(timezone.utc).isoformat()))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception:
+        pass
+    return {"status": "ok"}
+
+def send_push_notification(title, body, url="/app#home"):
+    """Invia push notification a tutti i subscriber."""
+    try:
+        from pywebpush import webpush
+        from database import _get_conn
+        conn = _get_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT subscription FROM push_subscriptions")
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        payload = json.dumps({"title": title, "body": body, "url": url})
+        priv_key = open(VAPID_PRIVATE_KEY_PATH, "r").read() if os.path.exists(VAPID_PRIVATE_KEY_PATH) else None
+        if not priv_key:
+            return
+        sent = 0
+        for row in rows:
+            try:
+                sub = json.loads(row[0])
+                webpush(sub, payload, vapid_private_key=priv_key, vapid_claims={"sub": VAPID_EMAIL})
+                sent += 1
+            except Exception:
+                pass
+        print(f"📱 Push inviata a {sent}/{len(rows)} dispositivi")
+    except Exception as e:
+        print(f"⚠️ Push error: {e}")
+
+# ─────────────────────────────
 # SISTEMA REFERRAL
 # ─────────────────────────────
 import hashlib

@@ -1777,13 +1777,24 @@ checkPaidReturn();
 
 // PWA Service Worker + Push Notifications
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').then(reg=>{
-    // Chiedi permesso notifiche dopo 5 secondi
-    setTimeout(()=>{
+  navigator.serviceWorker.register('/sw.js').then(async reg=>{
+    // Chiedi permesso notifiche dopo 5 secondi (solo utenti loggati)
+    setTimeout(async()=>{
       if(Notification.permission==='default' && userToken){
-        Notification.requestPermission().then(p=>{
-          if(p==='granted') console.log('Notifiche attive');
-        });
+        const p = await Notification.requestPermission();
+        if(p==='granted'){
+          try{
+            const vapid = await fetchAPI("/api/push/vapid-key");
+            if(vapid && vapid.publicKey){
+              const sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: Uint8Array.from(atob(vapid.publicKey.replace(/-/g,'+').replace(/_/g,'/').padEnd(vapid.publicKey.length+(4-vapid.publicKey.length%4)%4,'=')), c=>c.charCodeAt(0))
+              });
+              await postAPI("/api/push/subscribe", {subscription: sub.toJSON()});
+              console.log('Push subscription attiva');
+            }
+          }catch(e){console.log('Push setup error:',e)}
+        }
       }
     }, 5000);
   }).catch(()=>{});
