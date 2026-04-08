@@ -2282,6 +2282,155 @@ async def schedina_ll():
         return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
 
 # ─────────────────────────────
+# DASHBOARD ACCURATEZZA
+# ─────────────────────────────
+@app.get("/api/accuratezza")
+async def accuratezza():
+    """Calcola accuratezza pronostici vs risultati reali per ogni giornata."""
+    risultati = []
+
+    for league_key in ["serie-a", "premier-league", "la-liga"]:
+        league = LEAGUES.get(league_key)
+        if not league:
+            continue
+        lid = league["id"]
+        season = league["season"]
+        nome_map = _get_nome_map(league_key)
+
+        # Prendi CSV giusto per i pronostici
+        if league_key == "serie-a":
+            csv_df = _df
+        elif league_key == "premier-league":
+            csv_df = _df_pl
+        elif league_key == "la-liga":
+            csv_df = _df_ll
+        else:
+            csv_df = None
+
+        # Prendi risultati finiti dalla cache
+        storico = RISULTATI_STAGIONE_CACHE_ML.get(league_key) or []
+        if not storico:
+            continue
+
+        # Raggruppa per round
+        from collections import defaultdict
+        per_round = defaultdict(list)
+        for p in storico:
+            per_round[p.get("round", "")].append(p)
+
+        # Ultime 5 giornate completate
+        rounds_sorted = sorted(per_round.keys(), key=lambda r: int(r.split(" - ")[-1]) if " - " in r and r.split(" - ")[-1].isdigit() else 0, reverse=True)
+
+        for rd in rounds_sorted[:5]:
+            partite = per_round[rd]
+            if len(partite) < 5:
+                continue
+            g_num = rd.split(" - ")[-1] if " - " in rd else rd
+            ok_1x2 = 0
+            ok_ou = 0
+            ok_goal = 0
+            tot = 0
+            ok_alta = 0
+            tot_alta = 0
+            dettagli = []
+
+            for p in partite:
+                h, a = p["home"], p["away"]
+                gol_h, gol_a = p["gol_h"], p["gol_a"]
+                if gol_h is None:
+                    continue
+
+                # Calcola pronostico
+                try:
+                    if csv_df is not None and len(csv_df) > 100:
+                        hs = get_team_stats(csv_df, h, opponent=a)
+                        aws = get_team_stats(csv_df, a, opponent=h)
+                        pred = get_prediction(hs, aws, df=csv_df)
+                    else:
+                        pred = genera_pronostico(h, a)
+                except Exception:
+                    continue
+
+                # Risultato reale
+                if gol_h > gol_a:
+                    ris = "1"
+                elif gol_h == gol_a:
+                    ris = "X"
+                else:
+                    ris = "2"
+
+                sugg = pred.get("suggerimento", "")
+                corretto = sugg == ris
+                if corretto:
+                    ok_1x2 += 1
+
+                gol_tot = gol_h + gol_a
+                pred_over = pred.get("over_25", 50) > 50
+                ou_ok = (gol_tot > 2.5) == pred_over
+                if ou_ok:
+                    ok_ou += 1
+
+                is_goal = gol_h >= 1 and gol_a >= 1
+                pred_goal = pred.get("goal_si", 50) > 50
+                goal_ok = is_goal == pred_goal
+                if goal_ok:
+                    ok_goal += 1
+
+                conf = pred.get("confidence_label", "")
+                if conf == "Alta":
+                    tot_alta += 1
+                    if corretto:
+                        ok_alta += 1
+
+                tot += 1
+                dettagli.append({
+                    "home": h, "away": a,
+                    "gol_h": gol_h, "gol_a": gol_a,
+                    "pronostico": sugg,
+                    "risultato": ris,
+                    "corretto": corretto,
+                    "confidenza": conf,
+                })
+
+            if tot >= 5:
+                risultati.append({
+                    "campionato": league["name"],
+                    "league_key": league_key,
+                    "giornata": g_num,
+                    "totale": tot,
+                    "ok_1x2": ok_1x2,
+                    "acc_1x2": round(ok_1x2 / tot * 100, 0),
+                    "ok_ou": ok_ou,
+                    "acc_ou": round(ok_ou / tot * 100, 0),
+                    "ok_goal": ok_goal,
+                    "acc_goal": round(ok_goal / tot * 100, 0),
+                    "ok_alta": ok_alta,
+                    "tot_alta": tot_alta,
+                    "acc_alta": round(ok_alta / tot_alta * 100, 0) if tot_alta > 0 else 0,
+                    "dettagli": dettagli,
+                })
+
+    # Calcola totali
+    tot_all = sum(r["totale"] for r in risultati)
+    ok_all = sum(r["ok_1x2"] for r in risultati)
+    ok_ou_all = sum(r["ok_ou"] for r in risultati)
+    ok_g_all = sum(r["ok_goal"] for r in risultati)
+    ok_alta_all = sum(r["ok_alta"] for r in risultati)
+    tot_alta_all = sum(r["tot_alta"] for r in risultati)
+
+    return {
+        "giornate": risultati,
+        "totale": {
+            "partite": tot_all,
+            "acc_1x2": round(ok_all / tot_all * 100, 1) if tot_all > 0 else 0,
+            "acc_ou": round(ok_ou_all / tot_all * 100, 1) if tot_all > 0 else 0,
+            "acc_goal": round(ok_g_all / tot_all * 100, 1) if tot_all > 0 else 0,
+            "acc_alta": round(ok_alta_all / tot_alta_all * 100, 1) if tot_alta_all > 0 else 0,
+            "tot_alta": tot_alta_all,
+        }
+    }
+
+# ─────────────────────────────
 # NOTIZIE LIVE SERIE A
 # ─────────────────────────────
 NOTIZIE_CACHE = []
