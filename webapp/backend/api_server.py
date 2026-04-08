@@ -2570,6 +2570,7 @@ def _fetch_risultati_stagione():
                 # Ordina per data (piu' recente prima)
                 partite.sort(key=lambda x: x["data"], reverse=True)
                 RISULTATI_STAGIONE_CACHE = partite
+                RISULTATI_STAGIONE_CACHE_ML["serie-a"] = partite
                 RISULTATI_STAGIONE_TIME = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
                 print(f"📊 STORICO STAGIONE: {len(partite)} partite caricate")
     except Exception as e:
