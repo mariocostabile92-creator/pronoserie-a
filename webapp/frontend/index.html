@@ -103,6 +103,26 @@ const TEAM_IDS_UECL = {"AEK Athens FC":575,"AEK Larnaca":614,"AZ Alkmaar":201,Ab
 let currentLeague = "serie-a";
 function badge(name,size){size=size||20;const all={...TEAM_IDS,...TEAM_IDS_PL,...TEAM_IDS_LL,...TEAM_IDS_UCL,...TEAM_IDS_UEL,...TEAM_IDS_UECL};const id=all[name];if(!id)return'';return `<img src="https://media.api-sports.io/football/teams/${id}.png" alt="${name}" style="width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px">`}
 function getSQ(){return currentLeague==="premier-league"?SQ_PL:currentLeague==="la-liga"?SQ_LL:currentLeague==="champions-league"?SQ_UCL:currentLeague==="europa-league"?SQ_UEL:currentLeague==="conference-league"?SQ_UECL:SQ}
+// Carica squadre attive live per competizioni europee
+async function loadActiveTeams(){
+  if(!["champions-league","europa-league","conference-league"].includes(currentLeague)) return;
+  try{
+    const d = await fetchAPI("/api/"+currentLeague+"/squadre-attive");
+    if(d && d.squadre && d.squadre.length>0){
+      if(currentLeague==="champions-league") window._SQ_UCL_LIVE = d.squadre;
+      else if(currentLeague==="europa-league") window._SQ_UEL_LIVE = d.squadre;
+      else window._SQ_UECL_LIVE = d.squadre;
+      // Aggiorna i dropdown
+      const selH = document.getElementById("sel-home");
+      const selA = document.getElementById("sel-away");
+      if(selH && selA){
+        const opts = d.squadre.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
+        selH.innerHTML = opts;
+        selA.innerHTML = opts;
+      }
+    }
+  }catch(e){}
+}
 function leagueTabs(){return `<div style="display:flex;gap:0;margin-bottom:16px;flex-wrap:wrap"><button style="flex:1;padding:6px;border:none;cursor:pointer;font-weight:600;font-size:.65rem;border-radius:10px 0 0 10px;${currentLeague==='serie-a'?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('serie-a')">Italia</button><button style="flex:1;padding:6px;border:none;cursor:pointer;font-weight:600;font-size:.65rem;${currentLeague==='premier-league'?'background:var(--accent);color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('premier-league')">Inghilterra</button><button style="flex:1;padding:6px;border:none;cursor:pointer;font-weight:600;font-size:.65rem;${currentLeague==='la-liga'?'background:#f39c12;color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('la-liga')">Spagna</button><button style="flex:1;padding:6px;border:none;cursor:pointer;font-weight:600;font-size:.65rem;${currentLeague==='champions-league'?'background:#1a237e;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('champions-league')">UCL</button><button style="flex:1;padding:6px;border:none;cursor:pointer;font-weight:600;font-size:.65rem;${currentLeague==='europa-league'?'background:#ff6f00;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('europa-league')">UEL</button><button style="flex:1;padding:6px;border:none;cursor:pointer;font-weight:600;font-size:.65rem;border-radius:0 10px 10px 0;${currentLeague==='conference-league'?'background:#4caf50;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('conference-league')">UECL</button></div>`}
 function switchLeague(l){currentLeague=l;navigate()}
 function showGiornataCal(){
@@ -1763,6 +1783,8 @@ async function navigate(){
   // Mostra footer dopo caricamento pagina
   const ft=$("app-footer");if(ft)ft.style.display="block";
   if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq(getSQ()[0]),200);
+  // Carica squadre attive per competizioni europee
+  if(hash==="pronostici"&&["champions-league","europa-league","conference-league"].includes(currentLeague))setTimeout(()=>loadActiveTeams(),500);
   if(hash==="home"){
     setTimeout(()=>loadPartiteOggi(),500);
     setTimeout(()=>loadSchedina(),2000);

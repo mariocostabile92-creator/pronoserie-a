@@ -2327,6 +2327,33 @@ async def schedina_ll():
     except Exception as e:
         return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
 
+@app.get("/api/{league}/squadre-attive")
+async def squadre_attive(league: str):
+    """Ritorna le squadre ancora attive in una competizione (da prossime fixtures)."""
+    if league not in LEAGUES:
+        raise HTTPException(404, "Competizione non trovata")
+    lg = LEAGUES[league]
+    nome_map = _get_nome_map(league)
+    try:
+        # Prendi le prossime 20 fixtures per trovare le squadre ancora in gioco
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league={lg['id']}&season={lg['season']}&next=20",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+        teams = set()
+        for fix in data.get("response", []):
+            h = fix.get("teams", {}).get("home", {}).get("name", "")
+            a = fix.get("teams", {}).get("away", {}).get("name", "")
+            h_mapped = nome_map.get(h, h)
+            a_mapped = nome_map.get(a, a)
+            if h_mapped: teams.add(h_mapped)
+            if a_mapped: teams.add(a_mapped)
+        return {"squadre": sorted(teams)}
+    except Exception:
+        return {"squadre": []}
+
 # ─────────────────────────────
 # WEB PUSH NOTIFICATIONS
 # ─────────────────────────────
