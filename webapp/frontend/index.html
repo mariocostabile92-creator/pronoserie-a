@@ -568,7 +568,7 @@ async function calcPronostico(){
     extra+=`<div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,#0d3b1e,#162447);border-radius:12px;border:2px solid var(--green)">
       <h4 style="color:var(--green);margin-bottom:8px;text-align:center">Pronostico Migliore Consigliato dall'IA</h4>
       <div style="text-align:center"><span style="font-size:1.5rem;font-weight:800;color:var(--green)">${giocate[0].nome}</span><br><span style="color:var(--muted)">Probabilita': ${giocate[0].prob}% | Quota ~${giocate[0].quota}</span></div>
-      <div style="display:flex;justify-content:center;gap:12px;margin-top:8px">
+      <div style="display:flex;justify-content:center;gap:12px;margin-top:8px;flex-wrap:wrap">
         ${giocate.slice(1).map(g=>`<span style="color:var(--muted);font-size:.85rem">${g.nome}: ${g.prob}%</span>`).join(" | ")}
       </div>
     </div>`;
