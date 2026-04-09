@@ -3727,10 +3727,29 @@ async def pronostico_league(league: str, home: str, away: str):
             raw["over_25"] = round(ov, 1)
             raw["under_25"] = round(100 - ov, 1) if ov > 1 else round(un, 1)
 
-            # Goal: calibra
+            # Goal: assicura coerenza con risultati esatti
             gsi = raw.get("goal_si", 50)
-            raw["goal_si"] = round(gsi, 1)
-            raw["goal_no"] = round(100 - gsi, 1) if gsi > 1 else round(raw.get("goal_no", 50), 1)
+            gno = raw.get("goal_no", 50)
+            # Se entrambi sono percentuali > 1, ricalcola
+            if gsi > 1 and gno > 1:
+                if gsi + gno > 110:
+                    # I valori sono gonfiati dal blend - normalizza
+                    tot_g = gsi + gno
+                    gsi = round(gsi / tot_g * 100, 1)
+                    gno = round(gno / tot_g * 100, 1)
+                raw["goal_si"] = round(gsi, 1)
+                raw["goal_no"] = round(100 - gsi, 1)
+            elif gsi > 1:
+                raw["goal_si"] = round(gsi, 1)
+                raw["goal_no"] = round(100 - gsi, 1)
+            else:
+                raw["goal_si"] = round(gsi * 100, 1)
+                raw["goal_no"] = round((1 - gsi) * 100, 1)
+            # Coerenza: se gol attesi > 2.3 e entrambi lambda > 0.8, boost Goal Si
+            ga = raw.get("gol_attesi", 2.5)
+            if isinstance(ga, (int, float)) and ga > 2.3 and raw["goal_si"] < 50:
+                raw["goal_si"] = max(raw["goal_si"], 50 + (ga - 2.3) * 5)
+                raw["goal_no"] = round(100 - raw["goal_si"], 1)
 
             # Quote
             for tip in ["1", "x", "2"]:
@@ -3749,15 +3768,20 @@ async def pronostico_league(league: str, home: str, away: str):
     a_title = away.strip().title()
     form_casa = _get_last_lineup(h_title)
     form_ospite = _get_last_lineup(a_title)
-    # Marcatori: prendi i top scorer dal campionato
+    # Marcatori: cerca in TUTTI i campionati per trovare i goleador
     marc_casa = []
     marc_ospite = []
-    mc = MARCATORI_CACHE.get(league) or []
-    for m in mc:
-        if m.get("squadra") == h_title:
-            marc_casa.append(f"{m['giocatore']} ({m['gol']} gol)")
-        elif m.get("squadra") == a_title:
-            marc_ospite.append(f"{m['giocatore']} ({m['gol']} gol)")
+    for lk in [league, "serie-a", "premier-league", "la-liga", "champions-league", "europa-league", "conference-league"]:
+        mc = MARCATORI_CACHE.get(lk) or []
+        for m in mc:
+            if m.get("squadra") == h_title and len(marc_casa) < 3:
+                entry = f"{m['giocatore']} ({m['gol']} gol)"
+                if entry not in marc_casa:
+                    marc_casa.append(entry)
+            elif m.get("squadra") == a_title and len(marc_ospite) < 3:
+                entry = f"{m['giocatore']} ({m['gol']} gol)"
+                if entry not in marc_ospite:
+                    marc_ospite.append(entry)
 
     return {
         "home":home,"away":away,
