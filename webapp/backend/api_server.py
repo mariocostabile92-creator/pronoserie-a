@@ -2537,6 +2537,120 @@ async def apply_referral(data: dict):
     return {"status": "ok", "reward": "1 mese Pro gratis"}
 
 # ─────────────────────────────
+# STORICO PRONOSTICI UTENTE
+# ─────────────────────────────
+@app.post("/api/user/save-prediction")
+async def save_user_prediction(data: dict, user: Optional[dict] = Depends(get_optional_user)):
+    if not user:
+        raise HTTPException(401, "Devi essere loggato")
+    from database import _get_conn
+    conn = _get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO user_predictions (user_id, league, home, away, pronostico, prob, confidence, over_under, goal, created_at, match_date)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (
+        user["id"], data.get("league",""), data.get("home",""), data.get("away",""),
+        data.get("pronostico",""), data.get("prob",0), data.get("confidence",""),
+        data.get("over_under",""), data.get("goal",""),
+        datetime.now(timezone.utc).isoformat(), data.get("match_date","")
+    ))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"status": "ok"}
+
+@app.get("/api/user/my-predictions")
+async def get_user_predictions(user: Optional[dict] = Depends(get_optional_user)):
+    if not user:
+        raise HTTPException(401, "Devi essere loggato")
+    from database import _get_conn
+    import psycopg2.extras
+    conn = _get_conn()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("""
+        SELECT * FROM user_predictions WHERE user_id = %s ORDER BY id DESC LIMIT 50
+    """, (user["id"],))
+    preds = cur.fetchall()
+    # Statistiche
+    cur.execute("""
+        SELECT
+            COUNT(*) as totale,
+            SUM(CASE WHEN corretto THEN 1 ELSE 0 END) as ok_1x2,
+            SUM(CASE WHEN ou_corretto THEN 1 ELSE 0 END) as ok_ou,
+            SUM(CASE WHEN goal_corretto THEN 1 ELSE 0 END) as ok_goal,
+            SUM(CASE WHEN verificato THEN 1 ELSE 0 END) as verificati
+        FROM user_predictions WHERE user_id = %s
+    """, (user["id"],))
+    stats = cur.fetchone()
+    cur.close()
+    conn.close()
+    v = stats["verificati"] or 0
+    return {
+        "predictions": [dict(p) for p in preds],
+        "stats": {
+            "totale": stats["totale"] or 0,
+            "verificati": v,
+            "ok_1x2": stats["ok_1x2"] or 0,
+            "ok_ou": stats["ok_ou"] or 0,
+            "ok_goal": stats["ok_goal"] or 0,
+            "acc_1x2": round((stats["ok_1x2"] or 0) / v * 100, 1) if v > 0 else 0,
+            "acc_ou": round((stats["ok_ou"] or 0) / v * 100, 1) if v > 0 else 0,
+            "acc_goal": round((stats["ok_goal"] or 0) / v * 100, 1) if v > 0 else 0,
+        }
+    }
+
+@app.post("/api/user/verify-predictions")
+async def verify_user_predictions(user: Optional[dict] = Depends(get_optional_user)):
+    """Verifica i pronostici dell'utente con i risultati reali."""
+    if not user:
+        raise HTTPException(401, "Devi essere loggato")
+    from database import _get_conn
+    import psycopg2.extras
+    conn = _get_conn()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT * FROM user_predictions WHERE user_id = %s AND verificato = FALSE", (user["id"],))
+    preds = cur.fetchall()
+    verificati = 0
+    # Cerca risultati in tutte le cache
+    all_results = []
+    for lk in LEAGUES:
+        for p in (RISULTATI_STAGIONE_CACHE_ML.get(lk) or []):
+            all_results.append(p)
+        for p in (LIVE_RESULTS_CACHE_ML.get(lk) or []):
+            if p.get("status") in ("FT","AET","PEN"):
+                all_results.append(p)
+    if LIVE_RESULTS_CACHE:
+        for p in LIVE_RESULTS_CACHE:
+            if p.get("status") in ("FT","AET","PEN"):
+                all_results.append(p)
+    for pred in preds:
+        for ris in all_results:
+            if ris.get("home") == pred["home"] and ris.get("away") == pred["away"] and ris.get("status") in ("FT","AET","PEN"):
+                gol_h = ris["gol_h"]
+                gol_a = ris["gol_a"]
+                if gol_h > gol_a: ris_1x2 = "1"
+                elif gol_h == gol_a: ris_1x2 = "X"
+                else: ris_1x2 = "2"
+                corretto = pred["pronostico"] == ris_1x2
+                gol_tot = gol_h + gol_a
+                ou_pred = "Over" in (pred.get("over_under") or "")
+                ou_ok = (gol_tot > 2.5) == ou_pred
+                goal_pred = "Si" in (pred.get("goal") or "")
+                is_goal = gol_h >= 1 and gol_a >= 1
+                goal_ok = is_goal == goal_pred
+                cur.execute("""
+                    UPDATE user_predictions SET gol_h_reale=%s, gol_a_reale=%s, risultato_reale=%s,
+                    corretto=%s, ou_corretto=%s, goal_corretto=%s, verificato=TRUE WHERE id=%s
+                """, (gol_h, gol_a, ris_1x2, corretto, ou_ok, goal_ok, pred["id"]))
+                verificati += 1
+                break
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"verificati": verificati}
+
+# ─────────────────────────────
 # DASHBOARD ACCURATEZZA
 # ─────────────────────────────
 @app.get("/api/accuratezza")

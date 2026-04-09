@@ -83,6 +83,29 @@ def init_db():
         cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by INTEGER")
     except Exception:
         pass
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS user_predictions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            league TEXT,
+            home TEXT NOT NULL,
+            away TEXT NOT NULL,
+            pronostico TEXT NOT NULL,
+            prob REAL,
+            confidence TEXT,
+            over_under TEXT,
+            goal TEXT,
+            gol_h_reale INTEGER,
+            gol_a_reale INTEGER,
+            risultato_reale TEXT,
+            corretto BOOLEAN,
+            ou_corretto BOOLEAN,
+            goal_corretto BOOLEAN,
+            verificato BOOLEAN DEFAULT FALSE,
+            created_at TEXT NOT NULL,
+            match_date TEXT
+        )
+    """)
     conn.commit()
     cur.close()
     conn.close()

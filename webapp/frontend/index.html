@@ -579,6 +579,17 @@ async function calcPronostico(){
       if(d.marcatori_ospite&&d.marcatori_ospite.length)extra+=`<p style="color:var(--text);font-size:.9rem;margin-top:4px"><strong style="color:var(--red)">${a}:</strong> ${d.marcatori_ospite.join(" &middot; ")}</p>`;
       extra+=`</div>`;
     }
+    // Pulsante salva pronostico
+    if(userToken){
+      const ouTxt = d.over_25>50?'Over 2.5':'Under 2.5';
+      const glTxt = d.goal_si>50?'Goal Si':'Goal No';
+      extra+=`<div style="margin-top:12px;text-align:center">
+        <button class="btn btn-green" style="font-size:.9rem;padding:10px 24px" onclick="saveMyPrediction('${h}','${a}','${best}',${Math.max(d.prob_1,d.prob_x,d.prob_2)},'${d.confidence_label}','${ouTxt}','${glTxt}')">
+          Salva nel tuo storico
+        </button>
+        <div id="save-pred-msg" style="margin-top:6px;font-size:.8rem"></div>
+      </div>`;
+    }
     // Formazioni con campo
     if(d.formazione_casa||d.formazione_ospite){
       extra+=`<div style="margin-top:12px;padding:16px;background:#0d1b2a;border-radius:8px"><h4 style="color:var(--accent);margin-bottom:12px">Probabili Formazioni</h4>`;
@@ -1426,6 +1437,11 @@ function pageLogin(){
           </div>
         </div>
       </div>
+      <div class="card" style="padding:20px;margin-top:16px;border-color:var(--accent)">
+        <h3 style="color:var(--accent);margin-bottom:8px">I Miei Pronostici</h3>
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:12px">Vedi il tuo storico, quanti ne hai azzeccati e le tue statistiche personali.</p>
+        <a href="#miei" class="btn btn-blue" style="width:100%">Vedi i miei pronostici</a>
+      </div>
       <div class="card" style="padding:20px;margin-top:16px;border-color:var(--green);background:linear-gradient(135deg,#0d3b1e,#162447)">
         <h3 style="color:var(--green);margin-bottom:8px">Invita un amico</h3>
         <p style="color:var(--muted);font-size:.85rem;margin-bottom:12px">Condividi il tuo link. Quando un amico si registra, ottieni <strong style="color:var(--green)">1 mese Pro gratis</strong>!</p>
@@ -1610,6 +1626,60 @@ async function abbonarPro(){
   }
 }
 
+async function saveMyPrediction(home,away,tip,prob,conf,ou,goal){
+  const msg=$("save-pred-msg");
+  try{
+    await postAPI("/api/user/save-prediction",{home,away,pronostico:tip,prob,confidence:conf,over_under:ou,goal,league:currentLeague});
+    if(msg) msg.innerHTML='<span style="color:var(--green)">Salvato!</span>';
+  }catch(e){if(msg) msg.innerHTML='<span style="color:var(--red)">Errore</span>'}
+}
+
+async function pageMyPredictions(){
+  if(!userToken) return '<div class="container"><div class="card" style="text-align:center;padding:24px"><h2>Accedi per vedere i tuoi pronostici</h2><a href="#login" class="btn btn-green" style="margin-top:12px">Accedi</a></div></div>';
+  // Verifica prima i pronostici
+  try{await postAPI("/api/user/verify-predictions",{})}catch(e){}
+  const data = await fetchAPI("/api/user/my-predictions");
+  if(!data) return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento</div></div>';
+  const s = data.stats || {};
+  let html='<div class="container"><h1>I Miei Pronostici</h1><p class="sub">Il tuo storico personale</p>';
+  // Stats
+  html+=`<div class="grid3" style="margin-bottom:16px">
+    <div class="card" style="text-align:center;padding:12px"><div style="font-size:1.8rem;font-weight:800;color:var(--green)">${s.totale||0}</div><div style="color:var(--muted);font-size:.8rem">Pronostici fatti</div></div>
+    <div class="card" style="text-align:center;padding:12px"><div style="font-size:1.8rem;font-weight:800;color:var(--accent)">${s.acc_1x2||0}%</div><div style="color:var(--muted);font-size:.8rem">1X2 azzeccati</div></div>
+    <div class="card" style="text-align:center;padding:12px"><div style="font-size:1.8rem;font-weight:800;color:var(--yellow)">${s.verificati||0}</div><div style="color:var(--muted);font-size:.8rem">Verificati</div></div>
+  </div>`;
+  if(s.verificati>0){
+    html+=`<div class="card" style="padding:10px;margin-bottom:12px"><div style="display:flex;gap:16px;justify-content:center;font-size:.85rem">
+      <span>1X2: <strong style="color:var(--green)">${s.ok_1x2}/${s.verificati}</strong></span>
+      <span>O/U: <strong style="color:var(--accent)">${s.ok_ou}/${s.verificati}</strong></span>
+      <span>Goal: <strong style="color:var(--yellow)">${s.ok_goal}/${s.verificati}</strong></span>
+    </div></div>`;
+  }
+  // Lista pronostici
+  if(data.predictions && data.predictions.length>0){
+    data.predictions.forEach(p=>{
+      const ver = p.verificato;
+      const col = ver ? (p.corretto?"var(--green)":"var(--red)") : "var(--muted)";
+      const segno = ver ? (p.corretto?"&#10004;":"&#10006;") : "&#9201;";
+      html+=`<div class="card" style="padding:8px;margin-bottom:6px;border-left:3px solid ${col}">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:.85rem"><strong>${p.home}</strong> vs <strong>${p.away}</strong>
+            <br><span style="color:var(--muted);font-size:.75rem">${p.confidence||""} | ${p.over_under||""} | ${p.goal||""}</span>
+          </div>
+          <div style="text-align:right">
+            <span style="font-size:1.1rem;font-weight:800;color:${col}">${segno} ${p.pronostico}</span>
+            ${ver?`<br><span style="font-size:.75rem;color:var(--muted)">${p.gol_h_reale}-${p.gol_a_reale} (${p.risultato_reale})</span>`:'<br><span style="font-size:.7rem;color:var(--muted)">In attesa</span>'}
+          </div>
+        </div>
+      </div>`;
+    });
+  } else {
+    html+='<div class="card" style="text-align:center;padding:20px;color:var(--muted)"><p>Non hai ancora salvato nessun pronostico.</p><a href="#pronostici" class="btn btn-blue" style="margin-top:8px">Calcola il primo pronostico</a></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
 // ── DASHBOARD ACCURATEZZA ──
 async function pageAccuratezza(){
   const data = await fetchAPI("/api/accuratezza", true);
@@ -1678,7 +1748,7 @@ async function pageAccuratezza(){
 }
 
 // ROUTER
-const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,risultati:pageRisultati,pricing:pagePricing,login:pageLogin,privacy:pagePrivacy,termini:pageTermini,accuratezza:pageAccuratezza};
+const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,risultati:pageRisultati,pricing:pagePricing,login:pageLogin,privacy:pagePrivacy,termini:pageTermini,accuratezza:pageAccuratezza,miei:pageMyPredictions};
 
 function pagePrivacy(){
   return `<div class="container" style="max-width:800px">
