@@ -732,7 +732,7 @@ async function simulaGiornata(gNum){
   const calUrl = currentLeague==="serie-a" ? "/api/calendario" : "/api/"+currentLeague+"/calendario";
   const cal=await fetchAPI(calUrl);
   if(!cal)return;
-  const g=cal.giornate.find(x=>x.giornata===gNum || x.giornata===String(gNum));
+  const g=cal.giornate.find(x=>String(x.giornata)===String(gNum));
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
   const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":"Campionato Italiano";
 
