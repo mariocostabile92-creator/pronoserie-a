@@ -736,18 +736,46 @@ async function simulaGiornata(gNum){
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
   const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":"Campionato Italiano";
 
-  // Separa partite giocate (con risultato FT) e da giocare (NS o oggi/futuro)
-  const oggi = new Date().toISOString().slice(0,10);
+  // Separa partite giocate (con risultato FT) e da giocare
   const giocate = g.partite.filter(p=>p.gol_h!==null && p.gol_h!==undefined && (p.status==="FT"||p.status==="AET"||p.status==="PEN"));
-  const daGiocare = g.partite.filter(p=>!(p.gol_h!==null && p.gol_h!==undefined && (p.status==="FT"||p.status==="AET"||p.status==="PEN")));
+  const daGiocareRaw = g.partite.filter(p=>!(p.gol_h!==null && p.gol_h!==undefined && (p.status==="FT"||p.status==="AET"||p.status==="PEN")));
+
+  // Per competizioni europee: raggruppa andata/ritorno e mostra solo le partite non giocate
+  // Rimuovi duplicati (stessa coppia di squadre invertita)
+  const isEuro = ["champions-league","europa-league","conference-league"].includes(currentLeague);
+  let andata = [];
+  let ritorno = [];
+  if(isEuro){
+    const seen = new Set();
+    // Le partite giocate sono l'andata
+    giocate.forEach(p=>{
+      const key = [p.home, p.away].sort().join('|');
+      seen.add(key);
+      andata.push(p);
+    });
+    // Le partite da giocare: filtra i duplicati (stessa coppia invertita)
+    daGiocareRaw.forEach(p=>{
+      const key = [p.home, p.away].sort().join('|');
+      if(!seen.has(key)){
+        seen.add(key);
+        ritorno.push(p);
+      } else {
+        // E' il ritorno di una partita gia' vista
+        ritorno.push(p);
+      }
+    });
+  } else {
+    andata = giocate;
+    ritorno = daGiocareRaw;
+  }
 
   let html='<div class="container">';
 
   // PARTITE GIA' GIOCATE (Andata)
-  if(giocate.length>0){
-    html+=`<h3 style="margin-bottom:8px;color:var(--green)">Risultati - ${leagueLabel}</h3>`;
+  if(andata.length>0){
+    html+=`<h3 style="margin-bottom:8px;color:var(--green)">${isEuro?'Andata':'Risultati'} - ${leagueLabel}</h3>`;
     html+='<div class="card" style="padding:8px;margin-bottom:12px">';
-    giocate.forEach(p=>{
+    andata.forEach(p=>{
       const cH=p.gol_h>p.gol_a?"var(--green)":p.gol_h<p.gol_a?"var(--red)":"var(--yellow)";
       const cA=p.gol_a>p.gol_h?"var(--green)":p.gol_a<p.gol_h?"var(--red)":"var(--yellow)";
       html+=`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #1f3460">
@@ -760,10 +788,10 @@ async function simulaGiornata(gNum){
   }
 
   // PARTITE DA GIOCARE (Ritorno) - con pronostici
-  if(daGiocare.length>0){
-    html+=`<h3 style="margin-bottom:8px;color:var(--accent)">Pronostici - ${leagueLabel}</h3>`;
+  if(ritorno.length>0){
+    html+=`<h3 style="margin-bottom:8px;color:var(--accent)">${isEuro?'Ritorno':'Pronostici'} - ${leagueLabel}</h3>`;
     html+='<div style="overflow-x:auto"><table style="width:100%;font-size:.75rem;white-space:nowrap"><thead><tr><th style="text-align:left">Partita</th><th>1</th><th>X</th><th>2</th><th>Tip</th><th>O/U</th><th>Goal</th><th>Doppio</th><th>Aff.</th></tr></thead><tbody>';
-    for(const p of daGiocare){
+    for(const p of ritorno){
       const pronoUrl = "/api"+leagueApiPrefix()+"/pronostico/"+encodeURIComponent(p.home)+"/"+encodeURIComponent(p.away);
       const d=await fetchAPI(pronoUrl);
       if(!d)continue;
@@ -802,12 +830,12 @@ async function simulaGiornata(gNum){
       </tr>`;
     }
     html+='</tbody></table></div>';
-  } else if(giocate.length===0){
+  } else if(andata.length===0){
     html+='<div class="card" style="text-align:center;padding:16px;color:var(--muted)">Nessuna partita trovata per questa giornata</div>';
   }
 
   // Se tutte giocate e nessuna da giocare
-  if(giocate.length>0 && daGiocare.length===0){
+  if(andata.length>0 && ritorno.length===0){
     html+='<div style="text-align:center;padding:12px;color:var(--muted);font-size:.85rem">Tutte le partite di questa giornata sono state giocate.</div>';
   }
   // Legenda colori e abbreviazioni
