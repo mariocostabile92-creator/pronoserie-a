@@ -3727,28 +3727,26 @@ async def pronostico_league(league: str, home: str, away: str):
             raw["over_25"] = round(ov, 1)
             raw["under_25"] = round(100 - ov, 1) if ov > 1 else round(un, 1)
 
-            # Goal: assicura coerenza con risultati esatti
-            gsi = raw.get("goal_si", 50)
-            gno = raw.get("goal_no", 50)
-            # Se entrambi sono percentuali > 1, ricalcola
-            if gsi > 1 and gno > 1:
-                if gsi + gno > 110:
-                    # I valori sono gonfiati dal blend - normalizza
-                    tot_g = gsi + gno
-                    gsi = round(gsi / tot_g * 100, 1)
-                    gno = round(gno / tot_g * 100, 1)
-                raw["goal_si"] = round(gsi, 1)
-                raw["goal_no"] = round(100 - gsi, 1)
-            elif gsi > 1:
-                raw["goal_si"] = round(gsi, 1)
-                raw["goal_no"] = round(100 - gsi, 1)
-            else:
-                raw["goal_si"] = round(gsi * 100, 1)
-                raw["goal_no"] = round((1 - gsi) * 100, 1)
-            # Coerenza: se gol attesi > 2.3 e entrambi lambda > 0.8, boost Goal Si
+            # Goal Si/No: ricalcola dalla fonte piu' affidabile, non dal blend
+            # Il blend dei valori Goal produce risultati incoerenti
+            best_source = raw_domestic or raw_classifica or raw_euro or {}
+            gsi_best = best_source.get("goal_si", 50)
+            gno_best = best_source.get("goal_no", 50)
+            # Normalizza: se sono decimali (0-1) converti in percentuali
+            if isinstance(gsi_best, (int, float)) and gsi_best < 1:
+                gsi_best = gsi_best * 100
+            if isinstance(gno_best, (int, float)) and gno_best < 1:
+                gno_best = gno_best * 100
+            # Assicura coerenza
+            if gsi_best + gno_best > 110:
+                tot_g = gsi_best + gno_best
+                gsi_best = gsi_best / tot_g * 100
+            raw["goal_si"] = round(gsi_best, 1)
+            raw["goal_no"] = round(100 - gsi_best, 1)
+            # Boost se gol attesi alti
             ga = raw.get("gol_attesi", 2.5)
             if isinstance(ga, (int, float)) and ga > 2.3 and raw["goal_si"] < 50:
-                raw["goal_si"] = max(raw["goal_si"], 50 + (ga - 2.3) * 5)
+                raw["goal_si"] = round(50 + (ga - 2.3) * 5, 1)
                 raw["goal_no"] = round(100 - raw["goal_si"], 1)
 
             # Quote
