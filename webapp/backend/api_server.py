@@ -3643,20 +3643,44 @@ async def pronostico_league(league: str, home: str, away: str):
                     raw[k] = round(sum(v * w for v, w in vals) / sum(w for _, w in vals), 2)
                 else:
                     raw[k] = sources[0][0].get(k)
+
             # Ricalcola suggerimento
             mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
             raw["suggerimento"] = "1" if mp == raw.get("prob_1") else ("X" if mp == raw.get("prob_x") else "2")
             raw["sugg_label"] = "Vittoria Casa" if raw["suggerimento"] == "1" else ("Pareggio" if raw["suggerimento"] == "X" else "Vittoria Ospite")
-            # Ricalcola confidence
+
+            # Ricalcola confidence basata sullo spread delle probabilita'
             sp = sorted([raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0)], reverse=True)
-            spread = (sp[0] - sp[1]) / 100 if sp[0] > 1 else sp[0] - sp[1]
-            raw["confidence"] = min(1.0, spread * 2)
+            if sp[0] > 1:
+                spread = (sp[0] - sp[1]) / 100
+            else:
+                spread = sp[0] - sp[1]
+            raw["confidence"] = round(min(1.0, spread * 2.5), 3)
             raw["confidence_label"] = "Alta" if raw["confidence"] >= 0.82 else ("Media" if raw["confidence"] >= 0.50 else "Bassa")
             raw["sicura"] = raw["confidence"] >= 0.82 and sp[0] > 45
+
+            # Fix Over/Under: ricalcola correttamente
+            ov = raw.get("over_25", 50)
+            un = raw.get("under_25", 50)
+            if ov + un > 0:
+                raw["over_25"] = round(ov, 1)
+                raw["under_25"] = round(100 - ov, 1) if ov > 1 else round(un, 1)
+
+            # Fix Goal
+            gsi = raw.get("goal_si", 50)
+            gno = raw.get("goal_no", 50)
+            if gsi + gno > 0:
+                raw["goal_si"] = round(gsi, 1)
+                raw["goal_no"] = round(100 - gsi, 1) if gsi > 1 else round(gno, 1)
+
             # Quote
             for tip in ["1", "x", "2"]:
                 p = raw.get(f"prob_{tip}", 33)
                 raw[f"quota_{tip}"] = round(105 / max(1, p), 2)
+
+            # Risultati esatti e altri campi non numerici
+            raw["risultati_esatti"] = (raw_domestic or raw_euro or raw_classifica or {}).get("risultati_esatti", [])
+            raw["gol_attesi"] = round(raw.get("gol_attesi", 2.5), 2) if isinstance(raw.get("gol_attesi"), (int, float)) else 2.5
         else:
             raw = raw_classifica or genera_pronostico(home, away)
     else:
