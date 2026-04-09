@@ -1,0 +1,3309 @@
+Div,Date,HomeTeam,AwayTeam,FTHG,FTAG,FTR
+UCL,2011-06-28,FC Santa Coloma,F91 Dudelange,0,2,A
+UCL,2011-06-28,Tre Fiori,Valletta FC,0,3,A
+UCL,2011-07-05,F91 Dudelange,FC Santa Coloma,2,0,H
+UCL,2011-07-06,Valletta FC,Tre Fiori,2,1,H
+UCL,2011-07-12,Pyunik Yerevan,Plzen,0,4,A
+UCL,2011-07-12,Valletta FC,Ekranas,2,3,A
+UCL,2011-07-12,Maribor,F91 Dudelange,2,0,H
+UCL,2011-07-12,Mogren,Litex,1,2,A
+UCL,2011-07-12,Slovan Bratislava,FK Tobol Kostanay,2,0,H
+UCL,2011-07-12,Shamrock Rovers,Flora Tallinn,1,0,H
+UCL,2011-07-13,Zestafoni,Dacia,3,0,H
+UCL,2011-07-13,Malmo FF,HB Torshavn,2,0,H
+UCL,2011-07-13,Maccabi Haifa,Borac Banja Luka,5,1,H
+UCL,2011-07-13,Bangor City,HJK Helsinki,0,3,A
+UCL,2011-07-13,Skenderbeu Korce,Apoel Nicosia,0,2,A
+UCL,2011-07-13,Dinamo Zagreb,Neftchi Baku,3,0,H
+UCL,2011-07-13,Sturm Graz,Fehérvár FC,2,0,H
+UCL,2011-07-13,Skonto,Wisla Krakow,0,1,A
+UCL,2011-07-13,Rosenborg,Breidablik,5,0,H
+UCL,2011-07-13,FK Partizan,Shkendija,4,0,H
+UCL,2011-07-13,Linfield,Bate Borisov,1,1,D
+UCL,2011-07-19,Flora Tallinn,Shamrock Rovers,0,0,D
+UCL,2011-07-19,Bate Borisov,Linfield,2,0,H
+UCL,2011-07-19,F91 Dudelange,Maribor,1,3,A
+UCL,2011-07-19,HJK Helsinki,Bangor City,10,0,H
+UCL,2011-07-19,FK Tobol Kostanay,Slovan Bratislava,1,1,D
+UCL,2011-07-19,Neftchi Baku,Dinamo Zagreb,0,0,D
+UCL,2011-07-19,Ekranas,Valletta FC,1,0,H
+UCL,2011-07-19,Litex,Mogren,3,0,H
+UCL,2011-07-19,HB Torshavn,Malmo FF,1,1,D
+UCL,2011-07-19,Plzen,Pyunik Yerevan,5,1,H
+UCL,2011-07-19,Wisla Krakow,Skonto,2,0,H
+UCL,2011-07-19,Shkendija,FK Partizan,0,1,A
+UCL,2011-07-20,Apoel Nicosia,Skenderbeu Korce,4,0,H
+UCL,2011-07-20,Dacia,Zestafoni,2,0,H
+UCL,2011-07-20,Fehérvár FC,Sturm Graz,3,2,H
+UCL,2011-07-20,Breidablik,Rosenborg,2,0,H
+UCL,2011-07-20,Borac Banja Luka,Maccabi Haifa,3,2,H
+UCL,2011-07-26,Ekranas,Bate Borisov,0,0,D
+UCL,2011-07-26,Zestafoni,Sturm Graz,1,1,D
+UCL,2011-07-26,Apoel Nicosia,Slovan Bratislava,0,0,D
+UCL,2011-07-26,Litex,Wisla Krakow,1,2,A
+UCL,2011-07-26,Dynamo Kyiv,Rubin,0,2,A
+UCL,2011-07-26,Rangers,Malmo FF,0,1,A
+UCL,2011-07-26,Twente,Vaslui,2,0,H
+UCL,2011-07-26,Genk,FK Partizan,2,1,H
+UCL,2011-07-27,HJK Helsinki,Dinamo Zagreb,1,2,A
+UCL,2011-07-27,FC Copenhagen,Shamrock Rovers,1,0,H
+UCL,2011-07-27,Odense,Panathinaikos,1,1,D
+UCL,2011-07-27,Maccabi Haifa,Maribor,2,1,H
+UCL,2011-07-27,Standard Liege,FC Zurich,1,1,D
+UCL,2011-07-27,Benfica,Trabzonspor,2,0,H
+UCL,2011-07-27,Rosenborg,Plzen,0,1,A
+UCL,2011-08-02,Bate Borisov,Ekranas,3,1,H
+UCL,2011-08-02,Panathinaikos,Odense,3,4,A
+UCL,2011-08-02,Shamrock Rovers,FC Copenhagen,0,2,A
+UCL,2011-08-03,Rubin,Dynamo Kyiv,2,1,H
+UCL,2011-08-03,Malmo FF,Rangers,1,1,D
+UCL,2011-08-03,Vaslui,Twente,0,0,D
+UCL,2011-08-03,Plzen,Rosenborg,3,2,H
+UCL,2011-08-03,Slovan Bratislava,Apoel Nicosia,0,2,A
+UCL,2011-08-03,FC Zurich,Standard Liege,1,0,H
+UCL,2011-08-03,Wisla Krakow,Litex,3,1,H
+UCL,2011-08-03,Sturm Graz,Zestafoni,1,0,H
+UCL,2011-08-03,Maribor,Maccabi Haifa,1,1,D
+UCL,2011-08-03,FK Partizan,Genk,1,1,D
+UCL,2011-08-03,Dinamo Zagreb,HJK Helsinki,1,0,H
+UCL,2011-08-03,Trabzonspor,Benfica,1,1,D
+UCL,2011-08-16,Arsenal,Udinese,1,0,H
+UCL,2011-08-16,Lyon,Rubin,3,1,H
+UCL,2011-08-16,Bate Borisov,Sturm Graz,1,1,D
+UCL,2011-08-16,FC Copenhagen,Plzen,1,3,A
+UCL,2011-08-16,Twente,Benfica,2,2,D
+UCL,2011-08-17,Bayern Munich,FC Zurich,2,0,H
+UCL,2011-08-17,Wisla Krakow,Apoel Nicosia,1,0,H
+UCL,2011-08-17,Odense,Villarreal,1,0,H
+UCL,2011-08-17,Dinamo Zagreb,Malmo FF,4,1,H
+UCL,2011-08-17,Maccabi Haifa,Genk,2,1,H
+UCL,2011-08-23,Malmo FF,Dinamo Zagreb,2,0,H
+UCL,2011-08-23,Villarreal,Odense,3,0,H
+UCL,2011-08-23,Genk,Maccabi Haifa,4,2,H
+UCL,2011-08-23,FC Zurich,Bayern Munich,0,1,A
+UCL,2011-08-23,Apoel Nicosia,Wisla Krakow,3,1,H
+UCL,2011-08-24,Rubin,Lyon,1,1,D
+UCL,2011-08-24,Benfica,Twente,3,1,H
+UCL,2011-08-24,Udinese,Arsenal,1,2,A
+UCL,2011-08-24,Plzen,FC Copenhagen,2,1,H
+UCL,2011-08-24,Sturm Graz,Bate Borisov,0,2,A
+UCL,2011-09-13,Chelsea,Bayer Leverkusen,2,0,H
+UCL,2011-09-13,Borussia Dortmund,Arsenal,1,1,D
+UCL,2011-09-13,FC Porto,Shakhtar Donetsk,2,1,H
+UCL,2011-09-13,Barcelona,AC Milan,2,2,D
+UCL,2011-09-13,Olympiakos Piraeus,Marseille,0,1,A
+UCL,2011-09-13,Plzen,Bate Borisov,1,1,D
+UCL,2011-09-13,Genk,Valencia,0,0,D
+UCL,2011-09-13,Apoel Nicosia,Zenit Saint Petersburg,2,1,H
+UCL,2011-09-14,Manchester City,Napoli,1,1,D
+UCL,2011-09-14,Lille,CSKA Moscow,2,2,D
+UCL,2011-09-14,Ajax,Lyon,0,0,D
+UCL,2011-09-14,Benfica,Manchester United,1,1,D
+UCL,2011-09-14,Inter,Trabzonspor,0,1,A
+UCL,2011-09-14,Villarreal,Bayern Munich,0,2,A
+UCL,2011-09-14,FC Basel 1893,Oţelul,2,1,H
+UCL,2011-09-14,Dinamo Zagreb,Real Madrid,0,1,A
+UCL,2011-09-27,CSKA Moscow,Inter,2,3,A
+UCL,2011-09-27,Manchester United,FC Basel 1893,3,3,D
+UCL,2011-09-27,Lyon,Dinamo Zagreb,2,0,H
+UCL,2011-09-27,Bayern Munich,Manchester City,2,0,H
+UCL,2011-09-27,Napoli,Villarreal,2,0,H
+UCL,2011-09-27,Real Madrid,Ajax,3,0,H
+UCL,2011-09-27,Trabzonspor,Lille,1,1,D
+UCL,2011-09-27,Oţelul,Benfica,0,1,A
+UCL,2011-09-28,Zenit Saint Petersburg,FC Porto,3,1,H
+UCL,2011-09-28,Arsenal,Olympiakos Piraeus,2,1,H
+UCL,2011-09-28,Marseille,Borussia Dortmund,3,0,H
+UCL,2011-09-28,Bayer Leverkusen,Genk,2,0,H
+UCL,2011-09-28,Bate Borisov,Barcelona,0,5,A
+UCL,2011-09-28,AC Milan,Plzen,2,0,H
+UCL,2011-09-28,Valencia,Chelsea,1,1,D
+UCL,2011-09-28,Shakhtar Donetsk,Apoel Nicosia,1,1,D
+UCL,2011-10-18,CSKA Moscow,Trabzonspor,3,0,H
+UCL,2011-10-18,Manchester City,Villarreal,2,1,H
+UCL,2011-10-18,Lille,Inter,0,1,A
+UCL,2011-10-18,Napoli,Bayern Munich,1,1,D
+UCL,2011-10-18,Real Madrid,Lyon,4,0,H
+UCL,2011-10-18,FC Basel 1893,Benfica,0,2,A
+UCL,2011-10-18,Dinamo Zagreb,Ajax,0,2,A
+UCL,2011-10-18,Oţelul,Manchester United,0,2,A
+UCL,2011-10-19,Chelsea,Genk,5,0,H
+UCL,2011-10-19,Marseille,Arsenal,0,1,A
+UCL,2011-10-19,Bayer Leverkusen,Valencia,2,1,H
+UCL,2011-10-19,FC Porto,Apoel Nicosia,1,1,D
+UCL,2011-10-19,AC Milan,Bate Borisov,2,0,H
+UCL,2011-10-19,Barcelona,Plzen,2,0,H
+UCL,2011-10-19,Shakhtar Donetsk,Zenit Saint Petersburg,2,2,D
+UCL,2011-10-19,Olympiakos Piraeus,Borussia Dortmund,3,1,H
+UCL,2011-11-01,Bate Borisov,AC Milan,1,1,D
+UCL,2011-11-01,Zenit Saint Petersburg,Shakhtar Donetsk,1,0,H
+UCL,2011-11-01,Arsenal,Marseille,0,0,D
+UCL,2011-11-01,Borussia Dortmund,Olympiakos Piraeus,1,0,H
+UCL,2011-11-01,Valencia,Bayer Leverkusen,3,1,H
+UCL,2011-11-01,Plzen,Barcelona,0,4,A
+UCL,2011-11-01,Genk,Chelsea,1,1,D
+UCL,2011-11-01,Apoel Nicosia,FC Porto,2,1,H
+UCL,2011-11-02,Manchester United,Oţelul,2,0,H
+UCL,2011-11-02,Lyon,Real Madrid,0,2,A
+UCL,2011-11-02,Bayern Munich,Napoli,3,2,H
+UCL,2011-11-02,Ajax,Dinamo Zagreb,4,0,H
+UCL,2011-11-02,Benfica,FC Basel 1893,1,1,D
+UCL,2011-11-02,Inter,Lille,2,1,H
+UCL,2011-11-02,Villarreal,Manchester City,0,3,A
+UCL,2011-11-02,Trabzonspor,CSKA Moscow,0,0,D
+UCL,2011-11-22,CSKA Moscow,Lille,0,2,A
+UCL,2011-11-22,Manchester United,Benfica,2,2,D
+UCL,2011-11-22,Lyon,Ajax,0,0,D
+UCL,2011-11-22,Bayern Munich,Villarreal,3,1,H
+UCL,2011-11-22,Napoli,Manchester City,2,1,H
+UCL,2011-11-22,Real Madrid,Dinamo Zagreb,6,2,H
+UCL,2011-11-22,Trabzonspor,Inter,1,1,D
+UCL,2011-11-22,Oţelul,FC Basel 1893,2,3,A
+UCL,2011-11-23,Zenit Saint Petersburg,Apoel Nicosia,0,0,D
+UCL,2011-11-23,Bate Borisov,Plzen,0,1,A
+UCL,2011-11-23,Arsenal,Borussia Dortmund,2,1,H
+UCL,2011-11-23,Marseille,Olympiakos Piraeus,0,1,A
+UCL,2011-11-23,Bayer Leverkusen,Chelsea,2,1,H
+UCL,2011-11-23,AC Milan,Barcelona,2,3,A
+UCL,2011-11-23,Valencia,Genk,7,0,H
+UCL,2011-11-23,Shakhtar Donetsk,FC Porto,0,2,A
+UCL,2011-12-06,Chelsea,Valencia,3,0,H
+UCL,2011-12-06,Borussia Dortmund,Marseille,2,3,A
+UCL,2011-12-06,FC Porto,Zenit Saint Petersburg,0,0,D
+UCL,2011-12-06,Barcelona,Bate Borisov,4,0,H
+UCL,2011-12-06,Olympiakos Piraeus,Arsenal,3,1,H
+UCL,2011-12-06,Plzen,AC Milan,2,2,D
+UCL,2011-12-06,Genk,Bayer Leverkusen,1,1,D
+UCL,2011-12-06,Apoel Nicosia,Shakhtar Donetsk,0,2,A
+UCL,2011-12-07,Manchester City,Bayern Munich,2,0,H
+UCL,2011-12-07,Lille,Trabzonspor,0,0,D
+UCL,2011-12-07,Ajax,Real Madrid,0,3,A
+UCL,2011-12-07,Benfica,Oţelul,1,0,H
+UCL,2011-12-07,Inter,CSKA Moscow,1,2,A
+UCL,2011-12-07,Villarreal,Napoli,0,2,A
+UCL,2011-12-07,FC Basel 1893,Manchester United,2,1,H
+UCL,2011-12-07,Dinamo Zagreb,Lyon,1,7,A
+UCL,2012-02-14,Lyon,Apoel Nicosia,1,0,H
+UCL,2012-02-14,Bayer Leverkusen,Barcelona,1,3,A
+UCL,2012-02-15,Zenit Saint Petersburg,Benfica,3,2,H
+UCL,2012-02-15,AC Milan,Arsenal,4,0,H
+UCL,2012-02-21,CSKA Moscow,Real Madrid,1,1,D
+UCL,2012-02-21,Napoli,Chelsea,3,1,H
+UCL,2012-02-22,Marseille,Inter,1,0,H
+UCL,2012-02-22,FC Basel 1893,Bayern Munich,1,0,H
+UCL,2012-03-06,Arsenal,AC Milan,3,0,H
+UCL,2012-03-06,Benfica,Zenit Saint Petersburg,2,0,H
+UCL,2012-03-07,Barcelona,Bayer Leverkusen,7,1,H
+UCL,2012-03-07,Apoel Nicosia,Lyon,2,0,H
+UCL,2012-03-13,Bayern Munich,FC Basel 1893,7,0,H
+UCL,2012-03-13,Inter,Marseille,2,1,H
+UCL,2012-03-14,Chelsea,Napoli,4,1,H
+UCL,2012-03-14,Real Madrid,CSKA Moscow,4,1,H
+UCL,2012-03-27,Benfica,Chelsea,0,1,A
+UCL,2012-03-27,Apoel Nicosia,Real Madrid,0,3,A
+UCL,2012-03-28,Marseille,Bayern Munich,0,2,A
+UCL,2012-03-28,AC Milan,Barcelona,0,0,D
+UCL,2012-04-03,Bayern Munich,Marseille,2,0,H
+UCL,2012-04-03,Barcelona,AC Milan,3,1,H
+UCL,2012-04-04,Chelsea,Benfica,2,1,H
+UCL,2012-04-04,Real Madrid,Apoel Nicosia,5,2,H
+UCL,2012-04-17,Bayern Munich,Real Madrid,2,1,H
+UCL,2012-04-18,Chelsea,Barcelona,1,0,H
+UCL,2012-04-24,Barcelona,Chelsea,2,2,D
+UCL,2012-04-25,Real Madrid,Bayern Munich,4,2,H
+UCL,2012-05-19,Bayern Munich,Chelsea,1,1,D
+UCL,2012-07-03,F91 Dudelange,Tre Penne,7,0,H
+UCL,2012-07-03,Valletta FC,Lusitanos,8,0,H
+UCL,2012-07-03,Linfield,B36 Torshavn,0,0,D
+UCL,2012-07-10,B36 Torshavn,Linfield,0,0,D
+UCL,2012-07-10,Lusitanos,Valletta FC,0,1,A
+UCL,2012-07-10,Tre Penne,F91 Dudelange,0,4,A
+UCL,2012-07-17,Ulisses,Sheriff Tiraspol,0,1,A
+UCL,2012-07-17,Flora Tallinn,FC Basel 1893,0,2,A
+UCL,2012-07-17,HJK Helsinki,KR Reykjavik,7,0,H
+UCL,2012-07-17,Neftchi Baku,Zestafoni,3,0,H
+UCL,2012-07-17,F91 Dudelange,Red Bull Salzburg,1,0,H
+UCL,2012-07-17,Slovan Liberec,Shakhter Karagandy,1,0,H
+UCL,2012-07-17,Žilina,Ironi Kiryat Shmona,1,0,H
+UCL,2012-07-17,The New Saints,Helsingborg,0,0,D
+UCL,2012-07-17,Skenderbeu Korce,Debreceni VSC,1,0,H
+UCL,2012-07-17,Valletta FC,FK Partizan,1,4,A
+UCL,2012-07-17,Shamrock Rovers,Ekranas,0,0,D
+UCL,2012-07-18,Bate Borisov,Vardar Skopje,3,2,H
+UCL,2012-07-18,AEL,Linfield,3,0,H
+UCL,2012-07-18,Maribor,Zeljeznicar Sarajevo,4,1,H
+UCL,2012-07-18,Ludogorets,Dinamo Zagreb,1,1,D
+UCL,2012-07-18,Molde,FK Ventspils,3,0,H
+UCL,2012-07-18,Buducnost Podgorica,Slask Wroclaw,0,2,A
+UCL,2012-07-24,Shakhter Karagandy,Slovan Liberec,1,1,D
+UCL,2012-07-24,FK Ventspils,Molde,1,1,D
+UCL,2012-07-24,Red Bull Salzburg,F91 Dudelange,4,3,H
+UCL,2012-07-24,Ironi Kiryat Shmona,Žilina,2,0,H
+UCL,2012-07-24,Sheriff Tiraspol,Ulisses,1,0,H
+UCL,2012-07-24,Ekranas,Shamrock Rovers,2,1,H
+UCL,2012-07-24,Zestafoni,Neftchi Baku,2,2,D
+UCL,2012-07-24,FC Basel 1893,Flora Tallinn,3,0,H
+UCL,2012-07-24,Debreceni VSC,Skenderbeu Korce,3,0,H
+UCL,2012-07-24,FK Partizan,Valletta FC,3,1,H
+UCL,2012-07-24,Zeljeznicar Sarajevo,Maribor,1,2,A
+UCL,2012-07-24,KR Reykjavik,HJK Helsinki,1,2,A
+UCL,2012-07-25,Helsingborg,The New Saints,3,0,H
+UCL,2012-07-25,Vardar Skopje,Bate Borisov,0,0,D
+UCL,2012-07-25,Slask Wroclaw,Buducnost Podgorica,0,1,A
+UCL,2012-07-25,Linfield,AEL,0,0,D
+UCL,2012-07-25,Dinamo Zagreb,Ludogorets,3,2,H
+UCL,2012-07-31,Dynamo Kyiv,Feyenoord,2,1,H
+UCL,2012-07-31,Motherwell,Panathinaikos,0,2,A
+UCL,2012-08-01,Bate Borisov,Debreceni VSC,1,1,D
+UCL,2012-08-01,Ironi Kiryat Shmona,Neftchi Baku,4,0,H
+UCL,2012-08-01,Molde,FC Basel 1893,0,1,A
+UCL,2012-08-01,Sheriff Tiraspol,Dinamo Zagreb,0,1,A
+UCL,2012-08-01,AEL,FK Partizan,1,0,H
+UCL,2012-08-01,FC Copenhagen,Club Brugge KV,0,0,D
+UCL,2012-08-01,Maribor,F91 Dudelange,4,1,H
+UCL,2012-08-01,Anderlecht,Ekranas,5,0,H
+UCL,2012-08-01,Celtic,HJK Helsinki,2,1,H
+UCL,2012-08-01,Slask Wroclaw,Helsingborg,0,3,A
+UCL,2012-08-01,Fenerbahçe,Vaslui,1,1,D
+UCL,2012-08-01,CFR 1907 Cluj,Slovan Liberec,1,0,H
+UCL,2012-08-07,Feyenoord,Dynamo Kyiv,0,1,A
+UCL,2012-08-07,Debreceni VSC,Bate Borisov,0,2,A
+UCL,2012-08-08,F91 Dudelange,Maribor,0,1,A
+UCL,2012-08-08,Helsingborg,Slask Wroclaw,3,1,H
+UCL,2012-08-08,Neftchi Baku,Ironi Kiryat Shmona,2,2,D
+UCL,2012-08-08,HJK Helsinki,Celtic,0,2,A
+UCL,2012-08-08,Slovan Liberec,CFR 1907 Cluj,1,2,A
+UCL,2012-08-08,Ekranas,Anderlecht,0,6,A
+UCL,2012-08-08,FC Basel 1893,Molde,1,1,D
+UCL,2012-08-08,Vaslui,Fenerbahçe,1,4,A
+UCL,2012-08-08,Club Brugge KV,FC Copenhagen,2,3,A
+UCL,2012-08-08,FK Partizan,AEL,0,1,A
+UCL,2012-08-08,Panathinaikos,Motherwell,3,0,H
+UCL,2012-08-08,Dinamo Zagreb,Sheriff Tiraspol,4,0,H
+UCL,2012-08-21,Spartak Moscow,Fenerbahçe,2,1,H
+UCL,2012-08-21,Borussia Monchengladbach,Dynamo Kyiv,1,3,A
+UCL,2012-08-21,FC Copenhagen,Lille,1,0,H
+UCL,2012-08-21,FC Basel 1893,CFR 1907 Cluj,1,2,A
+UCL,2012-08-21,Helsingborg,Celtic,0,2,A
+UCL,2012-08-22,SC Braga,Udinese,1,1,D
+UCL,2012-08-22,Bate Borisov,Ironi Kiryat Shmona,2,0,H
+UCL,2012-08-22,Malaga,Panathinaikos,2,0,H
+UCL,2012-08-22,Dinamo Zagreb,Maribor,2,1,H
+UCL,2012-08-22,AEL,Anderlecht,2,1,H
+UCL,2012-08-28,Udinese,SC Braga,2,2,D
+UCL,2012-08-28,Maribor,Dinamo Zagreb,0,1,A
+UCL,2012-08-28,Anderlecht,AEL,2,0,H
+UCL,2012-08-28,Panathinaikos,Malaga,0,0,D
+UCL,2012-08-28,Ironi Kiryat Shmona,Bate Borisov,1,1,D
+UCL,2012-08-29,Lille,FC Copenhagen,2,0,H
+UCL,2012-08-29,Celtic,Helsingborg,2,0,H
+UCL,2012-08-29,Dynamo Kyiv,Borussia Monchengladbach,1,2,A
+UCL,2012-08-29,Fenerbahçe,Spartak Moscow,1,1,D
+UCL,2012-08-29,CFR 1907 Cluj,FC Basel 1893,1,0,H
+UCL,2012-09-18,Montpellier,Arsenal,1,2,A
+UCL,2012-09-18,Paris Saint Germain,Dynamo Kyiv,4,1,H
+UCL,2012-09-18,Borussia Dortmund,Ajax,1,0,H
+UCL,2012-09-18,AC Milan,Anderlecht,0,0,D
+UCL,2012-09-18,Malaga,Zenit Saint Petersburg,3,0,H
+UCL,2012-09-18,Real Madrid,Manchester City,3,2,H
+UCL,2012-09-18,Olympiakos Piraeus,FC Schalke 04,1,2,A
+UCL,2012-09-18,Dinamo Zagreb,FC Porto,0,2,A
+UCL,2012-09-19,Manchester United,Galatasaray,1,0,H
+UCL,2012-09-19,Chelsea,Juventus,2,2,D
+UCL,2012-09-19,Lille,Bate Borisov,1,3,A
+UCL,2012-09-19,Bayern Munich,Valencia,2,1,H
+UCL,2012-09-19,SC Braga,CFR 1907 Cluj,0,2,A
+UCL,2012-09-19,Celtic,Benfica,0,0,D
+UCL,2012-09-19,Barcelona,Spartak Moscow,3,2,H
+UCL,2012-09-19,Shakhtar Donetsk,FC Nordsjaelland,2,0,H
+UCL,2012-10-02,Spartak Moscow,Celtic,2,3,A
+UCL,2012-10-02,Benfica,Barcelona,0,2,A
+UCL,2012-10-02,Bate Borisov,Bayern Munich,3,1,H
+UCL,2012-10-02,FC Nordsjaelland,Chelsea,0,4,A
+UCL,2012-10-02,Juventus,Shakhtar Donetsk,1,1,D
+UCL,2012-10-02,Valencia,Lille,2,0,H
+UCL,2012-10-02,Galatasaray,SC Braga,0,2,A
+UCL,2012-10-02,CFR 1907 Cluj,Manchester United,1,2,A
+UCL,2012-10-03,Zenit Saint Petersburg,AC Milan,2,3,A
+UCL,2012-10-03,Arsenal,Olympiakos Piraeus,3,1,H
+UCL,2012-10-03,Manchester City,Borussia Dortmund,1,1,D
+UCL,2012-10-03,FC Schalke 04,Montpellier,2,2,D
+UCL,2012-10-03,Ajax,Real Madrid,1,4,A
+UCL,2012-10-03,FC Porto,Paris Saint Germain,1,0,H
+UCL,2012-10-03,Anderlecht,Malaga,0,3,A
+UCL,2012-10-03,Dynamo Kyiv,Dinamo Zagreb,2,0,H
+UCL,2012-10-23,Spartak Moscow,Benfica,2,1,H
+UCL,2012-10-23,Manchester United,SC Braga,3,2,H
+UCL,2012-10-23,Lille,Bayern Munich,0,1,A
+UCL,2012-10-23,Bate Borisov,Valencia,0,3,A
+UCL,2012-10-23,FC Nordsjaelland,Juventus,1,1,D
+UCL,2012-10-23,Barcelona,Celtic,2,1,H
+UCL,2012-10-23,Shakhtar Donetsk,Chelsea,2,1,H
+UCL,2012-10-23,Galatasaray,CFR 1907 Cluj,1,1,D
+UCL,2012-10-24,Zenit Saint Petersburg,Anderlecht,1,0,H
+UCL,2012-10-24,Arsenal,FC Schalke 04,0,2,A
+UCL,2012-10-24,Montpellier,Olympiakos Piraeus,1,2,A
+UCL,2012-10-24,Borussia Dortmund,Real Madrid,2,1,H
+UCL,2012-10-24,Ajax,Manchester City,3,1,H
+UCL,2012-10-24,FC Porto,Dynamo Kyiv,3,2,H
+UCL,2012-10-24,Malaga,AC Milan,1,0,H
+UCL,2012-10-24,Dinamo Zagreb,Paris Saint Germain,0,2,A
+UCL,2012-11-06,Manchester City,Ajax,2,2,D
+UCL,2012-11-06,Paris Saint Germain,Dinamo Zagreb,4,0,H
+UCL,2012-11-06,FC Schalke 04,Arsenal,2,2,D
+UCL,2012-11-06,AC Milan,Malaga,1,1,D
+UCL,2012-11-06,Real Madrid,Borussia Dortmund,2,2,D
+UCL,2012-11-06,Olympiakos Piraeus,Montpellier,3,1,H
+UCL,2012-11-06,Anderlecht,Zenit Saint Petersburg,1,0,H
+UCL,2012-11-06,Dynamo Kyiv,FC Porto,0,0,D
+UCL,2012-11-07,Chelsea,Shakhtar Donetsk,3,2,H
+UCL,2012-11-07,Bayern Munich,Lille,6,1,H
+UCL,2012-11-07,Benfica,Spartak Moscow,2,0,H
+UCL,2012-11-07,SC Braga,Manchester United,1,3,A
+UCL,2012-11-07,Celtic,Barcelona,2,1,H
+UCL,2012-11-07,Juventus,FC Nordsjaelland,4,0,H
+UCL,2012-11-07,Valencia,Bate Borisov,4,2,H
+UCL,2012-11-07,CFR 1907 Cluj,Galatasaray,1,3,A
+UCL,2012-11-20,Bate Borisov,Lille,0,2,A
+UCL,2012-11-20,Spartak Moscow,Barcelona,0,3,A
+UCL,2012-11-20,Benfica,Celtic,2,1,H
+UCL,2012-11-20,FC Nordsjaelland,Shakhtar Donetsk,2,5,A
+UCL,2012-11-20,Juventus,Chelsea,3,0,H
+UCL,2012-11-20,Valencia,Bayern Munich,1,1,D
+UCL,2012-11-20,Galatasaray,Manchester United,1,0,H
+UCL,2012-11-20,CFR 1907 Cluj,SC Braga,3,1,H
+UCL,2012-11-21,Zenit Saint Petersburg,Malaga,2,2,D
+UCL,2012-11-21,Arsenal,Montpellier,2,0,H
+UCL,2012-11-21,Manchester City,Real Madrid,1,1,D
+UCL,2012-11-21,FC Schalke 04,Olympiakos Piraeus,1,0,H
+UCL,2012-11-21,Ajax,Borussia Dortmund,1,4,A
+UCL,2012-11-21,FC Porto,Dinamo Zagreb,3,0,H
+UCL,2012-11-21,Anderlecht,AC Milan,1,3,A
+UCL,2012-11-21,Dynamo Kyiv,Paris Saint Germain,0,2,A
+UCL,2012-12-04,Montpellier,FC Schalke 04,1,1,D
+UCL,2012-12-04,Paris Saint Germain,FC Porto,2,1,H
+UCL,2012-12-04,Borussia Dortmund,Manchester City,1,0,H
+UCL,2012-12-04,AC Milan,Zenit Saint Petersburg,0,1,A
+UCL,2012-12-04,Malaga,Anderlecht,2,2,D
+UCL,2012-12-04,Real Madrid,Ajax,4,1,H
+UCL,2012-12-04,Olympiakos Piraeus,Arsenal,2,1,H
+UCL,2012-12-04,Dinamo Zagreb,Dynamo Kyiv,1,1,D
+UCL,2012-12-05,Manchester United,CFR 1907 Cluj,0,1,A
+UCL,2012-12-05,Chelsea,FC Nordsjaelland,6,1,H
+UCL,2012-12-05,Lille,Valencia,0,1,A
+UCL,2012-12-05,Bayern Munich,Bate Borisov,4,1,H
+UCL,2012-12-05,SC Braga,Galatasaray,1,2,A
+UCL,2012-12-05,Celtic,Spartak Moscow,2,1,H
+UCL,2012-12-05,Barcelona,Benfica,0,0,D
+UCL,2012-12-05,Shakhtar Donetsk,Juventus,0,1,A
+UCL,2013-02-12,Celtic,Juventus,0,3,A
+UCL,2013-02-12,Valencia,Paris Saint Germain,1,2,A
+UCL,2013-02-13,Real Madrid,Manchester United,1,1,D
+UCL,2013-02-13,Shakhtar Donetsk,Borussia Dortmund,2,2,D
+UCL,2013-02-19,Arsenal,Bayern Munich,1,3,A
+UCL,2013-02-19,FC Porto,Malaga,1,0,H
+UCL,2013-02-20,AC Milan,Barcelona,2,0,H
+UCL,2013-02-20,Galatasaray,FC Schalke 04,1,1,D
+UCL,2013-03-05,Manchester United,Real Madrid,1,2,A
+UCL,2013-03-05,Borussia Dortmund,Shakhtar Donetsk,3,0,H
+UCL,2013-03-06,Paris Saint Germain,Valencia,1,1,D
+UCL,2013-03-06,Juventus,Celtic,2,0,H
+UCL,2013-03-12,FC Schalke 04,Galatasaray,2,3,A
+UCL,2013-03-12,Barcelona,AC Milan,4,0,H
+UCL,2013-03-13,Bayern Munich,Arsenal,0,2,A
+UCL,2013-03-13,Malaga,FC Porto,2,0,H
+UCL,2013-04-02,Paris Saint Germain,Barcelona,2,2,D
+UCL,2013-04-02,Bayern Munich,Juventus,2,0,H
+UCL,2013-04-03,Malaga,Borussia Dortmund,0,0,D
+UCL,2013-04-03,Real Madrid,Galatasaray,3,0,H
+UCL,2013-04-09,Borussia Dortmund,Malaga,3,2,H
+UCL,2013-04-09,Galatasaray,Real Madrid,3,2,H
+UCL,2013-04-10,Juventus,Bayern Munich,0,2,A
+UCL,2013-04-10,Barcelona,Paris Saint Germain,1,1,D
+UCL,2013-04-23,Bayern Munich,Barcelona,4,0,H
+UCL,2013-04-24,Borussia Dortmund,Real Madrid,4,1,H
+UCL,2013-04-30,Real Madrid,Borussia Dortmund,2,0,H
+UCL,2013-05-01,Barcelona,Bayern Munich,0,3,A
+UCL,2013-05-25,Borussia Dortmund,Bayern Munich,1,2,A
+UCL,2013-07-02,Shirak,Tre Penne,3,0,H
+UCL,2013-07-02,Lusitanos,EB / Streymur,2,2,D
+UCL,2013-07-09,EB / Streymur,Lusitanos,5,1,H
+UCL,2013-07-09,Tre Penne,Shirak,1,0,H
+UCL,2013-07-16,Plzen,Zeljeznicar Sarajevo,4,3,H
+UCL,2013-07-16,Bate Borisov,Shakhter Karagandy,0,1,A
+UCL,2013-07-16,Dinamo Tbilisi,EB / Streymur,6,1,H
+UCL,2013-07-16,Sheriff Tiraspol,Sutjeska,1,1,D
+UCL,2013-07-16,Ekranas,FH hafnarfjordur,0,1,A
+UCL,2013-07-16,Fola Esch,Dinamo Zagreb,0,5,A
+UCL,2013-07-16,Birkirkara,Maribor,0,0,D
+UCL,2013-07-16,FCSB,Vardar Skopje,3,0,H
+UCL,2013-07-17,Shirak,FK Partizan,1,1,D
+UCL,2013-07-17,HJK Helsinki,Kalju Nomme,0,0,D
+UCL,2013-07-17,Neftchi Baku,Skenderbeu Korce,0,0,D
+UCL,2013-07-17,IF Elfsborg,Daugavpils / Progress,7,1,H
+UCL,2013-07-17,Sligo Rovers,Molde,0,1,A
+UCL,2013-07-17,The New Saints,Legia Warszawa,1,3,A
+UCL,2013-07-17,Slovan Bratislava,Ludogorets,2,1,H
+UCL,2013-07-17,Gyori ETO FC,Maccabi Tel Aviv,0,2,A
+UCL,2013-07-17,Cliftonville FC,Celtic,0,3,A
+UCL,2013-07-23,Shakhter Karagandy,Bate Borisov,1,0,H
+UCL,2013-07-23,Daugavpils / Progress,IF Elfsborg,0,4,A
+UCL,2013-07-23,Kalju Nomme,HJK Helsinki,2,1,H
+UCL,2013-07-23,Sutjeska,Sheriff Tiraspol,0,5,A
+UCL,2013-07-23,Molde,Sligo Rovers,2,0,H
+UCL,2013-07-23,Skenderbeu Korce,Neftchi Baku,1,0,H
+UCL,2013-07-23,EB / Streymur,Dinamo Tbilisi,1,3,A
+UCL,2013-07-23,Maccabi Tel Aviv,Gyori ETO FC,2,1,H
+UCL,2013-07-23,Celtic,Cliftonville FC,2,0,H
+UCL,2013-07-23,Vardar Skopje,FCSB,1,2,A
+UCL,2013-07-23,Dinamo Zagreb,Fola Esch,1,0,H
+UCL,2013-07-23,Zeljeznicar Sarajevo,Plzen,1,2,A
+UCL,2013-07-23,FH hafnarfjordur,Ekranas,2,1,H
+UCL,2013-07-24,Ludogorets,Slovan Bratislava,3,0,H
+UCL,2013-07-24,Maribor,Birkirkara,2,0,H
+UCL,2013-07-24,Legia Warszawa,The New Saints,1,0,H
+UCL,2013-07-24,FK Partizan,Shirak,0,0,D
+UCL,2013-07-30,Shakhter Karagandy,Skenderbeu Korce,3,0,H
+UCL,2013-07-30,Austria Vienna,FH hafnarfjordur,1,0,H
+UCL,2013-07-30,Kalju Nomme,Plzen,0,4,A
+UCL,2013-07-30,Dinamo Tbilisi,FCSB,0,2,A
+UCL,2013-07-30,FC Nordsjaelland,Zenit Saint Petersburg,0,1,A
+UCL,2013-07-30,FC Basel 1893,Maccabi Tel Aviv,1,0,H
+UCL,2013-07-30,PAOK,Metalist,0,2,A
+UCL,2013-07-30,PSV Eindhoven,Zulte Waregem,2,0,H
+UCL,2013-07-30,Dinamo Zagreb,Sheriff Tiraspol,1,0,H
+UCL,2013-07-30,Lyon,Grasshoppers,1,0,H
+UCL,2013-07-31,Molde,Legia Warszawa,1,1,D
+UCL,2013-07-31,Apoel Nicosia,Maribor,1,1,D
+UCL,2013-07-31,Ludogorets,FK Partizan,2,1,H
+UCL,2013-07-31,Red Bull Salzburg,Fenerbahçe,1,1,D
+UCL,2013-07-31,Celtic,IF Elfsborg,1,0,H
+UCL,2013-08-06,Maccabi Tel Aviv,FC Basel 1893,3,3,D
+UCL,2013-08-06,FCSB,Dinamo Tbilisi,1,1,D
+UCL,2013-08-06,Maribor,Apoel Nicosia,0,0,D
+UCL,2013-08-06,Skenderbeu Korce,Shakhter Karagandy,3,2,H
+UCL,2013-08-06,FK Partizan,Ludogorets,0,1,A
+UCL,2013-08-06,Fenerbahçe,Red Bull Salzburg,3,1,H
+UCL,2013-08-06,Grasshoppers,Lyon,0,1,A
+UCL,2013-08-07,FH hafnarfjordur,Austria Vienna,0,0,D
+UCL,2013-08-07,Zenit Saint Petersburg,FC Nordsjaelland,5,0,H
+UCL,2013-08-07,Sheriff Tiraspol,Dinamo Zagreb,0,3,A
+UCL,2013-08-07,Metalist,PAOK,1,1,D
+UCL,2013-08-07,IF Elfsborg,Celtic,0,0,D
+UCL,2013-08-07,Plzen,Kalju Nomme,6,2,H
+UCL,2013-08-07,Legia Warszawa,Molde,0,0,D
+UCL,2013-08-07,Zulte Waregem,PSV Eindhoven,0,3,A
+UCL,2013-08-20,Shakhter Karagandy,Celtic,2,0,H
+UCL,2013-08-20,Lyon,Real Sociedad,0,2,A
+UCL,2013-08-20,PSV Eindhoven,AC Milan,1,1,D
+UCL,2013-08-20,Pacos Ferreira,Zenit Saint Petersburg,1,4,A
+UCL,2013-08-20,Plzen,Maribor,3,1,H
+UCL,2013-08-21,FC Schalke 04,PAOK,1,1,D
+UCL,2013-08-21,FCSB,Legia Warszawa,1,1,D
+UCL,2013-08-21,Ludogorets,FC Basel 1893,2,4,A
+UCL,2013-08-21,Fenerbahçe,Arsenal,0,3,A
+UCL,2013-08-21,Dinamo Zagreb,Austria Vienna,0,2,A
+UCL,2013-08-27,Arsenal,Fenerbahçe,2,0,H
+UCL,2013-08-27,Legia Warszawa,FCSB,2,2,D
+UCL,2013-08-27,FC Basel 1893,Ludogorets,2,0,H
+UCL,2013-08-27,Austria Vienna,Dinamo Zagreb,2,3,A
+UCL,2013-08-27,PAOK,FC Schalke 04,2,3,A
+UCL,2013-08-28,Zenit Saint Petersburg,Pacos Ferreira,4,2,H
+UCL,2013-08-28,Celtic,Shakhter Karagandy,3,0,H
+UCL,2013-08-28,AC Milan,PSV Eindhoven,3,0,H
+UCL,2013-08-28,Real Sociedad,Lyon,2,0,H
+UCL,2013-08-28,Maribor,Plzen,0,1,A
+UCL,2013-09-17,Manchester United,Bayer Leverkusen,4,2,H
+UCL,2013-09-17,Bayern Munich,CSKA Moscow,3,0,H
+UCL,2013-09-17,Benfica,Anderlecht,2,0,H
+UCL,2013-09-17,FC Copenhagen,Juventus,1,1,D
+UCL,2013-09-17,Real Sociedad,Shakhtar Donetsk,0,2,A
+UCL,2013-09-17,Olympiakos Piraeus,Paris Saint Germain,1,4,A
+UCL,2013-09-17,Plzen,Manchester City,0,3,A
+UCL,2013-09-17,Galatasaray,Real Madrid,1,6,A
+UCL,2013-09-18,Chelsea,FC Basel 1893,1,2,A
+UCL,2013-09-18,Marseille,Arsenal,1,2,A
+UCL,2013-09-18,FC Schalke 04,FCSB,3,0,H
+UCL,2013-09-18,AC Milan,Celtic,2,0,H
+UCL,2013-09-18,Napoli,Borussia Dortmund,2,1,H
+UCL,2013-09-18,Barcelona,Ajax,4,0,H
+UCL,2013-09-18,Atletico Madrid,Zenit Saint Petersburg,3,1,H
+UCL,2013-09-18,Austria Vienna,FC Porto,0,1,A
+UCL,2013-10-01,Zenit Saint Petersburg,Austria Vienna,0,0,D
+UCL,2013-10-01,Arsenal,Napoli,2,0,H
+UCL,2013-10-01,Borussia Dortmund,Marseille,3,0,H
+UCL,2013-10-01,Ajax,AC Milan,1,1,D
+UCL,2013-10-01,FC Porto,Atletico Madrid,1,2,A
+UCL,2013-10-01,Celtic,Barcelona,0,1,A
+UCL,2013-10-01,FC Basel 1893,FC Schalke 04,0,1,A
+UCL,2013-10-01,FCSB,Chelsea,0,4,A
+UCL,2013-10-02,CSKA Moscow,Plzen,3,2,H
+UCL,2013-10-02,Manchester City,Bayern Munich,1,3,A
+UCL,2013-10-02,Paris Saint Germain,Benfica,3,0,H
+UCL,2013-10-02,Bayer Leverkusen,Real Sociedad,2,1,H
+UCL,2013-10-02,Juventus,Galatasaray,2,2,D
+UCL,2013-10-02,Real Madrid,FC Copenhagen,4,0,H
+UCL,2013-10-02,Shakhtar Donetsk,Manchester United,1,1,D
+UCL,2013-10-02,Anderlecht,Olympiakos Piraeus,0,3,A
+UCL,2013-10-22,Arsenal,Borussia Dortmund,1,2,A
+UCL,2013-10-22,Marseille,Napoli,1,2,A
+UCL,2013-10-22,FC Schalke 04,Chelsea,0,3,A
+UCL,2013-10-22,FC Porto,Zenit Saint Petersburg,0,1,A
+UCL,2013-10-22,Celtic,Ajax,2,1,H
+UCL,2013-10-22,AC Milan,Barcelona,1,1,D
+UCL,2013-10-22,FCSB,FC Basel 1893,1,1,D
+UCL,2013-10-22,Austria Vienna,Atletico Madrid,0,3,A
+UCL,2013-10-23,CSKA Moscow,Manchester City,1,2,A
+UCL,2013-10-23,Manchester United,Real Sociedad,1,0,H
+UCL,2013-10-23,Bayern Munich,Plzen,5,0,H
+UCL,2013-10-23,Bayer Leverkusen,Shakhtar Donetsk,4,0,H
+UCL,2013-10-23,Benfica,Olympiakos Piraeus,1,1,D
+UCL,2013-10-23,Real Madrid,Juventus,2,1,H
+UCL,2013-10-23,Anderlecht,Paris Saint Germain,0,5,A
+UCL,2013-10-23,Galatasaray,FC Copenhagen,3,1,H
+UCL,2013-11-05,Manchester City,CSKA Moscow,5,2,H
+UCL,2013-11-05,Paris Saint Germain,Anderlecht,1,1,D
+UCL,2013-11-05,FC Copenhagen,Galatasaray,1,0,H
+UCL,2013-11-05,Juventus,Real Madrid,2,2,D
+UCL,2013-11-05,Real Sociedad,Manchester United,0,0,D
+UCL,2013-11-05,Shakhtar Donetsk,Bayer Leverkusen,0,0,D
+UCL,2013-11-05,Olympiakos Piraeus,Benfica,1,0,H
+UCL,2013-11-05,Plzen,Bayern Munich,0,1,A
+UCL,2013-11-06,Zenit Saint Petersburg,FC Porto,1,1,D
+UCL,2013-11-06,Chelsea,FC Schalke 04,3,0,H
+UCL,2013-11-06,Borussia Dortmund,Arsenal,0,1,A
+UCL,2013-11-06,Ajax,Celtic,1,0,H
+UCL,2013-11-06,Napoli,Marseille,3,2,H
+UCL,2013-11-06,Barcelona,AC Milan,3,1,H
+UCL,2013-11-06,Atletico Madrid,Austria Vienna,4,0,H
+UCL,2013-11-06,FC Basel 1893,FCSB,1,1,D
+UCL,2013-11-26,Zenit Saint Petersburg,Atletico Madrid,1,1,D
+UCL,2013-11-26,Arsenal,Marseille,2,0,H
+UCL,2013-11-26,Borussia Dortmund,Napoli,3,1,H
+UCL,2013-11-26,Ajax,Barcelona,2,1,H
+UCL,2013-11-26,FC Porto,Austria Vienna,1,1,D
+UCL,2013-11-26,Celtic,AC Milan,0,3,A
+UCL,2013-11-26,FC Basel 1893,Chelsea,1,0,H
+UCL,2013-11-26,FCSB,FC Schalke 04,0,0,D
+UCL,2013-11-27,CSKA Moscow,Bayern Munich,1,3,A
+UCL,2013-11-27,Manchester City,Plzen,4,2,H
+UCL,2013-11-27,Paris Saint Germain,Olympiakos Piraeus,2,1,H
+UCL,2013-11-27,Bayer Leverkusen,Manchester United,0,5,A
+UCL,2013-11-27,Juventus,FC Copenhagen,3,1,H
+UCL,2013-11-27,Real Madrid,Galatasaray,4,1,H
+UCL,2013-11-27,Shakhtar Donetsk,Real Sociedad,4,0,H
+UCL,2013-11-27,Anderlecht,Benfica,2,3,A
+UCL,2013-12-10,Manchester United,Shakhtar Donetsk,1,0,H
+UCL,2013-12-10,Bayern Munich,Manchester City,2,3,A
+UCL,2013-12-10,Benfica,Paris Saint Germain,2,1,H
+UCL,2013-12-10,FC Copenhagen,Real Madrid,0,2,A
+UCL,2013-12-10,Real Sociedad,Bayer Leverkusen,0,1,A
+UCL,2013-12-10,Olympiakos Piraeus,Anderlecht,3,1,H
+UCL,2013-12-10,Plzen,CSKA Moscow,2,1,H
+UCL,2013-12-11,Galatasaray,Juventus,1,0,H
+UCL,2013-12-11,Chelsea,FCSB,1,0,H
+UCL,2013-12-11,Marseille,Borussia Dortmund,1,2,A
+UCL,2013-12-11,FC Schalke 04,FC Basel 1893,2,0,H
+UCL,2013-12-11,AC Milan,Ajax,0,0,D
+UCL,2013-12-11,Napoli,Arsenal,2,0,H
+UCL,2013-12-11,Barcelona,Celtic,6,1,H
+UCL,2013-12-11,Atletico Madrid,FC Porto,2,0,H
+UCL,2013-12-11,Austria Vienna,Zenit Saint Petersburg,4,1,H
+UCL,2014-02-18,Manchester City,Barcelona,0,2,A
+UCL,2014-02-18,Bayer Leverkusen,Paris Saint Germain,0,4,A
+UCL,2014-02-19,Arsenal,Bayern Munich,0,2,A
+UCL,2014-02-19,AC Milan,Atletico Madrid,0,1,A
+UCL,2014-02-25,Zenit Saint Petersburg,Borussia Dortmund,2,4,A
+UCL,2014-02-25,Olympiakos Piraeus,Manchester United,2,0,H
+UCL,2014-02-26,FC Schalke 04,Real Madrid,1,6,A
+UCL,2014-02-26,Galatasaray,Chelsea,1,1,D
+UCL,2014-03-11,Bayern Munich,Arsenal,1,1,D
+UCL,2014-03-11,Atletico Madrid,AC Milan,4,1,H
+UCL,2014-03-12,Paris Saint Germain,Bayer Leverkusen,2,1,H
+UCL,2014-03-12,Barcelona,Manchester City,2,1,H
+UCL,2014-03-18,Chelsea,Galatasaray,2,0,H
+UCL,2014-03-18,Real Madrid,FC Schalke 04,3,1,H
+UCL,2014-03-19,Manchester United,Olympiakos Piraeus,3,0,H
+UCL,2014-03-19,Borussia Dortmund,Zenit Saint Petersburg,1,2,A
+UCL,2014-04-01,Manchester United,Bayern Munich,1,1,D
+UCL,2014-04-01,Barcelona,Atletico Madrid,1,1,D
+UCL,2014-04-02,Paris Saint Germain,Chelsea,3,1,H
+UCL,2014-04-02,Real Madrid,Borussia Dortmund,3,0,H
+UCL,2014-04-08,Chelsea,Paris Saint Germain,2,0,H
+UCL,2014-04-08,Borussia Dortmund,Real Madrid,2,0,H
+UCL,2014-04-09,Bayern Munich,Manchester United,3,1,H
+UCL,2014-04-09,Atletico Madrid,Barcelona,1,0,H
+UCL,2014-04-22,Atletico Madrid,Chelsea,0,0,D
+UCL,2014-04-23,Real Madrid,Bayern Munich,1,0,H
+UCL,2014-04-29,Bayern Munich,Real Madrid,0,4,A
+UCL,2014-04-30,Chelsea,Atletico Madrid,1,3,A
+UCL,2014-05-24,Real Madrid,Atletico Madrid,4,1,H
+UCL,2014-07-01,FC Santa Coloma,FC Urartu,1,0,H
+UCL,2014-07-01,La Fiorita,FC Levadia Tallinn,0,1,A
+UCL,2014-07-02,Lincoln Red Imps FC,HB Torshavn,1,1,D
+UCL,2014-07-08,FC Urartu,FC Santa Coloma,3,2,H
+UCL,2014-07-08,FC Levadia Tallinn,La Fiorita,7,0,H
+UCL,2014-07-08,HB Torshavn,Lincoln Red Imps FC,5,2,H
+UCL,2014-07-15,Valletta FC,Qarabag,0,1,A
+UCL,2014-07-15,Slovan Bratislava,The New Saints,1,0,H
+UCL,2014-07-15,Bate Borisov,Skenderbeu Korce,0,0,D
+UCL,2014-07-15,Sheriff Tiraspol,Sutjeska,2,0,H
+UCL,2014-07-15,Zrinjski,Maribor,0,0,D
+UCL,2014-07-15,FC Santa Coloma,Maccabi Tel Aviv,0,1,A
+UCL,2014-07-15,FK Rabotnicki,HJK Helsinki,0,0,D
+UCL,2014-07-15,FK Partizan,HB Torshavn,3,0,H
+UCL,2014-07-15,Dinamo Zagreb,FK Zalgiris Vilnius,2,0,H
+UCL,2014-07-15,Sparta Praha,FC Levadia Tallinn,7,0,H
+UCL,2014-07-15,Cliftonville FC,Debreceni VSC,0,0,D
+UCL,2014-07-15,KR Reykjavik,Celtic,0,1,A
+UCL,2014-07-16,Malmo FF,FK Ventspils,0,0,D
+UCL,2014-07-16,Ludogorets,F91 Dudelange,4,0,H
+UCL,2014-07-16,Dinamo Tbilisi,Aktobe,0,1,A
+UCL,2014-07-16,Stromsgodset,FCSB,0,1,A
+UCL,2014-07-16,Legia Warszawa,St Patrick's Athl.,1,1,D
+UCL,2014-07-22,Sutjeska,Sheriff Tiraspol,0,3,A
+UCL,2014-07-22,F91 Dudelange,Ludogorets,1,1,D
+UCL,2014-07-22,FC Levadia Tallinn,Sparta Praha,1,1,D
+UCL,2014-07-22,Qarabag,Valletta FC,4,0,H
+UCL,2014-07-22,Maccabi Tel Aviv,FC Santa Coloma,2,0,H
+UCL,2014-07-22,The New Saints,Slovan Bratislava,0,2,A
+UCL,2014-07-22,Skenderbeu Korce,Bate Borisov,1,1,D
+UCL,2014-07-22,HB Torshavn,FK Partizan,1,3,A
+UCL,2014-07-22,FK Zalgiris Vilnius,Dinamo Zagreb,0,2,A
+UCL,2014-07-22,Debreceni VSC,Cliftonville FC,2,0,H
+UCL,2014-07-22,Celtic,KR Reykjavik,4,0,H
+UCL,2014-07-23,Aktobe,Dinamo Tbilisi,3,0,H
+UCL,2014-07-23,HJK Helsinki,FK Rabotnicki,2,1,H
+UCL,2014-07-23,FK Ventspils,Malmo FF,0,1,A
+UCL,2014-07-23,FCSB,Stromsgodset,2,0,H
+UCL,2014-07-23,Maribor,Zrinjski,2,0,H
+UCL,2014-07-23,St Patrick's Athl.,Legia Warszawa,0,5,A
+UCL,2014-07-29,Sparta Praha,Malmo FF,4,2,H
+UCL,2014-07-29,Slovan Bratislava,Sheriff Tiraspol,2,1,H
+UCL,2014-07-29,Debreceni VSC,Bate Borisov,1,0,H
+UCL,2014-07-30,Aktobe,FCSB,2,2,D
+UCL,2014-07-30,Qarabag,Red Bull Salzburg,2,1,H
+UCL,2014-07-30,HJK Helsinki,Apoel Nicosia,2,2,D
+UCL,2014-07-30,AEL,Zenit Saint Petersburg,1,0,H
+UCL,2014-07-30,Dnipro Dnipropetrovsk,FC Copenhagen,0,0,D
+UCL,2014-07-30,Grasshoppers,Lille,0,2,A
+UCL,2014-07-30,Feyenoord,Beşiktaş,1,2,A
+UCL,2014-07-30,Ludogorets,FK Partizan,0,0,D
+UCL,2014-07-30,Standard Liege,Panathinaikos,0,0,D
+UCL,2014-07-30,Aalborg,Dinamo Zagreb,0,1,A
+UCL,2014-07-30,Maribor,Maccabi Tel Aviv,1,0,H
+UCL,2014-07-30,Legia Warszawa,Celtic,4,1,H
+UCL,2014-08-05,Bate Borisov,Debreceni VSC,3,1,H
+UCL,2014-08-05,Maccabi Tel Aviv,Maribor,2,2,D
+UCL,2014-08-05,Panathinaikos,Standard Liege,1,2,A
+UCL,2014-08-05,Lille,Grasshoppers,1,1,D
+UCL,2014-08-06,Zenit Saint Petersburg,AEL,3,0,H
+UCL,2014-08-06,Apoel Nicosia,HJK Helsinki,2,0,H
+UCL,2014-08-06,Malmo FF,Sparta Praha,2,0,H
+UCL,2014-08-06,Sheriff Tiraspol,Slovan Bratislava,0,0,D
+UCL,2014-08-06,Beşiktaş,Feyenoord,3,1,H
+UCL,2014-08-06,FCSB,Aktobe,2,1,H
+UCL,2014-08-06,FC Copenhagen,Dnipro Dnipropetrovsk,2,0,H
+UCL,2014-08-06,Red Bull Salzburg,Qarabag,2,0,H
+UCL,2014-08-06,Celtic,Legia Warszawa,3,0,H
+UCL,2014-08-06,FK Partizan,Ludogorets,2,2,D
+UCL,2014-08-06,Dinamo Zagreb,Aalborg,0,2,A
+UCL,2014-08-19,FC Copenhagen,Bayer Leverkusen,2,3,A
+UCL,2014-08-19,Napoli,Athletic Club,1,1,D
+UCL,2014-08-19,Beşiktaş,Arsenal,0,0,D
+UCL,2014-08-19,FCSB,Ludogorets,1,0,H
+UCL,2014-08-19,Red Bull Salzburg,Malmo FF,2,1,H
+UCL,2014-08-20,Lille,FC Porto,0,1,A
+UCL,2014-08-20,Aalborg,Apoel Nicosia,1,1,D
+UCL,2014-08-20,Maribor,Celtic,1,1,D
+UCL,2014-08-20,Slovan Bratislava,Bate Borisov,1,1,D
+UCL,2014-08-20,Standard Liege,Zenit Saint Petersburg,0,1,A
+UCL,2014-08-26,Zenit Saint Petersburg,Standard Liege,3,0,H
+UCL,2014-08-26,FC Porto,Lille,2,0,H
+UCL,2014-08-26,Celtic,Maribor,0,1,A
+UCL,2014-08-26,Bate Borisov,Slovan Bratislava,3,0,H
+UCL,2014-08-26,Apoel Nicosia,Aalborg,4,0,H
+UCL,2014-08-27,Arsenal,Beşiktaş,1,0,H
+UCL,2014-08-27,Bayer Leverkusen,FC Copenhagen,4,0,H
+UCL,2014-08-27,Malmo FF,Red Bull Salzburg,3,0,H
+UCL,2014-08-27,Athletic Club,Napoli,3,1,H
+UCL,2014-08-27,Ludogorets,FCSB,2,0,H
+UCL,2014-09-16,Liverpool,Ludogorets,2,1,H
+UCL,2014-09-16,Monaco,Bayer Leverkusen,1,0,H
+UCL,2014-09-16,Borussia Dortmund,Arsenal,2,0,H
+UCL,2014-09-16,Benfica,Zenit Saint Petersburg,0,2,A
+UCL,2014-09-16,Juventus,Malmo FF,2,0,H
+UCL,2014-09-16,Real Madrid,FC Basel 1893,5,1,H
+UCL,2014-09-16,Olympiakos Piraeus,Atletico Madrid,3,2,H
+UCL,2014-09-16,Galatasaray,Anderlecht,1,1,D
+UCL,2014-09-17,Chelsea,FC Schalke 04,1,1,D
+UCL,2014-09-17,Bayern Munich,Manchester City,1,0,H
+UCL,2014-09-17,Ajax,Paris Saint Germain,1,1,D
+UCL,2014-09-17,FC Porto,Bate Borisov,6,0,H
+UCL,2014-09-17,AS Roma,CSKA Moscow,5,1,H
+UCL,2014-09-17,Barcelona,Apoel Nicosia,1,0,H
+UCL,2014-09-17,Athletic Club,Shakhtar Donetsk,0,0,D
+UCL,2014-09-17,Maribor,Sporting CP,1,1,D
+UCL,2014-09-30,CSKA Moscow,Bayern Munich,0,1,A
+UCL,2014-09-30,Manchester City,AS Roma,1,1,D
+UCL,2014-09-30,Paris Saint Germain,Barcelona,3,2,H
+UCL,2014-09-30,FC Schalke 04,Maribor,1,1,D
+UCL,2014-09-30,Sporting CP,Chelsea,0,1,A
+UCL,2014-09-30,Bate Borisov,Athletic Club,2,1,H
+UCL,2014-09-30,Shakhtar Donetsk,FC Porto,2,2,D
+UCL,2014-09-30,Apoel Nicosia,Ajax,1,1,D
+UCL,2014-10-01,Zenit Saint Petersburg,Monaco,0,0,D
+UCL,2014-10-01,Arsenal,Galatasaray,4,1,H
+UCL,2014-10-01,Bayer Leverkusen,Benfica,3,1,H
+UCL,2014-10-01,Malmo FF,Olympiakos Piraeus,2,0,H
+UCL,2014-10-01,Atletico Madrid,Juventus,1,0,H
+UCL,2014-10-01,FC Basel 1893,Liverpool,1,0,H
+UCL,2014-10-01,Anderlecht,Borussia Dortmund,0,3,A
+UCL,2014-10-01,Ludogorets,Real Madrid,1,2,A
+UCL,2014-10-21,CSKA Moscow,Manchester City,2,2,D
+UCL,2014-10-21,Chelsea,Maribor,6,0,H
+UCL,2014-10-21,FC Schalke 04,Sporting CP,4,3,H
+UCL,2014-10-21,FC Porto,Athletic Club,2,1,H
+UCL,2014-10-21,Bate Borisov,Shakhtar Donetsk,0,7,A
+UCL,2014-10-21,AS Roma,Bayern Munich,1,7,A
+UCL,2014-10-21,Barcelona,Ajax,3,1,H
+UCL,2014-10-21,Apoel Nicosia,Paris Saint Germain,0,1,A
+UCL,2014-10-22,Liverpool,Real Madrid,0,3,A
+UCL,2014-10-22,Monaco,Benfica,0,0,D
+UCL,2014-10-22,Bayer Leverkusen,Zenit Saint Petersburg,2,0,H
+UCL,2014-10-22,Atletico Madrid,Malmo FF,5,0,H
+UCL,2014-10-22,Olympiakos Piraeus,Juventus,1,0,H
+UCL,2014-10-22,Anderlecht,Arsenal,1,2,A
+UCL,2014-10-22,Ludogorets,FC Basel 1893,1,0,H
+UCL,2014-10-22,Galatasaray,Borussia Dortmund,0,4,A
+UCL,2014-11-04,Zenit Saint Petersburg,Bayer Leverkusen,1,2,A
+UCL,2014-11-04,Arsenal,Anderlecht,3,3,D
+UCL,2014-11-04,Borussia Dortmund,Galatasaray,4,1,H
+UCL,2014-11-04,Benfica,Monaco,1,0,H
+UCL,2014-11-04,Malmo FF,Atletico Madrid,0,2,A
+UCL,2014-11-04,Juventus,Olympiakos Piraeus,3,2,H
+UCL,2014-11-04,Real Madrid,Liverpool,1,0,H
+UCL,2014-11-04,FC Basel 1893,Ludogorets,4,0,H
+UCL,2014-11-05,Manchester City,CSKA Moscow,1,2,A
+UCL,2014-11-05,Paris Saint Germain,Apoel Nicosia,1,0,H
+UCL,2014-11-05,Bayern Munich,AS Roma,2,0,H
+UCL,2014-11-05,Ajax,Barcelona,0,2,A
+UCL,2014-11-05,Sporting CP,FC Schalke 04,4,2,H
+UCL,2014-11-05,Athletic Club,FC Porto,0,2,A
+UCL,2014-11-05,Shakhtar Donetsk,Bate Borisov,5,0,H
+UCL,2014-11-05,Maribor,Chelsea,1,1,D
+UCL,2014-11-25,Bate Borisov,FC Porto,0,3,A
+UCL,2014-11-25,CSKA Moscow,AS Roma,1,1,D
+UCL,2014-11-25,Manchester City,Bayern Munich,3,2,H
+UCL,2014-11-25,Paris Saint Germain,Ajax,3,1,H
+UCL,2014-11-25,FC Schalke 04,Chelsea,0,5,A
+UCL,2014-11-25,Sporting CP,Maribor,3,1,H
+UCL,2014-11-25,Shakhtar Donetsk,Athletic Club,0,1,A
+UCL,2014-11-25,Apoel Nicosia,Barcelona,0,4,A
+UCL,2014-11-26,Zenit Saint Petersburg,Benfica,1,0,H
+UCL,2014-11-26,Arsenal,Borussia Dortmund,2,0,H
+UCL,2014-11-26,Bayer Leverkusen,Monaco,0,1,A
+UCL,2014-11-26,Malmo FF,Juventus,0,2,A
+UCL,2014-11-26,Atletico Madrid,Olympiakos Piraeus,4,0,H
+UCL,2014-11-26,FC Basel 1893,Real Madrid,0,1,A
+UCL,2014-11-26,Anderlecht,Galatasaray,2,0,H
+UCL,2014-11-26,Ludogorets,Liverpool,2,2,D
+UCL,2014-12-09,Liverpool,FC Basel 1893,1,1,D
+UCL,2014-12-09,Monaco,Zenit Saint Petersburg,2,0,H
+UCL,2014-12-09,Borussia Dortmund,Anderlecht,1,1,D
+UCL,2014-12-09,Benfica,Bayer Leverkusen,0,0,D
+UCL,2014-12-09,Juventus,Atletico Madrid,0,0,D
+UCL,2014-12-09,Real Madrid,Ludogorets,4,0,H
+UCL,2014-12-09,Olympiakos Piraeus,Malmo FF,4,2,H
+UCL,2014-12-09,Galatasaray,Arsenal,1,4,A
+UCL,2014-12-10,Chelsea,Sporting CP,3,1,H
+UCL,2014-12-10,Bayern Munich,CSKA Moscow,3,0,H
+UCL,2014-12-10,Ajax,Apoel Nicosia,4,0,H
+UCL,2014-12-10,FC Porto,Shakhtar Donetsk,1,1,D
+UCL,2014-12-10,AS Roma,Manchester City,0,2,A
+UCL,2014-12-10,Barcelona,Paris Saint Germain,3,1,H
+UCL,2014-12-10,Athletic Club,Bate Borisov,2,0,H
+UCL,2014-12-10,Maribor,FC Schalke 04,0,1,A
+UCL,2015-02-17,Paris Saint Germain,Chelsea,1,1,D
+UCL,2015-02-17,Shakhtar Donetsk,Bayern Munich,0,0,D
+UCL,2015-02-18,FC Schalke 04,Real Madrid,0,2,A
+UCL,2015-02-18,FC Basel 1893,FC Porto,1,1,D
+UCL,2015-02-24,Manchester City,Barcelona,1,2,A
+UCL,2015-02-24,Juventus,Borussia Dortmund,2,1,H
+UCL,2015-02-25,Arsenal,Monaco,1,3,A
+UCL,2015-02-25,Bayer Leverkusen,Atletico Madrid,1,0,H
+UCL,2015-03-10,FC Porto,FC Basel 1893,4,0,H
+UCL,2015-03-10,Real Madrid,FC Schalke 04,3,4,A
+UCL,2015-03-11,Chelsea,Paris Saint Germain,2,2,D
+UCL,2015-03-11,Bayern Munich,Shakhtar Donetsk,7,0,H
+UCL,2015-03-17,Monaco,Arsenal,0,2,A
+UCL,2015-03-17,Atletico Madrid,Bayer Leverkusen,2,0,H
+UCL,2015-03-18,Borussia Dortmund,Juventus,0,3,A
+UCL,2015-03-18,Barcelona,Manchester City,1,0,H
+UCL,2015-04-14,Juventus,Monaco,1,0,H
+UCL,2015-04-14,Atletico Madrid,Real Madrid,0,0,D
+UCL,2015-04-15,Paris Saint Germain,Barcelona,1,3,A
+UCL,2015-04-15,FC Porto,Bayern Munich,3,1,H
+UCL,2015-04-21,Bayern Munich,FC Porto,6,1,H
+UCL,2015-04-21,Barcelona,Paris Saint Germain,2,0,H
+UCL,2015-04-22,Monaco,Juventus,0,0,D
+UCL,2015-04-22,Real Madrid,Atletico Madrid,1,0,H
+UCL,2015-05-05,Juventus,Real Madrid,2,1,H
+UCL,2015-05-06,Barcelona,Bayern Munich,3,0,H
+UCL,2015-05-12,Bayern Munich,Barcelona,3,2,H
+UCL,2015-05-13,Real Madrid,Juventus,1,1,D
+UCL,2015-06-06,Juventus,Barcelona,1,3,A
+UCL,2015-06-30,Pyunik Yerevan,Folgore,2,1,H
+UCL,2015-06-30,Lincoln Red Imps FC,FC Santa Coloma,0,0,D
+UCL,2015-06-30,Crusaders FC,FC Levadia Tallinn,0,0,D
+UCL,2015-07-01,B36 Torshavn,The New Saints,1,2,A
+UCL,2015-07-07,FC Levadia Tallinn,Crusaders FC,1,1,D
+UCL,2015-07-07,The New Saints,B36 Torshavn,4,1,H
+UCL,2015-07-07,FC Santa Coloma,Lincoln Red Imps FC,1,2,A
+UCL,2015-07-07,Folgore,Pyunik Yerevan,1,2,A
+UCL,2015-07-14,FK Ventspils,HJK Helsinki,1,3,A
+UCL,2015-07-14,Apoel Nicosia,Vardar Skopje,0,0,D
+UCL,2015-07-14,FC Midtjylland,Lincoln Red Imps FC,1,0,H
+UCL,2015-07-14,Ludogorets,Milsami Orhei,0,1,A
+UCL,2015-07-14,Molde,Pyunik Yerevan,5,0,H
+UCL,2015-07-14,The New Saints,Fehérvár FC,0,1,A
+UCL,2015-07-14,Skenderbeu Korce,Crusaders FC,4,1,H
+UCL,2015-07-14,Hibernians,Maccabi Tel Aviv,2,1,H
+UCL,2015-07-14,Maribor,FC Astana,1,0,H
+UCL,2015-07-14,AS Trencin,FCSB,0,2,A
+UCL,2015-07-14,FK Partizan,Dila,1,0,H
+UCL,2015-07-14,FK Sarajevo,Lech Poznan,0,2,A
+UCL,2015-07-15,Qarabag,Rudar Velenje,0,0,D
+UCL,2015-07-15,Malmo FF,FK Zalgiris Vilnius,0,0,D
+UCL,2015-07-15,Bate Borisov,Dundalk,2,1,H
+UCL,2015-07-15,Celtic,Stjarnan,2,0,H
+UCL,2015-07-15,Dinamo Zagreb,Fola Esch,1,1,D
+UCL,2015-07-21,Dila,FK Partizan,0,2,A
+UCL,2015-07-21,Pyunik Yerevan,Molde,1,0,H
+UCL,2015-07-21,Milsami Orhei,Ludogorets,2,1,H
+UCL,2015-07-21,HJK Helsinki,FK Ventspils,1,0,H
+UCL,2015-07-21,Maccabi Tel Aviv,Hibernians,5,1,H
+UCL,2015-07-21,Vardar Skopje,Apoel Nicosia,1,1,D
+UCL,2015-07-21,Lincoln Red Imps FC,FC Midtjylland,0,2,A
+UCL,2015-07-21,FK Zalgiris Vilnius,Malmo FF,0,1,A
+UCL,2015-07-21,Crusaders FC,Skenderbeu Korce,3,2,H
+UCL,2015-07-22,FC Astana,Maribor,3,1,H
+UCL,2015-07-22,Fola Esch,Dinamo Zagreb,0,3,A
+UCL,2015-07-22,FCSB,AS Trencin,2,3,A
+UCL,2015-07-22,Fehérvár FC,The New Saints,1,1,D
+UCL,2015-07-22,Lech Poznan,FK Sarajevo,1,0,H
+UCL,2015-07-22,Dundalk,Bate Borisov,0,0,D
+UCL,2015-07-22,Rudar Velenje,Qarabag,0,1,A
+UCL,2015-07-22,Stjarnan,Celtic,1,4,A
+UCL,2015-07-28,CSKA Moscow,Sparta Praha,2,2,D
+UCL,2015-07-28,FC Midtjylland,Apoel Nicosia,1,2,A
+UCL,2015-07-28,Milsami Orhei,Skenderbeu Korce,0,2,A
+UCL,2015-07-28,Maccabi Tel Aviv,Plzen,1,2,A
+UCL,2015-07-28,Fenerbahçe,Shakhtar Donetsk,0,0,D
+UCL,2015-07-28,Panathinaikos,Club Brugge KV,2,1,H
+UCL,2015-07-28,BSC Young Boys,Monaco,1,3,A
+UCL,2015-07-28,Fehérvár FC,Bate Borisov,1,1,D
+UCL,2015-07-28,Dinamo Zagreb,Molde,1,1,D
+UCL,2015-07-29,HJK Helsinki,FC Astana,0,0,D
+UCL,2015-07-29,Red Bull Salzburg,Malmo FF,2,0,H
+UCL,2015-07-29,FCSB,FK Partizan,1,1,D
+UCL,2015-07-29,Celtic,Qarabag,1,0,H
+UCL,2015-07-29,Lech Poznan,FC Basel 1893,1,3,A
+UCL,2015-07-29,Rapid Vienna,Ajax,2,2,D
+UCL,2015-08-04,Molde,Dinamo Zagreb,3,3,D
+UCL,2015-08-04,Apoel Nicosia,FC Midtjylland,0,1,A
+UCL,2015-08-04,Ajax,Rapid Vienna,2,3,A
+UCL,2015-08-04,Monaco,BSC Young Boys,4,0,H
+UCL,2015-08-05,FC Astana,HJK Helsinki,4,3,H
+UCL,2015-08-05,Qarabag,Celtic,0,0,D
+UCL,2015-08-05,Sparta Praha,CSKA Moscow,2,3,A
+UCL,2015-08-05,Bate Borisov,Fehérvár FC,1,0,H
+UCL,2015-08-05,FC Basel 1893,Lech Poznan,1,0,H
+UCL,2015-08-05,Malmo FF,Red Bull Salzburg,3,0,H
+UCL,2015-08-05,Club Brugge KV,Panathinaikos,3,0,H
+UCL,2015-08-05,FK Partizan,FCSB,4,2,H
+UCL,2015-08-05,Shakhtar Donetsk,Fenerbahçe,3,0,H
+UCL,2015-08-05,Plzen,Maccabi Tel Aviv,0,2,A
+UCL,2015-08-05,Skenderbeu Korce,Milsami Orhei,2,0,H
+UCL,2015-08-18,FC Astana,Apoel Nicosia,1,0,H
+UCL,2015-08-18,Manchester United,Club Brugge KV,3,1,H
+UCL,2015-08-18,Sporting CP,CSKA Moscow,2,1,H
+UCL,2015-08-18,Bate Borisov,FK Partizan,1,0,H
+UCL,2015-08-18,Lazio,Bayer Leverkusen,1,0,H
+UCL,2015-08-19,Celtic,Malmo FF,3,2,H
+UCL,2015-08-19,Valencia,Monaco,3,1,H
+UCL,2015-08-19,FC Basel 1893,Maccabi Tel Aviv,2,2,D
+UCL,2015-08-19,Skenderbeu Korce,Dinamo Zagreb,1,2,A
+UCL,2015-08-19,Rapid Vienna,Shakhtar Donetsk,0,1,A
+UCL,2015-08-25,Monaco,Valencia,2,1,H
+UCL,2015-08-25,Malmo FF,Celtic,2,0,H
+UCL,2015-08-25,Shakhtar Donetsk,Rapid Vienna,2,2,D
+UCL,2015-08-25,Maccabi Tel Aviv,FC Basel 1893,1,1,D
+UCL,2015-08-25,Dinamo Zagreb,Skenderbeu Korce,4,1,H
+UCL,2015-08-26,Bayer Leverkusen,Lazio,3,0,H
+UCL,2015-08-26,CSKA Moscow,Sporting CP,3,1,H
+UCL,2015-08-26,Club Brugge KV,Manchester United,0,4,A
+UCL,2015-08-26,FK Partizan,Bate Borisov,2,1,H
+UCL,2015-08-26,Apoel Nicosia,FC Astana,1,1,D
+UCL,2015-09-15,Manchester City,Juventus,1,2,A
+UCL,2015-09-15,Paris Saint Germain,Malmo FF,2,0,H
+UCL,2015-09-15,VfL Wolfsburg,CSKA Moscow,1,0,H
+UCL,2015-09-15,PSV Eindhoven,Manchester United,2,1,H
+UCL,2015-09-15,Benfica,FC Astana,2,0,H
+UCL,2015-09-15,Sevilla,Borussia Monchengladbach,3,0,H
+UCL,2015-09-15,Real Madrid,Shakhtar Donetsk,4,0,H
+UCL,2015-09-15,Galatasaray,Atletico Madrid,0,2,A
+UCL,2015-09-16,Chelsea,Maccabi Tel Aviv,4,0,H
+UCL,2015-09-16,Bayer Leverkusen,Bate Borisov,4,1,H
+UCL,2015-09-16,AS Roma,Barcelona,1,1,D
+UCL,2015-09-16,Valencia,Zenit Saint Petersburg,2,3,A
+UCL,2015-09-16,Olympiakos Piraeus,Bayern Munich,0,3,A
+UCL,2015-09-16,Dynamo Kyiv,FC Porto,2,2,D
+UCL,2015-09-16,Dinamo Zagreb,Arsenal,2,1,H
+UCL,2015-09-16,Gent,Lyon,1,1,D
+UCL,2015-09-29,Arsenal,Olympiakos Piraeus,2,3,A
+UCL,2015-09-29,Lyon,Valencia,0,1,A
+UCL,2015-09-29,Bayern Munich,Dinamo Zagreb,5,0,H
+UCL,2015-09-29,FC Porto,Chelsea,2,1,H
+UCL,2015-09-29,Bate Borisov,AS Roma,3,2,H
+UCL,2015-09-29,Barcelona,Bayer Leverkusen,2,1,H
+UCL,2015-09-29,Zenit Saint Petersburg,Gent,2,1,H
+UCL,2015-09-29,Maccabi Tel Aviv,Dynamo Kyiv,0,2,A
+UCL,2015-09-30,FC Astana,Galatasaray,2,2,D
+UCL,2015-09-30,Manchester United,VfL Wolfsburg,2,1,H
+UCL,2015-09-30,Borussia Monchengladbach,Manchester City,1,2,A
+UCL,2015-09-30,Malmo FF,Real Madrid,0,2,A
+UCL,2015-09-30,Juventus,Sevilla,2,0,H
+UCL,2015-09-30,Atletico Madrid,Benfica,1,2,A
+UCL,2015-09-30,Shakhtar Donetsk,Paris Saint Germain,0,3,A
+UCL,2015-09-30,CSKA Moscow,PSV Eindhoven,3,2,H
+UCL,2015-10-20,Arsenal,Bayern Munich,2,0,H
+UCL,2015-10-20,Bayer Leverkusen,AS Roma,4,4,D
+UCL,2015-10-20,FC Porto,Maccabi Tel Aviv,2,0,H
+UCL,2015-10-20,Bate Borisov,Barcelona,0,2,A
+UCL,2015-10-20,Valencia,Gent,2,1,H
+UCL,2015-10-20,Dynamo Kyiv,Chelsea,0,0,D
+UCL,2015-10-20,Zenit Saint Petersburg,Lyon,3,1,H
+UCL,2015-10-20,Dinamo Zagreb,Olympiakos Piraeus,0,1,A
+UCL,2015-10-21,Manchester City,Sevilla,2,1,H
+UCL,2015-10-21,Paris Saint Germain,Real Madrid,0,0,D
+UCL,2015-10-21,VfL Wolfsburg,PSV Eindhoven,2,0,H
+UCL,2015-10-21,Malmo FF,Shakhtar Donetsk,1,0,H
+UCL,2015-10-21,Juventus,Borussia Monchengladbach,0,0,D
+UCL,2015-10-21,Atletico Madrid,FC Astana,4,0,H
+UCL,2015-10-21,CSKA Moscow,Manchester United,1,1,D
+UCL,2015-10-21,Galatasaray,Benfica,2,1,H
+UCL,2015-11-03,FC Astana,Atletico Madrid,0,0,D
+UCL,2015-11-03,Manchester United,CSKA Moscow,1,0,H
+UCL,2015-11-03,Borussia Monchengladbach,Juventus,1,1,D
+UCL,2015-11-03,PSV Eindhoven,VfL Wolfsburg,2,0,H
+UCL,2015-11-03,Benfica,Galatasaray,2,1,H
+UCL,2015-11-03,Sevilla,Manchester City,1,3,A
+UCL,2015-11-03,Real Madrid,Paris Saint Germain,1,0,H
+UCL,2015-11-03,Shakhtar Donetsk,Malmo FF,4,0,H
+UCL,2015-11-04,Chelsea,Dynamo Kyiv,2,1,H
+UCL,2015-11-04,Lyon,Zenit Saint Petersburg,0,2,A
+UCL,2015-11-04,Bayern Munich,Arsenal,5,1,H
+UCL,2015-11-04,AS Roma,Bayer Leverkusen,3,2,H
+UCL,2015-11-04,Barcelona,Bate Borisov,3,0,H
+UCL,2015-11-04,Olympiakos Piraeus,Dinamo Zagreb,2,1,H
+UCL,2015-11-04,Maccabi Tel Aviv,FC Porto,1,3,A
+UCL,2015-11-04,Gent,Valencia,1,0,H
+UCL,2015-11-24,Bate Borisov,Bayer Leverkusen,1,1,D
+UCL,2015-11-24,Zenit Saint Petersburg,Valencia,2,0,H
+UCL,2015-11-24,Arsenal,Dinamo Zagreb,3,0,H
+UCL,2015-11-24,Lyon,Gent,1,2,A
+UCL,2015-11-24,Bayern Munich,Olympiakos Piraeus,4,0,H
+UCL,2015-11-24,FC Porto,Dynamo Kyiv,0,2,A
+UCL,2015-11-24,Barcelona,AS Roma,6,1,H
+UCL,2015-11-24,Maccabi Tel Aviv,Chelsea,0,4,A
+UCL,2015-11-25,FC Astana,Benfica,2,2,D
+UCL,2015-11-25,CSKA Moscow,VfL Wolfsburg,0,2,A
+UCL,2015-11-25,Manchester United,PSV Eindhoven,0,0,D
+UCL,2015-11-25,Borussia Monchengladbach,Sevilla,4,2,H
+UCL,2015-11-25,Malmo FF,Paris Saint Germain,0,5,A
+UCL,2015-11-25,Juventus,Manchester City,1,0,H
+UCL,2015-11-25,Atletico Madrid,Galatasaray,2,0,H
+UCL,2015-11-25,Shakhtar Donetsk,Real Madrid,3,4,A
+UCL,2015-12-08,Manchester City,Borussia Monchengladbach,4,2,H
+UCL,2015-12-08,Paris Saint Germain,Shakhtar Donetsk,2,0,H
+UCL,2015-12-08,VfL Wolfsburg,Manchester United,3,2,H
+UCL,2015-12-08,PSV Eindhoven,CSKA Moscow,2,1,H
+UCL,2015-12-08,Benfica,Atletico Madrid,1,2,A
+UCL,2015-12-08,Sevilla,Juventus,1,0,H
+UCL,2015-12-08,Real Madrid,Malmo FF,8,0,H
+UCL,2015-12-08,Galatasaray,FC Astana,1,1,D
+UCL,2015-12-09,Chelsea,FC Porto,2,0,H
+UCL,2015-12-09,Bayer Leverkusen,Barcelona,1,1,D
+UCL,2015-12-09,AS Roma,Bate Borisov,0,0,D
+UCL,2015-12-09,Valencia,Lyon,0,2,A
+UCL,2015-12-09,Olympiakos Piraeus,Arsenal,0,3,A
+UCL,2015-12-09,Dynamo Kyiv,Maccabi Tel Aviv,1,0,H
+UCL,2015-12-09,Dinamo Zagreb,Bayern Munich,0,2,A
+UCL,2015-12-09,Gent,Zenit Saint Petersburg,2,1,H
+UCL,2016-02-16,Paris Saint Germain,Chelsea,2,1,H
+UCL,2016-02-16,Benfica,Zenit Saint Petersburg,1,0,H
+UCL,2016-02-17,AS Roma,Real Madrid,0,2,A
+UCL,2016-02-17,Gent,VfL Wolfsburg,2,3,A
+UCL,2016-02-23,Arsenal,Barcelona,0,2,A
+UCL,2016-02-23,Juventus,Bayern Munich,2,2,D
+UCL,2016-02-24,PSV Eindhoven,Atletico Madrid,0,0,D
+UCL,2016-02-24,Dynamo Kyiv,Manchester City,1,3,A
+UCL,2016-03-08,VfL Wolfsburg,Gent,1,0,H
+UCL,2016-03-08,Real Madrid,AS Roma,2,0,H
+UCL,2016-03-09,Zenit Saint Petersburg,Benfica,1,2,A
+UCL,2016-03-09,Chelsea,Paris Saint Germain,1,2,A
+UCL,2016-03-15,Manchester City,Dynamo Kyiv,0,0,D
+UCL,2016-03-15,Atletico Madrid,PSV Eindhoven,0,0,D
+UCL,2016-03-16,Bayern Munich,Juventus,4,2,H
+UCL,2016-03-16,Barcelona,Arsenal,3,1,H
+UCL,2016-04-05,Bayern Munich,Benfica,1,0,H
+UCL,2016-04-05,Barcelona,Atletico Madrid,2,1,H
+UCL,2016-04-06,Paris Saint Germain,Manchester City,2,2,D
+UCL,2016-04-06,VfL Wolfsburg,Real Madrid,2,0,H
+UCL,2016-04-12,Manchester City,Paris Saint Germain,1,0,H
+UCL,2016-04-12,Real Madrid,VfL Wolfsburg,3,0,H
+UCL,2016-04-13,Benfica,Bayern Munich,2,2,D
+UCL,2016-04-13,Atletico Madrid,Barcelona,2,0,H
+UCL,2016-04-26,Manchester City,Real Madrid,0,0,D
+UCL,2016-04-27,Atletico Madrid,Bayern Munich,1,0,H
+UCL,2016-05-03,Bayern Munich,Atletico Madrid,2,1,H
+UCL,2016-05-04,Real Madrid,Manchester City,1,0,H
+UCL,2016-05-28,Real Madrid,Atletico Madrid,1,1,D
+UCL,2016-06-28,Flora Tallinn,Lincoln Red Imps FC,2,1,H
+UCL,2016-06-28,Valletta FC,B36 Torshavn,1,0,H
+UCL,2016-06-28,The New Saints,Tre Penne,2,1,H
+UCL,2016-06-28,FC Santa Coloma,Alashkert,0,0,D
+UCL,2016-07-05,Alashkert,FC Santa Coloma,3,0,H
+UCL,2016-07-05,B36 Torshavn,Valletta FC,2,1,H
+UCL,2016-07-05,Tre Penne,The New Saints,0,3,A
+UCL,2016-07-06,Lincoln Red Imps FC,Flora Tallinn,2,0,H
+UCL,2016-07-12,Zrinjski,Legia Warszawa,1,1,D
+UCL,2016-07-12,Qarabag,F91 Dudelange,2,0,H
+UCL,2016-07-12,Dinamo Tbilisi,Alashkert,2,0,H
+UCL,2016-07-12,Hapoel Beer Sheva,Sheriff Tiraspol,3,2,H
+UCL,2016-07-12,The New Saints,Apoel Nicosia,0,0,D
+UCL,2016-07-12,Bate Borisov,SJK,2,0,H
+UCL,2016-07-12,Valletta FC,FK Crvena Zvezda,1,2,A
+UCL,2016-07-12,Lincoln Red Imps FC,Celtic,1,0,H
+UCL,2016-07-12,Red Bull Salzburg,FK Liepaja,1,0,H
+UCL,2016-07-12,Vardar Skopje,Dinamo Zagreb,1,2,A
+UCL,2016-07-13,Rosenborg,IFK Norrkoping,3,1,H
+UCL,2016-07-13,FK Zalgiris Vilnius,FC Astana,0,0,D
+UCL,2016-07-13,Ludogorets,FK Mladost Podgorica,2,0,H
+UCL,2016-07-13,Crusaders FC,FC Copenhagen,0,3,A
+UCL,2016-07-13,Partizani,Ferencvarosi TC,1,1,D
+UCL,2016-07-13,Olimpija Ljubljana,AS Trencin,3,4,A
+UCL,2016-07-13,Dundalk,FH hafnarfjordur,1,1,D
+UCL,2016-07-19,Alashkert,Dinamo Tbilisi,1,1,D
+UCL,2016-07-19,FK Liepaja,Red Bull Salzburg,0,2,A
+UCL,2016-07-19,Sheriff Tiraspol,Hapoel Beer Sheva,0,0,D
+UCL,2016-07-19,SJK,Bate Borisov,2,2,D
+UCL,2016-07-19,Apoel Nicosia,The New Saints,3,0,H
+UCL,2016-07-19,FC Copenhagen,Crusaders FC,6,0,H
+UCL,2016-07-19,FK Crvena Zvezda,Valletta FC,2,1,H
+UCL,2016-07-19,Legia Warszawa,Zrinjski,2,0,H
+UCL,2016-07-19,FK Mladost Podgorica,Ludogorets,0,3,A
+UCL,2016-07-20,FC Astana,FK Zalgiris Vilnius,2,1,H
+UCL,2016-07-20,F91 Dudelange,Qarabag,1,1,D
+UCL,2016-07-20,IFK Norrkoping,Rosenborg,3,2,H
+UCL,2016-07-20,Ferencvarosi TC,Partizani,2,2,D
+UCL,2016-07-20,AS Trencin,Olimpija Ljubljana,2,3,A
+UCL,2016-07-20,Celtic,Lincoln Red Imps FC,3,0,H
+UCL,2016-07-20,Dinamo Zagreb,Vardar Skopje,3,2,H
+UCL,2016-07-20,FH hafnarfjordur,Dundalk,2,2,D
+UCL,2016-07-26,Bate Borisov,Dundalk,1,0,H
+UCL,2016-07-26,Ludogorets,FK Crvena Zvezda,2,2,D
+UCL,2016-07-26,Sparta Praha,FCSB,1,1,D
+UCL,2016-07-26,Plzen,Qarabag,0,0,D
+UCL,2016-07-26,Partizani,Red Bull Salzburg,0,1,A
+UCL,2016-07-26,FC Rostov,Anderlecht,2,2,D
+UCL,2016-07-26,Ajax,PAOK,1,1,D
+UCL,2016-07-26,Shakhtar Donetsk,BSC Young Boys,2,0,H
+UCL,2016-07-26,Dinamo Zagreb,Dinamo Tbilisi,2,0,H
+UCL,2016-07-27,FC Astana,Celtic,1,1,D
+UCL,2016-07-27,Rosenborg,Apoel Nicosia,2,1,H
+UCL,2016-07-27,FC Astra Giurgiu,FC Copenhagen,1,1,D
+UCL,2016-07-27,Fenerbahçe,Monaco,2,1,H
+UCL,2016-07-27,AS Trencin,Legia Warszawa,0,1,A
+UCL,2016-07-27,Olympiakos Piraeus,Hapoel Beer Sheva,0,0,D
+UCL,2016-08-02,Qarabag,Plzen,1,1,D
+UCL,2016-08-02,Apoel Nicosia,Rosenborg,3,0,H
+UCL,2016-08-02,Dinamo Tbilisi,Dinamo Zagreb,0,1,A
+UCL,2016-08-02,FK Crvena Zvezda,Ludogorets,2,4,A
+UCL,2016-08-02,Dundalk,Bate Borisov,3,0,H
+UCL,2016-08-03,FC Copenhagen,FC Astra Giurgiu,3,0,H
+UCL,2016-08-03,FCSB,Sparta Praha,2,0,H
+UCL,2016-08-03,Hapoel Beer Sheva,Olympiakos Piraeus,1,0,H
+UCL,2016-08-03,BSC Young Boys,Shakhtar Donetsk,4,0,H
+UCL,2016-08-03,Red Bull Salzburg,Partizani,2,0,H
+UCL,2016-08-03,PAOK,Ajax,1,2,A
+UCL,2016-08-03,Monaco,Fenerbahçe,3,1,H
+UCL,2016-08-03,Celtic,FC Astana,2,1,H
+UCL,2016-08-03,Legia Warszawa,AS Trencin,0,0,D
+UCL,2016-08-03,Anderlecht,FC Rostov,0,2,A
+UCL,2016-08-16,Ajax,FC Rostov,1,1,D
+UCL,2016-08-16,FC Copenhagen,Apoel Nicosia,1,0,H
+UCL,2016-08-16,FCSB,Manchester City,0,5,A
+UCL,2016-08-16,BSC Young Boys,Borussia Monchengladbach,1,3,A
+UCL,2016-08-16,Dinamo Zagreb,Red Bull Salzburg,1,1,D
+UCL,2016-08-17,FC Porto,AS Roma,1,1,D
+UCL,2016-08-17,Celtic,Hapoel Beer Sheva,5,2,H
+UCL,2016-08-17,Villarreal,Monaco,1,2,A
+UCL,2016-08-17,Ludogorets,Plzen,2,0,H
+UCL,2016-08-17,Dundalk,Legia Warszawa,0,2,A
+UCL,2016-08-23,Monaco,Villarreal,1,0,H
+UCL,2016-08-23,Legia Warszawa,Dundalk,1,1,D
+UCL,2016-08-23,AS Roma,FC Porto,0,3,A
+UCL,2016-08-23,Hapoel Beer Sheva,Celtic,2,0,H
+UCL,2016-08-23,Plzen,Ludogorets,2,2,D
+UCL,2016-08-24,Manchester City,FCSB,1,0,H
+UCL,2016-08-24,Borussia Monchengladbach,BSC Young Boys,6,1,H
+UCL,2016-08-24,Red Bull Salzburg,Dinamo Zagreb,1,2,A
+UCL,2016-08-24,FC Rostov,Ajax,4,1,H
+UCL,2016-08-24,Apoel Nicosia,FC Copenhagen,1,1,D
+UCL,2016-09-13,Paris Saint Germain,Arsenal,1,1,D
+UCL,2016-09-13,Bayern Munich,FC Rostov,5,0,H
+UCL,2016-09-13,PSV Eindhoven,Atletico Madrid,0,1,A
+UCL,2016-09-13,Benfica,Beşiktaş,1,1,D
+UCL,2016-09-13,Barcelona,Celtic,7,0,H
+UCL,2016-09-13,FC Basel 1893,Ludogorets,1,1,D
+UCL,2016-09-13,Dynamo Kyiv,Napoli,1,2,A
+UCL,2016-09-14,Tottenham,Monaco,1,2,A
+UCL,2016-09-14,Manchester City,Borussia Monchengladbach,4,0,H
+UCL,2016-09-14,Lyon,Dinamo Zagreb,3,0,H
+UCL,2016-09-14,Bayer Leverkusen,CSKA Moscow,2,2,D
+UCL,2016-09-14,FC Porto,FC Copenhagen,1,1,D
+UCL,2016-09-14,Legia Warszawa,Borussia Dortmund,0,6,A
+UCL,2016-09-14,Juventus,Sevilla,0,0,D
+UCL,2016-09-14,Real Madrid,Sporting CP,2,1,H
+UCL,2016-09-14,Club Brugge KV,Leicester,0,3,A
+UCL,2016-09-27,Leicester,FC Porto,1,0,H
+UCL,2016-09-27,Monaco,Bayer Leverkusen,1,1,D
+UCL,2016-09-27,Borussia Dortmund,Real Madrid,2,2,D
+UCL,2016-09-27,Sporting CP,Legia Warszawa,2,0,H
+UCL,2016-09-27,FC Copenhagen,Club Brugge KV,4,0,H
+UCL,2016-09-27,Sevilla,Lyon,1,0,H
+UCL,2016-09-27,CSKA Moscow,Tottenham,0,1,A
+UCL,2016-09-27,Dinamo Zagreb,Juventus,0,4,A
+UCL,2016-09-28,Arsenal,FC Basel 1893,2,0,H
+UCL,2016-09-28,Borussia Monchengladbach,Barcelona,1,2,A
+UCL,2016-09-28,Celtic,Manchester City,3,3,D
+UCL,2016-09-28,Napoli,Benfica,4,2,H
+UCL,2016-09-28,Atletico Madrid,Bayern Munich,1,0,H
+UCL,2016-09-28,Beşiktaş,Dynamo Kyiv,1,1,D
+UCL,2016-09-28,Ludogorets,Paris Saint Germain,1,3,A
+UCL,2016-09-28,FC Rostov,PSV Eindhoven,2,2,D
+UCL,2016-10-18,Leicester,FC Copenhagen,1,0,H
+UCL,2016-10-18,Lyon,Juventus,0,1,A
+UCL,2016-10-18,Bayer Leverkusen,Tottenham,0,0,D
+UCL,2016-10-18,Sporting CP,Borussia Dortmund,1,2,A
+UCL,2016-10-18,Real Madrid,Legia Warszawa,5,1,H
+UCL,2016-10-18,CSKA Moscow,Monaco,1,1,D
+UCL,2016-10-18,Club Brugge KV,FC Porto,1,2,A
+UCL,2016-10-18,Dinamo Zagreb,Sevilla,0,1,A
+UCL,2016-10-19,Arsenal,Ludogorets,6,0,H
+UCL,2016-10-19,Paris Saint Germain,FC Basel 1893,3,0,H
+UCL,2016-10-19,Bayern Munich,PSV Eindhoven,4,1,H
+UCL,2016-10-19,Celtic,Borussia Monchengladbach,0,2,A
+UCL,2016-10-19,Napoli,Beşiktaş,2,3,A
+UCL,2016-10-19,Barcelona,Manchester City,4,0,H
+UCL,2016-10-19,Dynamo Kyiv,Benfica,0,2,A
+UCL,2016-10-19,FC Rostov,Atletico Madrid,0,1,A
+UCL,2016-11-01,Beşiktaş,Napoli,1,1,D
+UCL,2016-11-01,Manchester City,Barcelona,3,1,H
+UCL,2016-11-01,Borussia Monchengladbach,Celtic,1,1,D
+UCL,2016-11-01,PSV Eindhoven,Bayern Munich,1,2,A
+UCL,2016-11-01,Benfica,Dynamo Kyiv,1,0,H
+UCL,2016-11-01,Atletico Madrid,FC Rostov,2,1,H
+UCL,2016-11-01,FC Basel 1893,Paris Saint Germain,1,2,A
+UCL,2016-11-01,Ludogorets,Arsenal,2,3,A
+UCL,2016-11-02,Tottenham,Bayer Leverkusen,0,1,A
+UCL,2016-11-02,Monaco,CSKA Moscow,3,0,H
+UCL,2016-11-02,Borussia Dortmund,Sporting CP,1,0,H
+UCL,2016-11-02,FC Porto,Club Brugge KV,1,0,H
+UCL,2016-11-02,Legia Warszawa,Real Madrid,3,3,D
+UCL,2016-11-02,FC Copenhagen,Leicester,0,0,D
+UCL,2016-11-02,Juventus,Lyon,1,1,D
+UCL,2016-11-02,Sevilla,Dinamo Zagreb,4,0,H
+UCL,2016-11-22,CSKA Moscow,Bayer Leverkusen,1,1,D
+UCL,2016-11-22,Leicester,Club Brugge KV,2,1,H
+UCL,2016-11-22,Monaco,Tottenham,2,1,H
+UCL,2016-11-22,Borussia Dortmund,Legia Warszawa,8,4,H
+UCL,2016-11-22,Sporting CP,Real Madrid,1,2,A
+UCL,2016-11-22,FC Copenhagen,FC Porto,0,0,D
+UCL,2016-11-22,Sevilla,Juventus,1,3,A
+UCL,2016-11-22,Dinamo Zagreb,Lyon,0,1,A
+UCL,2016-11-23,FC Rostov,Bayern Munich,3,2,H
+UCL,2016-11-23,Beşiktaş,Benfica,3,3,D
+UCL,2016-11-23,Arsenal,Paris Saint Germain,2,2,D
+UCL,2016-11-23,Borussia Monchengladbach,Manchester City,1,1,D
+UCL,2016-11-23,Celtic,Barcelona,0,2,A
+UCL,2016-11-23,Napoli,Dynamo Kyiv,0,0,D
+UCL,2016-11-23,Atletico Madrid,PSV Eindhoven,2,0,H
+UCL,2016-11-23,Ludogorets,FC Basel 1893,0,0,D
+UCL,2016-12-06,Manchester City,Celtic,1,1,D
+UCL,2016-12-06,Paris Saint Germain,Ludogorets,2,2,D
+UCL,2016-12-06,Bayern Munich,Atletico Madrid,1,0,H
+UCL,2016-12-06,PSV Eindhoven,FC Rostov,0,0,D
+UCL,2016-12-06,Benfica,Napoli,1,2,A
+UCL,2016-12-06,Barcelona,Borussia Monchengladbach,4,0,H
+UCL,2016-12-06,FC Basel 1893,Arsenal,1,4,A
+UCL,2016-12-06,Dynamo Kyiv,Beşiktaş,6,0,H
+UCL,2016-12-07,Tottenham,CSKA Moscow,3,1,H
+UCL,2016-12-07,Lyon,Sevilla,0,0,D
+UCL,2016-12-07,Bayer Leverkusen,Monaco,3,0,H
+UCL,2016-12-07,FC Porto,Leicester,5,0,H
+UCL,2016-12-07,Legia Warszawa,Sporting CP,1,0,H
+UCL,2016-12-07,Juventus,Dinamo Zagreb,2,0,H
+UCL,2016-12-07,Real Madrid,Borussia Dortmund,2,2,D
+UCL,2016-12-07,Club Brugge KV,FC Copenhagen,0,2,A
+UCL,2017-02-14,Paris Saint Germain,Barcelona,4,0,H
+UCL,2017-02-14,Benfica,Borussia Dortmund,1,0,H
+UCL,2017-02-15,Bayern Munich,Arsenal,5,1,H
+UCL,2017-02-15,Real Madrid,Napoli,3,1,H
+UCL,2017-02-21,Manchester City,Monaco,5,3,H
+UCL,2017-02-21,Bayer Leverkusen,Atletico Madrid,2,4,A
+UCL,2017-02-22,FC Porto,Juventus,0,2,A
+UCL,2017-02-22,Sevilla,Leicester,2,1,H
+UCL,2017-03-07,Arsenal,Bayern Munich,1,5,A
+UCL,2017-03-07,Napoli,Real Madrid,1,3,A
+UCL,2017-03-08,Borussia Dortmund,Benfica,4,0,H
+UCL,2017-03-08,Barcelona,Paris Saint Germain,6,1,H
+UCL,2017-03-14,Leicester,Sevilla,2,0,H
+UCL,2017-03-14,Juventus,FC Porto,1,0,H
+UCL,2017-03-15,Monaco,Manchester City,3,1,H
+UCL,2017-03-15,Atletico Madrid,Bayer Leverkusen,0,0,D
+UCL,2017-04-11,Juventus,Barcelona,3,0,H
+UCL,2017-04-12,Borussia Dortmund,Monaco,2,3,A
+UCL,2017-04-12,Bayern Munich,Real Madrid,1,2,A
+UCL,2017-04-12,Atletico Madrid,Leicester,1,0,H
+UCL,2017-04-18,Leicester,Atletico Madrid,1,1,D
+UCL,2017-04-18,Real Madrid,Bayern Munich,4,2,H
+UCL,2017-04-19,Monaco,Borussia Dortmund,3,1,H
+UCL,2017-04-19,Barcelona,Juventus,0,0,D
+UCL,2017-05-02,Real Madrid,Atletico Madrid,3,0,H
+UCL,2017-05-03,Monaco,Juventus,0,2,A
+UCL,2017-05-09,Juventus,Monaco,2,1,H
+UCL,2017-05-10,Atletico Madrid,Real Madrid,2,1,H
+UCL,2017-06-03,Juventus,Real Madrid,1,4,A
+UCL,2017-06-27,Alashkert,FC Santa Coloma,1,0,H
+UCL,2017-06-27,The New Saints,Europa Fc,1,2,A
+UCL,2017-06-27,Vikingur Gota,Trepça'89,2,1,H
+UCL,2017-06-27,Hibernians,FCI Tallinn,2,0,H
+UCL,2017-06-28,Linfield,La Fiorita,1,0,H
+UCL,2017-07-04,FCI Tallinn,Hibernians,0,1,A
+UCL,2017-07-04,Trepça'89,Vikingur Gota,1,4,A
+UCL,2017-07-04,Europa Fc,The New Saints,1,3,A
+UCL,2017-07-04,FC Santa Coloma,Alashkert,1,1,D
+UCL,2017-07-04,La Fiorita,Linfield,0,0,D
+UCL,2017-07-11,Qarabag,Samtredia,5,0,H
+UCL,2017-07-11,Hibernians,Red Bull Salzburg,0,3,A
+UCL,2017-07-11,HNK Rijeka,The New Saints,2,0,H
+UCL,2017-07-11,FK Partizan,Buducnost Podgorica,2,0,H
+UCL,2017-07-12,Spartaks Jurmala,FC Astana,0,1,A
+UCL,2017-07-12,Malmo FF,Vardar Skopje,1,1,D
+UCL,2017-07-12,Hapoel Beer Sheva,Budapest Honved,2,1,H
+UCL,2017-07-12,Sheriff Tiraspol,FK Kukesi,1,0,H
+UCL,2017-07-12,Zrinjski,Maribor,1,2,A
+UCL,2017-07-12,Apoel Nicosia,F91 Dudelange,1,0,H
+UCL,2017-07-12,Bate Borisov,Alashkert,1,1,D
+UCL,2017-07-12,FK Zalgiris Vilnius,Ludogorets,2,1,H
+UCL,2017-07-12,Mariehamn,Legia Warszawa,0,3,A
+UCL,2017-07-12,Žilina,FC Copenhagen,1,3,A
+UCL,2017-07-12,Dundalk,Rosenborg,1,1,D
+UCL,2017-07-12,FH hafnarfjordur,Vikingur Gota,1,1,D
+UCL,2017-07-14,Linfield,Celtic,0,2,A
+UCL,2017-07-18,FC Astana,Spartaks Jurmala,1,1,D
+UCL,2017-07-18,Vardar Skopje,Malmo FF,3,1,H
+UCL,2017-07-18,Alashkert,Bate Borisov,1,3,A
+UCL,2017-07-18,Samtredia,Qarabag,0,1,A
+UCL,2017-07-18,The New Saints,HNK Rijeka,1,5,A
+UCL,2017-07-18,Vikingur Gota,FH hafnarfjordur,0,2,A
+UCL,2017-07-18,Buducnost Podgorica,FK Partizan,0,0,D
+UCL,2017-07-19,F91 Dudelange,Apoel Nicosia,0,1,A
+UCL,2017-07-19,Rosenborg,Dundalk,2,1,H
+UCL,2017-07-19,FC Copenhagen,Žilina,1,2,A
+UCL,2017-07-19,FK Kukesi,Sheriff Tiraspol,2,1,H
+UCL,2017-07-19,Ludogorets,FK Zalgiris Vilnius,4,1,H
+UCL,2017-07-19,Maribor,Zrinjski,1,1,D
+UCL,2017-07-19,Red Bull Salzburg,Hibernians,3,0,H
+UCL,2017-07-19,Celtic,Linfield,4,0,H
+UCL,2017-07-19,Legia Warszawa,Mariehamn,6,0,H
+UCL,2017-07-19,Budapest Honved,Hapoel Beer Sheva,2,3,A
+UCL,2017-07-25,Qarabag,Sheriff Tiraspol,0,0,D
+UCL,2017-07-25,Slavia Praha,Bate Borisov,1,0,H
+UCL,2017-07-25,FCSB,Plzen,2,2,D
+UCL,2017-07-25,AEK Athens FC,CSKA Moscow,0,2,A
+UCL,2017-07-25,Vardar Skopje,FC Copenhagen,1,0,H
+UCL,2017-07-25,FK Partizan,Olympiakos Piraeus,1,3,A
+UCL,2017-07-26,FC Astana,Legia Warszawa,3,1,H
+UCL,2017-07-26,Dynamo Kyiv,BSC Young Boys,3,1,H
+UCL,2017-07-26,Red Bull Salzburg,HNK Rijeka,1,1,D
+UCL,2017-07-26,Hapoel Beer Sheva,Ludogorets,2,0,H
+UCL,2017-07-26,Viitorul Constanta,Apoel Nicosia,1,0,H
+UCL,2017-07-26,Maribor,FH hafnarfjordur,1,0,H
+UCL,2017-07-26,Nice,Ajax,1,1,D
+UCL,2017-07-26,Celtic,Rosenborg,0,0,D
+UCL,2017-07-26,Club Brugge KV,Başakşehir,3,3,D
+UCL,2017-08-01,Sheriff Tiraspol,Qarabag,1,2,A
+UCL,2017-08-02,Bate Borisov,Slavia Praha,2,1,H
+UCL,2017-08-02,CSKA Moscow,AEK Athens FC,1,0,H
+UCL,2017-08-02,Apoel Nicosia,Viitorul Constanta,4,0,H
+UCL,2017-08-02,Başakşehir,Club Brugge KV,2,0,H
+UCL,2017-08-02,FC Copenhagen,Vardar Skopje,4,1,H
+UCL,2017-08-02,BSC Young Boys,Dynamo Kyiv,2,0,H
+UCL,2017-08-02,Plzen,FCSB,1,4,A
+UCL,2017-08-02,FH hafnarfjordur,Maribor,0,1,A
+UCL,2017-08-02,Ludogorets,Hapoel Beer Sheva,3,1,H
+UCL,2017-08-02,Ajax,Nice,2,2,D
+UCL,2017-08-02,Rosenborg,Celtic,0,1,A
+UCL,2017-08-02,Legia Warszawa,FC Astana,1,0,H
+UCL,2017-08-02,Olympiakos Piraeus,FK Partizan,2,2,D
+UCL,2017-08-02,HNK Rijeka,Red Bull Salzburg,0,0,D
+UCL,2017-08-15,Qarabag,FC Copenhagen,1,0,H
+UCL,2017-08-15,1899 Hoffenheim,Liverpool,1,2,A
+UCL,2017-08-15,Sporting CP,FCSB,0,0,D
+UCL,2017-08-15,BSC Young Boys,CSKA Moscow,0,1,A
+UCL,2017-08-15,Apoel Nicosia,Slavia Praha,2,0,H
+UCL,2017-08-16,Celtic,FC Astana,5,0,H
+UCL,2017-08-16,Napoli,Nice,2,0,H
+UCL,2017-08-16,Olympiakos Piraeus,HNK Rijeka,2,1,H
+UCL,2017-08-16,Hapoel Beer Sheva,Maribor,2,1,H
+UCL,2017-08-16,Başakşehir,Sevilla,1,2,A
+UCL,2017-08-22,FC Astana,Celtic,4,3,H
+UCL,2017-08-22,Nice,Napoli,0,2,A
+UCL,2017-08-22,Sevilla,Başakşehir,2,2,D
+UCL,2017-08-22,Maribor,Hapoel Beer Sheva,1,0,H
+UCL,2017-08-22,HNK Rijeka,Olympiakos Piraeus,0,1,A
+UCL,2017-08-23,Liverpool,1899 Hoffenheim,4,2,H
+UCL,2017-08-23,FC Copenhagen,Qarabag,2,1,H
+UCL,2017-08-23,CSKA Moscow,BSC Young Boys,2,0,H
+UCL,2017-08-23,FCSB,Sporting CP,1,5,A
+UCL,2017-08-23,Slavia Praha,Apoel Nicosia,0,0,D
+UCL,2017-09-12,Manchester United,FC Basel 1893,3,0,H
+UCL,2017-09-12,Chelsea,Qarabag,6,0,H
+UCL,2017-09-12,Bayern Munich,Anderlecht,3,0,H
+UCL,2017-09-12,Benfica,CSKA Moscow,1,2,A
+UCL,2017-09-12,Celtic,Paris Saint Germain,0,5,A
+UCL,2017-09-12,AS Roma,Atletico Madrid,0,0,D
+UCL,2017-09-12,Barcelona,Juventus,3,0,H
+UCL,2017-09-12,Olympiakos Piraeus,Sporting CP,2,3,A
+UCL,2017-09-13,Liverpool,Sevilla,2,2,D
+UCL,2017-09-13,Tottenham,Borussia Dortmund,3,1,H
+UCL,2017-09-13,RB Leipzig,Monaco,1,1,D
+UCL,2017-09-13,Feyenoord,Manchester City,0,4,A
+UCL,2017-09-13,FC Porto,Beşiktaş,1,3,A
+UCL,2017-09-13,Real Madrid,Apoel Nicosia,3,0,H
+UCL,2017-09-13,Shakhtar Donetsk,Napoli,2,1,H
+UCL,2017-09-13,Maribor,Spartak Moscow,1,1,D
+UCL,2017-09-26,Manchester City,Shakhtar Donetsk,2,0,H
+UCL,2017-09-26,Monaco,FC Porto,0,3,A
+UCL,2017-09-26,Borussia Dortmund,Real Madrid,1,3,A
+UCL,2017-09-26,Napoli,Feyenoord,3,1,H
+UCL,2017-09-26,Sevilla,Maribor,3,0,H
+UCL,2017-09-26,Beşiktaş,RB Leipzig,2,0,H
+UCL,2017-09-26,Spartak Moscow,Liverpool,1,1,D
+UCL,2017-09-26,Apoel Nicosia,Tottenham,0,3,A
+UCL,2017-09-27,Qarabag,AS Roma,1,2,A
+UCL,2017-09-27,Paris Saint Germain,Bayern Munich,3,0,H
+UCL,2017-09-27,Sporting CP,Barcelona,0,1,A
+UCL,2017-09-27,Juventus,Olympiakos Piraeus,2,0,H
+UCL,2017-09-27,Atletico Madrid,Chelsea,1,2,A
+UCL,2017-09-27,FC Basel 1893,Benfica,5,0,H
+UCL,2017-09-27,Anderlecht,Celtic,0,3,A
+UCL,2017-09-27,CSKA Moscow,Manchester United,1,4,A
+UCL,2017-10-17,Manchester City,Napoli,2,1,H
+UCL,2017-10-17,Monaco,Beşiktaş,1,2,A
+UCL,2017-10-17,RB Leipzig,FC Porto,3,2,H
+UCL,2017-10-17,Feyenoord,Shakhtar Donetsk,1,2,A
+UCL,2017-10-17,Real Madrid,Tottenham,1,1,D
+UCL,2017-10-17,Maribor,Liverpool,0,7,A
+UCL,2017-10-17,Spartak Moscow,Sevilla,5,1,H
+UCL,2017-10-17,Apoel Nicosia,Borussia Dortmund,1,1,D
+UCL,2017-10-18,Qarabag,Atletico Madrid,0,0,D
+UCL,2017-10-18,Chelsea,AS Roma,3,3,D
+UCL,2017-10-18,Bayern Munich,Celtic,3,0,H
+UCL,2017-10-18,Benfica,Manchester United,0,1,A
+UCL,2017-10-18,Juventus,Sporting CP,2,1,H
+UCL,2017-10-18,Barcelona,Olympiakos Piraeus,3,1,H
+UCL,2017-10-18,Anderlecht,Paris Saint Germain,0,4,A
+UCL,2017-10-18,CSKA Moscow,FC Basel 1893,0,2,A
+UCL,2017-10-31,Manchester United,Benfica,2,0,H
+UCL,2017-10-31,Paris Saint Germain,Anderlecht,5,0,H
+UCL,2017-10-31,Sporting CP,Juventus,1,1,D
+UCL,2017-10-31,Celtic,Bayern Munich,1,2,A
+UCL,2017-10-31,AS Roma,Chelsea,3,0,H
+UCL,2017-10-31,Atletico Madrid,Qarabag,1,1,D
+UCL,2017-10-31,FC Basel 1893,CSKA Moscow,1,2,A
+UCL,2017-10-31,Olympiakos Piraeus,Barcelona,0,0,D
+UCL,2017-11-01,Beşiktaş,Monaco,1,1,D
+UCL,2017-11-01,Liverpool,Maribor,3,0,H
+UCL,2017-11-01,Tottenham,Real Madrid,3,1,H
+UCL,2017-11-01,Borussia Dortmund,Apoel Nicosia,1,1,D
+UCL,2017-11-01,FC Porto,RB Leipzig,3,1,H
+UCL,2017-11-01,Napoli,Manchester City,2,4,A
+UCL,2017-11-01,Sevilla,Spartak Moscow,2,1,H
+UCL,2017-11-01,Shakhtar Donetsk,Feyenoord,3,1,H
+UCL,2017-11-21,Beşiktaş,FC Porto,1,1,D
+UCL,2017-11-21,Spartak Moscow,Maribor,1,1,D
+UCL,2017-11-21,Manchester City,Feyenoord,1,0,H
+UCL,2017-11-21,Monaco,RB Leipzig,1,4,A
+UCL,2017-11-21,Borussia Dortmund,Tottenham,1,2,A
+UCL,2017-11-21,Napoli,Shakhtar Donetsk,3,0,H
+UCL,2017-11-21,Sevilla,Liverpool,3,3,D
+UCL,2017-11-21,Apoel Nicosia,Real Madrid,0,6,A
+UCL,2017-11-22,CSKA Moscow,Benfica,2,0,H
+UCL,2017-11-22,Qarabag,Chelsea,0,4,A
+UCL,2017-11-22,Paris Saint Germain,Celtic,7,1,H
+UCL,2017-11-22,Sporting CP,Olympiakos Piraeus,3,1,H
+UCL,2017-11-22,Juventus,Barcelona,0,0,D
+UCL,2017-11-22,Atletico Madrid,AS Roma,2,0,H
+UCL,2017-11-22,FC Basel 1893,Manchester United,1,0,H
+UCL,2017-11-22,Anderlecht,Bayern Munich,1,2,A
+UCL,2017-12-05,Manchester United,CSKA Moscow,2,1,H
+UCL,2017-12-05,Chelsea,Atletico Madrid,1,1,D
+UCL,2017-12-05,Bayern Munich,Paris Saint Germain,3,1,H
+UCL,2017-12-05,Benfica,FC Basel 1893,0,2,A
+UCL,2017-12-05,Celtic,Anderlecht,0,1,A
+UCL,2017-12-05,AS Roma,Qarabag,1,0,H
+UCL,2017-12-05,Barcelona,Sporting CP,2,0,H
+UCL,2017-12-05,Olympiakos Piraeus,Juventus,0,2,A
+UCL,2017-12-06,Liverpool,Spartak Moscow,7,0,H
+UCL,2017-12-06,Tottenham,Apoel Nicosia,3,0,H
+UCL,2017-12-06,RB Leipzig,Beşiktaş,1,2,A
+UCL,2017-12-06,Feyenoord,Napoli,2,1,H
+UCL,2017-12-06,FC Porto,Monaco,5,2,H
+UCL,2017-12-06,Real Madrid,Borussia Dortmund,3,2,H
+UCL,2017-12-06,Shakhtar Donetsk,Manchester City,2,1,H
+UCL,2017-12-06,Maribor,Sevilla,1,1,D
+UCL,2018-02-13,Juventus,Tottenham,2,2,D
+UCL,2018-02-13,FC Basel 1893,Manchester City,0,4,A
+UCL,2018-02-14,FC Porto,Liverpool,0,5,A
+UCL,2018-02-14,Real Madrid,Paris Saint Germain,3,1,H
+UCL,2018-02-20,Chelsea,Barcelona,1,1,D
+UCL,2018-02-20,Bayern Munich,Beşiktaş,5,0,H
+UCL,2018-02-21,Sevilla,Manchester United,0,0,D
+UCL,2018-02-21,Shakhtar Donetsk,AS Roma,2,1,H
+UCL,2018-03-06,Liverpool,FC Porto,0,0,D
+UCL,2018-03-06,Paris Saint Germain,Real Madrid,1,2,A
+UCL,2018-03-07,Tottenham,Juventus,1,2,A
+UCL,2018-03-07,Manchester City,FC Basel 1893,1,2,A
+UCL,2018-03-13,Manchester United,Sevilla,1,2,A
+UCL,2018-03-13,AS Roma,Shakhtar Donetsk,1,0,H
+UCL,2018-03-14,Beşiktaş,Bayern Munich,1,3,A
+UCL,2018-03-14,Barcelona,Chelsea,3,0,H
+UCL,2018-04-03,Juventus,Real Madrid,0,3,A
+UCL,2018-04-03,Sevilla,Bayern Munich,1,2,A
+UCL,2018-04-04,Liverpool,Manchester City,3,0,H
+UCL,2018-04-04,Barcelona,AS Roma,4,1,H
+UCL,2018-04-10,Manchester City,Liverpool,1,2,A
+UCL,2018-04-10,AS Roma,Barcelona,3,0,H
+UCL,2018-04-11,Bayern Munich,Sevilla,0,0,D
+UCL,2018-04-11,Real Madrid,Juventus,1,3,A
+UCL,2018-04-24,Liverpool,AS Roma,5,2,H
+UCL,2018-04-25,Bayern Munich,Real Madrid,1,2,A
+UCL,2018-05-01,Real Madrid,Bayern Munich,2,2,D
+UCL,2018-05-02,AS Roma,Liverpool,4,2,H
+UCL,2018-05-26,Real Madrid,Liverpool,3,1,H
+UCL,2018-06-26,FC Santa Coloma,Drita,0,2,A
+UCL,2018-06-26,La Fiorita,Lincoln Red Imps FC,0,2,A
+UCL,2018-06-29,Lincoln Red Imps FC,Drita,1,4,A
+UCL,2018-07-10,Torpedo Kutaisi,Sheriff Tiraspol,2,1,H
+UCL,2018-07-10,Flora Tallinn,Hapoel Beer Sheva,1,4,A
+UCL,2018-07-10,F91 Dudelange,Fehérvár FC,1,1,D
+UCL,2018-07-10,Alashkert,Celtic,0,3,A
+UCL,2018-07-10,Vikingur Gota,HJK Helsinki,1,2,A
+UCL,2018-07-10,Shkendija,The New Saints,5,0,H
+UCL,2018-07-10,Cork City,Legia Warszawa,0,1,A
+UCL,2018-07-10,Drita,Malmo FF,0,3,A
+UCL,2018-07-11,FC Astana,Sutjeska,1,0,H
+UCL,2018-07-11,Spartaks Jurmala,FK Crvena Zvezda,0,0,D
+UCL,2018-07-11,Suduva Marijampole,Apoel Nicosia,3,1,H
+UCL,2018-07-11,Spartak Trnava,Zrinjski,1,0,H
+UCL,2018-07-11,Ludogorets,Crusaders FC,7,0,H
+UCL,2018-07-11,FK Kukesi,Valletta FC,0,0,D
+UCL,2018-07-11,Olimpija Ljubljana,Qarabag,0,1,A
+UCL,2018-07-11,Valur Reykjavik,Rosenborg,1,0,H
+UCL,2018-07-17,HJK Helsinki,Vikingur Gota,3,1,H
+UCL,2018-07-17,Valletta FC,FK Kukesi,1,1,D
+UCL,2018-07-17,Malmo FF,Drita,2,0,H
+UCL,2018-07-17,Hapoel Beer Sheva,Flora Tallinn,3,1,H
+UCL,2018-07-17,Apoel Nicosia,Suduva Marijampole,1,0,H
+UCL,2018-07-17,The New Saints,Shkendija,4,0,H
+UCL,2018-07-17,Fehérvár FC,F91 Dudelange,2,1,H
+UCL,2018-07-17,FK Crvena Zvezda,Spartaks Jurmala,2,0,H
+UCL,2018-07-17,Legia Warszawa,Cork City,3,0,H
+UCL,2018-07-17,Crusaders FC,Ludogorets,0,2,A
+UCL,2018-07-18,Qarabag,Olimpija Ljubljana,0,0,D
+UCL,2018-07-18,Sheriff Tiraspol,Torpedo Kutaisi,3,0,H
+UCL,2018-07-18,Zrinjski,Spartak Trnava,1,1,D
+UCL,2018-07-18,Rosenborg,Valur Reykjavik,3,1,H
+UCL,2018-07-18,Sutjeska,FC Astana,0,2,A
+UCL,2018-07-18,Celtic,Alashkert,3,0,H
+UCL,2018-07-24,FC Astana,FC Midtjylland,2,1,H
+UCL,2018-07-24,CFR 1907 Cluj,Malmo FF,0,1,A
+UCL,2018-07-24,PAOK,FC Basel 1893,2,1,H
+UCL,2018-07-24,Dinamo Zagreb,Hapoel Beer Sheva,5,0,H
+UCL,2018-07-24,Shkendija,Sheriff Tiraspol,1,0,H
+UCL,2018-07-24,FK Crvena Zvezda,Suduva Marijampole,3,0,H
+UCL,2018-07-24,Legia Warszawa,Spartak Trnava,0,2,A
+UCL,2018-07-25,Bate Borisov,HJK Helsinki,0,0,D
+UCL,2018-07-25,Ludogorets,Fehérvár FC,0,0,D
+UCL,2018-07-25,FK Kukesi,Qarabag,0,0,D
+UCL,2018-07-25,Ajax,Sturm Graz,2,0,H
+UCL,2018-07-25,Celtic,Rosenborg,3,1,H
+UCL,2018-07-31,Hapoel Beer Sheva,Dinamo Zagreb,2,2,D
+UCL,2018-07-31,Sheriff Tiraspol,Shkendija,0,0,D
+UCL,2018-07-31,Spartak Trnava,Legia Warszawa,0,1,A
+UCL,2018-08-01,HJK Helsinki,Bate Borisov,1,2,A
+UCL,2018-08-01,FC Midtjylland,FC Astana,0,0,D
+UCL,2018-08-01,Qarabag,FK Kukesi,3,0,H
+UCL,2018-08-01,Malmo FF,CFR 1907 Cluj,1,1,D
+UCL,2018-08-01,Suduva Marijampole,FK Crvena Zvezda,0,2,A
+UCL,2018-08-01,FC Basel 1893,PAOK,0,3,A
+UCL,2018-08-01,Fehérvár FC,Ludogorets,1,0,H
+UCL,2018-08-01,Sturm Graz,Ajax,1,3,A
+UCL,2018-08-01,Rosenborg,Celtic,0,0,D
+UCL,2018-08-07,FC Astana,Dinamo Zagreb,0,2,A
+UCL,2018-08-07,Qarabag,Bate Borisov,0,1,A
+UCL,2018-08-07,Malmo FF,Fehérvár FC,1,1,D
+UCL,2018-08-07,Slavia Praha,Dynamo Kyiv,1,1,D
+UCL,2018-08-07,Standard Liege,Ajax,2,2,D
+UCL,2018-08-07,FK Crvena Zvezda,Spartak Trnava,1,1,D
+UCL,2018-08-07,Benfica,Fenerbahçe,1,0,H
+UCL,2018-08-08,Red Bull Salzburg,Shkendija,3,0,H
+UCL,2018-08-08,PAOK,Spartak Moscow,3,2,H
+UCL,2018-08-08,Celtic,AEK Athens FC,1,1,D
+UCL,2018-08-14,Dynamo Kyiv,Slavia Praha,2,0,H
+UCL,2018-08-14,Bate Borisov,Qarabag,1,1,D
+UCL,2018-08-14,Spartak Moscow,PAOK,0,0,D
+UCL,2018-08-14,AEK Athens FC,Celtic,2,1,H
+UCL,2018-08-14,Fehérvár FC,Malmo FF,0,0,D
+UCL,2018-08-14,Fenerbahçe,Benfica,1,1,D
+UCL,2018-08-14,Dinamo Zagreb,FC Astana,1,0,H
+UCL,2018-08-14,Shkendija,Red Bull Salzburg,0,1,A
+UCL,2018-08-14,Ajax,Standard Liege,3,0,H
+UCL,2018-08-14,Spartak Trnava,FK Crvena Zvezda,1,2,A
+UCL,2018-08-21,Benfica,PAOK,1,1,D
+UCL,2018-08-21,Bate Borisov,PSV Eindhoven,2,3,A
+UCL,2018-08-21,FK Crvena Zvezda,Red Bull Salzburg,0,0,D
+UCL,2018-08-22,Ajax,Dynamo Kyiv,3,1,H
+UCL,2018-08-22,BSC Young Boys,Dinamo Zagreb,1,1,D
+UCL,2018-08-22,Fehérvár FC,AEK Athens FC,1,2,A
+UCL,2018-08-28,Dynamo Kyiv,Ajax,0,0,D
+UCL,2018-08-28,AEK Athens FC,Fehérvár FC,1,1,D
+UCL,2018-08-28,Dinamo Zagreb,BSC Young Boys,1,2,A
+UCL,2018-08-29,PSV Eindhoven,Bate Borisov,3,0,H
+UCL,2018-08-29,Red Bull Salzburg,FK Crvena Zvezda,2,2,D
+UCL,2018-08-29,PAOK,Benfica,1,4,A
+UCL,2018-09-18,Inter,Tottenham,2,1,H
+UCL,2018-09-18,Barcelona,PSV Eindhoven,4,0,H
+UCL,2018-09-18,Liverpool,Paris Saint Germain,3,2,H
+UCL,2018-09-18,Monaco,Atletico Madrid,1,2,A
+UCL,2018-09-18,FC Schalke 04,FC Porto,1,1,D
+UCL,2018-09-18,Club Brugge KV,Borussia Dortmund,0,1,A
+UCL,2018-09-18,FK Crvena Zvezda,Napoli,0,0,D
+UCL,2018-09-18,Galatasaray,Lokomotiv Moscow,3,0,H
+UCL,2018-09-19,Ajax,AEK Athens FC,3,0,H
+UCL,2018-09-19,Shakhtar Donetsk,1899 Hoffenheim,2,2,D
+UCL,2018-09-19,Manchester City,Lyon,1,2,A
+UCL,2018-09-19,Benfica,Bayern Munich,0,2,A
+UCL,2018-09-19,Valencia,Juventus,0,2,A
+UCL,2018-09-19,Real Madrid,AS Roma,3,0,H
+UCL,2018-09-19,BSC Young Boys,Manchester United,0,3,A
+UCL,2018-09-19,Plzen,CSKA Moscow,2,2,D
+UCL,2018-10-02,1899 Hoffenheim,Manchester City,1,2,A
+UCL,2018-10-02,Juventus,BSC Young Boys,3,0,H
+UCL,2018-10-02,Manchester United,Valencia,0,0,D
+UCL,2018-10-02,Lyon,Shakhtar Donetsk,2,2,D
+UCL,2018-10-02,Bayern Munich,Ajax,1,1,D
+UCL,2018-10-02,AS Roma,Plzen,5,0,H
+UCL,2018-10-02,CSKA Moscow,Real Madrid,1,0,H
+UCL,2018-10-02,AEK Athens FC,Benfica,2,3,A
+UCL,2018-10-03,Paris Saint Germain,FK Crvena Zvezda,6,1,H
+UCL,2018-10-03,Lokomotiv Moscow,FC Schalke 04,0,1,A
+UCL,2018-10-03,Tottenham,Barcelona,2,4,A
+UCL,2018-10-03,Borussia Dortmund,Monaco,3,0,H
+UCL,2018-10-03,PSV Eindhoven,Inter,1,2,A
+UCL,2018-10-03,FC Porto,Galatasaray,1,0,H
+UCL,2018-10-03,Napoli,Liverpool,1,0,H
+UCL,2018-10-03,Atletico Madrid,Club Brugge KV,3,1,H
+UCL,2018-10-23,BSC Young Boys,Valencia,1,1,D
+UCL,2018-10-23,AEK Athens FC,Bayern Munich,0,2,A
+UCL,2018-10-23,Manchester United,Juventus,0,1,A
+UCL,2018-10-23,1899 Hoffenheim,Lyon,3,3,D
+UCL,2018-10-23,Ajax,Benfica,1,0,H
+UCL,2018-10-23,AS Roma,CSKA Moscow,3,0,H
+UCL,2018-10-23,Real Madrid,Plzen,2,1,H
+UCL,2018-10-23,Shakhtar Donetsk,Manchester City,0,3,A
+UCL,2018-10-24,PSV Eindhoven,Tottenham,2,2,D
+UCL,2018-10-24,Club Brugge KV,Monaco,1,1,D
+UCL,2018-10-24,Liverpool,FK Crvena Zvezda,4,0,H
+UCL,2018-10-24,Paris Saint Germain,Napoli,2,2,D
+UCL,2018-10-24,Borussia Dortmund,Atletico Madrid,4,0,H
+UCL,2018-10-24,Barcelona,Inter,2,0,H
+UCL,2018-10-24,Lokomotiv Moscow,FC Porto,1,3,A
+UCL,2018-10-24,Galatasaray,FC Schalke 04,0,0,D
+UCL,2018-11-06,Monaco,Club Brugge KV,0,4,A
+UCL,2018-11-06,FK Crvena Zvezda,Liverpool,2,0,H
+UCL,2018-11-06,Tottenham,PSV Eindhoven,2,1,H
+UCL,2018-11-06,FC Schalke 04,Galatasaray,2,0,H
+UCL,2018-11-06,FC Porto,Lokomotiv Moscow,4,1,H
+UCL,2018-11-06,Napoli,Paris Saint Germain,1,1,D
+UCL,2018-11-06,Inter,Barcelona,1,1,D
+UCL,2018-11-06,Atletico Madrid,Borussia Dortmund,2,0,H
+UCL,2018-11-07,Valencia,BSC Young Boys,3,1,H
+UCL,2018-11-07,CSKA Moscow,AS Roma,1,2,A
+UCL,2018-11-07,Manchester City,Shakhtar Donetsk,6,0,H
+UCL,2018-11-07,Lyon,1899 Hoffenheim,2,2,D
+UCL,2018-11-07,Bayern Munich,AEK Athens FC,2,0,H
+UCL,2018-11-07,Benfica,Ajax,1,1,D
+UCL,2018-11-07,Juventus,Manchester United,1,2,A
+UCL,2018-11-07,Plzen,Real Madrid,0,5,A
+UCL,2018-11-27,CSKA Moscow,Plzen,1,2,A
+UCL,2018-11-27,AEK Athens FC,Ajax,0,2,A
+UCL,2018-11-27,Manchester United,BSC Young Boys,1,0,H
+UCL,2018-11-27,Lyon,Manchester City,2,2,D
+UCL,2018-11-27,Bayern Munich,Benfica,5,1,H
+UCL,2018-11-27,1899 Hoffenheim,Shakhtar Donetsk,2,3,A
+UCL,2018-11-27,Juventus,Valencia,1,0,H
+UCL,2018-11-27,AS Roma,Real Madrid,0,2,A
+UCL,2018-11-28,Atletico Madrid,Monaco,2,0,H
+UCL,2018-11-28,Lokomotiv Moscow,Galatasaray,2,0,H
+UCL,2018-11-28,Tottenham,Inter,1,0,H
+UCL,2018-11-28,Paris Saint Germain,Liverpool,2,1,H
+UCL,2018-11-28,Borussia Dortmund,Club Brugge KV,0,0,D
+UCL,2018-11-28,PSV Eindhoven,Barcelona,1,2,A
+UCL,2018-11-28,FC Porto,FC Schalke 04,3,1,H
+UCL,2018-11-28,Napoli,FK Crvena Zvezda,3,1,H
+UCL,2018-12-11,FC Schalke 04,Lokomotiv Moscow,1,0,H
+UCL,2018-12-11,Galatasaray,FC Porto,2,3,A
+UCL,2018-12-11,Liverpool,Napoli,1,0,H
+UCL,2018-12-11,Monaco,Borussia Dortmund,0,2,A
+UCL,2018-12-11,Inter,PSV Eindhoven,1,1,D
+UCL,2018-12-11,Barcelona,Tottenham,1,1,D
+UCL,2018-12-11,Club Brugge KV,Atletico Madrid,0,0,D
+UCL,2018-12-11,FK Crvena Zvezda,Paris Saint Germain,1,4,A
+UCL,2018-12-12,Real Madrid,CSKA Moscow,0,3,A
+UCL,2018-12-12,Plzen,AS Roma,2,1,H
+UCL,2018-12-12,Manchester City,1899 Hoffenheim,2,1,H
+UCL,2018-12-12,Ajax,Bayern Munich,3,3,D
+UCL,2018-12-12,Benfica,AEK Athens FC,1,0,H
+UCL,2018-12-12,Valencia,Manchester United,2,1,H
+UCL,2018-12-12,Shakhtar Donetsk,Lyon,1,1,D
+UCL,2018-12-12,BSC Young Boys,Juventus,2,1,H
+UCL,2019-02-12,Manchester United,Paris Saint Germain,0,2,A
+UCL,2019-02-12,AS Roma,FC Porto,2,1,H
+UCL,2019-02-13,Tottenham,Borussia Dortmund,3,0,H
+UCL,2019-02-13,Ajax,Real Madrid,1,2,A
+UCL,2019-02-19,Liverpool,Bayern Munich,0,0,D
+UCL,2019-02-19,Lyon,Barcelona,0,0,D
+UCL,2019-02-20,FC Schalke 04,Manchester City,2,3,A
+UCL,2019-02-20,Atletico Madrid,Juventus,2,0,H
+UCL,2019-03-05,Borussia Dortmund,Tottenham,0,1,A
+UCL,2019-03-05,Real Madrid,Ajax,1,4,A
+UCL,2019-03-06,Paris Saint Germain,Manchester United,1,3,A
+UCL,2019-03-06,FC Porto,AS Roma,3,1,H
+UCL,2019-03-12,Manchester City,FC Schalke 04,7,0,H
+UCL,2019-03-12,Juventus,Atletico Madrid,3,0,H
+UCL,2019-03-13,Bayern Munich,Liverpool,1,3,A
+UCL,2019-03-13,Barcelona,Lyon,5,1,H
+UCL,2019-04-09,Liverpool,FC Porto,2,0,H
+UCL,2019-04-09,Tottenham,Manchester City,1,0,H
+UCL,2019-04-10,Manchester United,Barcelona,0,1,A
+UCL,2019-04-10,Ajax,Juventus,1,1,D
+UCL,2019-04-16,Juventus,Ajax,1,2,A
+UCL,2019-04-16,Barcelona,Manchester United,3,0,H
+UCL,2019-04-17,Manchester City,Tottenham,4,3,H
+UCL,2019-04-17,FC Porto,Liverpool,1,4,A
+UCL,2019-04-30,Tottenham,Ajax,0,1,A
+UCL,2019-05-01,Barcelona,Liverpool,3,0,H
+UCL,2019-05-07,Liverpool,Barcelona,4,0,H
+UCL,2019-05-08,Ajax,Tottenham,2,3,A
+UCL,2019-06-01,Tottenham,Liverpool,0,2,A
+UCL,2019-06-25,Tre Penne,FC Santa Coloma,0,1,A
+UCL,2019-06-25,Feronikeli,Lincoln Red Imps FC,1,0,H
+UCL,2019-06-28,Feronikeli,FC Santa Coloma,2,1,H
+UCL,2019-07-09,FC Astana,CFR 1907 Cluj,1,0,H
+UCL,2019-07-09,Ararat-Armenia,AIK Stockholm,2,1,H
+UCL,2019-07-09,HJK Helsinki,HB Torshavn,3,0,H
+UCL,2019-07-09,Kalju Nomme,Shkendija,0,1,A
+UCL,2019-07-09,FK Sarajevo,Celtic,1,3,A
+UCL,2019-07-09,The New Saints,Feronikeli,2,2,D
+UCL,2019-07-09,F91 Dudelange,Valletta FC,2,2,D
+UCL,2019-07-09,Suduva Marijampole,FK Crvena Zvezda,0,0,D
+UCL,2019-07-10,Partizani,Qarabag,0,0,D
+UCL,2019-07-10,Bate Borisov,Piast Gliwice,1,1,D
+UCL,2019-07-10,Sheriff Tiraspol,Saburtalo,0,3,A
+UCL,2019-07-10,Ferencvarosi TC,Ludogorets,2,1,H
+UCL,2019-07-10,Slovan Bratislava,Sutjeska,1,1,D
+UCL,2019-07-10,Linfield,Rosenborg,0,2,A
+UCL,2019-07-10,Dundalk,Riga,0,0,D
+UCL,2019-07-10,Valur Reykjavik,Maribor,0,3,A
+UCL,2019-07-16,Shkendija,Kalju Nomme,1,2,A
+UCL,2019-07-16,Saburtalo,Sheriff Tiraspol,1,3,A
+UCL,2019-07-16,Valletta FC,F91 Dudelange,1,1,D
+UCL,2019-07-16,HB Torshavn,HJK Helsinki,2,2,D
+UCL,2019-07-16,FK Crvena Zvezda,Suduva Marijampole,2,1,H
+UCL,2019-07-16,Feronikeli,The New Saints,0,1,A
+UCL,2019-07-17,Riga,Dundalk,0,0,D
+UCL,2019-07-17,Rosenborg,Linfield,4,0,H
+UCL,2019-07-17,AIK Stockholm,Ararat-Armenia,3,1,H
+UCL,2019-07-17,Qarabag,Partizani,2,0,H
+UCL,2019-07-17,Ludogorets,Ferencvarosi TC,2,3,A
+UCL,2019-07-17,Piast Gliwice,Bate Borisov,1,2,A
+UCL,2019-07-17,CFR 1907 Cluj,FC Astana,3,1,H
+UCL,2019-07-17,Maribor,Valur Reykjavik,2,0,H
+UCL,2019-07-17,Sutjeska,Slovan Bratislava,2,2,D
+UCL,2019-07-17,Celtic,FK Sarajevo,2,1,H
+UCL,2019-07-23,Plzen,Olympiakos Piraeus ,0,0,D
+UCL,2019-07-23,Saburtalo,Dinamo Zagreb,0,2,A
+UCL,2019-07-23,PSV Eindhoven,FC Basel 1893,3,2,H
+UCL,2019-07-23,The New Saints,FC Copenhagen,0,2,A
+UCL,2019-07-23,Sutjeska,Apoel Nicosia,0,1,A
+UCL,2019-07-24,Bate Borisov,Rosenborg,2,1,H
+UCL,2019-07-24,Ferencvarosi TC,Valletta FC,3,1,H
+UCL,2019-07-24,CFR 1907 Cluj,Maccabi Tel Aviv,1,0,H
+UCL,2019-07-24,Maribor,AIK Stockholm,2,1,H
+UCL,2019-07-24,Celtic,Kalju Nomme,5,0,H
+UCL,2019-07-24,Dundalk,Qarabag,1,1,D
+UCL,2019-07-24,FK Crvena Zvezda,HJK Helsinki,2,0,H
+UCL,2019-07-30,Maccabi Tel Aviv,CFR 1907 Cluj,2,2,D
+UCL,2019-07-30,Kalju Nomme,Celtic,0,2,A
+UCL,2019-07-30,Apoel Nicosia,Sutjeska,3,0,H
+UCL,2019-07-30,FC Basel 1893,PSV Eindhoven,2,1,H
+UCL,2019-07-30,Dinamo Zagreb,Saburtalo,3,0,H
+UCL,2019-07-30,Valletta FC,Ferencvarosi TC,1,1,D
+UCL,2019-07-30,Olympiakos Piraeus ,Plzen,4,0,H
+UCL,2019-07-31,HJK Helsinki,FK Crvena Zvezda,2,1,H
+UCL,2019-07-31,Rosenborg,Bate Borisov,2,0,H
+UCL,2019-07-31,AIK Stockholm,Maribor,3,2,H
+UCL,2019-07-31,Qarabag,Dundalk,3,0,H
+UCL,2019-07-31,FC Copenhagen,The New Saints,1,0,H
+UCL,2019-08-06,PAOK,Ajax,2,2,D
+UCL,2019-08-06,Apoel Nicosia,Qarabag,1,2,A
+UCL,2019-08-06,Dinamo Zagreb,Ferencvarosi TC,1,1,D
+UCL,2019-08-06,Club Brugge KV,Dynamo Kyiv,1,0,H
+UCL,2019-08-06,FK Crvena Zvezda,FC Copenhagen,1,1,D
+UCL,2019-08-07,Krasnodar,FC Porto,0,1,A
+UCL,2019-08-07,Başakşehir,Olympiakos Piraeus,0,1,A
+UCL,2019-08-07,FC Basel 1893,Lask Linz,1,2,A
+UCL,2019-08-07,CFR 1907 Cluj,Celtic,1,1,D
+UCL,2019-08-07,Maribor,Rosenborg,1,3,A
+UCL,2019-08-13,Qarabag,Apoel Nicosia,0,2,A
+UCL,2019-08-13,Rosenborg,Maribor,3,1,H
+UCL,2019-08-13,Dynamo Kyiv,Club Brugge KV,3,3,D
+UCL,2019-08-13,FC Copenhagen,FK Crvena Zvezda,2,2,D
+UCL,2019-08-13,Ferencvarosi TC,Dinamo Zagreb,0,4,A
+UCL,2019-08-13,Ajax,PAOK,3,2,H
+UCL,2019-08-13,Olympiakos Piraeus,Başakşehir,2,0,H
+UCL,2019-08-13,Lask Linz,FC Basel 1893,3,1,H
+UCL,2019-08-13,Celtic,CFR 1907 Cluj,3,4,A
+UCL,2019-08-13,FC Porto,Krasnodar,2,3,A
+UCL,2019-08-20,Lask Linz,Club Brugge KV,0,1,A
+UCL,2019-08-20,CFR 1907 Cluj,Slavia Praha,0,1,A
+UCL,2019-08-20,Apoel Nicosia,Ajax,0,0,D
+UCL,2019-08-21,Olympiakos Piraeus,Krasnodar,4,0,H
+UCL,2019-08-21,BSC Young Boys,FK Crvena Zvezda,2,2,D
+UCL,2019-08-21,Dinamo Zagreb,Rosenborg,2,0,H
+UCL,2019-08-27,Rosenborg,Dinamo Zagreb,1,1,D
+UCL,2019-08-27,FK Crvena Zvezda,BSC Young Boys,1,1,D
+UCL,2019-08-27,Krasnodar,Olympiakos Piraeus,1,2,A
+UCL,2019-08-28,Ajax,Apoel Nicosia,2,0,H
+UCL,2019-08-28,Slavia Praha,CFR 1907 Cluj,1,0,H
+UCL,2019-08-28,Club Brugge KV,Lask Linz,2,1,H
+UCL,2019-09-17,Lyon,Zenit Saint Petersburg,1,1,D
+UCL,2019-09-17,Inter,Slavia Praha,1,1,D
+UCL,2019-09-17,Chelsea,Valencia,0,1,A
+UCL,2019-09-17,Borussia Dortmund,Barcelona,0,0,D
+UCL,2019-09-17,Ajax,Lille,3,0,H
+UCL,2019-09-17,Benfica,RB Leipzig,1,2,A
+UCL,2019-09-17,Napoli,Liverpool,2,0,H
+UCL,2019-09-17,Red Bull Salzburg,Genk,6,2,H
+UCL,2019-09-18,Olympiakos Piraeus,Tottenham,2,2,D
+UCL,2019-09-18,Club Brugge KV,Galatasaray,0,0,D
+UCL,2019-09-18,Paris Saint Germain,Real Madrid,3,0,H
+UCL,2019-09-18,Bayern Munich,FK Crvena Zvezda,3,0,H
+UCL,2019-09-18,Bayer Leverkusen,Lokomotiv Moscow,1,2,A
+UCL,2019-09-18,Atletico Madrid,Juventus,2,2,D
+UCL,2019-09-18,Shakhtar Donetsk,Manchester City,0,3,A
+UCL,2019-09-18,Dinamo Zagreb,Atalanta,4,0,H
+UCL,2019-10-01,Atalanta,Shakhtar Donetsk,1,2,A
+UCL,2019-10-01,Real Madrid,Club Brugge KV,2,2,D
+UCL,2019-10-01,Tottenham,Bayern Munich,2,7,A
+UCL,2019-10-01,Manchester City,Dinamo Zagreb,2,0,H
+UCL,2019-10-01,Juventus,Bayer Leverkusen,3,0,H
+UCL,2019-10-01,Lokomotiv Moscow,Atletico Madrid,0,2,A
+UCL,2019-10-01,FK Crvena Zvezda,Olympiakos Piraeus,3,1,H
+UCL,2019-10-01,Galatasaray,Paris Saint Germain,0,1,A
+UCL,2019-10-02,Slavia Praha,Borussia Dortmund,0,2,A
+UCL,2019-10-02,Genk,Napoli,0,0,D
+UCL,2019-10-02,Liverpool,Red Bull Salzburg,4,3,H
+UCL,2019-10-02,Lille,Chelsea,1,2,A
+UCL,2019-10-02,RB Leipzig,Lyon,0,2,A
+UCL,2019-10-02,Barcelona,Inter,2,1,H
+UCL,2019-10-02,Valencia,Ajax,0,3,A
+UCL,2019-10-02,Zenit Saint Petersburg,Benfica,3,1,H
+UCL,2019-10-22,Atletico Madrid,Bayer Leverkusen,1,0,H
+UCL,2019-10-22,Shakhtar Donetsk,Dinamo Zagreb,2,2,D
+UCL,2019-10-22,Tottenham,FK Crvena Zvezda,5,0,H
+UCL,2019-10-22,Manchester City,Atalanta,5,1,H
+UCL,2019-10-22,Juventus,Lokomotiv Moscow,2,1,H
+UCL,2019-10-22,Olympiakos Piraeus,Bayern Munich,2,3,A
+UCL,2019-10-22,Club Brugge KV,Paris Saint Germain,0,5,A
+UCL,2019-10-22,Galatasaray,Real Madrid,0,1,A
+UCL,2019-10-23,RB Leipzig,Zenit Saint Petersburg,2,1,H
+UCL,2019-10-23,Ajax,Chelsea,0,1,A
+UCL,2019-10-23,Lille,Valencia,1,1,D
+UCL,2019-10-23,Benfica,Lyon,2,1,H
+UCL,2019-10-23,Inter,Borussia Dortmund,2,0,H
+UCL,2019-10-23,Slavia Praha,Barcelona,1,2,A
+UCL,2019-10-23,Red Bull Salzburg,Napoli,2,3,A
+UCL,2019-10-23,Genk,Liverpool,1,4,A
+UCL,2019-11-05,Barcelona,Slavia Praha,0,0,D
+UCL,2019-11-05,Zenit Saint Petersburg,RB Leipzig,0,2,A
+UCL,2019-11-05,Liverpool,Genk,2,1,H
+UCL,2019-11-05,Chelsea,Ajax,4,4,D
+UCL,2019-11-05,Lyon,Benfica,3,1,H
+UCL,2019-11-05,Borussia Dortmund,Inter,3,2,H
+UCL,2019-11-05,Napoli,Red Bull Salzburg,1,1,D
+UCL,2019-11-05,Valencia,Lille,4,1,H
+UCL,2019-11-06,Bayern Munich,Olympiakos Piraeus,2,0,H
+UCL,2019-11-06,Lokomotiv Moscow,Juventus,1,2,A
+UCL,2019-11-06,Paris Saint Germain,Club Brugge KV,1,0,H
+UCL,2019-11-06,Bayer Leverkusen,Atletico Madrid,2,1,H
+UCL,2019-11-06,Atalanta,Manchester City,1,1,D
+UCL,2019-11-06,Real Madrid,Galatasaray,6,0,H
+UCL,2019-11-06,FK Crvena Zvezda,Tottenham,0,4,A
+UCL,2019-11-06,Dinamo Zagreb,Shakhtar Donetsk,3,3,D
+UCL,2019-11-26,Lokomotiv Moscow,Bayer Leverkusen,0,2,A
+UCL,2019-11-26,Galatasaray,Club Brugge KV,1,1,D
+UCL,2019-11-26,Tottenham,Olympiakos Piraeus,4,2,H
+UCL,2019-11-26,Manchester City,Shakhtar Donetsk,1,1,D
+UCL,2019-11-26,Juventus,Atletico Madrid,1,0,H
+UCL,2019-11-26,Atalanta,Dinamo Zagreb,2,0,H
+UCL,2019-11-26,Real Madrid,Paris Saint Germain,2,2,D
+UCL,2019-11-26,FK Crvena Zvezda,Bayern Munich,0,6,A
+UCL,2019-11-27,Valencia,Chelsea,2,2,D
+UCL,2019-11-27,Zenit Saint Petersburg,Lyon,2,0,H
+UCL,2019-11-27,Liverpool,Napoli,1,1,D
+UCL,2019-11-27,Lille,Ajax,0,2,A
+UCL,2019-11-27,RB Leipzig,Benfica,2,2,D
+UCL,2019-11-27,Barcelona,Borussia Dortmund,3,1,H
+UCL,2019-11-27,Slavia Praha,Inter,1,3,A
+UCL,2019-11-27,Genk,Red Bull Salzburg,1,4,A
+UCL,2019-12-10,Napoli,Genk,4,0,H
+UCL,2019-12-10,Red Bull Salzburg,Liverpool,0,2,A
+UCL,2019-12-10,Chelsea,Lille,2,1,H
+UCL,2019-12-10,Lyon,RB Leipzig,2,2,D
+UCL,2019-12-10,Borussia Dortmund,Slavia Praha,2,1,H
+UCL,2019-12-10,Ajax,Valencia,0,1,A
+UCL,2019-12-10,Benfica,Zenit Saint Petersburg,3,0,H
+UCL,2019-12-10,Inter,Barcelona,1,2,A
+UCL,2019-12-11,Shakhtar Donetsk,Atalanta,0,3,A
+UCL,2019-12-11,Dinamo Zagreb,Manchester City,1,4,A
+UCL,2019-12-11,Paris Saint Germain,Galatasaray,5,0,H
+UCL,2019-12-11,Bayern Munich,Tottenham,3,1,H
+UCL,2019-12-11,Bayer Leverkusen,Juventus,0,2,A
+UCL,2019-12-11,Atletico Madrid,Lokomotiv Moscow,2,0,H
+UCL,2019-12-11,Olympiakos Piraeus,FK Crvena Zvezda,1,0,H
+UCL,2019-12-11,Club Brugge KV,Real Madrid,1,3,A
+UCL,2020-02-18,Borussia Dortmund,Paris Saint Germain,2,1,H
+UCL,2020-02-18,Atletico Madrid,Liverpool,1,0,H
+UCL,2020-02-19,Tottenham,RB Leipzig,0,1,A
+UCL,2020-02-19,Atalanta,Valencia,4,1,H
+UCL,2020-02-25,Chelsea,Bayern Munich,0,3,A
+UCL,2020-02-25,Napoli,Barcelona,1,1,D
+UCL,2020-02-26,Lyon,Juventus,1,0,H
+UCL,2020-02-26,Real Madrid,Manchester City,1,2,A
+UCL,2020-03-10,RB Leipzig,Tottenham,3,0,H
+UCL,2020-03-10,Valencia,Atalanta,3,4,A
+UCL,2020-03-11,Liverpool,Atletico Madrid,2,3,A
+UCL,2020-03-11,Paris Saint Germain,Borussia Dortmund,2,0,H
+UCL,2020-08-07,Manchester City,Real Madrid,2,1,H
+UCL,2020-08-07,Juventus,Lyon,2,1,H
+UCL,2020-08-08,Bayern Munich,Chelsea,4,1,H
+UCL,2020-08-08,Barcelona,Napoli,3,1,H
+UCL,2020-08-12,Atalanta,Paris Saint Germain,1,2,A
+UCL,2020-08-13,RB Leipzig,Atletico Madrid,2,1,H
+UCL,2020-08-14,Barcelona,Bayern Munich,2,8,A
+UCL,2020-08-15,Manchester City,Lyon,1,3,A
+UCL,2020-08-18,RB Leipzig,Paris Saint Germain,0,3,A
+UCL,2020-08-19,Lyon,Bayern Munich,0,3,A
+UCL,2020-08-23,Paris Saint Germain,Bayern Munich,0,1,A
+UCL,2020-08-08,Tre Fiori,Linfield,0,2,A
+UCL,2020-08-08,Drita,Inter Club d'Escaldes,2,1,H
+UCL,2020-08-11,Drita,Linfield,0,3,A
+UCL,2020-08-18,Qarabag,Sileks,4,0,H
+UCL,2020-08-18,Legia Warszawa,Linfield,1,0,H
+UCL,2020-08-18,Dinamo Brest,FC Astana,6,3,H
+UCL,2020-08-18,Celtic,KR Reykjavik,6,0,H
+UCL,2020-08-18,FK Crvena Zvezda,Europa,5,0,H
+UCL,2020-08-19,Ararat-Armenia,Omonia Nicosia,0,1,A
+UCL,2020-08-19,Molde,KuPS,5,0,H
+UCL,2020-08-19,Flora Tallinn,Suduva Marijampole,1,1,D
+UCL,2020-08-19,Maccabi Tel Aviv,Riga,2,0,H
+UCL,2020-08-19,Ferencvarosi TC,Djurgardens IF,2,0,H
+UCL,2020-08-19,Dinamo Tbilisi,Tirana,0,2,A
+UCL,2020-08-19,Celje,Dundalk,3,0,H
+UCL,2020-08-19,GAP Connah S Quay FC,FK Sarajevo,0,2,A
+UCL,2020-08-19,Sheriff Tiraspol,Fola Esch,2,0,H
+UCL,2020-08-19,Buducnost Podgorica,Ludogorets,1,3,A
+UCL,2020-08-19,Floriana,CFR 1907 Cluj,0,2,A
+UCL,2020-08-21,KI Klaksvik,Slovan Bratislava,3,0,H
+UCL,2020-08-25,PAOK,Beşiktaş,3,1,H
+UCL,2020-08-25,Tirana,FK Crvena Zvezda,0,1,A
+UCL,2020-08-26,AZ Alkmaar,Plzen,3,1,H
+UCL,2020-08-26,Qarabag,Sheriff Tiraspol,2,1,H
+UCL,2020-08-26,Suduva Marijampole,Maccabi Tel Aviv,0,3,A
+UCL,2020-08-26,Celje,Molde,1,2,A
+UCL,2020-08-26,NK Lokomotiva Zagreb,Rapid Vienna,0,1,A
+UCL,2020-08-26,Ludogorets,FC Midtjylland,0,1,A
+UCL,2020-08-26,Legia Warszawa,Omonia Nicosia,0,2,A
+UCL,2020-08-26,Dinamo Brest,FK Sarajevo,2,1,H
+UCL,2020-08-26,CFR 1907 Cluj,Dinamo Zagreb,2,2,D
+UCL,2020-08-26,BSC Young Boys,KI Klaksvik,3,1,H
+UCL,2020-08-26,Celtic,Ferencvarosi TC,1,2,A
+UCL,2020-09-15,Dynamo Kyiv,AZ Alkmaar,2,0,H
+UCL,2020-09-15,PAOK,Benfica,2,1,H
+UCL,2020-09-15,Gent,Rapid Vienna,2,1,H
+UCL,2020-09-16,Omonia Nicosia,FK Crvena Zvezda,1,1,D
+UCL,2020-09-16,Qarabag,Molde,0,0,D
+UCL,2020-09-16,Maccabi Tel Aviv,Dinamo Brest,1,0,H
+UCL,2020-09-16,Ferencvarosi TC,Dinamo Zagreb,2,1,H
+UCL,2020-09-16,FC Midtjylland,BSC Young Boys,3,0,H
+UCL,2020-09-22,Slavia Praha,FC Midtjylland,0,0,D
+UCL,2020-09-22,Maccabi Tel Aviv,Red Bull Salzburg,1,2,A
+UCL,2020-09-22,Krasnodar,PAOK,2,1,H
+UCL,2020-09-23,Molde,Ferencvarosi TC,3,3,D
+UCL,2020-09-23,Olympiakos Piraeus,Omonia Nicosia,2,0,H
+UCL,2020-09-23,Gent,Dynamo Kyiv,1,2,A
+UCL,2020-09-29,Dynamo Kyiv,Gent,3,0,H
+UCL,2020-09-29,Ferencvarosi TC,Molde,0,0,D
+UCL,2020-09-29,Omonia Nicosia,Olympiakos Piraeus,0,0,D
+UCL,2020-09-30,FC Midtjylland,Slavia Praha,4,1,H
+UCL,2020-09-30,Red Bull Salzburg,Maccabi Tel Aviv,3,1,H
+UCL,2020-09-30,PAOK,Krasnodar,1,2,A
+UCL,2020-10-20,Dynamo Kyiv,Juventus,0,2,A
+UCL,2020-10-20,Zenit Saint Petersburg,Club Brugge KV,1,2,A
+UCL,2020-10-20,Chelsea,Sevilla,0,0,D
+UCL,2020-10-20,Paris Saint Germain,Manchester United,1,2,A
+UCL,2020-10-20,Rennes,Krasnodar,1,1,D
+UCL,2020-10-20,RB Leipzig,Başakşehir,2,0,H
+UCL,2020-10-20,Lazio,Borussia Dortmund,3,1,H
+UCL,2020-10-20,Barcelona,Ferencvarosi TC,5,1,H
+UCL,2020-10-21,Real Madrid,Shakhtar Donetsk,2,3,A
+UCL,2020-10-21,Red Bull Salzburg,Lokomotiv Moscow,2,2,D
+UCL,2020-10-21,Manchester City,FC Porto,3,1,H
+UCL,2020-10-21,Bayern Munich,Atletico Madrid,4,0,H
+UCL,2020-10-21,Ajax,Liverpool,0,1,A
+UCL,2020-10-21,FC Midtjylland,Atalanta,0,4,A
+UCL,2020-10-21,Inter,Borussia Monchengladbach,2,2,D
+UCL,2020-10-21,Olympiakos Piraeus,Marseille,1,0,H
+UCL,2020-10-27,Shakhtar Donetsk,Inter,0,0,D
+UCL,2020-10-27,Lokomotiv Moscow,Bayern Munich,1,2,A
+UCL,2020-10-27,Liverpool,FC Midtjylland,2,0,H
+UCL,2020-10-27,Marseille,Manchester City,0,3,A
+UCL,2020-10-27,Borussia Monchengladbach,Real Madrid,2,2,D
+UCL,2020-10-27,FC Porto,Olympiakos Piraeus,2,0,H
+UCL,2020-10-27,Atalanta,Ajax,2,2,D
+UCL,2020-10-27,Atletico Madrid,Red Bull Salzburg,3,2,H
+UCL,2020-10-28,Başakşehir,Paris Saint Germain,0,2,A
+UCL,2020-10-28,Krasnodar,Chelsea,0,4,A
+UCL,2020-10-28,Manchester United,RB Leipzig,5,0,H
+UCL,2020-10-28,Borussia Dortmund,Zenit Saint Petersburg,2,0,H
+UCL,2020-10-28,Juventus,Barcelona,0,2,A
+UCL,2020-10-28,Sevilla,Rennes,1,0,H
+UCL,2020-10-28,Club Brugge KV,Lazio,1,1,D
+UCL,2020-10-28,Ferencvarosi TC,Dynamo Kyiv,2,2,D
+UCL,2020-11-03,Shakhtar Donetsk,Borussia Monchengladbach,0,6,A
+UCL,2020-11-03,Lokomotiv Moscow,Atletico Madrid,1,1,D
+UCL,2020-11-03,Manchester City,Olympiakos Piraeus,3,0,H
+UCL,2020-11-03,FC Porto,Marseille,3,0,H
+UCL,2020-11-03,FC Midtjylland,Ajax,1,2,A
+UCL,2020-11-03,Atalanta,Liverpool,0,5,A
+UCL,2020-11-03,Real Madrid,Inter,3,2,H
+UCL,2020-11-03,Red Bull Salzburg,Bayern Munich,2,6,A
+UCL,2020-11-04,Başakşehir,Manchester United,2,1,H
+UCL,2020-11-04,Zenit Saint Petersburg,Lazio,1,1,D
+UCL,2020-11-04,Chelsea,Rennes,3,0,H
+UCL,2020-11-04,RB Leipzig,Paris Saint Germain,2,1,H
+UCL,2020-11-04,Barcelona,Dynamo Kyiv,2,1,H
+UCL,2020-11-04,Sevilla,Krasnodar,3,2,H
+UCL,2020-11-04,Club Brugge KV,Borussia Dortmund,0,3,A
+UCL,2020-11-04,Ferencvarosi TC,Juventus,1,4,A
+UCL,2020-11-24,Rennes,Chelsea,1,2,A
+UCL,2020-11-24,Krasnodar,Sevilla,1,2,A
+UCL,2020-11-24,Manchester United,Başakşehir,4,1,H
+UCL,2020-11-24,Paris Saint Germain,RB Leipzig,1,0,H
+UCL,2020-11-24,Borussia Dortmund,Club Brugge KV,3,0,H
+UCL,2020-11-24,Lazio,Zenit Saint Petersburg,3,1,H
+UCL,2020-11-24,Juventus,Ferencvarosi TC,2,1,H
+UCL,2020-11-24,Dynamo Kyiv,Barcelona,0,4,A
+UCL,2020-11-25,Borussia Monchengladbach,Shakhtar Donetsk,4,0,H
+UCL,2020-11-25,Olympiakos Piraeus,Manchester City,0,1,A
+UCL,2020-11-25,Liverpool,Atalanta,0,2,A
+UCL,2020-11-25,Marseille,FC Porto,0,2,A
+UCL,2020-11-25,Bayern Munich,Red Bull Salzburg,3,1,H
+UCL,2020-11-25,Ajax,FC Midtjylland,3,1,H
+UCL,2020-11-25,Inter,Real Madrid,0,2,A
+UCL,2020-11-25,Atletico Madrid,Lokomotiv Moscow,0,0,D
+UCL,2020-12-01,Shakhtar Donetsk,Real Madrid,2,0,H
+UCL,2020-12-01,Lokomotiv Moscow,Red Bull Salzburg,1,3,A
+UCL,2020-12-01,Liverpool,Ajax,1,0,H
+UCL,2020-12-01,Marseille,Olympiakos Piraeus,2,1,H
+UCL,2020-12-01,Borussia Monchengladbach,Inter,2,3,A
+UCL,2020-12-01,FC Porto,Manchester City,0,0,D
+UCL,2020-12-01,Atalanta,FC Midtjylland,1,1,D
+UCL,2020-12-01,Atletico Madrid,Bayern Munich,1,1,D
+UCL,2020-12-02,Başakşehir,RB Leipzig,3,4,A
+UCL,2020-12-02,Krasnodar,Rennes,1,0,H
+UCL,2020-12-02,Manchester United,Paris Saint Germain,1,3,A
+UCL,2020-12-02,Borussia Dortmund,Lazio,1,1,D
+UCL,2020-12-02,Juventus,Dynamo Kyiv,3,0,H
+UCL,2020-12-02,Sevilla,Chelsea,0,4,A
+UCL,2020-12-02,Club Brugge KV,Zenit Saint Petersburg,3,0,H
+UCL,2020-12-02,Ferencvarosi TC,Barcelona,0,3,A
+UCL,2020-12-08,Lazio,Club Brugge KV,2,2,D
+UCL,2020-12-08,Zenit Saint Petersburg,Borussia Dortmund,1,2,A
+UCL,2020-12-08,Chelsea,Krasnodar,1,1,D
+UCL,2020-12-08,Rennes,Sevilla,1,3,A
+UCL,2020-12-08,RB Leipzig,Manchester United,3,2,H
+UCL,2020-12-08,Barcelona,Juventus,0,3,A
+UCL,2020-12-08,Dynamo Kyiv,Ferencvarosi TC,1,0,H
+UCL,2020-12-09,Paris Saint Germain,Başakşehir,5,1,H
+UCL,2020-12-09,Ajax,Atalanta,0,1,A
+UCL,2020-12-09,FC Midtjylland,Liverpool,1,1,D
+UCL,2020-12-09,Manchester City,Marseille,3,0,H
+UCL,2020-12-09,Bayern Munich,Lokomotiv Moscow,2,0,H
+UCL,2020-12-09,Inter,Shakhtar Donetsk,0,0,D
+UCL,2020-12-09,Real Madrid,Borussia Monchengladbach,2,0,H
+UCL,2020-12-09,Olympiakos Piraeus,FC Porto,0,2,A
+UCL,2020-12-09,Red Bull Salzburg,Atletico Madrid,0,2,A
+UCL,2021-02-16,RB Leipzig,Liverpool,0,2,A
+UCL,2021-02-16,Barcelona,Paris Saint Germain,1,4,A
+UCL,2021-02-17,FC Porto,Juventus,2,1,H
+UCL,2021-02-17,Sevilla,Borussia Dortmund,2,3,A
+UCL,2021-02-23,Lazio,Bayern Munich,1,4,A
+UCL,2021-02-23,Atletico Madrid,Chelsea,0,1,A
+UCL,2021-02-24,Borussia Monchengladbach,Manchester City,0,2,A
+UCL,2021-02-24,Atalanta,Real Madrid,0,1,A
+UCL,2021-03-09,Borussia Dortmund,Sevilla,2,2,D
+UCL,2021-03-09,Juventus,FC Porto,3,2,H
+UCL,2021-03-10,Liverpool,RB Leipzig,2,0,H
+UCL,2021-03-10,Paris Saint Germain,Barcelona,1,1,D
+UCL,2021-03-16,Manchester City,Borussia Monchengladbach,2,0,H
+UCL,2021-03-16,Real Madrid,Atalanta,3,1,H
+UCL,2021-03-17,Chelsea,Atletico Madrid,2,0,H
+UCL,2021-03-17,Bayern Munich,Lazio,2,1,H
+UCL,2021-04-06,Manchester City,Borussia Dortmund,2,1,H
+UCL,2021-04-06,Real Madrid,Liverpool,3,1,H
+UCL,2021-04-07,Bayern Munich,Paris Saint Germain,2,3,A
+UCL,2021-04-07,FC Porto,Chelsea,0,2,A
+UCL,2021-04-13,Chelsea,FC Porto,0,1,A
+UCL,2021-04-13,Paris Saint Germain,Bayern Munich,0,1,A
+UCL,2021-04-14,Liverpool,Real Madrid,0,0,D
+UCL,2021-04-14,Borussia Dortmund,Manchester City,1,2,A
+UCL,2021-04-27,Real Madrid,Chelsea,1,1,D
+UCL,2021-04-28,Paris Saint Germain,Manchester City,1,2,A
+UCL,2021-05-04,Manchester City,Paris Saint Germain,2,0,H
+UCL,2021-05-05,Chelsea,Real Madrid,2,0,H
+UCL,2021-05-29,Manchester City,Chelsea,0,1,A
+UCL,2021-06-22,Folgore,Prishtina,0,2,A
+UCL,2021-06-22,HB Torshavn,Inter Club d'Escaldes,0,1,A
+UCL,2021-06-25,Prishtina,Inter Club d'Escaldes,2,0,H
+UCL,2021-07-06,HJK Helsinki,Buducnost Podgorica,3,1,H
+UCL,2021-07-06,Ferencvarosi TC,Prishtina,3,0,H
+UCL,2021-07-06,Flora Tallinn,Hibernians,2,0,H
+UCL,2021-07-06,FK Zalgiris Vilnius,Linfield,3,1,H
+UCL,2021-07-06,CFR 1907 Cluj,Borac Banja Luka,3,1,H
+UCL,2021-07-06,Fola Esch,Lincoln Red Imps FC,2,2,D
+UCL,2021-07-06,Shkendija,Mura,0,1,A
+UCL,2021-07-07,Bodo/Glimt,Legia Warszawa,2,3,A
+UCL,2021-07-07,Dinamo Tbilisi,Neftchi Baku,1,2,A
+UCL,2021-07-07,Slovan Bratislava,Shamrock Rovers,2,0,H
+UCL,2021-07-07,Malmo FF,Riga,1,0,H
+UCL,2021-07-07,Ludogorets,Shakhter Soligorsk,1,0,H
+UCL,2021-07-07,Dinamo Zagreb,Valur Reykjavik,3,2,H
+UCL,2021-07-07,Teuta Durrës,Sheriff Tiraspol,0,4,A
+UCL,2021-07-07,Maccabi Haifa,Kairat Almaty,1,1,D
+UCL,2021-07-07,GAP Connah S Quay FC,Alashkert,2,2,D
+UCL,2021-07-13,Lincoln Red Imps FC,Fola Esch,5,0,H
+UCL,2021-07-13,Hibernians,Flora Tallinn,0,3,A
+UCL,2021-07-13,Riga,Malmo FF,1,1,D
+UCL,2021-07-13,Sheriff Tiraspol,Teuta Durrës,1,0,H
+UCL,2021-07-13,Prishtina,Ferencvarosi TC,1,3,A
+UCL,2021-07-13,Borac Banja Luka,CFR 1907 Cluj,2,1,H
+UCL,2021-07-13,Mura,Shkendija,5,0,H
+UCL,2021-07-13,Buducnost Podgorica,HJK Helsinki,0,4,A
+UCL,2021-07-13,Linfield,FK Zalgiris Vilnius,1,2,A
+UCL,2021-07-13,Shamrock Rovers,Slovan Bratislava,2,1,H
+UCL,2021-07-13,Shakhter Soligorsk,Ludogorets,0,1,A
+UCL,2021-07-13,Valur Reykjavik,Dinamo Zagreb,0,2,A
+UCL,2021-07-14,Kairat Almaty,Maccabi Haifa,2,0,H
+UCL,2021-07-14,Alashkert,GAP Connah S Quay FC,1,0,H
+UCL,2021-07-14,Neftchi Baku,Dinamo Tbilisi,2,1,H
+UCL,2021-07-14,Legia Warszawa,Bodo/Glimt,2,0,H
+UCL,2021-07-20,Alashkert,Sheriff Tiraspol,0,1,A
+UCL,2021-07-20,Lincoln Red Imps FC,CFR 1907 Cluj,1,2,A
+UCL,2021-07-20,Dinamo Zagreb,Omonia Nicosia,2,0,H
+UCL,2021-07-20,Ferencvarosi TC,FK Zalgiris Vilnius,2,0,H
+UCL,2021-07-20,Rapid Vienna,Sparta Praha,2,1,H
+UCL,2021-07-20,Celtic,FC Midtjylland,1,1,D
+UCL,2021-07-21,Kairat Almaty,FK Crvena Zvezda,2,1,H
+UCL,2021-07-21,Malmo FF,HJK Helsinki,2,1,H
+UCL,2021-07-21,Mura,Ludogorets,0,0,D
+UCL,2021-07-21,Slovan Bratislava,BSC Young Boys,0,0,D
+UCL,2021-07-21,PSV Eindhoven,Galatasaray,5,1,H
+UCL,2021-07-21,Legia Warszawa,Flora Tallinn,2,1,H
+UCL,2021-07-21,Olympiakos Piraeus,Neftchi Baku,1,0,H
+UCL,2021-07-27,HJK Helsinki,Malmo FF,2,2,D
+UCL,2021-07-27,Flora Tallinn,Legia Warszawa,0,1,A
+UCL,2021-07-27,Omonia Nicosia,Dinamo Zagreb,0,1,A
+UCL,2021-07-27,FK Zalgiris Vilnius,Ferencvarosi TC,1,3,A
+UCL,2021-07-28,Sheriff Tiraspol,Alashkert,3,1,H
+UCL,2021-07-28,Neftchi Baku,Olympiakos Piraeus,0,1,A
+UCL,2021-07-28,CFR 1907 Cluj,Lincoln Red Imps FC,2,0,H
+UCL,2021-07-28,FC Midtjylland,Celtic,2,1,H
+UCL,2021-07-28,Ludogorets,Mura,3,1,H
+UCL,2021-07-28,Galatasaray,PSV Eindhoven,1,2,A
+UCL,2021-07-28,BSC Young Boys,Slovan Bratislava,3,2,H
+UCL,2021-07-28,FK Crvena Zvezda,Kairat Almaty,5,0,H
+UCL,2021-07-28,Sparta Praha,Rapid Vienna,2,0,H
+UCL,2021-08-03,Malmo FF,Rangers,2,1,H
+UCL,2021-08-03,Sparta Praha,Monaco,0,2,A
+UCL,2021-08-03,PSV Eindhoven,FC Midtjylland,3,0,H
+UCL,2021-08-03,Genk,Shakhtar Donetsk,1,2,A
+UCL,2021-08-03,CFR 1907 Cluj,BSC Young Boys,1,1,D
+UCL,2021-08-03,Olympiakos Piraeus,Ludogorets,1,1,D
+UCL,2021-08-03,FK Crvena Zvezda,Sheriff Tiraspol,1,1,D
+UCL,2021-08-04,Spartak Moscow,Benfica,0,2,A
+UCL,2021-08-04,Dinamo Zagreb,Legia Warszawa,1,1,D
+UCL,2021-08-04,Ferencvarosi TC,Slavia Praha,2,0,H
+UCL,2021-08-10,Slavia Praha,Ferencvarosi TC,1,0,H
+UCL,2021-08-10,Sheriff Tiraspol,FK Crvena Zvezda,1,0,H
+UCL,2021-08-10,Shakhtar Donetsk,Genk,2,1,H
+UCL,2021-08-10,Monaco,Sparta Praha,3,1,H
+UCL,2021-08-10,FC Midtjylland,PSV Eindhoven,0,1,A
+UCL,2021-08-10,Ludogorets,Olympiakos Piraeus,2,2,D
+UCL,2021-08-10,BSC Young Boys,CFR 1907 Cluj,3,1,H
+UCL,2021-08-10,Benfica,Spartak Moscow,2,0,H
+UCL,2021-08-10,Rangers,Malmo FF,1,2,A
+UCL,2021-08-10,Legia Warszawa,Dinamo Zagreb,0,1,A
+UCL,2021-08-17,Monaco,Shakhtar Donetsk,0,1,A
+UCL,2021-08-17,Sheriff Tiraspol,Dinamo Zagreb,3,0,H
+UCL,2021-08-17,Red Bull Salzburg,Brondby,2,1,H
+UCL,2021-08-18,Benfica,PSV Eindhoven,2,1,H
+UCL,2021-08-18,Malmo FF,Ludogorets,2,0,H
+UCL,2021-08-18,BSC Young Boys,Ferencvarosi TC,3,2,H
+UCL,2021-08-24,PSV Eindhoven,Benfica,0,0,D
+UCL,2021-08-24,Ludogorets,Malmo FF,2,1,H
+UCL,2021-08-24,Ferencvarosi TC,BSC Young Boys,2,3,A
+UCL,2021-08-25,Brondby,Red Bull Salzburg,1,2,A
+UCL,2021-08-25,Shakhtar Donetsk,Monaco,2,2,D
+UCL,2021-08-25,Dinamo Zagreb,Sheriff Tiraspol,0,0,D
+UCL,2021-09-14,Sevilla,Red Bull Salzburg,1,1,D
+UCL,2021-09-14,BSC Young Boys,Manchester United,2,1,H
+UCL,2021-09-14,Chelsea,Zenit Saint Petersburg,1,0,H
+UCL,2021-09-14,Lille,VfL Wolfsburg,0,0,D
+UCL,2021-09-14,Malmo FF,Juventus,0,3,A
+UCL,2021-09-14,Barcelona,Bayern Munich,0,3,A
+UCL,2021-09-14,Villarreal,Atalanta,2,2,D
+UCL,2021-09-14,Dynamo Kyiv,Benfica,0,0,D
+UCL,2021-09-15,Beşiktaş,Borussia Dortmund,1,2,A
+UCL,2021-09-15,Sheriff Tiraspol,Shakhtar Donetsk,2,0,H
+UCL,2021-09-15,Liverpool,AC Milan,3,2,H
+UCL,2021-09-15,Manchester City,RB Leipzig,6,3,H
+UCL,2021-09-15,Sporting CP,Ajax,1,5,A
+UCL,2021-09-15,Inter,Real Madrid,0,1,A
+UCL,2021-09-15,Atletico Madrid,FC Porto,0,0,D
+UCL,2021-09-15,Club Brugge KV,Paris Saint Germain,1,1,D
+UCL,2021-09-28,Ajax,Beşiktaş,2,0,H
+UCL,2021-09-28,Shakhtar Donetsk,Inter,0,0,D
+UCL,2021-09-28,Paris Saint Germain,Manchester City,2,0,H
+UCL,2021-09-28,Borussia Dortmund,Sporting CP,1,0,H
+UCL,2021-09-28,RB Leipzig,Club Brugge KV,1,2,A
+UCL,2021-09-28,FC Porto,Liverpool,1,5,A
+UCL,2021-09-28,AC Milan,Atletico Madrid,1,2,A
+UCL,2021-09-28,Real Madrid,Sheriff Tiraspol,1,2,A
+UCL,2021-09-29,Atalanta,BSC Young Boys,1,0,H
+UCL,2021-09-29,Zenit Saint Petersburg,Malmo FF,4,0,H
+UCL,2021-09-29,Manchester United,Villarreal,2,1,H
+UCL,2021-09-29,Bayern Munich,Dynamo Kyiv,5,0,H
+UCL,2021-09-29,VfL Wolfsburg,Sevilla,1,1,D
+UCL,2021-09-29,Benfica,Barcelona,3,0,H
+UCL,2021-09-29,Juventus,Chelsea,1,0,H
+UCL,2021-09-29,Red Bull Salzburg,Lille,2,1,H
+UCL,2021-10-19,Beşiktaş,Sporting CP,1,4,A
+UCL,2021-10-19,Club Brugge KV,Manchester City,1,5,A
+UCL,2021-10-19,Paris Saint Germain,RB Leipzig,3,2,H
+UCL,2021-10-19,Ajax,Borussia Dortmund,4,0,H
+UCL,2021-10-19,FC Porto,AC Milan,1,0,H
+UCL,2021-10-19,Inter,Sheriff Tiraspol,3,1,H
+UCL,2021-10-19,Atletico Madrid,Liverpool,2,3,A
+UCL,2021-10-19,Shakhtar Donetsk,Real Madrid,0,5,A
+UCL,2021-10-20,Barcelona,Dynamo Kyiv,1,0,H
+UCL,2021-10-20,Red Bull Salzburg,VfL Wolfsburg,3,1,H
+UCL,2021-10-20,Manchester United,Atalanta,3,2,H
+UCL,2021-10-20,Chelsea,Malmo FF,4,0,H
+UCL,2021-10-20,Lille,Sevilla,0,0,D
+UCL,2021-10-20,Benfica,Bayern Munich,0,4,A
+UCL,2021-10-20,BSC Young Boys,Villarreal,1,4,A
+UCL,2021-10-20,Zenit Saint Petersburg,Juventus,0,1,A
+UCL,2021-11-02,VfL Wolfsburg,Red Bull Salzburg,2,1,H
+UCL,2021-11-02,Malmo FF,Chelsea,0,1,A
+UCL,2021-11-02,Bayern Munich,Benfica,5,2,H
+UCL,2021-11-02,Juventus,Zenit Saint Petersburg,4,2,H
+UCL,2021-11-02,Atalanta,Manchester United,2,2,D
+UCL,2021-11-02,Villarreal,BSC Young Boys,2,0,H
+UCL,2021-11-02,Sevilla,Lille,1,2,A
+UCL,2021-11-02,Dynamo Kyiv,Barcelona,0,1,A
+UCL,2021-11-03,AC Milan,FC Porto,1,1,D
+UCL,2021-11-03,Real Madrid,Shakhtar Donetsk,2,1,H
+UCL,2021-11-03,Liverpool,Atletico Madrid,2,0,H
+UCL,2021-11-03,Manchester City,Club Brugge KV,4,1,H
+UCL,2021-11-03,Borussia Dortmund,Ajax,1,3,A
+UCL,2021-11-03,RB Leipzig,Paris Saint Germain,2,2,D
+UCL,2021-11-03,Sporting CP,Beşiktaş,4,0,H
+UCL,2021-11-03,Sheriff Tiraspol,Inter,1,3,A
+UCL,2021-11-23,Villarreal,Manchester United,0,2,A
+UCL,2021-11-23,Dynamo Kyiv,Bayern Munich,1,2,A
+UCL,2021-11-23,Chelsea,Juventus,4,0,H
+UCL,2021-11-23,Lille,Red Bull Salzburg,1,0,H
+UCL,2021-11-23,Malmo FF,Zenit Saint Petersburg,1,1,D
+UCL,2021-11-23,Barcelona,Benfica,0,0,D
+UCL,2021-11-23,Sevilla,VfL Wolfsburg,2,0,H
+UCL,2021-11-23,BSC Young Boys,Atalanta,3,3,D
+UCL,2021-11-24,Inter,Shakhtar Donetsk,2,0,H
+UCL,2021-11-24,Beşiktaş,Ajax,1,2,A
+UCL,2021-11-24,Liverpool,FC Porto,2,0,H
+UCL,2021-11-24,Manchester City,Paris Saint Germain,2,1,H
+UCL,2021-11-24,Sporting CP,Borussia Dortmund,3,1,H
+UCL,2021-11-24,Atletico Madrid,AC Milan,0,1,A
+UCL,2021-11-24,Sheriff Tiraspol,Real Madrid,0,3,A
+UCL,2021-11-24,Club Brugge KV,RB Leipzig,0,5,A
+UCL,2021-12-07,Paris Saint Germain,Club Brugge KV,4,1,H
+UCL,2021-12-07,RB Leipzig,Manchester City,2,1,H
+UCL,2021-12-07,Borussia Dortmund,Beşiktaş,5,0,H
+UCL,2021-12-07,Ajax,Sporting CP,4,2,H
+UCL,2021-12-07,FC Porto,Atletico Madrid,1,3,A
+UCL,2021-12-07,AC Milan,Liverpool,1,2,A
+UCL,2021-12-07,Real Madrid,Inter,2,0,H
+UCL,2021-12-07,Shakhtar Donetsk,Sheriff Tiraspol,1,1,D
+UCL,2021-12-08,Juventus,Malmo FF,1,0,H
+UCL,2021-12-08,Zenit Saint Petersburg,Chelsea,3,3,D
+UCL,2021-12-08,Manchester United,BSC Young Boys,1,1,D
+UCL,2021-12-08,Bayern Munich,Barcelona,3,0,H
+UCL,2021-12-08,VfL Wolfsburg,Lille,1,3,A
+UCL,2021-12-08,Benfica,Dynamo Kyiv,2,0,H
+UCL,2021-12-08,Red Bull Salzburg,Sevilla,1,0,H
+UCL,2021-12-09,Atalanta,Villarreal,2,3,A
+UCL,2022-02-15,Paris Saint Germain,Real Madrid,1,0,H
+UCL,2022-02-15,Sporting CP,Manchester City,0,5,A
+UCL,2022-02-16,Inter,Liverpool,0,2,A
+UCL,2022-02-16,Red Bull Salzburg,Bayern Munich,1,1,D
+UCL,2022-02-22,Chelsea,Lille,2,0,H
+UCL,2022-02-22,Villarreal,Juventus,1,1,D
+UCL,2022-02-23,Benfica,Ajax,2,2,D
+UCL,2022-02-23,Atletico Madrid,Manchester United,1,1,D
+UCL,2022-03-08,Liverpool,Inter,0,1,A
+UCL,2022-03-08,Bayern Munich,Red Bull Salzburg,7,1,H
+UCL,2022-03-09,Manchester City,Sporting CP,0,0,D
+UCL,2022-03-09,Real Madrid,Paris Saint Germain,3,1,H
+UCL,2022-03-15,Manchester United,Atletico Madrid,0,1,A
+UCL,2022-03-15,Ajax,Benfica,0,1,A
+UCL,2022-03-16,Lille,Chelsea,1,2,A
+UCL,2022-03-16,Juventus,Villarreal,0,3,A
+UCL,2022-04-05,Manchester City,Atletico Madrid,1,0,H
+UCL,2022-04-05,Benfica,Liverpool,1,3,A
+UCL,2022-04-06,Chelsea,Real Madrid,1,3,A
+UCL,2022-04-06,Villarreal,Bayern Munich,1,0,H
+UCL,2022-04-12,Bayern Munich,Villarreal,1,1,D
+UCL,2022-04-12,Real Madrid,Chelsea,2,3,A
+UCL,2022-04-13,Liverpool,Benfica,3,3,D
+UCL,2022-04-13,Atletico Madrid,Manchester City,0,0,D
+UCL,2022-04-26,Manchester City,Real Madrid,4,3,H
+UCL,2022-04-27,Liverpool,Villarreal,2,0,H
+UCL,2022-05-03,Villarreal,Liverpool,2,3,A
+UCL,2022-05-04,Real Madrid,Manchester City,3,1,H
+UCL,2022-05-28,Liverpool,Real Madrid,0,1,A
+UCL,2022-06-21,La Fiorita,Inter Club d'Escaldes,1,2,A
+UCL,2022-06-21,FC Levadia Tallinn,Vikingur Reykjavik,1,6,A
+UCL,2022-06-24,Inter Club d'Escaldes,Vikingur Reykjavik,0,1,A
+UCL,2022-07-05,Pyunik Yerevan,CFR 1907 Cluj,0,0,D
+UCL,2022-07-05,Malmo FF,Vikingur Reykjavik,3,2,H
+UCL,2022-07-05,Ludogorets,Sutjeska,2,0,H
+UCL,2022-07-05,Lech Poznan,Qarabag,1,0,H
+UCL,2022-07-05,The New Saints,Linfield,1,0,H
+UCL,2022-07-05,Ballkani,FK Zalgiris Vilnius,1,1,D
+UCL,2022-07-05,Shamrock Rovers,Hibernians,3,0,H
+UCL,2022-07-05,Shkupi 1927,Lincoln Red Imps FC,3,0,H
+UCL,2022-07-06,FK Tobol Kostanay,Ferencvarosi TC,0,0,D
+UCL,2022-07-06,Bodo/Glimt,KI Klaksvik,3,0,H
+UCL,2022-07-06,HJK Helsinki,Rīgas FS,1,0,H
+UCL,2022-07-06,F91 Dudelange,Tirana,1,0,H
+UCL,2022-07-06,Zrinjski,Sheriff Tiraspol,0,0,D
+UCL,2022-07-06,Maribor,Shakhter Soligorsk,0,0,D
+UCL,2022-07-06,Slovan Bratislava,Dinamo Batumi,0,0,D
+UCL,2022-07-12,Rīgas FS,HJK Helsinki,2,1,H
+UCL,2022-07-12,Qarabag,Lech Poznan,5,1,H
+UCL,2022-07-12,FK Zalgiris Vilnius,Ballkani,1,0,H
+UCL,2022-07-12,Lincoln Red Imps FC,Shkupi 1927,2,0,H
+UCL,2022-07-12,Sheriff Tiraspol,Zrinjski,1,0,H
+UCL,2022-07-12,Tirana,F91 Dudelange,1,2,A
+UCL,2022-07-12,Hibernians,Shamrock Rovers,0,0,D
+UCL,2022-07-12,Sutjeska,Ludogorets,0,1,A
+UCL,2022-07-12,Vikingur Reykjavik,Malmo FF,3,3,D
+UCL,2022-07-13,Shakhter Soligorsk,Maribor,0,2,A
+UCL,2022-07-13,KI Klaksvik,Bodo/Glimt,3,1,H
+UCL,2022-07-13,Dinamo Batumi,Slovan Bratislava,1,2,A
+UCL,2022-07-13,Ferencvarosi TC,FK Tobol Kostanay,5,1,H
+UCL,2022-07-13,CFR 1907 Cluj,Pyunik Yerevan,2,2,D
+UCL,2022-07-13,Linfield,The New Saints,2,0,H
+UCL,2022-07-19,Qarabag,FC Zurich,3,2,H
+UCL,2022-07-19,FK Zalgiris Vilnius,Malmo FF,1,0,H
+UCL,2022-07-19,Pyunik Yerevan,F91 Dudelange,0,1,A
+UCL,2022-07-19,FC Midtjylland,AEK Larnaca,1,1,D
+UCL,2022-07-19,Ludogorets,Shamrock Rovers,3,0,H
+UCL,2022-07-19,Linfield,Bodo/Glimt,1,0,H
+UCL,2022-07-19,Dinamo Zagreb,Shkupi 1927,2,2,D
+UCL,2022-07-20,HJK Helsinki,Plzen,1,2,A
+UCL,2022-07-20,Maccabi Haifa,Olympiakos Piraeus,1,1,D
+UCL,2022-07-20,Dynamo Kyiv,Fenerbahçe,0,0,D
+UCL,2022-07-20,Ferencvarosi TC,Slovan Bratislava,1,2,A
+UCL,2022-07-20,Maribor,Sheriff Tiraspol,0,0,D
+UCL,2022-07-26,AEK Larnaca,FC Midtjylland,1,1,D
+UCL,2022-07-26,Plzen,HJK Helsinki,5,0,H
+UCL,2022-07-26,Sheriff Tiraspol,Maribor,1,0,H
+UCL,2022-07-26,F91 Dudelange,Pyunik Yerevan,1,4,A
+UCL,2022-07-26,Shamrock Rovers,Ludogorets,2,1,H
+UCL,2022-07-26,Shkupi 1927,Dinamo Zagreb,0,1,A
+UCL,2022-07-27,Bodo/Glimt,Linfield,8,0,H
+UCL,2022-07-27,Malmo FF,FK Zalgiris Vilnius,0,2,A
+UCL,2022-07-27,Fenerbahçe,Dynamo Kyiv,1,2,A
+UCL,2022-07-27,FC Zurich,Qarabag,2,2,D
+UCL,2022-07-27,Slovan Bratislava,Ferencvarosi TC,1,4,A
+UCL,2022-07-27,Olympiakos Piraeus,Maccabi Haifa,0,4,A
+UCL,2022-08-02,Sheriff Tiraspol,Plzen,1,2,A
+UCL,2022-08-02,Ludogorets,Dinamo Zagreb,1,2,A
+UCL,2022-08-02,Monaco,PSV Eindhoven,1,1,D
+UCL,2022-08-02,Union St. Gilloise,Rangers,2,0,H
+UCL,2022-08-02,Benfica,FC Midtjylland,4,1,H
+UCL,2022-08-03,Bodo/Glimt,FK Zalgiris Vilnius,5,0,H
+UCL,2022-08-03,Qarabag,Ferencvarosi TC,1,1,D
+UCL,2022-08-03,Maccabi Haifa,Apollon Limassol,4,0,H
+UCL,2022-08-03,Dynamo Kyiv,Sturm Graz,1,0,H
+UCL,2022-08-03,FK Crvena Zvezda,Pyunik Yerevan,5,0,H
+UCL,2022-08-09,FK Zalgiris Vilnius,Bodo/Glimt,1,1,D
+UCL,2022-08-09,Plzen,Sheriff Tiraspol,2,1,H
+UCL,2022-08-09,Apollon Limassol,Maccabi Haifa,2,0,H
+UCL,2022-08-09,Pyunik Yerevan,FK Crvena Zvezda,0,2,A
+UCL,2022-08-09,FC Midtjylland,Benfica,1,3,A
+UCL,2022-08-09,Dinamo Zagreb,Ludogorets,4,2,H
+UCL,2022-08-09,Ferencvarosi TC,Qarabag,1,3,A
+UCL,2022-08-09,PSV Eindhoven,Monaco,3,2,H
+UCL,2022-08-09,Sturm Graz,Dynamo Kyiv,1,2,A
+UCL,2022-08-09,Rangers,Union St. Gilloise,3,0,H
+UCL,2022-08-16,Rangers,PSV Eindhoven,2,2,D
+UCL,2022-08-16,Bodo/Glimt,Dinamo Zagreb,1,0,H
+UCL,2022-08-16,FC Copenhagen,Trabzonspor,2,1,H
+UCL,2022-08-17,Qarabag,Plzen,0,0,D
+UCL,2022-08-17,Dynamo Kyiv,Benfica,0,2,A
+UCL,2022-08-17,Maccabi Haifa,FK Crvena Zvezda,3,2,H
+UCL,2022-08-23,Benfica,Dynamo Kyiv,3,0,H
+UCL,2022-08-23,Plzen,Qarabag,2,1,H
+UCL,2022-08-23,FK Crvena Zvezda,Maccabi Haifa,2,2,D
+UCL,2022-08-24,PSV Eindhoven,Rangers,0,1,A
+UCL,2022-08-24,Dinamo Zagreb,Bodo/Glimt,4,1,H
+UCL,2022-08-24,Trabzonspor,FC Copenhagen,0,0,D
+UCL,2022-09-06,Borussia Dortmund,FC Copenhagen,3,0,H
+UCL,2022-09-06,Dinamo Zagreb,Chelsea,1,0,H
+UCL,2022-09-06,Paris Saint Germain,Juventus,2,1,H
+UCL,2022-09-06,RB Leipzig,Shakhtar Donetsk,1,4,A
+UCL,2022-09-06,Benfica,Maccabi Haifa,2,0,H
+UCL,2022-09-06,Celtic,Real Madrid,0,3,A
+UCL,2022-09-06,Sevilla,Manchester City,0,4,A
+UCL,2022-09-06,Red Bull Salzburg,AC Milan,1,1,D
+UCL,2022-09-07,Eintracht Frankfurt,Sporting CP,0,3,A
+UCL,2022-09-07,Ajax,Rangers,4,0,H
+UCL,2022-09-07,Tottenham,Marseille,2,0,H
+UCL,2022-09-07,Napoli,Liverpool,4,1,H
+UCL,2022-09-07,Inter,Bayern Munich,0,2,A
+UCL,2022-09-07,Barcelona,Plzen,5,1,H
+UCL,2022-09-07,Atletico Madrid,FC Porto,2,1,H
+UCL,2022-09-07,Club Brugge KV,Bayer Leverkusen,1,0,H
+UCL,2022-09-13,Sporting CP,Tottenham,2,0,H
+UCL,2022-09-13,Plzen,Inter,0,2,A
+UCL,2022-09-13,Liverpool,Ajax,2,1,H
+UCL,2022-09-13,Marseille,Eintracht Frankfurt,0,1,A
+UCL,2022-09-13,Bayern Munich,Barcelona,2,0,H
+UCL,2022-09-13,Bayer Leverkusen,Atletico Madrid,2,0,H
+UCL,2022-09-13,FC Porto,Club Brugge KV,0,4,A
+UCL,2022-09-14,AC Milan,Dinamo Zagreb,3,1,H
+UCL,2022-09-14,Shakhtar Donetsk,Celtic,1,1,D
+UCL,2022-09-14,Chelsea,Red Bull Salzburg,1,1,D
+UCL,2022-09-14,Manchester City,Borussia Dortmund,2,1,H
+UCL,2022-09-14,Rangers,Napoli,0,3,A
+UCL,2022-09-14,FC Copenhagen,Sevilla,0,0,D
+UCL,2022-09-14,Juventus,Benfica,1,2,A
+UCL,2022-09-14,Real Madrid,RB Leipzig,2,0,H
+UCL,2022-09-14,Maccabi Haifa,Paris Saint Germain,1,3,A
+UCL,2022-10-04,Marseille,Sporting CP,4,1,H
+UCL,2022-10-04,Bayern Munich,Plzen,5,0,H
+UCL,2022-10-04,Liverpool,Rangers,2,0,H
+UCL,2022-10-04,Eintracht Frankfurt,Tottenham,0,0,D
+UCL,2022-10-04,Ajax,Napoli,1,6,A
+UCL,2022-10-04,FC Porto,Bayer Leverkusen,2,0,H
+UCL,2022-10-04,Inter,Barcelona,1,0,H
+UCL,2022-10-04,Club Brugge KV,Atletico Madrid,2,0,H
+UCL,2022-10-05,RB Leipzig,Celtic,3,1,H
+UCL,2022-10-05,Red Bull Salzburg,Dinamo Zagreb,1,0,H
+UCL,2022-10-05,Chelsea,AC Milan,3,0,H
+UCL,2022-10-05,Manchester City,FC Copenhagen,5,0,H
+UCL,2022-10-05,Benfica,Paris Saint Germain,1,1,D
+UCL,2022-10-05,Juventus,Maccabi Haifa,3,1,H
+UCL,2022-10-05,Sevilla,Borussia Dortmund,1,4,A
+UCL,2022-10-05,Real Madrid,Shakhtar Donetsk,2,1,H
+UCL,2022-10-11,FC Copenhagen,Manchester City,0,0,D
+UCL,2022-10-11,Maccabi Haifa,Juventus,2,0,H
+UCL,2022-10-11,Paris Saint Germain,Benfica,1,1,D
+UCL,2022-10-11,Borussia Dortmund,Sevilla,1,1,D
+UCL,2022-10-11,Celtic,RB Leipzig,0,2,A
+UCL,2022-10-11,AC Milan,Chelsea,0,2,A
+UCL,2022-10-11,Shakhtar Donetsk,Real Madrid,1,1,D
+UCL,2022-10-11,Dinamo Zagreb,Red Bull Salzburg,1,1,D
+UCL,2022-10-12,Napoli,Ajax,4,2,H
+UCL,2022-10-12,Atletico Madrid,Club Brugge KV,0,0,D
+UCL,2022-10-12,Tottenham,Eintracht Frankfurt,3,2,H
+UCL,2022-10-12,Bayer Leverkusen,FC Porto,0,3,A
+UCL,2022-10-12,Sporting CP,Marseille,0,2,A
+UCL,2022-10-12,Rangers,Liverpool,1,7,A
+UCL,2022-10-12,Barcelona,Inter,3,3,D
+UCL,2022-10-12,Plzen,Bayern Munich,2,4,A
+UCL,2022-10-25,Sevilla,FC Copenhagen,3,0,H
+UCL,2022-10-25,Red Bull Salzburg,Chelsea,1,2,A
+UCL,2022-10-25,Paris Saint Germain,Maccabi Haifa,7,2,H
+UCL,2022-10-25,Borussia Dortmund,Manchester City,0,0,D
+UCL,2022-10-25,RB Leipzig,Real Madrid,3,2,H
+UCL,2022-10-25,Benfica,Juventus,4,3,H
+UCL,2022-10-25,Celtic,Shakhtar Donetsk,1,1,D
+UCL,2022-10-25,Dinamo Zagreb,AC Milan,0,4,A
+UCL,2022-10-26,Inter,Plzen,4,0,H
+UCL,2022-10-26,Club Brugge KV,FC Porto,0,4,A
+UCL,2022-10-26,Tottenham,Sporting CP,1,1,D
+UCL,2022-10-26,Eintracht Frankfurt,Marseille,2,1,H
+UCL,2022-10-26,Ajax,Liverpool,0,3,A
+UCL,2022-10-26,Napoli,Rangers,3,0,H
+UCL,2022-10-26,Barcelona,Bayern Munich,0,3,A
+UCL,2022-10-26,Atletico Madrid,Bayer Leverkusen,2,2,D
+UCL,2022-11-01,Bayer Leverkusen,Club Brugge KV,0,0,D
+UCL,2022-11-01,FC Porto,Atletico Madrid,2,1,H
+UCL,2022-11-01,Liverpool,Napoli,2,0,H
+UCL,2022-11-01,Marseille,Tottenham,1,2,A
+UCL,2022-11-01,Bayern Munich,Inter,2,0,H
+UCL,2022-11-01,Sporting CP,Eintracht Frankfurt,1,2,A
+UCL,2022-11-01,Rangers,Ajax,1,3,A
+UCL,2022-11-01,Plzen,Barcelona,2,4,A
+UCL,2022-11-02,Real Madrid,Celtic,5,1,H
+UCL,2022-11-02,Shakhtar Donetsk,RB Leipzig,0,4,A
+UCL,2022-11-02,Chelsea,Dinamo Zagreb,2,1,H
+UCL,2022-11-02,Manchester City,Sevilla,3,1,H
+UCL,2022-11-02,FC Copenhagen,Borussia Dortmund,1,1,D
+UCL,2022-11-02,AC Milan,Red Bull Salzburg,4,0,H
+UCL,2022-11-02,Juventus,Paris Saint Germain,1,2,A
+UCL,2022-11-02,Maccabi Haifa,Benfica,1,6,A
+UCL,2023-02-14,Paris Saint Germain,Bayern Munich,0,1,A
+UCL,2023-02-14,AC Milan,Tottenham,1,0,H
+UCL,2023-02-15,Borussia Dortmund,Chelsea,1,0,H
+UCL,2023-02-15,Club Brugge KV,Benfica,0,2,A
+UCL,2023-02-21,Liverpool,Real Madrid,2,5,A
+UCL,2023-02-21,Eintracht Frankfurt,Napoli,0,2,A
+UCL,2023-02-22,RB Leipzig,Manchester City,1,1,D
+UCL,2023-02-22,Inter,FC Porto,1,0,H
+UCL,2023-03-07,Chelsea,Borussia Dortmund,2,0,H
+UCL,2023-03-07,Benfica,Club Brugge KV,5,1,H
+UCL,2023-03-08,Tottenham,AC Milan,0,0,D
+UCL,2023-03-08,Bayern Munich,Paris Saint Germain,2,0,H
+UCL,2023-03-14,Manchester City,RB Leipzig,7,0,H
+UCL,2023-03-14,FC Porto,Inter,0,0,D
+UCL,2023-03-15,Napoli,Eintracht Frankfurt,3,0,H
+UCL,2023-03-15,Real Madrid,Liverpool,1,0,H
+UCL,2023-04-11,Manchester City,Bayern Munich,3,0,H
+UCL,2023-04-11,Benfica,Inter,0,2,A
+UCL,2023-04-12,AC Milan,Napoli,1,0,H
+UCL,2023-04-12,Real Madrid,Chelsea,2,0,H
+UCL,2023-04-18,Chelsea,Real Madrid,0,2,A
+UCL,2023-04-18,Napoli,AC Milan,1,1,D
+UCL,2023-04-19,Bayern Munich,Manchester City,1,1,D
+UCL,2023-04-19,Inter,Benfica,3,3,D
+UCL,2023-05-09,Real Madrid,Manchester City,1,1,D
+UCL,2023-05-10,AC Milan,Inter,0,2,A
+UCL,2023-05-16,Inter,AC Milan,1,0,H
+UCL,2023-05-17,Manchester City,Real Madrid,4,0,H
+UCL,2023-06-10,Manchester City,Inter,1,0,H
+UCL,2023-06-27,Atlètic Club d'Escaldes,Buducnost Podgorica,0,3,A
+UCL,2023-06-27,Tre Penne,Breidablik,1,7,A
+UCL,2023-06-30,Buducnost Podgorica,Breidablik,0,5,A
+UCL,2023-07-11,FC Urartu,Zrinjski,0,1,A
+UCL,2023-07-11,Lincoln Red Imps FC,Qarabag,1,2,A
+UCL,2023-07-11,FK Zalgiris Vilnius,Struga,0,0,D
+UCL,2023-07-11,Olimpija Ljubljana,Valmiera / BSS,2,1,H
+UCL,2023-07-11,Raków Częstochowa,Flora Tallinn,1,0,H
+UCL,2023-07-11,Hamrun Spartans,Maccabi Haifa,0,4,A
+UCL,2023-07-11,Shamrock Rovers,Breidablik,0,1,A
+UCL,2023-07-11,KI Klaksvik,Ferencvarosi TC,0,0,D
+UCL,2023-07-11,Partizani,Bate Borisov,1,1,D
+UCL,2023-07-11,Ballkani,Ludogorets,2,0,H
+UCL,2023-07-12,FC Astana,Dinamo Tbilisi,1,1,D
+UCL,2023-07-12,HJK Helsinki,Larne,1,0,H
+UCL,2023-07-12,BK Hacken,The New Saints,3,1,H
+UCL,2023-07-12,Farul Constanta,Sheriff Tiraspol,1,0,H
+UCL,2023-07-12,Slovan Bratislava,Swift Hesperange,1,1,D
+UCL,2023-07-18,Struga,FK Zalgiris Vilnius,1,2,A
+UCL,2023-07-18,Sheriff Tiraspol,Farul Constanta,3,0,H
+UCL,2023-07-18,Flora Tallinn,Raków Częstochowa,0,3,A
+UCL,2023-07-18,Maccabi Haifa,Hamrun Spartans,2,1,H
+UCL,2023-07-18,The New Saints,BK Hacken,0,2,A
+UCL,2023-07-18,Bate Borisov,Partizani,2,0,H
+UCL,2023-07-18,Zrinjski,FC Urartu,2,3,A
+UCL,2023-07-18,Breidablik,Shamrock Rovers,2,1,H
+UCL,2023-07-19,Valmiera / BSS,Olimpija Ljubljana,1,2,A
+UCL,2023-07-19,Qarabag,Lincoln Red Imps FC,4,0,H
+UCL,2023-07-19,Ferencvarosi TC,KI Klaksvik,0,3,A
+UCL,2023-07-19,Dinamo Tbilisi,FC Astana,1,2,A
+UCL,2023-07-19,Ludogorets,Ballkani,4,0,H
+UCL,2023-07-19,Swift Hesperange,Slovan Bratislava,0,2,A
+UCL,2023-07-19,Larne,HJK Helsinki,2,2,D
+UCL,2023-07-25,FK Zalgiris Vilnius,Galatasaray,2,2,D
+UCL,2023-07-25,HJK Helsinki,Molde,1,0,H
+UCL,2023-07-25,Dinamo Zagreb,FC Astana,4,0,H
+UCL,2023-07-25,Dnipro-1,Panathinaikos,1,3,A
+UCL,2023-07-25,Servette FC,Genk,1,1,D
+UCL,2023-07-25,Zrinjski,Slovan Bratislava,0,1,A
+UCL,2023-07-25,Breidablik,FC Copenhagen,0,2,A
+UCL,2023-07-26,Sheriff Tiraspol,Maccabi Haifa,1,0,H
+UCL,2023-07-26,Aris,Bate Borisov,6,2,H
+UCL,2023-07-26,Raków Częstochowa,Qarabag,3,2,H
+UCL,2023-07-26,Ludogorets,Olimpija Ljubljana,1,1,D
+UCL,2023-07-26,KI Klaksvik,BK Hacken,0,0,D
+UCL,2023-08-01,Panathinaikos,Dnipro-1,2,2,D
+UCL,2023-08-01,Bate Borisov,Aris,3,5,A
+UCL,2023-08-01,Olimpija Ljubljana,Ludogorets,2,1,H
+UCL,2023-08-01,Slovan Bratislava,Zrinjski,2,2,D
+UCL,2023-08-02,FC Astana,Dinamo Zagreb,0,2,A
+UCL,2023-08-02,Qarabag,Raków Częstochowa,1,1,D
+UCL,2023-08-02,Molde,HJK Helsinki,2,0,H
+UCL,2023-08-02,BK Hacken,KI Klaksvik,3,3,D
+UCL,2023-08-02,Genk,Servette FC,2,2,D
+UCL,2023-08-02,Maccabi Haifa,Sheriff Tiraspol,4,1,H
+UCL,2023-08-02,FC Copenhagen,Breidablik,6,3,H
+UCL,2023-08-02,Galatasaray,FK Zalgiris Vilnius,1,0,H
+UCL,2023-08-08,FC Copenhagen,Sparta Praha,0,0,D
+UCL,2023-08-08,Raków Częstochowa,Aris,2,1,H
+UCL,2023-08-08,PSV Eindhoven,Sturm Graz,4,1,H
+UCL,2023-08-08,KI Klaksvik,Molde,2,1,H
+UCL,2023-08-08,SC Braga,TSC Backa Topola,3,0,H
+UCL,2023-08-08,Olimpija Ljubljana,Galatasaray,0,3,A
+UCL,2023-08-09,Panathinaikos,Marseille,1,0,H
+UCL,2023-08-09,Slovan Bratislava,Maccabi Haifa,1,2,A
+UCL,2023-08-09,Rangers,Servette FC,2,1,H
+UCL,2023-08-15,Molde,KI Klaksvik,2,0,H
+UCL,2023-08-15,Sparta Praha,FC Copenhagen,3,3,D
+UCL,2023-08-15,Aris,Raków Częstochowa,0,1,A
+UCL,2023-08-15,Maccabi Haifa,Slovan Bratislava,3,1,H
+UCL,2023-08-15,Dinamo Zagreb,AEK Athens FC,1,2,A
+UCL,2023-08-15,Galatasaray,Olimpija Ljubljana,1,0,H
+UCL,2023-08-15,TSC Backa Topola,SC Braga,1,4,A
+UCL,2023-08-15,Sturm Graz,PSV Eindhoven,1,3,A
+UCL,2023-08-15,Servette FC,Rangers,1,1,D
+UCL,2023-08-15,Marseille,Panathinaikos,2,1,H
+UCL,2023-08-19,AEK Athens FC,Dinamo Zagreb,2,2,D
+UCL,2023-08-22,Rangers,PSV Eindhoven,2,2,D
+UCL,2023-08-22,Antwerp,AEK Athens FC,1,0,H
+UCL,2023-08-22,Raków Częstochowa,FC Copenhagen,0,1,A
+UCL,2023-08-23,SC Braga,Panathinaikos,2,1,H
+UCL,2023-08-23,Molde,Galatasaray,2,3,A
+UCL,2023-08-23,Maccabi Haifa,BSC Young Boys,0,0,D
+UCL,2023-08-29,BSC Young Boys,Maccabi Haifa,3,0,H
+UCL,2023-08-29,Panathinaikos,SC Braga,0,1,A
+UCL,2023-08-29,Galatasaray,Molde,2,1,H
+UCL,2023-08-30,PSV Eindhoven,Rangers,5,1,H
+UCL,2023-08-30,FC Copenhagen,Raków Częstochowa,1,1,D
+UCL,2023-08-30,AEK Athens FC,Antwerp,1,2,A
+UCL,2023-09-19,AC Milan,Newcastle,0,0,D
+UCL,2023-09-19,BSC Young Boys,RB Leipzig,1,3,A
+UCL,2023-09-19,Manchester City,FK Crvena Zvezda,3,1,H
+UCL,2023-09-19,Paris Saint Germain,Borussia Dortmund,2,0,H
+UCL,2023-09-19,Feyenoord,Celtic,2,0,H
+UCL,2023-09-19,Lazio,Atletico Madrid,1,1,D
+UCL,2023-09-19,Barcelona,Antwerp,5,0,H
+UCL,2023-09-19,Shakhtar Donetsk,FC Porto,1,3,A
+UCL,2023-09-20,Real Madrid,Union Berlin,1,0,H
+UCL,2023-09-20,Galatasaray,FC Copenhagen,2,2,D
+UCL,2023-09-20,Arsenal,PSV Eindhoven,4,0,H
+UCL,2023-09-20,Bayern Munich,Manchester United,4,3,H
+UCL,2023-09-20,Benfica,Red Bull Salzburg,0,2,A
+UCL,2023-09-20,SC Braga,Napoli,1,2,A
+UCL,2023-09-20,Sevilla,Lens,1,1,D
+UCL,2023-09-20,Real Sociedad,Inter,1,1,D
+UCL,2023-10-03,Union Berlin,SC Braga,2,3,A
+UCL,2023-10-03,Red Bull Salzburg,Real Sociedad,0,2,A
+UCL,2023-10-03,Manchester United,Galatasaray,2,3,A
+UCL,2023-10-03,Lens,Arsenal,2,1,H
+UCL,2023-10-03,PSV Eindhoven,Sevilla,2,2,D
+UCL,2023-10-03,FC Copenhagen,Bayern Munich,1,2,A
+UCL,2023-10-03,Napoli,Real Madrid,2,3,A
+UCL,2023-10-03,Inter,Benfica,1,0,H
+UCL,2023-10-04,Atletico Madrid,Feyenoord,3,2,H
+UCL,2023-10-04,Antwerp,Shakhtar Donetsk,2,3,A
+UCL,2023-10-04,Newcastle,Paris Saint Germain,4,1,H
+UCL,2023-10-04,Borussia Dortmund,AC Milan,0,0,D
+UCL,2023-10-04,RB Leipzig,Manchester City,1,3,A
+UCL,2023-10-04,FC Porto,Barcelona,0,1,A
+UCL,2023-10-04,Celtic,Lazio,1,2,A
+UCL,2023-10-04,FK Crvena Zvezda,BSC Young Boys,2,2,D
+UCL,2023-10-24,Inter,Red Bull Salzburg,2,1,H
+UCL,2023-10-24,Galatasaray,Bayern Munich,1,3,A
+UCL,2023-10-24,Manchester United,FC Copenhagen,1,0,H
+UCL,2023-10-24,Lens,PSV Eindhoven,1,1,D
+UCL,2023-10-24,Union Berlin,Napoli,0,1,A
+UCL,2023-10-24,Benfica,Real Sociedad,0,1,A
+UCL,2023-10-24,SC Braga,Real Madrid,1,2,A
+UCL,2023-10-24,Sevilla,Arsenal,1,2,A
+UCL,2023-10-25,Feyenoord,Lazio,3,1,H
+UCL,2023-10-25,Barcelona,Shakhtar Donetsk,2,1,H
+UCL,2023-10-25,Newcastle,Borussia Dortmund,0,1,A
+UCL,2023-10-25,Paris Saint Germain,AC Milan,3,0,H
+UCL,2023-10-25,RB Leipzig,FK Crvena Zvezda,3,1,H
+UCL,2023-10-25,Celtic,Atletico Madrid,2,2,D
+UCL,2023-10-25,BSC Young Boys,Manchester City,1,3,A
+UCL,2023-10-25,Antwerp,FC Porto,1,4,A
+UCL,2023-11-07,Borussia Dortmund,Newcastle,2,0,H
+UCL,2023-11-07,Shakhtar Donetsk,Barcelona,1,0,H
+UCL,2023-11-07,Manchester City,BSC Young Boys,3,0,H
+UCL,2023-11-07,FC Porto,Antwerp,2,0,H
+UCL,2023-11-07,Lazio,Feyenoord,1,0,H
+UCL,2023-11-07,AC Milan,Paris Saint Germain,2,1,H
+UCL,2023-11-07,Atletico Madrid,Celtic,6,0,H
+UCL,2023-11-07,FK Crvena Zvezda,RB Leipzig,1,2,A
+UCL,2023-11-08,Napoli,Union Berlin,1,1,D
+UCL,2023-11-08,Real Sociedad,Benfica,3,1,H
+UCL,2023-11-08,Arsenal,Sevilla,2,0,H
+UCL,2023-11-08,Bayern Munich,Galatasaray,2,1,H
+UCL,2023-11-08,PSV Eindhoven,Lens,1,0,H
+UCL,2023-11-08,FC Copenhagen,Manchester United,4,3,H
+UCL,2023-11-08,Real Madrid,SC Braga,3,0,H
+UCL,2023-11-08,Red Bull Salzburg,Inter,0,1,A
+UCL,2023-11-28,Lazio,Celtic,2,0,H
+UCL,2023-11-28,Shakhtar Donetsk,Antwerp,1,0,H
+UCL,2023-11-28,Manchester City,RB Leipzig,3,2,H
+UCL,2023-11-28,Paris Saint Germain,Newcastle,1,1,D
+UCL,2023-11-28,Feyenoord,Atletico Madrid,1,3,A
+UCL,2023-11-28,AC Milan,Borussia Dortmund,1,3,A
+UCL,2023-11-28,Barcelona,FC Porto,2,1,H
+UCL,2023-11-28,BSC Young Boys,FK Crvena Zvezda,2,0,H
+UCL,2023-11-29,Sevilla,PSV Eindhoven,2,3,A
+UCL,2023-11-29,Galatasaray,Manchester United,3,3,D
+UCL,2023-11-29,Arsenal,Lens,6,0,H
+UCL,2023-11-29,Bayern Munich,FC Copenhagen,0,0,D
+UCL,2023-11-29,Benfica,Inter,3,3,D
+UCL,2023-11-29,SC Braga,Union Berlin,1,1,D
+UCL,2023-11-29,Real Madrid,Napoli,4,2,H
+UCL,2023-11-29,Real Sociedad,Red Bull Salzburg,0,0,D
+UCL,2023-12-12,Lens,Sevilla,2,1,H
+UCL,2023-12-12,PSV Eindhoven,Arsenal,1,1,D
+UCL,2023-12-12,Manchester United,Bayern Munich,0,1,A
+UCL,2023-12-12,Union Berlin,Real Madrid,2,3,A
+UCL,2023-12-12,FC Copenhagen,Galatasaray,1,0,H
+UCL,2023-12-12,Napoli,SC Braga,2,0,H
+UCL,2023-12-12,Inter,Real Sociedad,0,0,D
+UCL,2023-12-12,Red Bull Salzburg,Benfica,1,3,A
+UCL,2023-12-13,RB Leipzig,BSC Young Boys,2,1,H
+UCL,2023-12-13,FK Crvena Zvezda,Manchester City,2,3,A
+UCL,2023-12-13,Newcastle,AC Milan,1,2,A
+UCL,2023-12-13,Borussia Dortmund,Paris Saint Germain,1,1,D
+UCL,2023-12-13,FC Porto,Shakhtar Donetsk,5,3,H
+UCL,2023-12-13,Celtic,Feyenoord,2,1,H
+UCL,2023-12-13,Atletico Madrid,Lazio,2,0,H
+UCL,2023-12-13,Antwerp,Barcelona,3,2,H
+UCL,2024-02-13,RB Leipzig,Real Madrid,0,1,A
+UCL,2024-02-13,FC Copenhagen,Manchester City,1,3,A
+UCL,2024-02-14,Paris Saint Germain,Real Sociedad,2,0,H
+UCL,2024-02-14,Lazio,Bayern Munich,1,0,H
+UCL,2024-02-20,PSV Eindhoven,Borussia Dortmund,1,1,D
+UCL,2024-02-20,Inter,Atletico Madrid,1,0,H
+UCL,2024-02-21,FC Porto,Arsenal,1,0,H
+UCL,2024-02-21,Napoli,Barcelona,1,1,D
+UCL,2024-03-05,Bayern Munich,Lazio,3,0,H
+UCL,2024-03-05,Real Sociedad,Paris Saint Germain,1,2,A
+UCL,2024-03-06,Manchester City,FC Copenhagen,3,1,H
+UCL,2024-03-06,Real Madrid,RB Leipzig,1,1,D
+UCL,2024-03-12,Arsenal,FC Porto,1,0,H
+UCL,2024-03-12,Barcelona,Napoli,3,1,H
+UCL,2024-03-13,Borussia Dortmund,PSV Eindhoven,2,0,H
+UCL,2024-03-13,Atletico Madrid,Inter,2,1,H
+UCL,2024-04-09,Arsenal,Bayern Munich,2,2,D
+UCL,2024-04-09,Real Madrid,Manchester City,3,3,D
+UCL,2024-04-10,Paris Saint Germain,Barcelona,2,3,A
+UCL,2024-04-10,Atletico Madrid,Borussia Dortmund,2,1,H
+UCL,2024-04-16,Borussia Dortmund,Atletico Madrid,4,2,H
+UCL,2024-04-16,Barcelona,Paris Saint Germain,1,4,A
+UCL,2024-04-17,Manchester City,Real Madrid,1,1,D
+UCL,2024-04-17,Bayern Munich,Arsenal,1,0,H
+UCL,2024-04-30,Bayern Munich,Real Madrid,2,2,D
+UCL,2024-05-01,Borussia Dortmund,Paris Saint Germain,1,0,H
+UCL,2024-05-07,Paris Saint Germain,Borussia Dortmund,0,1,A
+UCL,2024-05-08,Real Madrid,Bayern Munich,2,1,H
+UCL,2024-06-01,Borussia Dortmund,Real Madrid,0,2,A
+UCL,2024-07-09,Panevėžys,HJK Helsinki,3,0,H
+UCL,2024-07-09,Hamrun Spartans,Lincoln Red Imps FC,0,1,A
+UCL,2024-07-09,The New Saints,Dečić,3,0,H
+UCL,2024-07-09,UE Santa Coloma,Ballkani,1,2,A
+UCL,2024-07-09,Vikingur Reykjavik,Shamrock Rovers,0,0,D
+UCL,2024-07-09,Virtus,FCSB,1,7,A
+UCL,2024-07-10,Ordabasy,Petrocub,0,0,D
+UCL,2024-07-10,Flora Tallinn,Celje,0,5,A
+UCL,2024-07-10,Slovan Bratislava,Struga,4,2,H
+UCL,2024-07-10,Rīgas FS,Larne,3,0,H
+UCL,2024-07-10,Ludogorets,Dinamo Batumi,3,1,H
+UCL,2024-07-10,KI Klaksvik,FC Differdange 03,2,0,H
+UCL,2024-07-10,Dinamo Minsk,Pyunik Yerevan,0,0,D
+UCL,2024-07-10,Borac Banja Luka,Egnatia Rrogozhinë,1,0,H
+UCL,2024-07-16,Ballkani,UE Santa Coloma,1,2,A
+UCL,2024-07-16,HJK Helsinki,Panevėžys,1,1,D
+UCL,2024-07-16,Lincoln Red Imps FC,Hamrun Spartans,0,1,A
+UCL,2024-07-16,Pyunik Yerevan,Dinamo Minsk,0,1,A
+UCL,2024-07-16,Celje,Flora Tallinn,2,1,H
+UCL,2024-07-16,FCSB,Virtus,4,0,H
+UCL,2024-07-16,Shamrock Rovers,Vikingur Reykjavik,2,1,H
+UCL,2024-07-16,Dečić,The New Saints,1,1,D
+UCL,2024-07-17,Struga,Slovan Bratislava,1,2,A
+UCL,2024-07-17,FC Differdange 03,KI Klaksvik,0,0,D
+UCL,2024-07-17,Dinamo Batumi,Ludogorets,1,0,H
+UCL,2024-07-17,Petrocub,Ordabasy,1,0,H
+UCL,2024-07-17,Egnatia Rrogozhinë,Borac Banja Luka,2,1,H
+UCL,2024-07-17,Larne,Rīgas FS,0,4,A
+UCL,2024-07-23,Bodo/Glimt,Rīgas FS,4,0,H
+UCL,2024-07-23,Panevėžys,Jagiellonia,0,4,A
+UCL,2024-07-23,Lincoln Red Imps FC,Qarabag,0,2,A
+UCL,2024-07-23,Malmo FF,KI Klaksvik,4,1,H
+UCL,2024-07-23,Apoel Nicosia,Petrocub,1,0,H
+UCL,2024-07-23,FCSB,Maccabi Tel Aviv,1,1,D
+UCL,2024-07-23,Dynamo Kyiv,FK Partizan,6,2,H
+UCL,2024-07-23,Ferencvarosi TC,The New Saints,5,0,H
+UCL,2024-07-23,UE Santa Coloma,FC Midtjylland,0,3,A
+UCL,2024-07-23,FC Lugano,Fenerbahçe,3,4,A
+UCL,2024-07-23,Shamrock Rovers,Sparta Praha,0,2,A
+UCL,2024-07-24,PAOK,Borac Banja Luka,3,2,H
+UCL,2024-07-24,Ludogorets,Dinamo Minsk,2,0,H
+UCL,2024-07-24,Celje,Slovan Bratislava,1,1,D
+UCL,2024-07-30,Qarabag,Lincoln Red Imps FC,5,0,H
+UCL,2024-07-30,Fenerbahçe,FC Lugano,2,1,H
+UCL,2024-07-30,Sparta Praha,Shamrock Rovers,4,2,H
+UCL,2024-07-30,Petrocub,Apoel Nicosia,1,1,D
+UCL,2024-07-30,The New Saints,Ferencvarosi TC,1,2,A
+UCL,2024-07-30,Slovan Bratislava,Celje,5,0,H
+UCL,2024-07-30,KI Klaksvik,Malmo FF,3,2,H
+UCL,2024-07-31,Rīgas FS,Bodo/Glimt,1,3,A
+UCL,2024-07-31,FC Midtjylland,UE Santa Coloma,1,0,H
+UCL,2024-07-31,FK Partizan,Dynamo Kyiv,0,3,A
+UCL,2024-07-31,Maccabi Tel Aviv,FCSB,0,1,A
+UCL,2024-07-31,Jagiellonia,Panevėžys,3,1,H
+UCL,2024-07-31,Dinamo Minsk,Ludogorets,1,0,H
+UCL,2024-07-31,Borac Banja Luka,PAOK,0,1,A
+UCL,2024-08-06,Qarabag,Ludogorets,1,2,A
+UCL,2024-08-06,Malmo FF,PAOK,2,2,D
+UCL,2024-08-06,FC Midtjylland,Ferencvarosi TC,2,0,H
+UCL,2024-08-06,Dynamo Kyiv,Rangers,1,1,D
+UCL,2024-08-06,Sparta Praha,FCSB,1,1,D
+UCL,2024-08-06,Lille,Fenerbahçe,2,1,H
+UCL,2024-08-06,Red Bull Salzburg,Twente,2,1,H
+UCL,2024-08-07,Slavia Praha,Union St. Gilloise,3,1,H
+UCL,2024-08-07,Slovan Bratislava,Apoel Nicosia,2,0,H
+UCL,2024-08-07,Jagiellonia,Bodo/Glimt,0,1,A
+UCL,2024-08-13,Bodo/Glimt,Jagiellonia,4,1,H
+UCL,2024-08-13,Twente,Red Bull Salzburg,3,3,D
+UCL,2024-08-13,Fenerbahçe,Lille,1,1,D
+UCL,2024-08-13,Apoel Nicosia,Slovan Bratislava,0,0,D
+UCL,2024-08-13,PAOK,Malmo FF,3,4,A
+UCL,2024-08-13,Ludogorets,Qarabag,2,7,A
+UCL,2024-08-13,Ferencvarosi TC,FC Midtjylland,1,1,D
+UCL,2024-08-13,FCSB,Sparta Praha,2,3,A
+UCL,2024-08-13,Union St. Gilloise,Slavia Praha,0,1,A
+UCL,2024-08-13,Rangers,Dynamo Kyiv,0,2,A
+UCL,2024-08-20,Lille,Slavia Praha,2,0,H
+UCL,2024-08-20,Bodo/Glimt,FK Crvena Zvezda,2,1,H
+UCL,2024-08-20,Dinamo Zagreb,Qarabag,3,0,H
+UCL,2024-08-21,Malmo FF,Sparta Praha,0,2,A
+UCL,2024-08-21,FC Midtjylland,Slovan Bratislava,1,1,D
+UCL,2024-08-21,BSC Young Boys,Galatasaray,3,2,H
+UCL,2024-08-21,Dynamo Kyiv,Red Bull Salzburg,0,2,A
+UCL,2024-08-27,Red Bull Salzburg,Dynamo Kyiv,1,1,D
+UCL,2024-08-27,Sparta Praha,Malmo FF,2,0,H
+UCL,2024-08-27,Galatasaray,BSC Young Boys,0,1,A
+UCL,2024-08-28,Qarabag,Dinamo Zagreb,0,2,A
+UCL,2024-08-28,Slavia Praha,Lille,2,1,H
+UCL,2024-08-28,FK Crvena Zvezda,Bodo/Glimt,2,0,H
+UCL,2024-08-28,Slovan Bratislava,FC Midtjylland,3,2,H
+UCL,2024-09-17,Juventus,PSV Eindhoven,3,1,H
+UCL,2024-09-17,BSC Young Boys,Aston Villa,0,3,A
+UCL,2024-09-17,Bayern München,Dinamo Zagreb,9,2,H
+UCL,2024-09-17,Sporting CP,Lille,2,0,H
+UCL,2024-09-17,AC Milan,Liverpool,1,3,A
+UCL,2024-09-17,Real Madrid,VfB Stuttgart,3,1,H
+UCL,2024-09-18,Bologna,Shakhtar Donetsk,0,0,D
+UCL,2024-09-18,Sparta Praha,Red Bull Salzburg,3,0,H
+UCL,2024-09-18,Manchester City,Inter,0,0,D
+UCL,2024-09-18,Paris Saint Germain,Girona,1,0,H
+UCL,2024-09-18,Celtic,Slovan Bratislava,5,1,H
+UCL,2024-09-18,Club Brugge KV,Borussia Dortmund,0,3,A
+UCL,2024-09-19,Feyenoord,Bayer Leverkusen,0,4,A
+UCL,2024-09-19,FK Crvena Zvezda,Benfica,1,2,A
+UCL,2024-09-19,Monaco,Barcelona,2,1,H
+UCL,2024-09-19,Stade Brestois 29,Sturm Graz,2,1,H
+UCL,2024-09-19,Atalanta,Arsenal,0,0,D
+UCL,2024-09-19,Atletico Madrid,RB Leipzig,2,1,H
+UCL,2024-10-01,VfB Stuttgart,Sparta Praha,1,1,D
+UCL,2024-10-01,Red Bull Salzburg,Stade Brestois 29,0,4,A
+UCL,2024-10-01,Arsenal,Paris Saint Germain,2,0,H
+UCL,2024-10-01,Borussia Dortmund,Celtic,7,1,H
+UCL,2024-10-01,Bayer Leverkusen,AC Milan,1,0,H
+UCL,2024-10-01,PSV Eindhoven,Sporting CP,1,1,D
+UCL,2024-10-01,Inter,FK Crvena Zvezda,4,0,H
+UCL,2024-10-01,Barcelona,BSC Young Boys,5,0,H
+UCL,2024-10-01,Slovan Bratislava,Manchester City,0,4,A
+UCL,2024-10-02,Girona,Feyenoord,2,3,A
+UCL,2024-10-02,Shakhtar Donetsk,Atalanta,0,3,A
+UCL,2024-10-02,Liverpool,Bologna,2,0,H
+UCL,2024-10-02,Aston Villa,Bayern München,1,0,H
+UCL,2024-10-02,Lille,Real Madrid,1,0,H
+UCL,2024-10-02,RB Leipzig,Juventus,2,3,A
+UCL,2024-10-02,Benfica,Atletico Madrid,4,0,H
+UCL,2024-10-02,Dinamo Zagreb,Monaco,2,2,D
+UCL,2024-10-02,Sturm Graz,Club Brugge KV,0,1,A
+UCL,2024-10-22,Monaco,FK Crvena Zvezda,5,1,H
+UCL,2024-10-22,AC Milan,Club Brugge KV,3,1,H
+UCL,2024-10-22,Arsenal,Shakhtar Donetsk,1,0,H
+UCL,2024-10-22,Aston Villa,Bologna,2,0,H
+UCL,2024-10-22,Paris Saint Germain,PSV Eindhoven,1,1,D
+UCL,2024-10-22,Juventus,VfB Stuttgart,0,1,A
+UCL,2024-10-22,Real Madrid,Borussia Dortmund,5,2,H
+UCL,2024-10-22,Girona,Slovan Bratislava,2,0,H
+UCL,2024-10-22,Sturm Graz,Sporting CP,0,2,A
+UCL,2024-10-23,Stade Brestois 29,Bayer Leverkusen,1,1,D
+UCL,2024-10-23,Atalanta,Celtic,0,0,D
+UCL,2024-10-23,Manchester City,Sparta Praha,5,0,H
+UCL,2024-10-23,RB Leipzig,Liverpool,0,1,A
+UCL,2024-10-23,Benfica,Feyenoord,1,3,A
+UCL,2024-10-23,Barcelona,Bayern München,4,1,H
+UCL,2024-10-23,Atletico Madrid,Lille,1,3,A
+UCL,2024-10-23,BSC Young Boys,Inter,0,1,A
+UCL,2024-10-23,Red Bull Salzburg,Dinamo Zagreb,0,2,A
+UCL,2024-11-05,PSV Eindhoven,Girona,4,0,H
+UCL,2024-11-05,Slovan Bratislava,Dinamo Zagreb,1,4,A
+UCL,2024-11-05,Liverpool,Bayer Leverkusen,4,0,H
+UCL,2024-11-05,Lille,Juventus,1,1,D
+UCL,2024-11-05,Borussia Dortmund,Sturm Graz,1,0,H
+UCL,2024-11-05,Sporting CP,Manchester City,4,1,H
+UCL,2024-11-05,Celtic,RB Leipzig,3,1,H
+UCL,2024-11-05,Bologna,Monaco,0,1,A
+UCL,2024-11-05,Real Madrid,AC Milan,1,3,A
+UCL,2024-11-06,Shakhtar Donetsk,BSC Young Boys,2,1,H
+UCL,2024-11-06,Club Brugge KV,Aston Villa,1,0,H
+UCL,2024-11-06,Paris Saint Germain,Atletico Madrid,1,2,A
+UCL,2024-11-06,Bayern München,Benfica,1,0,H
+UCL,2024-11-06,VfB Stuttgart,Atalanta,0,2,A
+UCL,2024-11-06,Feyenoord,Red Bull Salzburg,1,3,A
+UCL,2024-11-06,Inter,Arsenal,1,0,H
+UCL,2024-11-06,FK Crvena Zvezda,Barcelona,2,5,A
+UCL,2024-11-06,Sparta Praha,Stade Brestois 29,1,2,A
+UCL,2024-11-26,Sparta Praha,Atletico Madrid,0,6,A
+UCL,2024-11-26,Slovan Bratislava,AC Milan,2,3,A
+UCL,2024-11-26,Manchester City,Feyenoord,3,3,D
+UCL,2024-11-26,Bayern München,Paris Saint Germain,1,0,H
+UCL,2024-11-26,Bayer Leverkusen,Red Bull Salzburg,5,0,H
+UCL,2024-11-26,Sporting CP,Arsenal,1,5,A
+UCL,2024-11-26,Inter,RB Leipzig,1,0,H
+UCL,2024-11-26,Barcelona,Stade Brestois 29,3,0,H
+UCL,2024-11-26,BSC Young Boys,Atalanta,1,6,A
+UCL,2024-11-27,FK Crvena Zvezda,VfB Stuttgart,5,1,H
+UCL,2024-11-27,Sturm Graz,Girona,1,0,H
+UCL,2024-11-27,Liverpool,Real Madrid,2,0,H
+UCL,2024-11-27,Aston Villa,Juventus,0,0,D
+UCL,2024-11-27,Monaco,Benfica,2,3,A
+UCL,2024-11-27,PSV Eindhoven,Shakhtar Donetsk,3,2,H
+UCL,2024-11-27,Celtic,Club Brugge KV,1,1,D
+UCL,2024-11-27,Bologna,Lille,1,2,A
+UCL,2024-11-27,Dinamo Zagreb,Borussia Dortmund,0,3,A
+UCL,2024-12-10,Girona,Liverpool,0,1,A
+UCL,2024-12-10,Dinamo Zagreb,Celtic,0,0,D
+UCL,2024-12-10,Stade Brestois 29,PSV Eindhoven,1,0,H
+UCL,2024-12-10,Bayer Leverkusen,Inter,1,0,H
+UCL,2024-12-10,RB Leipzig,Aston Villa,2,3,A
+UCL,2024-12-10,Atalanta,Real Madrid,2,3,A
+UCL,2024-12-10,Shakhtar Donetsk,Bayern München,1,5,A
+UCL,2024-12-10,Club Brugge KV,Sporting CP,2,1,H
+UCL,2024-12-10,Red Bull Salzburg,Paris Saint Germain,0,3,A
+UCL,2024-12-11,Lille,Sturm Graz,3,2,H
+UCL,2024-12-11,Atletico Madrid,Slovan Bratislava,3,1,H
+UCL,2024-12-11,Arsenal,Monaco,3,0,H
+UCL,2024-12-11,Borussia Dortmund,Barcelona,2,3,A
+UCL,2024-12-11,VfB Stuttgart,BSC Young Boys,5,1,H
+UCL,2024-12-11,Feyenoord,Sparta Praha,4,2,H
+UCL,2024-12-11,Benfica,Bologna,0,0,D
+UCL,2024-12-11,AC Milan,FK Crvena Zvezda,2,1,H
+UCL,2024-12-11,Juventus,Manchester City,2,0,H
+UCL,2025-01-21,Monaco,Aston Villa,1,0,H
+UCL,2025-01-21,Atalanta,Sturm Graz,5,0,H
+UCL,2025-01-21,Liverpool,Lille,2,1,H
+UCL,2025-01-21,Benfica,Barcelona,4,5,A
+UCL,2025-01-21,Bologna,Borussia Dortmund,2,1,H
+UCL,2025-01-21,Atletico Madrid,Bayer Leverkusen,2,1,H
+UCL,2025-01-21,Club Brugge KV,Juventus,0,0,D
+UCL,2025-01-21,FK Crvena Zvezda,PSV Eindhoven,2,3,A
+UCL,2025-01-21,Slovan Bratislava,VfB Stuttgart,1,3,A
+UCL,2025-01-22,RB Leipzig,Sporting CP,2,1,H
+UCL,2025-01-22,Shakhtar Donetsk,Stade Brestois 29,2,0,H
+UCL,2025-01-22,Arsenal,Dinamo Zagreb,3,0,H
+UCL,2025-01-22,Paris Saint Germain,Manchester City,4,2,H
+UCL,2025-01-22,Feyenoord,Bayern München,3,0,H
+UCL,2025-01-22,Celtic,BSC Young Boys,1,0,H
+UCL,2025-01-22,AC Milan,Girona,1,0,H
+UCL,2025-01-22,Real Madrid,Red Bull Salzburg,5,1,H
+UCL,2025-01-22,Sparta Praha,Inter,0,1,A
+UCL,2025-01-29,Manchester City,Club Brugge KV,3,1,H
+UCL,2025-01-29,Aston Villa,Celtic,4,2,H
+UCL,2025-01-29,Lille,Feyenoord,6,1,H
+UCL,2025-01-29,Stade Brestois 29,Real Madrid,0,3,A
+UCL,2025-01-29,Bayern München,Slovan Bratislava,3,1,H
+UCL,2025-01-29,Borussia Dortmund,Shakhtar Donetsk,3,1,H
+UCL,2025-01-29,Bayer Leverkusen,Sparta Praha,2,0,H
+UCL,2025-01-29,VfB Stuttgart,Paris Saint Germain,1,4,A
+UCL,2025-01-29,PSV Eindhoven,Liverpool,3,2,H
+UCL,2025-01-29,Sporting CP,Bologna,1,1,D
+UCL,2025-01-29,Juventus,Benfica,0,2,A
+UCL,2025-01-29,Inter,Monaco,3,0,H
+UCL,2025-01-29,Barcelona,Atalanta,2,2,D
+UCL,2025-01-29,Girona,Arsenal,1,2,A
+UCL,2025-01-29,BSC Young Boys,FK Crvena Zvezda,0,1,A
+UCL,2025-01-29,Red Bull Salzburg,Atletico Madrid,1,4,A
+UCL,2025-01-29,Dinamo Zagreb,AC Milan,2,1,H
+UCL,2025-01-29,Sturm Graz,RB Leipzig,1,0,H
+UCL,2025-02-11,Stade Brestois 29,Paris Saint Germain,0,3,A
+UCL,2025-02-11,Manchester City,Real Madrid,2,3,A
+UCL,2025-02-11,Sporting CP,Borussia Dortmund,0,3,A
+UCL,2025-02-11,Juventus,PSV Eindhoven,2,1,H
+UCL,2025-02-12,Club Brugge KV,Atalanta,2,1,H
+UCL,2025-02-12,Monaco,Benfica,0,1,A
+UCL,2025-02-12,Feyenoord,AC Milan,1,0,H
+UCL,2025-02-12,Celtic,Bayern München,1,2,A
+UCL,2025-02-18,AC Milan,Feyenoord,1,1,D
+UCL,2025-02-18,Bayern München,Celtic,1,1,D
+UCL,2025-02-18,Benfica,Monaco,3,3,D
+UCL,2025-02-18,Atalanta,Club Brugge KV,1,3,A
+UCL,2025-02-19,Borussia Dortmund,Sporting CP,0,0,D
+UCL,2025-02-19,Paris Saint Germain,Stade Brestois 29,7,0,H
+UCL,2025-02-19,PSV Eindhoven,Juventus,3,1,H
+UCL,2025-02-19,Real Madrid,Manchester City,3,1,H
+UCL,2025-03-04,Club Brugge KV,Aston Villa,1,3,A
+UCL,2025-03-04,Borussia Dortmund,Lille,1,1,D
+UCL,2025-03-04,PSV Eindhoven,Arsenal,1,7,A
+UCL,2025-03-04,Real Madrid,Atletico Madrid,2,1,H
+UCL,2025-03-05,Feyenoord,Inter,0,2,A
+UCL,2025-03-05,Paris Saint Germain,Liverpool,0,1,A
+UCL,2025-03-05,Bayern München,Bayer Leverkusen,3,0,H
+UCL,2025-03-05,Benfica,Barcelona,0,1,A
+UCL,2025-03-11,Barcelona,Benfica,3,1,H
+UCL,2025-03-11,Liverpool,Paris Saint Germain,0,1,A
+UCL,2025-03-11,Bayer Leverkusen,Bayern München,0,2,A
+UCL,2025-03-11,Inter,Feyenoord,2,1,H
+UCL,2025-03-12,Lille,Borussia Dortmund,1,2,A
+UCL,2025-03-12,Arsenal,PSV Eindhoven,2,2,D
+UCL,2025-03-12,Aston Villa,Club Brugge KV,3,0,H
+UCL,2025-03-12,Atletico Madrid,Real Madrid,1,0,H
+UCL,2025-04-08,Arsenal,Real Madrid,3,0,H
+UCL,2025-04-08,Bayern München,Inter,1,2,A
+UCL,2025-04-09,Paris Saint Germain,Aston Villa,3,1,H
+UCL,2025-04-09,Barcelona,Borussia Dortmund,4,0,H
+UCL,2025-04-15,Aston Villa,Paris Saint Germain,3,2,H
+UCL,2025-04-15,Borussia Dortmund,Barcelona,3,1,H
+UCL,2025-04-16,Inter,Bayern München,2,2,D
+UCL,2025-04-16,Real Madrid,Arsenal,1,2,A
+UCL,2025-04-29,Arsenal,Paris Saint Germain,0,1,A
+UCL,2025-04-30,Barcelona,Inter,3,3,D
+UCL,2025-05-06,Inter,Barcelona,4,3,H
+UCL,2025-05-07,Paris Saint Germain,Arsenal,2,1,H
+UCL,2025-05-31,Paris Saint Germain,Inter,5,0,H
+UCL,2025-07-08,KuPS,Milsami Orhei,1,0,H
+UCL,2025-07-08,Saburtalo,Malmo FF,1,3,A
+UCL,2025-07-08,FC Noah,Buducnost Podgorica,1,0,H
+UCL,2025-07-08,FC Levadia Tallinn,Rīgas FS,0,1,A
+UCL,2025-07-08,Olimpija Ljubljana,Kairat Almaty,1,1,D
+UCL,2025-07-08,The New Saints,Shkendija,0,0,D
+UCL,2025-07-08,Vikingur Gota,Lincoln Red Imps FC,2,3,A
+UCL,2025-07-08,Drita,FC Differdange 03,1,0,H
+UCL,2025-07-08,Egnatia Rrogozhinë,Breidablik,1,0,H
+UCL,2025-07-08,Virtus,Zrinjski,0,2,A
+UCL,2025-07-09,FK Zalgiris Vilnius,Hamrun Spartans,2,0,H
+UCL,2025-07-09,FCSB,Inter Club d'Escaldes,3,1,H
+UCL,2025-07-09,Ludogorets,Dinamo Minsk,1,0,H
+UCL,2025-07-09,Shelbourne,Linfield,1,0,H
+UCL,2025-07-15,Kairat Almaty,Olimpija Ljubljana,2,0,H
+UCL,2025-07-15,Lincoln Red Imps FC,Vikingur Gota,1,0,H
+UCL,2025-07-15,Malmo FF,Saburtalo,3,1,H
+UCL,2025-07-15,Milsami Orhei,KuPS,0,0,D
+UCL,2025-07-15,Rīgas FS,FC Levadia Tallinn,1,0,H
+UCL,2025-07-15,Hamrun Spartans,FK Zalgiris Vilnius,2,0,H
+UCL,2025-07-15,Shkendija,The New Saints,2,1,H
+UCL,2025-07-15,FC Differdange 03,Drita,2,3,A
+UCL,2025-07-15,Inter Club d'Escaldes,FCSB,2,1,H
+UCL,2025-07-15,Breidablik,Egnatia Rrogozhinë,5,0,H
+UCL,2025-07-15,Buducnost Podgorica,FC Noah,2,2,D
+UCL,2025-07-15,Zrinjski,Virtus,2,1,H
+UCL,2025-07-16,Dinamo Minsk,Ludogorets,2,2,D
+UCL,2025-07-16,Linfield,Shelbourne,1,1,D
+UCL,2025-07-22,KuPS,Kairat Almaty,2,0,H
+UCL,2025-07-22,Lincoln Red Imps FC,FK Crvena Zvezda,0,1,A
+UCL,2025-07-22,FC Noah,Ferencvarosi TC,1,2,A
+UCL,2025-07-22,FC Copenhagen,Drita,2,0,H
+UCL,2025-07-22,Plzen,Servette FC,0,1,A
+UCL,2025-07-22,Pafos,Maccabi Tel Aviv,1,1,D
+UCL,2025-07-22,Rīgas FS,Malmo FF,1,4,A
+UCL,2025-07-22,Hamrun Spartans,Dynamo Kyiv,0,3,A
+UCL,2025-07-22,Shkendija,FCSB,1,0,H
+UCL,2025-07-22,Slovan Bratislava,Zrinjski,4,0,H
+UCL,2025-07-22,Lech Poznan,Breidablik,7,1,H
+UCL,2025-07-22,Rangers,Panathinaikos,2,0,H
+UCL,2025-07-22,HNK Rijeka,Ludogorets,0,0,D
+UCL,2025-07-23,Brann,Red Bull Salzburg,1,4,A
+UCL,2025-07-23,Shelbourne,Qarabag,0,3,A
+UCL,2025-07-29,Kairat Almaty,KuPS,3,0,H
+UCL,2025-07-29,Dynamo Kyiv,Hamrun Spartans,3,0,H
+UCL,2025-07-29,Drita,FC Copenhagen,0,1,A
+UCL,2025-07-29,Zrinjski,Slovan Bratislava,2,2,D
+UCL,2025-07-29,FK Crvena Zvezda,Lincoln Red Imps FC,5,1,H
+UCL,2025-07-30,Qarabag,Shelbourne,1,0,H
+UCL,2025-07-30,Malmo FF,Rīgas FS,1,0,H
+UCL,2025-07-30,FCSB,Shkendija,1,2,A
+UCL,2025-07-30,Ludogorets,HNK Rijeka,3,1,H
+UCL,2025-07-30,Maccabi Tel Aviv,Pafos,0,1,A
+UCL,2025-07-30,Panathinaikos,Rangers,1,1,D
+UCL,2025-07-30,Ferencvarosi TC,FC Noah,4,3,H
+UCL,2025-07-30,Breidablik,Lech Poznan,0,1,A
+UCL,2025-07-30,Red Bull Salzburg,Brann,1,1,D
+UCL,2025-07-30,Servette FC,Plzen,1,3,A
+UCL,2025-08-05,Malmo FF,FC Copenhagen,0,0,D
+UCL,2025-08-05,Dynamo Kyiv,Pafos,0,1,A
+UCL,2025-08-05,Shkendija,Qarabag,0,1,A
+UCL,2025-08-05,Rangers,Plzen,3,0,H
+UCL,2025-08-06,Kairat Almaty,Slovan Bratislava,1,0,H
+UCL,2025-08-06,Red Bull Salzburg,Club Brugge KV,0,1,A
+UCL,2025-08-06,Ludogorets,Ferencvarosi TC,0,0,D
+UCL,2025-08-06,Lech Poznan,FK Crvena Zvezda,1,3,A
+UCL,2025-08-06,Nice,Benfica,0,2,A
+UCL,2025-08-06,Feyenoord,Fenerbahçe,2,1,H
+UCL,2025-08-12,Qarabag,Shkendija,5,1,H
+UCL,2025-08-12,FC Copenhagen,Malmo FF,5,0,H
+UCL,2025-08-12,Plzen,Rangers,2,1,H
+UCL,2025-08-12,Fenerbahçe,Feyenoord,5,2,H
+UCL,2025-08-12,Pafos,Dynamo Kyiv,2,0,H
+UCL,2025-08-12,Club Brugge KV,Red Bull Salzburg,3,2,H
+UCL,2025-08-12,Ferencvarosi TC,Ludogorets,3,0,H
+UCL,2025-08-12,Slovan Bratislava,Kairat Almaty,1,0,H
+UCL,2025-08-12,Benfica,Nice,2,0,H
+UCL,2025-08-12,FK Crvena Zvezda,Lech Poznan,1,1,D
+UCL,2025-08-19,Rangers,Club Brugge KV,1,3,A
+UCL,2025-08-19,FK Crvena Zvezda,Pafos,1,2,A
+UCL,2025-08-19,Ferencvarosi TC,Qarabag,1,3,A
+UCL,2025-08-20,Celtic,Kairat Almaty,0,0,D
+UCL,2025-08-20,Bodo/Glimt,Sturm Graz,5,0,H
+UCL,2025-08-20,FC Basel 1893,FC Copenhagen,1,1,D
+UCL,2025-08-20,Fenerbahçe,Benfica,0,0,D
+UCL,2025-08-26,Kairat Almaty,Celtic,0,0,D
+UCL,2025-08-26,Sturm Graz,Bodo/Glimt,2,1,H
+UCL,2025-08-26,Pafos,FK Crvena Zvezda,1,1,D
+UCL,2025-08-27,Qarabag,Ferencvarosi TC,2,3,A
+UCL,2025-08-27,Benfica,Fenerbahçe,1,0,H
+UCL,2025-08-27,FC Copenhagen,FC Basel 1893,2,0,H
+UCL,2025-08-27,Club Brugge KV,Rangers,6,0,H
+UCL,2025-09-16,PSV Eindhoven,Union St. Gilloise,1,3,A
+UCL,2025-09-16,Athletic Club,Arsenal,0,2,A
+UCL,2025-09-16,Tottenham,Villarreal,1,0,H
+UCL,2025-09-16,Benfica,Qarabag,2,3,A
+UCL,2025-09-16,Juventus,Borussia Dortmund,4,4,D
+UCL,2025-09-16,Real Madrid,Marseille,2,1,H
+UCL,2025-09-17,Olympiakos Piraeus,Pafos,0,0,D
+UCL,2025-09-17,Slavia Praha,Bodo/Glimt,2,2,D
+UCL,2025-09-17,Liverpool,Atletico Madrid,3,2,H
+UCL,2025-09-17,Paris Saint Germain,Atalanta,4,0,H
+UCL,2025-09-17,Bayern München,Chelsea,3,1,H
+UCL,2025-09-17,Ajax,Inter,0,2,A
+UCL,2025-09-18,FC Copenhagen,Bayer Leverkusen,2,2,D
+UCL,2025-09-18,Club Brugge KV,Monaco,4,1,H
+UCL,2025-09-18,Newcastle,Barcelona,1,2,A
+UCL,2025-09-18,Manchester City,Napoli,2,0,H
+UCL,2025-09-18,Eintracht Frankfurt,Galatasaray,5,1,H
+UCL,2025-09-18,Sporting CP,Kairat Almaty,4,1,H
+UCL,2025-09-30,Atalanta,Club Brugge KV,2,1,H
+UCL,2025-09-30,Kairat Almaty,Real Madrid,0,5,A
+UCL,2025-09-30,Chelsea,Benfica,1,0,H
+UCL,2025-09-30,Marseille,Ajax,4,0,H
+UCL,2025-09-30,Bodo/Glimt,Tottenham,2,2,D
+UCL,2025-09-30,Inter,Slavia Praha,3,0,H
+UCL,2025-09-30,Atletico Madrid,Eintracht Frankfurt,5,1,H
+UCL,2025-09-30,Galatasaray,Liverpool,1,0,H
+UCL,2025-09-30,Pafos,Bayern München,1,5,A
+UCL,2025-10-01,Qarabag,FC Copenhagen,2,0,H
+UCL,2025-10-01,Union St. Gilloise,Newcastle,0,4,A
+UCL,2025-10-01,Arsenal,Olympiakos Piraeus,2,0,H
+UCL,2025-10-01,Monaco,Manchester City,2,2,D
+UCL,2025-10-01,Borussia Dortmund,Athletic Club,4,1,H
+UCL,2025-10-01,Bayer Leverkusen,PSV Eindhoven,1,1,D
+UCL,2025-10-01,Napoli,Sporting CP,2,1,H
+UCL,2025-10-01,Barcelona,Paris Saint Germain,1,2,A
+UCL,2025-10-01,Villarreal,Juventus,2,2,D
+UCL,2025-10-21,Barcelona,Olympiakos Piraeus,6,1,H
+UCL,2025-10-21,Kairat Almaty,Pafos,0,0,D
+UCL,2025-10-21,Newcastle,Benfica,3,0,H
+UCL,2025-10-21,Arsenal,Atletico Madrid,4,0,H
+UCL,2025-10-21,Bayer Leverkusen,Paris Saint Germain,2,7,A
+UCL,2025-10-21,PSV Eindhoven,Napoli,6,2,H
+UCL,2025-10-21,FC Copenhagen,Borussia Dortmund,2,4,A
+UCL,2025-10-21,Villarreal,Manchester City,0,2,A
+UCL,2025-10-21,Union St. Gilloise,Inter,0,4,A
+UCL,2025-10-22,Athletic Club,Qarabag,3,1,H
+UCL,2025-10-22,Galatasaray,Bodo/Glimt,3,1,H
+UCL,2025-10-22,Chelsea,Ajax,5,1,H
+UCL,2025-10-22,Monaco,Tottenham,0,0,D
+UCL,2025-10-22,Bayern München,Club Brugge KV,4,0,H
+UCL,2025-10-22,Eintracht Frankfurt,Liverpool,1,5,A
+UCL,2025-10-22,Sporting CP,Marseille,2,1,H
+UCL,2025-10-22,Atalanta,Slavia Praha,0,0,D
+UCL,2025-10-22,Real Madrid,Juventus,1,0,H
+UCL,2025-11-04,Napoli,Eintracht Frankfurt,0,0,D
+UCL,2025-11-04,Slavia Praha,Arsenal,0,3,A
+UCL,2025-11-04,Liverpool,Real Madrid,1,0,H
+UCL,2025-11-04,Tottenham,FC Copenhagen,4,0,H
+UCL,2025-11-04,Paris Saint Germain,Bayern München,1,2,A
+UCL,2025-11-04,Bodo/Glimt,Monaco,0,1,A
+UCL,2025-11-04,Juventus,Sporting CP,1,1,D
+UCL,2025-11-04,Atletico Madrid,Union St. Gilloise,3,1,H
+UCL,2025-11-04,Olympiakos Piraeus,PSV Eindhoven,1,1,D
+UCL,2025-11-05,Qarabag,Chelsea,2,2,D
+UCL,2025-11-05,Pafos,Villarreal,1,0,H
+UCL,2025-11-05,Newcastle,Athletic Club,2,0,H
+UCL,2025-11-05,Manchester City,Borussia Dortmund,4,1,H
+UCL,2025-11-05,Marseille,Atalanta,0,1,A
+UCL,2025-11-05,Ajax,Galatasaray,0,3,A
+UCL,2025-11-05,Benfica,Bayer Leverkusen,0,1,A
+UCL,2025-11-05,Inter,Kairat Almaty,2,1,H
+UCL,2025-11-05,Club Brugge KV,Barcelona,3,3,D
+UCL,2025-11-25,Ajax,Benfica,0,2,A
+UCL,2025-11-25,Galatasaray,Union St. Gilloise,0,1,A
+UCL,2025-11-25,Chelsea,Barcelona,3,0,H
+UCL,2025-11-25,Manchester City,Bayer Leverkusen,0,2,A
+UCL,2025-11-25,Marseille,Newcastle,2,1,H
+UCL,2025-11-25,Borussia Dortmund,Villarreal,4,0,H
+UCL,2025-11-25,Bodo/Glimt,Juventus,2,3,A
+UCL,2025-11-25,Napoli,Qarabag,2,0,H
+UCL,2025-11-25,Slavia Praha,Athletic Club,0,0,D
+UCL,2025-11-26,FC Copenhagen,Kairat Almaty,3,2,H
+UCL,2025-11-26,Pafos,Monaco,2,2,D
+UCL,2025-11-26,Liverpool,PSV Eindhoven,1,4,A
+UCL,2025-11-26,Arsenal,Bayern München,3,1,H
+UCL,2025-11-26,Paris Saint Germain,Tottenham,5,3,H
+UCL,2025-11-26,Eintracht Frankfurt,Atalanta,0,3,A
+UCL,2025-11-26,Sporting CP,Club Brugge KV,3,0,H
+UCL,2025-11-26,Atletico Madrid,Inter,2,1,H
+UCL,2025-11-26,Olympiakos Piraeus,Real Madrid,3,4,A
+UCL,2025-12-09,Kairat Almaty,Olympiakos Piraeus,0,1,A
+UCL,2025-12-09,Bayern München,Sporting CP,3,1,H
+UCL,2025-12-09,Tottenham,Slavia Praha,3,0,H
+UCL,2025-12-09,Monaco,Galatasaray,1,0,H
+UCL,2025-12-09,PSV Eindhoven,Atletico Madrid,2,3,A
+UCL,2025-12-09,Atalanta,Chelsea,2,1,H
+UCL,2025-12-09,Inter,Liverpool,0,1,A
+UCL,2025-12-09,Barcelona,Eintracht Frankfurt,2,1,H
+UCL,2025-12-09,Union St. Gilloise,Marseille,2,3,A
+UCL,2025-12-10,Villarreal,FC Copenhagen,2,3,A
+UCL,2025-12-10,Qarabag,Ajax,2,4,A
+UCL,2025-12-10,Borussia Dortmund,Bodo/Glimt,2,2,D
+UCL,2025-12-10,Bayer Leverkusen,Newcastle,2,2,D
+UCL,2025-12-10,Benfica,Napoli,2,0,H
+UCL,2025-12-10,Juventus,Pafos,2,0,H
+UCL,2025-12-10,Athletic Club,Paris Saint Germain,0,0,D
+UCL,2025-12-10,Real Madrid,Manchester City,1,2,A
+UCL,2025-12-10,Club Brugge KV,Arsenal,0,3,A
+UCL,2026-01-20,Kairat Almaty,Club Brugge KV,1,4,A
+UCL,2026-01-20,Bodo/Glimt,Manchester City,3,1,H
+UCL,2026-01-20,Tottenham,Borussia Dortmund,2,0,H
+UCL,2026-01-20,Sporting CP,Paris Saint Germain,2,1,H
+UCL,2026-01-20,FC Copenhagen,Napoli,1,1,D
+UCL,2026-01-20,Inter,Arsenal,1,3,A
+UCL,2026-01-20,Villarreal,Ajax,1,2,A
+UCL,2026-01-20,Real Madrid,Monaco,6,1,H
+UCL,2026-01-20,Olympiakos Piraeus,Bayer Leverkusen,2,0,H
+UCL,2026-01-21,Qarabag,Eintracht Frankfurt,3,2,H
+UCL,2026-01-21,Galatasaray,Atletico Madrid,1,1,D
+UCL,2026-01-21,Newcastle,PSV Eindhoven,3,0,H
+UCL,2026-01-21,Chelsea,Pafos,1,0,H
+UCL,2026-01-21,Marseille,Liverpool,0,3,A
+UCL,2026-01-21,Bayern München,Union St. Gilloise,2,0,H
+UCL,2026-01-21,Juventus,Benfica,2,0,H
+UCL,2026-01-21,Atalanta,Athletic Club,2,3,A
+UCL,2026-01-21,Slavia Praha,Barcelona,2,4,A
+UCL,2026-01-28,Liverpool,Qarabag,6,0,H
+UCL,2026-01-28,Arsenal,Kairat Almaty,3,2,H
+UCL,2026-01-28,Manchester City,Galatasaray,2,0,H
+UCL,2026-01-28,Paris Saint Germain,Newcastle,1,1,D
+UCL,2026-01-28,Monaco,Juventus,0,0,D
+UCL,2026-01-28,Borussia Dortmund,Inter,0,2,A
+UCL,2026-01-28,Bayer Leverkusen,Villarreal,3,0,H
+UCL,2026-01-28,Eintracht Frankfurt,Tottenham,0,2,A
+UCL,2026-01-28,Ajax,Olympiakos Piraeus,1,2,A
+UCL,2026-01-28,PSV Eindhoven,Bayern München,1,2,A
+UCL,2026-01-28,Benfica,Real Madrid,4,2,H
+UCL,2026-01-28,Napoli,Chelsea,2,3,A
+UCL,2026-01-28,Barcelona,FC Copenhagen,4,1,H
+UCL,2026-01-28,Atletico Madrid,Bodo/Glimt,1,2,A
+UCL,2026-01-28,Athletic Club,Sporting CP,2,3,A
+UCL,2026-01-28,Club Brugge KV,Marseille,3,0,H
+UCL,2026-01-28,Union St. Gilloise,Atalanta,1,0,H
+UCL,2026-01-28,Pafos,Slavia Praha,4,1,H
+UCL,2026-02-17,Galatasaray,Juventus,5,2,H
+UCL,2026-02-17,Monaco,Paris Saint Germain,2,3,A
+UCL,2026-02-17,Borussia Dortmund,Atalanta,2,0,H
+UCL,2026-02-17,Benfica,Real Madrid,0,1,A
+UCL,2026-02-18,Qarabag,Newcastle,1,6,A
+UCL,2026-02-18,Bodo/Glimt,Inter,3,1,H
+UCL,2026-02-18,Olympiakos Piraeus,Bayer Leverkusen,0,2,A
+UCL,2026-02-18,Club Brugge KV,Atletico Madrid,3,3,D
+UCL,2026-02-24,Atletico Madrid,Club Brugge KV,4,1,H
+UCL,2026-02-24,Newcastle,Qarabag,3,2,H
+UCL,2026-02-24,Bayer Leverkusen,Olympiakos Piraeus,0,0,D
+UCL,2026-02-24,Inter,Bodo/Glimt,1,2,A
+UCL,2026-02-25,Atalanta,Borussia Dortmund,4,1,H
+UCL,2026-02-25,Paris Saint Germain,Monaco,2,2,D
+UCL,2026-02-25,Juventus,Galatasaray,3,2,H
+UCL,2026-02-25,Real Madrid,Benfica,2,1,H
+UCL,2026-03-10,Galatasaray,Liverpool,1,0,H
+UCL,2026-03-10,Newcastle,Barcelona,1,1,D
+UCL,2026-03-10,Atalanta,Bayern München,1,6,A
+UCL,2026-03-10,Atletico Madrid,Tottenham,5,2,H
+UCL,2026-03-11,Bayer Leverkusen,Arsenal,1,1,D
+UCL,2026-03-11,Paris Saint Germain,Chelsea,5,2,H
+UCL,2026-03-11,Bodo/Glimt,Sporting CP,3,0,H
+UCL,2026-03-11,Real Madrid,Manchester City,3,0,H
+UCL,2026-03-17,Sporting CP,Bodo/Glimt,5,0,H
+UCL,2026-03-17,Arsenal,Bayer Leverkusen,2,0,H
+UCL,2026-03-17,Chelsea,Paris Saint Germain,0,3,A
+UCL,2026-03-17,Manchester City,Real Madrid,1,2,A
+UCL,2026-03-18,Barcelona,Newcastle,7,2,H
+UCL,2026-03-18,Liverpool,Galatasaray,4,0,H
+UCL,2026-03-18,Tottenham,Atletico Madrid,3,2,H
+UCL,2026-03-18,Bayern München,Atalanta,4,1,H
+UCL,2026-04-07,Sporting CP,Arsenal,0,1,A
+UCL,2026-04-07,Real Madrid,Bayern München,1,2,A
+UCL,2026-04-08,Paris Saint Germain,Liverpool,2,0,H
+UCL,2026-04-08,Barcelona,Atletico Madrid,0,2,A

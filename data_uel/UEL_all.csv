@@ -1,0 +1,4345 @@
+Div,Date,HomeTeam,AwayTeam,FTHG,FTAG,FTR
+UEL,2015-05-27,Dnipro Dnipropetrovsk,Sevilla,2,3,A
+UEL,2015-05-07,Napoli,Dnipro Dnipropetrovsk,1,1,D
+UEL,2015-05-14,Dnipro Dnipropetrovsk,Napoli,1,0,H
+UEL,2015-05-07,Sevilla,Fiorentina,3,0,H
+UEL,2015-05-14,Fiorentina,Sevilla,0,2,A
+UEL,2015-04-16,Sevilla,Zenit Saint Petersburg,2,1,H
+UEL,2015-04-23,Zenit Saint Petersburg,Sevilla,2,2,D
+UEL,2015-04-16,Club Brugge KV,Dnipro Dnipropetrovsk,0,0,D
+UEL,2015-04-23,Dnipro Dnipropetrovsk,Club Brugge KV,1,0,H
+UEL,2015-04-16,Dynamo Kyiv,Fiorentina,1,1,D
+UEL,2015-04-23,Fiorentina,Dynamo Kyiv,2,0,H
+UEL,2015-04-16,VfL Wolfsburg,Napoli,1,4,A
+UEL,2015-04-23,Napoli,VfL Wolfsburg,2,2,D
+UEL,2015-03-12,Zenit Saint Petersburg,Torino,2,0,H
+UEL,2015-03-19,Torino,Zenit Saint Petersburg,1,0,H
+UEL,2015-03-12,Dnipro Dnipropetrovsk,Ajax,1,0,H
+UEL,2015-03-19,Ajax,Dnipro Dnipropetrovsk,2,1,H
+UEL,2015-03-12,VfL Wolfsburg,Inter,3,1,H
+UEL,2015-03-19,Inter,VfL Wolfsburg,1,2,A
+UEL,2015-03-12,Club Brugge KV,Beşiktaş,2,1,H
+UEL,2015-03-19,Beşiktaş,Club Brugge KV,1,3,A
+UEL,2015-03-12,Napoli,Dinamo Moscow,3,1,H
+UEL,2015-03-19,Dinamo Moscow,Napoli,0,0,D
+UEL,2015-03-12,Everton,Dynamo Kyiv,2,1,H
+UEL,2015-03-19,Dynamo Kyiv,Everton,5,2,H
+UEL,2015-03-12,Fiorentina,AS Roma,1,1,D
+UEL,2015-03-19,AS Roma,Fiorentina,0,3,A
+UEL,2015-03-12,Villarreal,Sevilla,1,3,A
+UEL,2015-03-19,Sevilla,Villarreal,2,1,H
+UEL,2015-02-19,PSV Eindhoven,Zenit Saint Petersburg,0,1,A
+UEL,2015-02-26,Zenit Saint Petersburg,PSV Eindhoven,3,0,H
+UEL,2015-02-19,BSC Young Boys,Everton,1,4,A
+UEL,2015-02-26,Everton,BSC Young Boys,3,1,H
+UEL,2015-02-19,Aalborg,Club Brugge KV,1,3,A
+UEL,2015-02-26,Club Brugge KV,Aalborg,3,0,H
+UEL,2015-02-19,Torino,Athletic Club,2,2,D
+UEL,2015-02-26,Athletic Club,Torino,2,3,A
+UEL,2015-02-19,VfL Wolfsburg,Sporting CP,2,0,H
+UEL,2015-02-26,Sporting CP,VfL Wolfsburg,0,0,D
+UEL,2015-02-19,Dnipro Dnipropetrovsk,Olympiakos Piraeus,2,0,H
+UEL,2015-02-26,Olympiakos Piraeus,Dnipro Dnipropetrovsk,2,2,D
+UEL,2015-02-19,Trabzonspor,Napoli,0,4,A
+UEL,2015-02-26,Napoli,Trabzonspor,1,0,H
+UEL,2015-02-19,AS Roma,Feyenoord,1,1,D
+UEL,2015-02-26,Feyenoord,AS Roma,1,2,A
+UEL,2015-02-19,Anderlecht,Dinamo Moscow,0,0,D
+UEL,2015-02-26,Dinamo Moscow,Anderlecht,3,1,H
+UEL,2015-02-19,Sevilla,Borussia Monchengladbach,1,0,H
+UEL,2015-02-26,Borussia Monchengladbach,Sevilla,2,3,A
+UEL,2015-02-19,Ajax,Legia Warszawa,1,0,H
+UEL,2015-02-26,Legia Warszawa,Ajax,0,3,A
+UEL,2015-02-19,Guingamp,Dynamo Kyiv,2,1,H
+UEL,2015-02-26,Dynamo Kyiv,Guingamp,3,1,H
+UEL,2015-02-19,Villarreal,Red Bull Salzburg,2,1,H
+UEL,2015-02-26,Red Bull Salzburg,Villarreal,1,3,A
+UEL,2015-02-19,Liverpool,Beşiktaş,1,0,H
+UEL,2015-02-26,Beşiktaş,Liverpool,2,0,H
+UEL,2015-02-19,Tottenham,Fiorentina,1,1,D
+UEL,2015-02-26,Fiorentina,Tottenham,2,0,H
+UEL,2015-02-19,Celtic,Inter,3,3,D
+UEL,2015-02-26,Inter,Celtic,1,0,H
+UEL,2014-09-18,Qarabag,Saint Etienne,0,0,D
+UEL,2014-09-18,Borussia Monchengladbach,Villarreal,1,1,D
+UEL,2014-09-18,Apollon Limassol,FC Zurich,3,2,H
+UEL,2014-09-18,Club Brugge KV,Torino,0,0,D
+UEL,2014-09-18,FC Copenhagen,HJK Helsinki,2,0,H
+UEL,2014-09-18,FK Partizan,Tottenham,0,0,D
+UEL,2014-09-18,Beşiktaş,Asteras Tripolis,1,1,D
+UEL,2014-09-18,Red Bull Salzburg,Celtic,2,2,D
+UEL,2014-09-18,Dinamo Zagreb,FC Astra Giurgiu,5,1,H
+UEL,2014-09-18,PSV Eindhoven,Estoril,1,0,H
+UEL,2014-09-18,Panathinaikos,Dinamo Moscow,1,2,A
+UEL,2014-09-18,Dnipro Dnipropetrovsk,Inter,0,1,A
+UEL,2014-09-18,Standard Liege,HNK Rijeka,2,0,H
+UEL,2014-09-18,Sevilla,Feyenoord,2,0,H
+UEL,2014-09-18,Lille,Krasnodar,1,1,D
+UEL,2014-09-18,Everton,VfL Wolfsburg,4,1,H
+UEL,2014-09-18,BSC Young Boys,Slovan Bratislava,5,0,H
+UEL,2014-09-18,Napoli,Sparta Praha,3,1,H
+UEL,2014-09-18,FCSB,Aalborg,6,0,H
+UEL,2014-09-18,Rio Ave,Dynamo Kyiv,0,3,A
+UEL,2014-09-18,PAOK,Dinamo Minsk,6,1,H
+UEL,2014-09-18,Fiorentina,Guingamp,3,0,H
+UEL,2014-09-18,Metalist,Trabzonspor,1,2,A
+UEL,2014-09-18,Legia Warszawa,Lokeren,1,0,H
+UEL,2014-10-02,Dinamo Moscow,PSV Eindhoven,1,0,H
+UEL,2014-10-02,Krasnodar,Everton,1,1,D
+UEL,2014-10-02,Feyenoord,Standard Liege,2,1,H
+UEL,2014-10-02,HNK Rijeka,Sevilla,2,2,D
+UEL,2014-10-02,VfL Wolfsburg,Lille,1,1,D
+UEL,2014-10-02,Sparta Praha,BSC Young Boys,3,1,H
+UEL,2014-10-02,Slovan Bratislava,Napoli,0,2,A
+UEL,2014-10-02,Dynamo Kyiv,FCSB,3,1,H
+UEL,2014-10-02,Aalborg,Rio Ave,1,0,H
+UEL,2014-10-02,Guingamp,PAOK,2,0,H
+UEL,2014-10-02,Dinamo Minsk,Fiorentina,0,3,A
+UEL,2014-10-02,Lokeren,Metalist,1,0,H
+UEL,2014-10-02,Trabzonspor,Legia Warszawa,0,1,A
+UEL,2014-10-02,FC Zurich,Borussia Monchengladbach,1,1,D
+UEL,2014-10-02,Villarreal,Apollon Limassol,4,0,H
+UEL,2014-10-02,HJK Helsinki,Club Brugge KV,0,3,A
+UEL,2014-10-02,Torino,FC Copenhagen,1,0,H
+UEL,2014-10-02,Asteras Tripolis,FK Partizan,2,0,H
+UEL,2014-10-02,Tottenham,Beşiktaş,1,1,D
+UEL,2014-10-02,FC Astra Giurgiu,Red Bull Salzburg,1,2,A
+UEL,2014-10-02,Celtic,Dinamo Zagreb,1,0,H
+UEL,2014-10-02,Estoril,Panathinaikos,2,0,H
+UEL,2014-10-02,Saint Etienne,Dnipro Dnipropetrovsk,0,0,D
+UEL,2014-10-02,Inter,Qarabag,2,0,H
+UEL,2014-10-22,Metalist,Legia Warszawa,0,1,A
+UEL,2014-10-23,Krasnodar,VfL Wolfsburg,2,4,A
+UEL,2014-10-23,HNK Rijeka,Feyenoord,3,1,H
+UEL,2014-10-23,Standard Liege,Sevilla,0,0,D
+UEL,2014-10-23,Lille,Everton,0,0,D
+UEL,2014-10-23,Slovan Bratislava,Sparta Praha,0,3,A
+UEL,2014-10-23,BSC Young Boys,Napoli,2,0,H
+UEL,2014-10-23,Aalborg,Dynamo Kyiv,3,0,H
+UEL,2014-10-23,FCSB,Rio Ave,2,1,H
+UEL,2014-10-23,Dinamo Minsk,Guingamp,0,0,D
+UEL,2014-10-23,PAOK,Fiorentina,0,1,A
+UEL,2014-10-23,Trabzonspor,Lokeren,2,0,H
+UEL,2014-10-23,Villarreal,FC Zurich,4,1,H
+UEL,2014-10-23,Borussia Monchengladbach,Apollon Limassol,5,0,H
+UEL,2014-10-23,Torino,HJK Helsinki,2,0,H
+UEL,2014-10-23,Club Brugge KV,FC Copenhagen,1,1,D
+UEL,2014-10-23,Tottenham,Asteras Tripolis,5,1,H
+UEL,2014-10-23,FK Partizan,Beşiktaş,0,4,A
+UEL,2014-10-23,Celtic,FC Astra Giurgiu,2,1,H
+UEL,2014-10-23,Red Bull Salzburg,Dinamo Zagreb,4,2,H
+UEL,2014-10-23,Estoril,Dinamo Moscow,1,2,A
+UEL,2014-10-23,PSV Eindhoven,Panathinaikos,1,1,D
+UEL,2014-10-23,Inter,Saint Etienne,0,0,D
+UEL,2014-10-23,Dnipro Dnipropetrovsk,Qarabag,0,1,A
+UEL,2014-11-06,Dinamo Moscow,Estoril,1,0,H
+UEL,2014-11-06,Qarabag,Dnipro Dnipropetrovsk,1,2,A
+UEL,2014-11-06,FC Zurich,Villarreal,3,2,H
+UEL,2014-11-06,Apollon Limassol,Borussia Monchengladbach,0,2,A
+UEL,2014-11-06,HJK Helsinki,Torino,2,1,H
+UEL,2014-11-06,FC Copenhagen,Club Brugge KV,0,4,A
+UEL,2014-11-06,Asteras Tripolis,Tottenham,1,2,A
+UEL,2014-11-06,Beşiktaş,FK Partizan,2,1,H
+UEL,2014-11-06,FC Astra Giurgiu,Celtic,1,1,D
+UEL,2014-11-06,Dinamo Zagreb,Red Bull Salzburg,1,5,A
+UEL,2014-11-06,Panathinaikos,PSV Eindhoven,2,3,A
+UEL,2014-11-06,Saint Etienne,Inter,1,1,D
+UEL,2014-11-06,Feyenoord,HNK Rijeka,2,0,H
+UEL,2014-11-06,Sevilla,Standard Liege,3,1,H
+UEL,2014-11-06,VfL Wolfsburg,Krasnodar,5,1,H
+UEL,2014-11-06,Everton,Lille,3,0,H
+UEL,2014-11-06,Sparta Praha,Slovan Bratislava,4,0,H
+UEL,2014-11-06,Napoli,BSC Young Boys,3,0,H
+UEL,2014-11-06,Dynamo Kyiv,Aalborg,2,0,H
+UEL,2014-11-06,Rio Ave,FCSB,2,2,D
+UEL,2014-11-06,Guingamp,Dinamo Minsk,2,0,H
+UEL,2014-11-06,Fiorentina,PAOK,1,1,D
+UEL,2014-11-06,Lokeren,Trabzonspor,1,1,D
+UEL,2014-11-06,Legia Warszawa,Metalist,2,1,H
+UEL,2014-11-27,Dinamo Moscow,Panathinaikos,2,1,H
+UEL,2014-11-27,Krasnodar,Lille,1,1,D
+UEL,2014-11-27,HNK Rijeka,Standard Liege,2,0,H
+UEL,2014-11-27,Feyenoord,Sevilla,2,0,H
+UEL,2014-11-27,VfL Wolfsburg,Everton,0,2,A
+UEL,2014-11-27,Slovan Bratislava,BSC Young Boys,1,3,A
+UEL,2014-11-27,Sparta Praha,Napoli,0,0,D
+UEL,2014-11-27,Aalborg,FCSB,1,0,H
+UEL,2014-11-27,Dynamo Kyiv,Rio Ave,2,0,H
+UEL,2014-11-27,Dinamo Minsk,PAOK,0,2,A
+UEL,2014-11-27,Guingamp,Fiorentina,1,2,A
+UEL,2014-11-27,Trabzonspor,Metalist,3,1,H
+UEL,2014-11-27,Lokeren,Legia Warszawa,1,0,H
+UEL,2014-11-27,Villarreal,Borussia Monchengladbach,2,2,D
+UEL,2014-11-27,FC Zurich,Apollon Limassol,3,1,H
+UEL,2014-11-27,Torino,Club Brugge KV,0,0,D
+UEL,2014-11-27,HJK Helsinki,FC Copenhagen,2,1,H
+UEL,2014-11-27,Tottenham,FK Partizan,1,0,H
+UEL,2014-11-27,Asteras Tripolis,Beşiktaş,2,2,D
+UEL,2014-11-27,Celtic,Red Bull Salzburg,1,3,A
+UEL,2014-11-27,FC Astra Giurgiu,Dinamo Zagreb,1,0,H
+UEL,2014-11-27,Inter,Dnipro Dnipropetrovsk,2,1,H
+UEL,2014-11-27,Saint Etienne,Qarabag,1,1,D
+UEL,2014-11-28,Estoril,PSV Eindhoven,3,3,D
+UEL,2014-12-11,Dnipro Dnipropetrovsk,Saint Etienne,1,0,H
+UEL,2014-12-11,Qarabag,Inter,0,0,D
+UEL,2014-12-11,Borussia Monchengladbach,FC Zurich,3,0,H
+UEL,2014-12-11,Apollon Limassol,Villarreal,0,2,A
+UEL,2014-12-11,Club Brugge KV,HJK Helsinki,2,1,H
+UEL,2014-12-11,FC Copenhagen,Torino,1,5,A
+UEL,2014-12-11,FK Partizan,Asteras Tripolis,0,0,D
+UEL,2014-12-11,Beşiktaş,Tottenham,1,0,H
+UEL,2014-12-11,Red Bull Salzburg,FC Astra Giurgiu,5,1,H
+UEL,2014-12-11,Dinamo Zagreb,Celtic,4,3,H
+UEL,2014-12-11,PSV Eindhoven,Dinamo Moscow,0,1,A
+UEL,2014-12-11,Panathinaikos,Estoril,1,1,D
+UEL,2014-12-11,Standard Liege,Feyenoord,0,3,A
+UEL,2014-12-11,Sevilla,HNK Rijeka,1,0,H
+UEL,2014-12-11,Lille,VfL Wolfsburg,0,3,A
+UEL,2014-12-11,Everton,Krasnodar,0,1,A
+UEL,2014-12-11,BSC Young Boys,Sparta Praha,2,0,H
+UEL,2014-12-11,Napoli,Slovan Bratislava,3,0,H
+UEL,2014-12-11,FCSB,Dynamo Kyiv,0,2,A
+UEL,2014-12-11,Rio Ave,Aalborg,2,0,H
+UEL,2014-12-11,PAOK,Guingamp,1,2,A
+UEL,2014-12-11,Fiorentina,Dinamo Minsk,1,2,A
+UEL,2014-12-11,Metalist,Lokeren,0,1,A
+UEL,2014-12-11,Legia Warszawa,Trabzonspor,2,0,H
+UEL,2014-08-20,Dnipro Dnipropetrovsk,HNK Hajduk Split,2,1,H
+UEL,2014-08-28,HNK Hajduk Split,Dnipro Dnipropetrovsk,0,0,D
+UEL,2014-08-20,Stjarnan,Inter,0,3,A
+UEL,2014-08-28,Inter,Stjarnan,6,0,H
+UEL,2014-08-21,FC Astana,Villarreal,0,3,A
+UEL,2014-08-28,Villarreal,FC Astana,4,0,H
+UEL,2014-08-21,Aktobe,Legia Warszawa,0,1,A
+UEL,2014-08-28,Legia Warszawa,Aktobe,2,0,H
+UEL,2014-08-21,Dinamo Moscow,Omonia Nicosia,2,2,D
+UEL,2014-08-28,Omonia Nicosia,Dinamo Moscow,1,2,A
+UEL,2014-08-21,Ruch Chorzów,Metalist,0,0,D
+UEL,2014-08-28,Metalist,Ruch Chorzów,1,0,H
+UEL,2014-08-21,Qarabag,Twente,0,0,D
+UEL,2014-08-28,Twente,Qarabag,1,1,D
+UEL,2014-08-21,HJK Helsinki,Rapid Vienna,2,1,H
+UEL,2014-08-28,Rapid Vienna,HJK Helsinki,3,3,D
+UEL,2014-08-21,AEL,Tottenham,1,2,A
+UEL,2014-08-28,Tottenham,AEL,3,0,H
+UEL,2014-08-21,PSV Eindhoven,Shakhter Soligorsk,1,0,H
+UEL,2014-08-28,Shakhter Soligorsk,PSV Eindhoven,0,2,A
+UEL,2014-08-21,Kardemir Karabukspor,Saint Etienne,1,0,H
+UEL,2014-08-28,Saint Etienne,Kardemir Karabukspor,2,0,H
+UEL,2014-08-21,Dinamo Minsk,Nacional,2,0,H
+UEL,2014-08-28,Nacional,Dinamo Minsk,2,3,A
+UEL,2014-08-21,IF Elfsborg,Rio Ave,2,1,H
+UEL,2014-08-28,Rio Ave,IF Elfsborg,1,0,H
+UEL,2014-08-21,Petrolul Ploiesti,Dinamo Zagreb,1,3,A
+UEL,2014-08-28,Dinamo Zagreb,Petrolul Ploiesti,2,1,H
+UEL,2014-08-21,Apollon Limassol,Lokomotiv Moscow,1,1,D
+UEL,2014-08-28,Lokomotiv Moscow,Apollon Limassol,1,4,A
+UEL,2014-08-21,BSC Young Boys,Debreceni VSC,3,1,H
+UEL,2014-08-28,Debreceni VSC,BSC Young Boys,0,0,D
+UEL,2014-08-21,Zorya Luhansk,Feyenoord,1,1,D
+UEL,2014-08-28,Feyenoord,Zorya Luhansk,4,3,H
+UEL,2014-08-21,Trabzonspor,FC Rostov,2,0,H
+UEL,2014-08-28,FC Rostov,Trabzonspor,0,0,D
+UEL,2014-08-21,Panathinaikos,FC Midtjylland,4,1,H
+UEL,2014-08-28,FC Midtjylland,Panathinaikos,1,2,A
+UEL,2014-08-21,PEC Zwolle,Sparta Praha,1,1,D
+UEL,2014-08-28,Sparta Praha,PEC Zwolle,3,1,H
+UEL,2014-08-21,Zimbru,PAOK,1,0,H
+UEL,2014-08-28,PAOK,Zimbru,4,0,H
+UEL,2014-08-21,FK Partizan,Neftchi Baku,3,2,H
+UEL,2014-08-28,Neftchi Baku,FK Partizan,1,2,A
+UEL,2014-08-21,Asteras Tripolis,Maccabi Tel Aviv,2,0,H
+UEL,2014-08-28,Maccabi Tel Aviv,Asteras Tripolis,3,1,H
+UEL,2014-08-21,Spartak Trnava,FC Zurich,1,3,A
+UEL,2014-08-28,FC Zurich,Spartak Trnava,1,1,D
+UEL,2014-08-21,Grasshoppers,Club Brugge KV,1,2,A
+UEL,2014-08-28,Club Brugge KV,Grasshoppers,1,0,H
+UEL,2014-08-21,Real Sociedad,Krasnodar,1,0,H
+UEL,2014-08-28,Krasnodar,Real Sociedad,3,0,H
+UEL,2014-08-21,Lyon,FC Astra Giurgiu,1,2,A
+UEL,2014-08-28,FC Astra Giurgiu,Lyon,0,1,A
+UEL,2014-08-21,RNK Split,Torino,0,0,D
+UEL,2014-08-28,Torino,RNK Split,1,0,H
+UEL,2014-08-21,Lokeren,Hull City,1,0,H
+UEL,2014-08-28,Hull City,Lokeren,2,1,H
+UEL,2014-08-21,FK Sarajevo,Borussia Monchengladbach,2,3,A
+UEL,2014-08-28,Borussia Monchengladbach,FK Sarajevo,7,0,H
+UEL,2014-08-21,HNK Rijeka,Sheriff Tiraspol,1,0,H
+UEL,2014-08-28,Sheriff Tiraspol,HNK Rijeka,0,3,A
+UEL,2014-07-31,Shakhter Karagandy,HNK Hajduk Split,4,2,H
+UEL,2014-08-07,HNK Hajduk Split,Shakhter Karagandy,3,0,H
+UEL,2014-07-31,FC Astana,AIK Stockholm,1,1,D
+UEL,2014-08-07,AIK Stockholm,FC Astana,0,3,A
+UEL,2014-07-31,Neftchi Baku,Chikhura Sachkhere,0,0,D
+UEL,2014-08-07,Chikhura Sachkhere,Neftchi Baku,2,3,A
+UEL,2014-07-31,FC Astra Giurgiu,Slovan Liberec,3,0,H
+UEL,2014-08-07,Slovan Liberec,FC Astra Giurgiu,2,3,A
+UEL,2014-07-31,Dinamo Moscow,Ironi Kiryat Shmona,1,1,D
+UEL,2014-08-07,Ironi Kiryat Shmona,Dinamo Moscow,1,2,A
+UEL,2014-07-31,IF Elfsborg,FH hafnarfjordur,4,1,H
+UEL,2014-08-07,FH hafnarfjordur,IF Elfsborg,2,1,H
+UEL,2014-07-31,Omonia Nicosia,Metalurg,3,0,H
+UEL,2014-08-07,Metalurg,Omonia Nicosia,0,1,A
+UEL,2014-07-31,Ruch Chorzów,Esbjerg,0,0,D
+UEL,2014-08-07,Esbjerg,Ruch Chorzów,2,2,D
+UEL,2014-07-31,Kardemir Karabukspor,Rosenborg,0,0,D
+UEL,2014-08-07,Rosenborg,Kardemir Karabukspor,1,1,D
+UEL,2014-07-31,PSV Eindhoven,SKN ST. Polten,1,0,H
+UEL,2014-08-07,SKN ST. Polten,PSV Eindhoven,2,3,A
+UEL,2014-07-31,Dinamo Minsk,CFR 1907 Cluj,1,0,H
+UEL,2014-08-07,CFR 1907 Cluj,Dinamo Minsk,0,2,A
+UEL,2014-07-31,Mlada Boleslav,Lyon,1,4,A
+UEL,2014-08-07,Lyon,Mlada Boleslav,2,1,H
+UEL,2014-07-31,AS Trencin,Hull City,0,0,D
+UEL,2014-08-07,Hull City,AS Trencin,2,1,H
+UEL,2014-07-31,IF Brommapojkarna,Torino,0,3,A
+UEL,2014-08-07,Torino,IF Brommapojkarna,4,0,H
+UEL,2014-07-31,IFK Goteborg,Rio Ave,0,1,A
+UEL,2014-08-07,Rio Ave,IFK Goteborg,0,0,D
+UEL,2014-07-31,BSC Young Boys,Ermis,1,0,H
+UEL,2014-08-07,Ermis,BSC Young Boys,0,2,A
+UEL,2014-07-31,Zorya Luhansk,Molde,1,1,D
+UEL,2014-08-07,Molde,Zorya Luhansk,1,2,A
+UEL,2014-07-31,RNK Split,Chornomorets,2,0,H
+UEL,2014-08-07,Chornomorets,RNK Split,0,0,D
+UEL,2014-07-31,Zulte Waregem,Shakhter Soligorsk,2,5,A
+UEL,2014-08-07,Shakhter Soligorsk,Zulte Waregem,2,2,D
+UEL,2014-07-31,Petrolul Ploiesti,Plzen,1,1,D
+UEL,2014-08-07,Plzen,Petrolul Ploiesti,1,4,A
+UEL,2014-07-31,Vikingur Gota,HNK Rijeka,1,5,A
+UEL,2014-08-07,HNK Rijeka,Vikingur Gota,4,0,H
+UEL,2014-07-31,Diosgyori VTK,Krasnodar,1,5,A
+UEL,2014-08-07,Krasnodar,Diosgyori VTK,3,0,H
+UEL,2014-07-31,Stjarnan,Lech Poznan,1,0,H
+UEL,2014-08-07,Lech Poznan,Stjarnan,0,0,D
+UEL,2014-07-31,FK Sarajevo,Atromitos Athinon,1,2,A
+UEL,2014-08-07,Atromitos Athinon,FK Sarajevo,1,3,A
+UEL,2014-07-31,Club Brugge KV,Brondby,3,0,H
+UEL,2014-08-07,Brondby,Club Brugge KV,0,2,A
+UEL,2014-07-31,FSV Mainz 05,Asteras Tripolis,1,0,H
+UEL,2014-08-07,Asteras Tripolis,FSV Mainz 05,3,1,H
+UEL,2014-07-31,Real Sociedad,Aberdeen,2,0,H
+UEL,2014-08-07,Aberdeen,Real Sociedad,2,3,A
+UEL,2014-07-31,ST Johnstone,Spartak Trnava,1,2,A
+UEL,2014-08-07,Spartak Trnava,ST Johnstone,1,1,D
+UEL,2014-07-31,Grödig,Zimbru,1,2,A
+UEL,2014-08-07,Zimbru,Grödig,0,1,A
+UEL,2014-07-17,FC Astana,Hapoel Tel Aviv,3,0,H
+UEL,2014-07-24,Hapoel Tel Aviv,FC Astana,1,0,H
+UEL,2014-07-17,Kairat Almaty,Esbjerg,1,1,D
+UEL,2014-07-24,Esbjerg,Kairat Almaty,1,0,H
+UEL,2014-07-17,Košice,Slovan Liberec,0,1,A
+UEL,2014-07-24,Slovan Liberec,Košice,3,0,H
+UEL,2014-07-17,Laci,Zorya Luhansk,0,3,A
+UEL,2014-07-24,Zorya Luhansk,Laci,2,1,H
+UEL,2014-07-17,Neftchi Baku,Koper,1,2,A
+UEL,2014-07-24,Koper,Neftchi Baku,0,2,A
+UEL,2014-07-17,Dinamo Minsk,MyPa,3,0,H
+UEL,2014-07-24,MyPa,Dinamo Minsk,0,0,D
+UEL,2014-07-17,Buducnost Podgorica,Omonia Nicosia,0,2,A
+UEL,2014-07-24,Omonia Nicosia,Buducnost Podgorica,0,0,D
+UEL,2014-07-17,AS Trencin,Vojvodina,4,0,H
+UEL,2014-07-24,Vojvodina,AS Trencin,3,0,H
+UEL,2014-07-17,Atlantas,Shakhter Karagandy,0,0,D
+UEL,2014-07-24,Shakhter Karagandy,Atlantas,3,0,H
+UEL,2014-07-17,IF Elfsborg,İnter Bakı,0,1,A
+UEL,2014-07-24,İnter Bakı,IF Elfsborg,0,2,A
+UEL,2014-07-17,Ruch Chorzów,FC Vaduz,3,2,H
+UEL,2014-07-24,FC Vaduz,Ruch Chorzów,0,0,D
+UEL,2014-07-17,Kalju Nomme,Lech Poznan,1,0,H
+UEL,2014-07-24,Lech Poznan,Kalju Nomme,3,0,H
+UEL,2014-07-17,Zestafoni,Spartak Trnava,0,0,D
+UEL,2014-07-24,Spartak Trnava,Zestafoni,3,0,H
+UEL,2014-07-17,Rops,Asteras Tripolis,1,1,D
+UEL,2014-07-24,Asteras Tripolis,Rops,4,2,H
+UEL,2014-07-17,Petrolul Ploiesti,Flamurtari,2,0,H
+UEL,2014-07-24,Flamurtari,Petrolul Ploiesti,1,3,A
+UEL,2014-07-17,Botev Plovdiv,SKN ST. Polten,2,1,H
+UEL,2014-07-24,SKN ST. Polten,Botev Plovdiv,2,0,H
+UEL,2014-07-17,Rosenborg,Sligo Rovers,1,2,A
+UEL,2014-07-24,Sligo Rovers,Rosenborg,1,3,A
+UEL,2014-07-17,Mlada Boleslav,Siroki Brijeg,2,1,H
+UEL,2014-07-24,Siroki Brijeg,Mlada Boleslav,0,4,A
+UEL,2014-07-17,IF Brommapojkarna,Crusaders FC,4,0,H
+UEL,2014-07-24,Crusaders FC,IF Brommapojkarna,1,1,D
+UEL,2014-07-17,Neman,FH hafnarfjordur,1,1,D
+UEL,2014-07-24,FH hafnarfjordur,Neman,2,0,H
+UEL,2014-07-17,CSKA Sofia,Zimbru,1,1,D
+UEL,2014-07-24,Zimbru,CSKA Sofia,0,0,D
+UEL,2014-07-17,CFR 1907 Cluj,Jagodina,0,0,D
+UEL,2014-07-24,Jagodina,CFR 1907 Cluj,0,1,A
+UEL,2014-07-17,FC Luzern,ST Johnstone,1,1,D
+UEL,2014-07-24,ST Johnstone,FC Luzern,2,2,D
+UEL,2014-07-17,Litex,Diosgyori VTK,0,2,A
+UEL,2014-07-24,Diosgyori VTK,Litex,1,2,A
+UEL,2014-07-17,Gyori ETO FC,IFK Goteborg,0,3,A
+UEL,2014-07-24,IFK Goteborg,Gyori ETO FC,0,1,A
+UEL,2014-07-17,Vikingur Gota,Tromso,0,0,D
+UEL,2014-07-24,Tromso,Vikingur Gota,1,2,A
+UEL,2014-07-17,Zulte Waregem,Zawisza Bydgoszcz,2,1,H
+UEL,2014-07-24,Zawisza Bydgoszcz,Zulte Waregem,1,3,A
+UEL,2014-07-17,Metalurg,Zeljeznicar Sarajevo,0,0,D
+UEL,2014-07-22,Zeljeznicar Sarajevo,Metalurg,2,2,D
+UEL,2014-07-17,RNK Split,Hapoel Beer Sheva,2,1,H
+UEL,2014-07-24,Hapoel Beer Sheva,RNK Split,0,0,D
+UEL,2014-07-17,Sillamäe Kalev,Krasnodar,0,4,A
+UEL,2014-07-24,Krasnodar,Sillamäe Kalev,5,0,H
+UEL,2014-07-17,Bursaspor,Chikhura Sachkhere,0,0,D
+UEL,2014-07-24,Chikhura Sachkhere,Bursaspor,0,0,D
+UEL,2014-07-17,Molde,Gorica,4,1,H
+UEL,2014-07-24,Gorica,Molde,1,1,D
+UEL,2014-07-17,HNK Rijeka,Ferencvarosi TC,1,0,H
+UEL,2014-07-24,Ferencvarosi TC,HNK Rijeka,1,2,A
+UEL,2014-07-17,Derry City,Shakhter Soligorsk,0,1,A
+UEL,2014-07-24,Shakhter Soligorsk,Derry City,5,1,H
+UEL,2014-07-17,Linfield,AIK Stockholm,1,0,H
+UEL,2014-07-24,AIK Stockholm,Linfield,2,0,H
+UEL,2014-07-17,Aberdeen,Groningen,0,0,D
+UEL,2014-07-24,Groningen,Aberdeen,1,2,A
+UEL,2014-07-17,Dundalk,HNK Hajduk Split,0,2,A
+UEL,2014-07-24,HNK Hajduk Split,Dundalk,1,2,A
+UEL,2014-07-17,Motherwell,Stjarnan,2,2,D
+UEL,2014-07-24,Stjarnan,Motherwell,3,2,H
+UEL,2014-07-17,FK Sarajevo,Haugesund,0,1,A
+UEL,2014-07-24,Haugesund,FK Sarajevo,1,3,A
+UEL,2014-07-17,Cukaricki,Grödig,0,4,A
+UEL,2014-07-24,Grödig,Cukaricki,1,2,A
+UEL,2014-07-01,Sliema Wanderers,Ferencvarosi TC,1,1,D
+UEL,2014-07-10,Ferencvarosi TC,Sliema Wanderers,2,1,H
+UEL,2014-07-01,AS Jeunesse Esch,Dundalk,0,2,A
+UEL,2014-07-10,Dundalk,AS Jeunesse Esch,3,1,H
+UEL,2014-07-01,Shkendija,Zimbru,2,1,H
+UEL,2014-07-10,Zimbru,Shkendija,2,0,H
+UEL,2014-07-03,Shirak,Shakhter Karagandy,1,2,A
+UEL,2014-07-10,Shakhter Karagandy,Shirak,4,0,H
+UEL,2014-07-03,Pyunik Yerevan,FC Astana,1,4,A
+UEL,2014-07-10,FC Astana,Pyunik Yerevan,2,0,H
+UEL,2014-07-03,Kairat Almaty,FK Kukesi,1,0,H
+UEL,2014-07-10,FK Kukesi,Kairat Almaty,0,0,D
+UEL,2014-07-03,Veris,Litex,0,0,D
+UEL,2014-07-11,Litex,Veris,3,0,H
+UEL,2014-07-03,Tartu Santos,Tromso,0,7,A
+UEL,2014-07-10,Tromso,Tartu Santos,6,1,H
+UEL,2014-07-03,Banga,Sligo Rovers,0,0,D
+UEL,2014-07-10,Sligo Rovers,Banga,4,0,H
+UEL,2014-07-03,Qabala,Siroki Brijeg,0,2,A
+UEL,2014-07-10,Siroki Brijeg,Qabala,3,0,H
+UEL,2014-07-03,Sillamäe Kalev,Honka,2,1,H
+UEL,2014-07-10,Honka,Sillamäe Kalev,3,2,H
+UEL,2014-07-03,MyPa,ÍF II,1,0,H
+UEL,2014-07-10,ÍF II,MyPa,0,0,D
+UEL,2014-07-03,Čelik,Koper,0,5,A
+UEL,2014-07-10,Koper,Čelik,4,0,H
+UEL,2014-07-03,Turnovo,Chikhura Sachkhere,0,1,A
+UEL,2014-07-10,Chikhura Sachkhere,Turnovo,3,1,H
+UEL,2014-07-03,VPS,IF Brommapojkarna,2,1,H
+UEL,2014-07-10,IF Brommapojkarna,VPS,2,0,H
+UEL,2014-07-03,UE Santa Coloma,Metalurg,0,3,A
+UEL,2014-07-10,Metalurg,UE Santa Coloma,2,0,H
+UEL,2014-07-03,Botev Plovdiv,Libertas,4,0,H
+UEL,2014-07-10,Libertas,Botev Plovdiv,0,2,A
+UEL,2014-07-03,Rosenborg,Jelgava,4,0,H
+UEL,2014-07-10,Jelgava,Rosenborg,0,2,A
+UEL,2014-07-03,Tiraspol,İnter Bakı,2,3,A
+UEL,2014-07-10,İnter Bakı,Tiraspol,3,1,H
+UEL,2014-07-03,Sioni,Flamurtari,2,3,A
+UEL,2014-07-10,Flamurtari,Sioni,1,2,A
+UEL,2014-07-03,IFK Goteborg,Fola Esch,0,0,D
+UEL,2014-07-10,Fola Esch,IFK Goteborg,0,2,A
+UEL,2014-07-03,FC Vaduz,Europa,3,0,H
+UEL,2014-07-10,Europa,FC Vaduz,0,1,A
+UEL,2014-07-03,FC Differdange 03,Atlantas,1,0,H
+UEL,2014-07-10,Atlantas,FC Differdange 03,3,1,H
+UEL,2014-07-03,Airbus UK,Haugesund,1,1,D
+UEL,2014-07-10,Haugesund,Airbus UK,2,1,H
+UEL,2014-07-03,B36 Torshavn,Linfield,1,2,A
+UEL,2014-07-08,Linfield,B36 Torshavn,1,1,D
+UEL,2014-07-03,RNK Split,Mika,2,0,H
+UEL,2014-07-10,Mika,RNK Split,1,1,D
+UEL,2014-07-03,Rudar Velenje,Laci,1,1,D
+UEL,2014-07-10,Laci,Rudar Velenje,2,2,D
+UEL,2014-07-03,Vikingur Gota,Daugavpils / Progress,2,1,H
+UEL,2014-07-10,Daugavpils / Progress,Vikingur Gota,1,1,D
+UEL,2014-07-03,Cukaricki,UE Sant Julia,4,0,H
+UEL,2014-07-10,UE Sant Julia,Cukaricki,0,0,D
+UEL,2014-07-03,Hibernians,Spartak Trnava,2,4,A
+UEL,2014-07-10,Spartak Trnava,Hibernians,5,0,H
+UEL,2014-07-03,Folgore,Buducnost Podgorica,1,2,A
+UEL,2014-07-10,Buducnost Podgorica,Folgore,3,0,H
+UEL,2014-07-03,Diosgyori VTK,Birkirkara,2,1,H
+UEL,2014-07-10,Birkirkara,Diosgyori VTK,1,4,A
+UEL,2014-07-03,Crusaders FC,Ekranas,3,1,H
+UEL,2014-07-10,Ekranas,Crusaders FC,1,2,A
+UEL,2014-07-03,Aberdeen,Daugava Rīga,5,0,H
+UEL,2014-07-10,Daugava Rīga,Aberdeen,0,3,A
+UEL,2014-07-03,Derry City,Aberystwyth Town,4,0,H
+UEL,2014-07-10,Aberystwyth Town,Derry City,0,5,A
+UEL,2014-07-03,Zeljeznicar Sarajevo,Lovćen,0,0,D
+UEL,2014-07-10,Lovćen,Zeljeznicar Sarajevo,0,1,A
+UEL,2014-07-03,Fram Reykjavik,Kalju Nomme,0,1,A
+UEL,2014-07-10,Kalju Nomme,Fram Reykjavik,2,2,D
+UEL,2014-07-03,Stjarnan,Bangor City,4,0,H
+UEL,2014-07-10,Bangor City,Stjarnan,0,4,A
+UEL,2014-07-03,FH hafnarfjordur,Glenavon FC,3,0,H
+UEL,2014-07-10,Glenavon FC,FH hafnarfjordur,2,3,A
+UEL,2016-05-18,Liverpool,Sevilla,1,3,A
+UEL,2016-04-28,Shakhtar Donetsk,Sevilla,2,2,D
+UEL,2016-05-05,Sevilla,Shakhtar Donetsk,3,1,H
+UEL,2016-04-28,Villarreal,Liverpool,1,0,H
+UEL,2016-05-05,Liverpool,Villarreal,3,0,H
+UEL,2016-04-07,SC Braga,Shakhtar Donetsk,1,2,A
+UEL,2016-04-14,Shakhtar Donetsk,SC Braga,4,0,H
+UEL,2016-04-07,Athletic Club,Sevilla,1,2,A
+UEL,2016-04-14,Sevilla,Athletic Club,2,4,A
+UEL,2016-04-07,Borussia Dortmund,Liverpool,1,1,D
+UEL,2016-04-14,Liverpool,Borussia Dortmund,4,3,H
+UEL,2016-04-07,Villarreal,Sparta Praha,2,1,H
+UEL,2016-04-14,Sparta Praha,Villarreal,2,4,A
+UEL,2016-03-10,Shakhtar Donetsk,Anderlecht,3,1,H
+UEL,2016-03-17,Anderlecht,Shakhtar Donetsk,0,1,A
+UEL,2016-03-10,FC Basel 1893,Sevilla,0,0,D
+UEL,2016-03-17,Sevilla,FC Basel 1893,3,0,H
+UEL,2016-03-10,Borussia Dortmund,Tottenham,3,0,H
+UEL,2016-03-17,Tottenham,Borussia Dortmund,1,2,A
+UEL,2016-03-10,Fenerbahçe,SC Braga,1,0,H
+UEL,2016-03-17,SC Braga,Fenerbahçe,4,1,H
+UEL,2016-03-10,Villarreal,Bayer Leverkusen,2,0,H
+UEL,2016-03-17,Bayer Leverkusen,Villarreal,0,0,D
+UEL,2016-03-10,Athletic Club,Valencia,1,0,H
+UEL,2016-03-17,Valencia,Athletic Club,2,1,H
+UEL,2016-03-10,Sparta Praha,Lazio,1,1,D
+UEL,2016-03-17,Lazio,Sparta Praha,0,3,A
+UEL,2016-03-10,Liverpool,Manchester United,2,0,H
+UEL,2016-03-17,Manchester United,Liverpool,1,1,D
+UEL,2016-02-16,Fenerbahçe,Lokomotiv Moscow,2,0,H
+UEL,2016-02-25,Lokomotiv Moscow,Fenerbahçe,1,1,D
+UEL,2016-02-18,Fiorentina,Tottenham,1,1,D
+UEL,2016-02-25,Tottenham,Fiorentina,3,0,H
+UEL,2016-02-18,Borussia Dortmund,FC Porto,2,0,H
+UEL,2016-02-25,FC Porto,Borussia Dortmund,0,1,A
+UEL,2016-02-18,Anderlecht,Olympiakos Piraeus,1,0,H
+UEL,2016-02-25,Olympiakos Piraeus,Anderlecht,1,2,A
+UEL,2016-02-18,FC Midtjylland,Manchester United,2,1,H
+UEL,2016-02-25,Manchester United,FC Midtjylland,5,1,H
+UEL,2016-02-18,Sevilla,Molde,3,0,H
+UEL,2016-02-25,Molde,Sevilla,1,0,H
+UEL,2016-02-18,Villarreal,Napoli,1,0,H
+UEL,2016-02-25,Napoli,Villarreal,1,1,D
+UEL,2016-02-18,Saint Etienne,FC Basel 1893,3,2,H
+UEL,2016-02-25,FC Basel 1893,Saint Etienne,2,1,H
+UEL,2016-02-18,FC Sion,SC Braga,1,2,A
+UEL,2016-02-24,SC Braga,FC Sion,2,2,D
+UEL,2016-02-18,Valencia,Rapid Vienna,6,0,H
+UEL,2016-02-25,Rapid Vienna,Valencia,0,4,A
+UEL,2016-02-18,FC Augsburg,Liverpool,0,0,D
+UEL,2016-02-25,Liverpool,FC Augsburg,1,0,H
+UEL,2016-02-18,Sparta Praha,Krasnodar,1,0,H
+UEL,2016-02-25,Krasnodar,Sparta Praha,0,3,A
+UEL,2016-02-18,Galatasaray,Lazio,1,1,D
+UEL,2016-02-25,Lazio,Galatasaray,3,1,H
+UEL,2016-02-18,Shakhtar Donetsk,FC Schalke 04,0,0,D
+UEL,2016-02-25,FC Schalke 04,Shakhtar Donetsk,0,3,A
+UEL,2016-02-18,Marseille,Athletic Club,0,1,A
+UEL,2016-02-25,Athletic Club,Marseille,1,1,D
+UEL,2016-02-18,Sporting CP,Bayer Leverkusen,0,1,A
+UEL,2016-02-25,Bayer Leverkusen,Sporting CP,3,1,H
+UEL,2015-09-17,Fenerbahçe,Molde,1,3,A
+UEL,2015-09-17,Ajax,Celtic,2,2,D
+UEL,2015-09-17,Bordeaux,Liverpool,1,1,D
+UEL,2015-09-17,FC Sion,Rubin,2,1,H
+UEL,2015-09-17,Qabala,PAOK,0,0,D
+UEL,2015-09-17,Borussia Dortmund,Krasnodar,2,1,H
+UEL,2015-09-17,FC Midtjylland,Legia Warszawa,1,0,H
+UEL,2015-09-17,Napoli,Club Brugge KV,5,0,H
+UEL,2015-09-17,Rapid Vienna,Villarreal,2,1,H
+UEL,2015-09-17,Plzen,Dinamo Minsk,2,0,H
+UEL,2015-09-17,Slovan Liberec,SC Braga,0,1,A
+UEL,2015-09-17,Groningen,Marseille,0,3,A
+UEL,2015-09-17,Dnipro Dnipropetrovsk,Lazio,1,1,D
+UEL,2015-09-17,Saint Etienne,Rosenborg,2,2,D
+UEL,2015-09-17,Sporting CP,Lokomotiv Moscow,1,3,A
+UEL,2015-09-17,Skenderbeu Korce,Beşiktaş,0,1,A
+UEL,2015-09-17,Fiorentina,FC Basel 1893,1,2,A
+UEL,2015-09-17,Lech Poznan,Belenenses,0,0,D
+UEL,2015-09-17,Anderlecht,Monaco,1,1,D
+UEL,2015-09-17,Tottenham,Qarabag,3,1,H
+UEL,2015-09-17,Apoel Nicosia,FC Schalke 04,0,3,A
+UEL,2015-09-17,Asteras Tripolis,Sparta Praha,1,1,D
+UEL,2015-09-17,FK Partizan,AZ Alkmaar,3,2,H
+UEL,2015-09-17,Athletic Club,FC Augsburg,3,1,H
+UEL,2015-10-01,Rosenborg,Dnipro Dnipropetrovsk,0,1,A
+UEL,2015-10-01,Lazio,Saint Etienne,3,2,H
+UEL,2015-10-01,Beşiktaş,Sporting CP,1,1,D
+UEL,2015-10-01,Lokomotiv Moscow,Skenderbeu Korce,2,0,H
+UEL,2015-10-01,Belenenses,Fiorentina,0,4,A
+UEL,2015-10-01,FC Basel 1893,Lech Poznan,2,0,H
+UEL,2015-10-01,Qarabag,Anderlecht,1,0,H
+UEL,2015-10-01,Monaco,Tottenham,1,1,D
+UEL,2015-10-01,Sparta Praha,Apoel Nicosia,2,0,H
+UEL,2015-10-01,FC Schalke 04,Asteras Tripolis,4,0,H
+UEL,2015-10-01,FC Augsburg,FK Partizan,1,3,A
+UEL,2015-10-01,AZ Alkmaar,Athletic Club,2,1,H
+UEL,2015-10-01,Celtic,Fenerbahçe,2,2,D
+UEL,2015-10-01,Molde,Ajax,1,1,D
+UEL,2015-10-01,Rubin,Bordeaux,0,0,D
+UEL,2015-10-01,Liverpool,FC Sion,1,1,D
+UEL,2015-10-01,Krasnodar,Qabala,2,1,H
+UEL,2015-10-01,PAOK,Borussia Dortmund,1,1,D
+UEL,2015-10-01,Club Brugge KV,FC Midtjylland,1,3,A
+UEL,2015-10-01,Legia Warszawa,Napoli,0,2,A
+UEL,2015-10-01,Dinamo Minsk,Rapid Vienna,0,1,A
+UEL,2015-10-01,Villarreal,Plzen,1,0,H
+UEL,2015-10-01,Marseille,Slovan Liberec,0,1,A
+UEL,2015-10-01,SC Braga,Groningen,1,0,H
+UEL,2015-10-22,Qabala,Borussia Dortmund,1,3,A
+UEL,2015-10-22,Lazio,Rosenborg,3,1,H
+UEL,2015-10-22,Dnipro Dnipropetrovsk,Saint Etienne,0,1,A
+UEL,2015-10-22,Lokomotiv Moscow,Beşiktaş,1,1,D
+UEL,2015-10-22,Sporting CP,Skenderbeu Korce,5,1,H
+UEL,2015-10-22,FC Basel 1893,Belenenses,1,2,A
+UEL,2015-10-22,Fiorentina,Lech Poznan,1,2,A
+UEL,2015-10-22,Monaco,Qarabag,1,0,H
+UEL,2015-10-22,Anderlecht,Tottenham,2,1,H
+UEL,2015-10-22,FC Schalke 04,Sparta Praha,2,2,D
+UEL,2015-10-22,Apoel Nicosia,Asteras Tripolis,2,1,H
+UEL,2015-10-22,AZ Alkmaar,FC Augsburg,0,1,A
+UEL,2015-10-22,FK Partizan,Athletic Club,0,2,A
+UEL,2015-10-22,Molde,Celtic,3,1,H
+UEL,2015-10-22,Fenerbahçe,Ajax,1,0,H
+UEL,2015-10-22,Liverpool,Rubin,1,1,D
+UEL,2015-10-22,Bordeaux,FC Sion,0,1,A
+UEL,2015-10-22,PAOK,Krasnodar,0,0,D
+UEL,2015-10-22,Legia Warszawa,Club Brugge KV,1,1,D
+UEL,2015-10-22,FC Midtjylland,Napoli,1,4,A
+UEL,2015-10-22,Villarreal,Dinamo Minsk,4,0,H
+UEL,2015-10-22,Rapid Vienna,Plzen,3,2,H
+UEL,2015-10-22,SC Braga,Marseille,3,2,H
+UEL,2015-10-22,Slovan Liberec,Groningen,1,1,D
+UEL,2015-11-05,Beşiktaş,Lokomotiv Moscow,1,1,D
+UEL,2015-11-05,Qarabag,Monaco,1,1,D
+UEL,2015-11-05,Celtic,Molde,1,2,A
+UEL,2015-11-05,Ajax,Fenerbahçe,0,0,D
+UEL,2015-11-05,Rubin,Liverpool,0,1,A
+UEL,2015-11-05,FC Sion,Bordeaux,1,1,D
+UEL,2015-11-05,Krasnodar,PAOK,2,1,H
+UEL,2015-11-05,Borussia Dortmund,Qabala,4,0,H
+UEL,2015-11-05,Club Brugge KV,Legia Warszawa,1,0,H
+UEL,2015-11-05,Napoli,FC Midtjylland,5,0,H
+UEL,2015-11-05,Dinamo Minsk,Villarreal,1,2,A
+UEL,2015-11-05,Plzen,Rapid Vienna,1,2,A
+UEL,2015-11-05,Marseille,SC Braga,1,0,H
+UEL,2015-11-05,Groningen,Slovan Liberec,0,1,A
+UEL,2015-11-05,Rosenborg,Lazio,0,2,A
+UEL,2015-11-05,Saint Etienne,Dnipro Dnipropetrovsk,3,0,H
+UEL,2015-11-05,Skenderbeu Korce,Sporting CP,3,0,H
+UEL,2015-11-05,Belenenses,FC Basel 1893,0,2,A
+UEL,2015-11-05,Lech Poznan,Fiorentina,0,2,A
+UEL,2015-11-05,Tottenham,Anderlecht,2,1,H
+UEL,2015-11-05,Sparta Praha,FC Schalke 04,1,1,D
+UEL,2015-11-05,Asteras Tripolis,Apoel Nicosia,2,0,H
+UEL,2015-11-05,FC Augsburg,AZ Alkmaar,4,1,H
+UEL,2015-11-05,Athletic Club,FK Partizan,5,1,H
+UEL,2015-11-26,Rubin,FC Sion,2,0,H
+UEL,2015-11-26,Krasnodar,Borussia Dortmund,1,0,H
+UEL,2015-11-26,Dinamo Minsk,Plzen,1,0,H
+UEL,2015-11-26,Lazio,Dnipro Dnipropetrovsk,3,1,H
+UEL,2015-11-26,Rosenborg,Saint Etienne,1,1,D
+UEL,2015-11-26,Lokomotiv Moscow,Sporting CP,2,4,A
+UEL,2015-11-26,Beşiktaş,Skenderbeu Korce,2,0,H
+UEL,2015-11-26,FC Basel 1893,Fiorentina,2,2,D
+UEL,2015-11-26,Belenenses,Lech Poznan,0,0,D
+UEL,2015-11-26,Monaco,Anderlecht,0,2,A
+UEL,2015-11-26,Qarabag,Tottenham,0,1,A
+UEL,2015-11-26,FC Schalke 04,Apoel Nicosia,1,0,H
+UEL,2015-11-26,Sparta Praha,Asteras Tripolis,1,0,H
+UEL,2015-11-26,AZ Alkmaar,FK Partizan,1,2,A
+UEL,2015-11-26,FC Augsburg,Athletic Club,2,3,A
+UEL,2015-11-26,Molde,Fenerbahçe,0,2,A
+UEL,2015-11-26,Celtic,Ajax,1,2,A
+UEL,2015-11-26,Liverpool,Bordeaux,2,1,H
+UEL,2015-11-26,PAOK,Qabala,0,0,D
+UEL,2015-11-26,Legia Warszawa,FC Midtjylland,1,0,H
+UEL,2015-11-26,Club Brugge KV,Napoli,0,1,A
+UEL,2015-11-26,Villarreal,Rapid Vienna,1,0,H
+UEL,2015-11-26,SC Braga,Slovan Liberec,2,1,H
+UEL,2015-11-26,Marseille,Groningen,2,1,H
+UEL,2015-12-10,Fenerbahçe,Celtic,1,1,D
+UEL,2015-12-10,Ajax,Molde,1,1,D
+UEL,2015-12-10,Bordeaux,Rubin,2,2,D
+UEL,2015-12-10,FC Sion,Liverpool,0,0,D
+UEL,2015-12-10,Qabala,Krasnodar,0,3,A
+UEL,2015-12-10,Borussia Dortmund,PAOK,0,1,A
+UEL,2015-12-10,FC Midtjylland,Club Brugge KV,1,1,D
+UEL,2015-12-10,Napoli,Legia Warszawa,5,2,H
+UEL,2015-12-10,Rapid Vienna,Dinamo Minsk,2,1,H
+UEL,2015-12-10,Plzen,Villarreal,3,3,D
+UEL,2015-12-10,Slovan Liberec,Marseille,2,4,A
+UEL,2015-12-10,Groningen,SC Braga,0,0,D
+UEL,2015-12-10,Dnipro Dnipropetrovsk,Rosenborg,3,0,H
+UEL,2015-12-10,Saint Etienne,Lazio,1,1,D
+UEL,2015-12-10,Sporting CP,Beşiktaş,3,1,H
+UEL,2015-12-10,Skenderbeu Korce,Lokomotiv Moscow,0,3,A
+UEL,2015-12-10,Fiorentina,Belenenses,1,0,H
+UEL,2015-12-10,Lech Poznan,FC Basel 1893,0,1,A
+UEL,2015-12-10,Anderlecht,Qarabag,2,1,H
+UEL,2015-12-10,Tottenham,Monaco,4,1,H
+UEL,2015-12-10,Apoel Nicosia,Sparta Praha,1,3,A
+UEL,2015-12-10,Asteras Tripolis,FC Schalke 04,0,4,A
+UEL,2015-12-10,FK Partizan,FC Augsburg,1,3,A
+UEL,2015-12-10,Athletic Club,AZ Alkmaar,2,2,D
+UEL,2015-08-20,Qabala,Panathinaikos,0,0,D
+UEL,2015-08-27,Panathinaikos,Qabala,2,2,D
+UEL,2015-08-20,FC Astra Giurgiu,AZ Alkmaar,3,2,H
+UEL,2015-08-27,AZ Alkmaar,FC Astra Giurgiu,2,0,H
+UEL,2015-08-20,Dinamo Minsk,Red Bull Salzburg,2,0,H
+UEL,2015-08-27,Red Bull Salzburg,Dinamo Minsk,4,0,H
+UEL,2015-08-20,Ajax,FK Jablonec,1,0,H
+UEL,2015-08-27,FK Jablonec,Ajax,0,0,D
+UEL,2015-08-20,Krasnodar,HJK Helsinki,5,1,H
+UEL,2015-08-27,HJK Helsinki,Krasnodar,0,0,D
+UEL,2015-08-20,Sparta Praha,FC Thun,3,1,H
+UEL,2015-08-27,FC Thun,Sparta Praha,3,3,D
+UEL,2015-08-20,PAOK,Brondby,5,0,H
+UEL,2015-08-27,Brondby,PAOK,1,1,D
+UEL,2015-08-20,Slovan Liberec,HNK Hajduk Split,1,0,H
+UEL,2015-08-27,HNK Hajduk Split,Slovan Liberec,0,1,A
+UEL,2015-08-20,Molde,Standard Liege,2,0,H
+UEL,2015-08-27,Standard Liege,Molde,3,1,H
+UEL,2015-08-20,Zorya Luhansk,Legia Warszawa,0,1,A
+UEL,2015-08-27,Legia Warszawa,Zorya Luhansk,3,2,H
+UEL,2015-08-20,Milsami Orhei,Saint Etienne,1,1,D
+UEL,2015-08-27,Saint Etienne,Milsami Orhei,1,0,H
+UEL,2015-08-20,BSC Young Boys,Qarabag,0,1,A
+UEL,2015-08-27,Qarabag,BSC Young Boys,3,0,H
+UEL,2015-08-20,FK Rabotnicki,Rubin,1,1,D
+UEL,2015-08-27,Rubin,FK Rabotnicki,1,0,H
+UEL,2015-08-20,FCSB,Rosenborg,0,3,A
+UEL,2015-08-27,Rosenborg,FCSB,0,1,A
+UEL,2015-08-20,Atromitos Athinon,Fenerbahçe,0,1,A
+UEL,2015-08-27,Fenerbahçe,Atromitos,3,0,H
+UEL,2015-08-20,Žilina,Athletic Club,3,2,H
+UEL,2015-08-27,Athletic Club,Žilina,1,0,H
+UEL,2015-08-20,Bordeaux,Kairat Almaty,1,0,H
+UEL,2015-08-27,Kairat Almaty,Bordeaux,2,1,H
+UEL,2015-08-20,ODD Ballklubb,Borussia Dortmund,3,4,A
+UEL,2015-08-27,Borussia Dortmund,ODD Ballklubb,7,2,H
+UEL,2015-08-20,SCR Altach,Belenenses,0,1,A
+UEL,2015-08-27,Belenenses,SCR Altach,0,0,D
+UEL,2015-08-20,Plzen,Vojvodina,3,0,H
+UEL,2015-08-27,Vojvodina,Plzen,0,2,A
+UEL,2015-08-20,Lech Poznan,Fehérvár FC,3,0,H
+UEL,2015-08-27,Fehérvár FC,Lech Poznan,0,1,A
+UEL,2015-08-20,Southampton,FC Midtjylland,1,1,D
+UEL,2015-08-27,FC Midtjylland,Southampton,1,0,H
+UEL,2015-07-29,FK Jablonec,FC Copenhagen,0,1,A
+UEL,2015-08-06,FC Copenhagen,FK Jablonec,2,3,A
+UEL,2015-07-30,Kairat Almaty,Aberdeen,2,1,H
+UEL,2015-08-06,Aberdeen,Kairat Almaty,1,1,D
+UEL,2015-07-30,IF Elfsborg,ODD Ballklubb,2,1,H
+UEL,2015-08-06,ODD Ballklubb,IF Elfsborg,2,0,H
+UEL,2015-07-30,Apollon Limassol,Qabala,1,1,D
+UEL,2015-08-06,Qabala,Apollon Limassol,1,0,H
+UEL,2015-07-30,Sturm Graz,Rubin,2,3,A
+UEL,2015-08-06,Rubin,Sturm Graz,1,1,D
+UEL,2015-07-30,Slovan Liberec,Ironi Kiryat Shmona,2,1,H
+UEL,2015-08-06,Ironi Kiryat Shmona,Slovan Liberec,0,3,A
+UEL,2015-07-30,AIK Stockholm,Atromitos Athinon,1,3,A
+UEL,2015-08-06,Atromitos,AIK Stockholm,1,0,H
+UEL,2015-07-30,PAOK,Spartak Trnava,1,0,H
+UEL,2015-08-06,Spartak Trnava,PAOK,1,1,D
+UEL,2015-07-30,Krasnodar,Slovan Bratislava,2,0,H
+UEL,2015-08-06,Slovan Bratislava,Krasnodar,3,3,D
+UEL,2015-07-30,SCR Altach,Guimaraes,2,1,H
+UEL,2015-08-06,Guimaraes,SCR Altach,1,4,A
+UEL,2015-07-30,Žilina,Vorskla Poltava,2,0,H
+UEL,2015-08-06,Vorskla Poltava,Žilina,3,1,H
+UEL,2015-07-30,AZ Alkmaar,Başakşehir,2,0,H
+UEL,2015-08-06,Başakşehir,AZ Alkmaar,1,2,A
+UEL,2015-07-30,FC Zurich,Dinamo Minsk,0,1,A
+UEL,2015-08-06,Dinamo Minsk,FC Zurich,1,1,D
+UEL,2015-07-30,FC Thun,FC Vaduz,0,0,D
+UEL,2015-08-06,FC Vaduz,FC Thun,2,2,D
+UEL,2015-07-30,Brondby,Omonia Nicosia,0,0,D
+UEL,2015-08-06,Omonia Nicosia,Brondby,2,2,D
+UEL,2015-07-30,FK Rabotnicki,Trabzonspor,1,0,H
+UEL,2015-08-06,Trabzonspor,FK Rabotnicki,1,1,D
+UEL,2015-07-30,Debreceni VSC,Rosenborg,2,3,A
+UEL,2015-08-06,Rosenborg,Debreceni VSC,3,1,H
+UEL,2015-07-30,ASA Targu Mures,Saint Etienne,0,3,A
+UEL,2015-08-06,Saint Etienne,ASA Targu Mures,1,2,A
+UEL,2015-07-30,FK Kukesi,Legia Warszawa,0,3,A
+UEL,2015-08-06,Legia Warszawa,FK Kukesi,1,0,H
+UEL,2015-07-30,Bordeaux,AEK Larnaca,3,0,H
+UEL,2015-08-06,AEK Larnaca,Bordeaux,0,1,A
+UEL,2015-07-30,Standard Liege,Zeljeznicar Sarajevo,2,1,H
+UEL,2015-08-06,Zeljeznicar Sarajevo,Standard Liege,0,1,A
+UEL,2015-07-30,Charleroi,Zorya Luhansk,0,2,A
+UEL,2015-08-06,Zorya Luhansk,Charleroi,3,0,H
+UEL,2015-07-30,Athletic Club,İnter Bakı,2,0,H
+UEL,2015-08-06,İnter Bakı,Athletic Club,0,0,D
+UEL,2015-07-30,West Ham,FC Astra Giurgiu,2,2,D
+UEL,2015-08-06,FC Astra Giurgiu,West Ham,2,1,H
+UEL,2015-07-30,Belenenses,IFK Goteborg,2,1,H
+UEL,2015-08-06,IFK Goteborg,Belenenses,0,0,D
+UEL,2015-07-30,HNK Hajduk Split,Stromsgodset,2,0,H
+UEL,2015-08-06,Stromsgodset,HNK Hajduk Split,0,2,A
+UEL,2015-07-30,Sampdoria,Vojvodina,0,4,A
+UEL,2015-08-06,Vojvodina,Sampdoria,0,2,A
+UEL,2015-07-30,Southampton,Vitesse,3,0,H
+UEL,2015-08-06,Vitesse,Southampton,0,2,A
+UEL,2015-07-30,Wolfsberger AC,Borussia Dortmund,0,1,A
+UEL,2015-08-06,Borussia Dortmund,Wolfsberger AC,5,0,H
+UEL,2015-07-16,Kairat Almaty,Alashkert,3,0,H
+UEL,2015-07-23,Alashkert,Kairat Almaty,2,1,H
+UEL,2015-07-16,Jelgava,FK Rabotnicki,1,0,H
+UEL,2015-07-23,FK Rabotnicki,Jelgava,2,0,H
+UEL,2015-07-16,Randers FC,IF Elfsborg,0,0,D
+UEL,2015-07-21,IF Elfsborg,Randers FC,1,0,H
+UEL,2015-07-16,Skonto,Debreceni VSC,2,2,D
+UEL,2015-07-23,Debreceni VSC,Skonto,9,2,H
+UEL,2015-07-16,Dacia,Žilina,1,2,A
+UEL,2015-07-23,Žilina,Dacia,4,2,H
+UEL,2015-07-16,Shakhter Soligorsk,Wolfsberger AC,0,1,A
+UEL,2015-07-23,Wolfsberger AC,Shakhter Soligorsk,2,0,H
+UEL,2015-07-16,AIK Stockholm,Shirak,2,0,H
+UEL,2015-07-23,Shirak,AIK Stockholm,0,2,A
+UEL,2015-07-16,Cherno More Varna,Dinamo Minsk,1,1,D
+UEL,2015-07-23,Dinamo Minsk,Cherno More Varna,4,0,H
+UEL,2015-07-16,Beroe,Brondby,0,1,A
+UEL,2015-07-23,Brondby,Beroe,0,0,D
+UEL,2015-07-16,Mlada Boleslav,Stromsgodset,1,2,A
+UEL,2015-07-23,Stromsgodset,Mlada Boleslav,0,1,A
+UEL,2015-07-16,Apollon Limassol,FK Trakai,4,0,H
+UEL,2015-07-23,FK Trakai,Apollon Limassol,0,0,D
+UEL,2015-07-16,Koper,HNK Hajduk Split,3,2,H
+UEL,2015-07-23,HNK Hajduk Split,Koper,4,1,H
+UEL,2015-07-16,Hapoel Beer Sheva,FC Thun,1,1,D
+UEL,2015-07-23,FC Thun,Hapoel Beer Sheva,2,1,H
+UEL,2015-07-16,Charleroi,Beitar Jerusalem,5,1,H
+UEL,2015-07-23,Beitar Jerusalem,Charleroi,1,4,A
+UEL,2015-07-16,FK Kukesi,FK Mladost Podgorica,0,1,A
+UEL,2015-07-23,FK Mladost Podgorica,FK Kukesi,2,4,A
+UEL,2015-07-16,FC Vaduz,Kalju Nomme,3,1,H
+UEL,2015-07-23,Kalju Nomme,FC Vaduz,0,2,A
+UEL,2015-07-16,FC Copenhagen,Newtown AFC,2,0,H
+UEL,2015-07-23,Newtown AFC,FC Copenhagen,1,3,A
+UEL,2015-07-16,NK Lokomotiva Zagreb,PAOK,2,1,H
+UEL,2015-07-23,PAOK,NK Lokomotiva Zagreb,6,0,H
+UEL,2015-07-16,Trabzonspor,FC Differdange 03,1,0,H
+UEL,2015-07-23,FC Differdange 03,Trabzonspor,1,2,A
+UEL,2015-07-16,Spartak Trnava,Linfield,2,1,H
+UEL,2015-07-23,Linfield,Spartak Trnava,1,3,A
+UEL,2015-07-16,Slovan Bratislava,UCD,1,0,H
+UEL,2015-07-23,UCD,Slovan Bratislava,1,5,A
+UEL,2015-07-16,Ferencvarosi TC,Zeljeznicar Sarajevo,0,1,A
+UEL,2015-07-23,Zeljeznicar Sarajevo,Ferencvarosi TC,2,0,H
+UEL,2015-07-16,Cukaricki,Qabala,1,0,H
+UEL,2015-07-23,Qabala,Cukaricki,2,0,H
+UEL,2015-07-16,Vojvodina,Spartaks Jurmala,3,0,H
+UEL,2015-07-23,Spartaks Jurmala,Vojvodina,1,1,D
+UEL,2015-07-16,Jagiellonia,Omonia Nicosia,0,0,D
+UEL,2015-07-23,Omonia Nicosia,Jagiellonia,1,0,H
+UEL,2015-07-16,Slask Wroclaw,IFK Goteborg,0,0,D
+UEL,2015-07-23,IFK Goteborg,Slask Wroclaw,2,0,H
+UEL,2015-07-16,Inverness CT,FC Astra Giurgiu,0,1,A
+UEL,2015-07-23,FC Astra Giurgiu,Inverness CT,0,0,D
+UEL,2015-07-16,West Ham,Birkirkara,1,0,H
+UEL,2015-07-23,Birkirkara,West Ham,2,0,H
+UEL,2015-07-16,Shamrock Rovers,ODD Ballklubb,0,2,A
+UEL,2015-07-23,ODD Ballklubb,Shamrock Rovers,2,1,H
+UEL,2015-07-16,Legia Warszawa,FC Botosani,1,0,H
+UEL,2015-07-23,FC Botosani,Legia Warszawa,0,3,A
+UEL,2015-07-16,HNK Rijeka,Aberdeen,0,3,A
+UEL,2015-07-23,Aberdeen,HNK Rijeka,2,2,D
+UEL,2015-07-16,FH hafnarfjordur,İnter Bakı,1,2,A
+UEL,2015-07-23,İnter Bakı,FH hafnarfjordur,2,2,D
+UEL,2015-07-16,KR Reykjavik,Rosenborg,0,1,A
+UEL,2015-07-23,Rosenborg,KR Reykjavik,3,0,H
+UEL,2015-06-30,Balzan FC,Zeljeznicar Sarajevo,0,2,A
+UEL,2015-07-09,Zeljeznicar Sarajevo,Balzan FC,1,0,H
+UEL,2015-06-30,Progres Niederkorn,Shamrock Rovers,0,0,D
+UEL,2015-07-07,Shamrock Rovers,Progres Niederkorn,3,0,H
+UEL,2015-06-30,Renova,Dacia,0,1,A
+UEL,2015-07-09,Dacia,Renova,4,1,H
+UEL,2015-07-02,Ordabasy,Beitar Jerusalem,0,0,D
+UEL,2015-07-09,Beitar Jerusalem,Ordabasy,2,1,H
+UEL,2015-07-02,Shirak,Zrinjski,2,0,H
+UEL,2015-07-09,Zrinjski,Shirak,2,1,H
+UEL,2015-07-02,Kruoja,Jagiellonia,0,1,A
+UEL,2015-07-09,Jagiellonia,Kruoja,8,0,H
+UEL,2015-07-02,Alashkert,ST Johnstone,1,0,H
+UEL,2015-07-09,ST Johnstone,Alashkert,2,1,H
+UEL,2015-07-02,Laci,İnter Bakı,1,1,D
+UEL,2015-07-09,İnter Bakı,Laci,0,0,D
+UEL,2015-07-02,Dinamo Tbilisi,Qabala,2,1,H
+UEL,2015-07-09,Qabala,Dinamo Tbilisi,2,0,H
+UEL,2015-07-02,Aktobe,Kalju Nomme,0,1,A
+UEL,2015-07-09,Kalju Nomme,Aktobe,0,0,D
+UEL,2015-07-02,FK Kukesi,Torpedo Zhodino,2,0,H
+UEL,2015-07-09,Torpedo Zhodino,FK Kukesi,0,0,D
+UEL,2015-07-02,Dinamo Batumi,Omonia Nicosia,1,0,H
+UEL,2015-07-09,Omonia Nicosia,Dinamo Batumi,2,0,H
+UEL,2015-07-02,Lahti,IF Elfsborg,2,2,D
+UEL,2015-07-09,IF Elfsborg,Lahti,5,0,H
+UEL,2015-07-02,Atlantas,Beroe,0,2,A
+UEL,2015-07-09,Beroe,Atlantas,3,1,H
+UEL,2015-07-02,VPS,AIK Stockholm,2,2,D
+UEL,2015-07-09,AIK Stockholm,VPS,4,0,H
+UEL,2015-07-02,UE Sant Julia,Randers FC,0,1,A
+UEL,2015-07-09,Randers FC,UE Sant Julia,3,0,H
+UEL,2015-07-02,Jelgava,Litex,1,1,D
+UEL,2015-07-09,Litex,Jelgava,2,2,D
+UEL,2015-07-02,Flora Tallinn,FK Rabotnicki,1,0,H
+UEL,2015-07-09,FK Rabotnicki,Flora Tallinn,2,0,H
+UEL,2015-07-02,Olimpik Sarajevo,Spartak Trnava,1,1,D
+UEL,2015-07-09,Spartak Trnava,Olimpik Sarajevo,0,0,D
+UEL,2015-07-02,Neftchi Baku,FK Mladost Podgorica,2,2,D
+UEL,2015-07-09,FK Mladost Podgorica,Neftchi Baku,1,1,D
+UEL,2015-07-02,Skonto,St Patrick's Athl.,2,1,H
+UEL,2015-07-09,St Patrick's Athl.,Skonto,0,2,A
+UEL,2015-07-02,SJK,FH hafnarfjordur,0,1,A
+UEL,2015-07-09,FH hafnarfjordur,SJK,1,0,H
+UEL,2015-07-02,Debreceni VSC,Sutjeska,3,0,H
+UEL,2015-07-09,Sutjeska,Debreceni VSC,2,0,H
+UEL,2015-07-02,Sillamäe Kalev,HNK Hajduk Split,1,1,D
+UEL,2015-07-09,HNK Hajduk Split,Sillamäe Kalev,6,2,H
+UEL,2015-07-02,FC Botosani,Tskhinvali,1,1,D
+UEL,2015-07-09,Tskhinvali,FC Botosani,1,3,A
+UEL,2015-07-02,Sheriff Tiraspol,ODD Ballklubb,0,3,A
+UEL,2015-07-09,ODD Ballklubb,Sheriff Tiraspol,0,0,D
+UEL,2015-07-02,Saxan,Apollon Limassol,0,2,A
+UEL,2015-07-09,Apollon Limassol,Saxan,2,0,H
+UEL,2015-07-02,FC Differdange 03,Bala Town,3,1,H
+UEL,2015-07-09,Bala Town,FC Differdange 03,2,1,H
+UEL,2015-07-02,Stromsgodset,Partizani,3,1,H
+UEL,2015-07-09,Partizani,Stromsgodset,0,1,A
+UEL,2015-07-02,Brondby,Juvenes / Dogana,9,0,H
+UEL,2015-07-09,Juvenes / Dogana,Brondby,0,2,A
+UEL,2015-07-02,FK Trakai,HB Torshavn,3,0,H
+UEL,2015-07-09,HB Torshavn,FK Trakai,1,4,A
+UEL,2015-07-02,Europa Fc,Slovan Bratislava,0,6,A
+UEL,2015-07-09,Slovan Bratislava,Europa Fc,3,0,H
+UEL,2015-07-02,Airbus UK,NK Lokomotiva Zagreb,1,3,A
+UEL,2015-07-09,NK Lokomotiva Zagreb,Airbus UK,2,2,D
+UEL,2015-07-02,Vikingur Gota,Rosenborg,0,2,A
+UEL,2015-07-09,Rosenborg,Vikingur Gota,0,0,D
+UEL,2015-07-02,Celje,Slask Wroclaw,0,1,A
+UEL,2015-07-09,Slask Wroclaw,Celje,3,1,H
+UEL,2015-07-02,GO Ahead Eagles,Ferencvarosi TC,1,1,D
+UEL,2015-07-09,Ferencvarosi TC,GO Ahead Eagles,4,1,H
+UEL,2015-07-02,NK Domzale,Cukaricki,0,1,A
+UEL,2015-07-09,Cukaricki,NK Domzale,0,0,D
+UEL,2015-07-02,Newtown AFC,Valletta FC,2,1,H
+UEL,2015-07-09,Valletta FC,Newtown AFC,1,2,A
+UEL,2015-07-02,Buducnost Podgorica,Spartaks Jurmala,1,3,A
+UEL,2015-07-09,Spartaks Jurmala,Buducnost Podgorica,0,0,D
+UEL,2015-07-02,La Fiorita,FC Vaduz,0,5,A
+UEL,2015-07-09,FC Vaduz,La Fiorita,5,1,H
+UEL,2015-07-02,MTK Budapest,Vojvodina,0,0,D
+UEL,2015-07-09,Vojvodina,MTK Budapest,3,1,H
+UEL,2015-07-02,FK Crvena Zvezda,Kairat Almaty,0,2,A
+UEL,2015-07-09,Kairat Almaty,FK Crvena Zvezda,2,1,H
+UEL,2015-07-02,UCD,F91 Dudelange,1,0,H
+UEL,2015-07-09,F91 Dudelange,UCD,2,1,H
+UEL,2015-07-02,Birkirkara,Ulisses,0,0,D
+UEL,2015-07-09,Ulisses,Birkirkara,1,3,A
+UEL,2015-07-02,Glenavon FC,Shakhter Soligorsk,1,2,A
+UEL,2015-07-09,Shakhter Soligorsk,Glenavon FC,3,0,H
+UEL,2015-07-02,West Ham,Lusitanos,3,0,H
+UEL,2015-07-09,Lusitanos,West Ham,0,1,A
+UEL,2015-07-02,Linfield,NSI Runavik,2,0,H
+UEL,2015-07-09,NSI Runavik,Linfield,4,3,H
+UEL,2015-07-02,Cork City,KR Reykjavik,1,1,D
+UEL,2015-07-09,KR Reykjavik,Cork City,2,1,H
+UEL,2015-07-02,Glentoran,Žilina,1,4,A
+UEL,2015-07-09,Žilina,Glentoran,3,0,H
+UEL,2015-07-02,Shkendija,Aberdeen,1,1,D
+UEL,2015-07-09,Aberdeen,Shkendija,0,0,D
+UEL,2015-07-02,Vikingur Reykjavik,Koper,0,1,A
+UEL,2015-07-09,Koper,Vikingur Reykjavik,2,2,D
+UEL,2016-06-28,FK Rabotnicki,Buducnost Podgorica,1,1,D
+UEL,2016-06-28,Partizani,Slovan Bratislava,0,0,D
+UEL,2016-06-28,Kapaz,Dacia,0,0,D
+UEL,2016-06-28,St Patrick's Athl.,AS Jeunesse Esch,1,0,H
+UEL,2016-06-30,Dila,Shirak,1,0,H
+UEL,2016-06-30,Aktobe,MTK Budapest,1,1,D
+UEL,2016-06-30,UE Santa Coloma,NK Lokomotiva Zagreb,1,3,A
+UEL,2016-06-30,FK Ventspils,Vikingur Gota,2,0,H
+UEL,2016-06-30,Admira Wacker,Spartak Myjava,1,1,D
+UEL,2016-06-30,Bokelj,Vojvodina,1,1,D
+UEL,2016-06-30,Dinamo Minsk,Spartaks Jurmala,2,1,H
+UEL,2016-06-30,Fehérvár FC,Zaria Balti,3,0,H
+UEL,2016-06-30,FK Trakai,Kalju Nomme,2,1,H
+UEL,2016-06-30,Atlantas,HJK Helsinki,0,2,A
+UEL,2016-06-30,Balzan FC,Neftchi Baku,0,2,A
+UEL,2016-06-30,FC Levadia Tallinn,HB Torshavn,1,1,D
+UEL,2016-06-30,FC Urartu,Omonia Nicosia,0,1,A
+UEL,2016-06-30,Sloboda Tuzla,Beitar Jerusalem,0,0,D
+UEL,2016-06-30,IFK Goteborg,Llandudno,5,0,H
+UEL,2016-06-30,AIK Stockholm,Bala Town,2,0,H
+UEL,2016-06-30,Europa Fc,Pyunik Yerevan,2,0,H
+UEL,2016-06-30,Slavia Sofia,Zaglebie Lubin,1,0,H
+UEL,2016-06-30,ODD Ballklubb,Mariehamn,2,0,H
+UEL,2016-06-30,FC Midtjylland,Suduva Marijampole,1,0,H
+UEL,2016-06-30,FK Kukesi,Rudar Velenje,1,1,D
+UEL,2016-06-30,AEK Larnaca,Folgore,3,0,H
+UEL,2016-06-30,Qabala,Samtredia,5,1,H
+UEL,2016-06-30,Siroki Brijeg,Birkirkara,1,1,D
+UEL,2016-06-30,FC Vaduz,Sileks,3,1,H
+UEL,2016-06-30,FC Differdange 03,Cliftonville FC,1,1,D
+UEL,2016-06-30,Zimbru,Chikhura Sachkhere,0,1,A
+UEL,2016-06-30,Maccabi Tel Aviv,Gorica,3,0,H
+UEL,2016-06-30,Beroe,Radnik Bijeljina,0,0,D
+UEL,2016-06-30,NK Domzale,Lusitanos,3,1,H
+UEL,2016-06-30,NSI Runavik,Shakhter Soligorsk,0,2,A
+UEL,2016-06-30,Teuta Durrës,Kairat Almaty,0,1,A
+UEL,2016-06-30,GAP Connah S Quay FC,Stabaek,0,0,D
+UEL,2016-06-30,Spartak Trnava,Hibernians,3,0,H
+UEL,2016-06-30,La Fiorita,Debreceni VSC,0,5,A
+UEL,2016-06-30,Cukaricki,Ordabasy,3,0,H
+UEL,2016-06-30,Aberdeen,Fola Esch,3,1,H
+UEL,2016-06-30,Linfield,Cork City,0,1,A
+UEL,2016-06-30,Heart Of Midlothian,FCI Tallinn,2,1,H
+UEL,2016-06-30,Shkendija,Cracovia Krakow,2,0,H
+UEL,2016-06-30,Shamrock Rovers,Rops,0,2,A
+UEL,2016-06-30,KR Reykjavik,Glenavon FC,2,1,H
+UEL,2016-06-30,Breidablik,Jelgava,2,3,A
+UEL,2016-06-30,Valur Reykjavik,Brondby,1,4,A
+UEL,2016-07-05,Birkirkara,Siroki Brijeg,2,0,H
+UEL,2016-07-05,Chikhura Sachkhere,Zimbru,2,3,A
+UEL,2016-07-05,AS Jeunesse Esch,St Patrick's Athl.,2,1,H
+UEL,2016-07-06,FCI Tallinn,Heart Of Midlothian,2,4,A
+UEL,2016-07-07,Ordabasy,Cukaricki,3,3,D
+UEL,2016-07-07,Shirak,Dila,2,0,H
+UEL,2016-07-07,Kairat Almaty,Teuta Durrës,5,0,H
+UEL,2016-07-07,Samtredia,Qabala,2,1,H
+UEL,2016-07-07,Pyunik Yerevan,Europa Fc,2,1,H
+UEL,2016-07-07,Dacia,Kapaz,0,1,A
+UEL,2016-07-07,Spartak Myjava,Admira Wacker,2,3,A
+UEL,2016-07-07,Rudar Velenje,FK Kukesi,0,1,A
+UEL,2016-07-07,Jelgava,Breidablik,2,2,D
+UEL,2016-07-07,Zaglebie Lubin,Slavia Sofia,3,0,H
+UEL,2016-07-07,Mariehamn,ODD Ballklubb,1,1,D
+UEL,2016-07-07,Spartaks Jurmala,Dinamo Minsk,0,2,A
+UEL,2016-07-07,HJK Helsinki,Atlantas,1,1,D
+UEL,2016-07-07,Kalju Nomme,FK Trakai,4,1,H
+UEL,2016-07-07,NK Lokomotiva Zagreb,UE Santa Coloma,4,1,H
+UEL,2016-07-07,Rops,Shamrock Rovers,1,1,D
+UEL,2016-07-07,Neftchi Baku,Balzan FC,1,2,A
+UEL,2016-07-07,Debreceni VSC,La Fiorita,2,0,H
+UEL,2016-07-07,MTK Budapest,Aktobe,2,0,H
+UEL,2016-07-07,Radnik Bijeljina,Beroe,0,2,A
+UEL,2016-07-07,Brondby,Valur Reykjavik,6,0,H
+UEL,2016-07-07,Fola Esch,Aberdeen,1,0,H
+UEL,2016-07-07,Omonia Nicosia,FC Urartu,4,1,H
+UEL,2016-07-07,Gorica,Maccabi Tel Aviv,0,1,A
+UEL,2016-07-07,Beitar Jerusalem,Sloboda Tuzla,1,0,H
+UEL,2016-07-07,Stabaek,GAP Connah S Quay FC,0,1,A
+UEL,2016-07-07,Buducnost Podgorica,FK Rabotnicki,1,0,H
+UEL,2016-07-07,Suduva Marijampole,FC Midtjylland,0,1,A
+UEL,2016-07-07,Zaria Balti,Fehérvár FC,2,0,H
+UEL,2016-07-07,HB Torshavn,FC Levadia Tallinn,0,2,A
+UEL,2016-07-07,Bala Town,AIK Stockholm,0,2,A
+UEL,2016-07-07,Cracovia Krakow,Shkendija,1,2,A
+UEL,2016-07-07,Llandudno,IFK Goteborg,1,2,A
+UEL,2016-07-07,Shakhter Soligorsk,NSI Runavik,5,0,H
+UEL,2016-07-07,Vikingur Gota,FK Ventspils,0,2,A
+UEL,2016-07-07,Vojvodina,Bokelj,5,0,H
+UEL,2016-07-07,Hibernians,Spartak Trnava,0,3,A
+UEL,2016-07-07,Sileks,FC Vaduz,1,2,A
+UEL,2016-07-07,Folgore,AEK Larnaca,1,3,A
+UEL,2016-07-07,Lusitanos,NK Domzale,1,2,A
+UEL,2016-07-07,Cork City,Linfield,1,1,D
+UEL,2016-07-07,Cliftonville FC,FC Differdange 03,2,0,H
+UEL,2016-07-07,Glenavon FC,KR Reykjavik,0,6,A
+UEL,2016-07-14,Shirak,Spartak Trnava,1,1,D
+UEL,2016-07-14,Kairat Almaty,Maccabi Tel Aviv,1,1,D
+UEL,2016-07-14,Dinamo Minsk,St Patrick's Athl.,1,1,D
+UEL,2016-07-14,Rops,NK Lokomotiva Zagreb,1,1,D
+UEL,2016-07-14,Neftchi Baku,Shkendija,0,0,D
+UEL,2016-07-14,FC Levadia Tallinn,Slavia Praha,3,1,H
+UEL,2016-07-14,FC Midtjylland,FC Vaduz,3,0,H
+UEL,2016-07-14,Debreceni VSC,Torpedo Zhodino,1,2,A
+UEL,2016-07-14,BK Hacken,Cork City,1,1,D
+UEL,2016-07-14,AIK Stockholm,Europa Fc,1,0,H
+UEL,2016-07-14,Sonderjyske,Stromsgodset,2,1,H
+UEL,2016-07-14,Beitar Jerusalem,Omonia Nicosia,1,0,H
+UEL,2016-07-14,Admira Wacker,Kapaz,1,0,H
+UEL,2016-07-14,Maccabi Haifa,Kalju Nomme,1,1,D
+UEL,2016-07-14,Zimbru,Osmanlispor,2,2,D
+UEL,2016-07-14,Shakhter Soligorsk,NK Domzale,1,1,D
+UEL,2016-07-14,Beroe,HJK Helsinki,1,1,D
+UEL,2016-07-14,Maribor,Levski Sofia,0,0,D
+UEL,2016-07-14,Vojvodina,GAP Connah S Quay FC,1,0,H
+UEL,2016-07-14,Genk,Buducnost Podgorica,2,0,H
+UEL,2016-07-14,PAS Giannina,ODD Ballklubb,3,0,H
+UEL,2016-07-14,Politehnica Iasi,HNK Hajduk Split,2,2,D
+UEL,2016-07-14,FK Partizan,Zaglebie Lubin,0,0,D
+UEL,2016-07-14,Slovan Bratislava,Jelgava,0,0,D
+UEL,2016-07-14,Fehérvár FC,Cukaricki,2,0,H
+UEL,2016-07-14,Birkirkara,Heart Of Midlothian,0,0,D
+UEL,2016-07-14,MTK Budapest,Qabala,1,2,A
+UEL,2016-07-14,Hibernian,Brondby,0,1,A
+UEL,2016-07-14,Aberdeen,FK Ventspils,3,0,H
+UEL,2016-07-14,Piast Gliwice,IFK Goteborg,0,3,A
+UEL,2016-07-14,Cliftonville FC,AEK Larnaca,2,3,A
+UEL,2016-07-14,Austria Vienna,FK Kukesi,1,0,H
+UEL,2016-07-14,KR Reykjavik,Grasshoppers,3,3,D
+UEL,2016-07-20,Kapaz,Admira Wacker,0,2,A
+UEL,2016-07-21,FK Ventspils,Aberdeen,0,1,A
+UEL,2016-07-21,Jelgava,Slovan Bratislava,3,0,H
+UEL,2016-07-21,Torpedo Zhodino,Debreceni VSC,1,0,H
+UEL,2016-07-21,HJK Helsinki,Beroe,1,0,H
+UEL,2016-07-21,Kalju Nomme,Maccabi Haifa,2,2,D
+UEL,2016-07-21,NK Lokomotiva Zagreb,Rops,3,0,H
+UEL,2016-07-21,Omonia Nicosia,Beitar Jerusalem,3,2,H
+UEL,2016-07-21,Stromsgodset,Sonderjyske,2,2,D
+UEL,2016-07-21,ODD Ballklubb,PAS Giannina,3,1,H
+UEL,2016-07-21,IFK Goteborg,Piast Gliwice,0,0,D
+UEL,2016-07-21,Slavia Praha,FC Levadia Tallinn,2,0,H
+UEL,2016-07-21,Europa Fc,AIK Stockholm,0,1,A
+UEL,2016-07-21,Maccabi Tel Aviv,Kairat Almaty,2,1,H
+UEL,2016-07-21,AEK Larnaca,Cliftonville FC,2,0,H
+UEL,2016-07-21,Qabala,MTK Budapest,2,0,H
+UEL,2016-07-21,Levski Sofia,Maribor,1,1,D
+UEL,2016-07-21,FC Vaduz,FC Midtjylland,2,2,D
+UEL,2016-07-21,Grasshoppers,KR Reykjavik,2,1,H
+UEL,2016-07-21,FK Kukesi,Austria Vienna,1,4,A
+UEL,2016-07-21,GAP Connah S Quay FC,Vojvodina,1,2,A
+UEL,2016-07-21,Brondby,Hibernian,0,2,A
+UEL,2016-07-21,Shkendija,Neftchi Baku,1,0,H
+UEL,2016-07-21,Osmanlispor,Zimbru,5,0,H
+UEL,2016-07-21,Spartak Trnava,Shirak,2,0,H
+UEL,2016-07-21,HNK Hajduk Split,Politehnica Iasi,2,1,H
+UEL,2016-07-21,NK Domzale,Shakhter Soligorsk,2,1,H
+UEL,2016-07-21,Cukaricki,Fehérvár FC,1,1,D
+UEL,2016-07-21,Buducnost Podgorica,Genk,4,0,H
+UEL,2016-07-21,Cork City,BK Hacken,1,0,H
+UEL,2016-07-21,St Patrick's Athl.,Dinamo Minsk,0,1,A
+UEL,2016-07-21,Heart Of Midlothian,Birkirkara,1,2,A
+UEL,2016-07-21,Zaglebie Lubin,FK Partizan,0,0,D
+UEL,2016-07-28,AEK Larnaca,Spartak Moscow,1,1,D
+UEL,2016-07-28,Oleksandria,HNK Hajduk Split,0,3,A
+UEL,2016-07-28,Heracles,Arouca,1,1,D
+UEL,2016-07-28,Lille,Qabala,1,1,D
+UEL,2016-07-28,Zaglebie Lubin,Sonderjyske,1,2,A
+UEL,2016-07-28,IFK Goteborg,HJK Helsinki,1,2,A
+UEL,2016-07-28,Torpedo Zhodino,Rapid Vienna,0,0,D
+UEL,2016-07-28,Slavia Praha,Rio Ave,0,0,D
+UEL,2016-07-28,Austria Vienna,Spartak Trnava,0,1,A
+UEL,2016-07-28,NK Lokomotiva Zagreb,Vorskla Poltava,0,0,D
+UEL,2016-07-28,Jelgava,Beitar Jerusalem,1,1,D
+UEL,2016-07-28,Başakşehir,HNK Rijeka,0,0,D
+UEL,2016-07-28,Birkirkara,Krasnodar,0,3,A
+UEL,2016-07-28,FC Luzern,Sassuolo,1,1,D
+UEL,2016-07-28,Grasshoppers,Apollon Limassol,2,1,H
+UEL,2016-07-28,Shkendija,Mlada Boleslav,2,0,H
+UEL,2016-07-28,Panathinaikos,AIK Stockholm,1,0,H
+UEL,2016-07-28,Vojvodina,Dinamo Minsk,1,1,D
+UEL,2016-07-28,Genk,Cork City,1,0,H
+UEL,2016-07-28,Osmanlispor,Kalju Nomme,1,0,H
+UEL,2016-07-28,Pandurii TG JIU,Maccabi Tel Aviv,1,3,A
+UEL,2016-07-28,Hertha Berlin,Brondby,1,0,H
+UEL,2016-07-28,Fehérvár FC,FC Midtjylland,0,1,A
+UEL,2016-07-28,Gent,Viitorul Constanta,5,0,H
+UEL,2016-07-28,AZ Alkmaar,PAS Giannina,1,0,H
+UEL,2016-07-28,Aberdeen,Maribor,1,1,D
+UEL,2016-07-28,NK Domzale,West Ham,2,1,H
+UEL,2016-07-28,Saint Etienne,AEK Athens FC,0,0,D
+UEL,2016-07-28,Admira Wacker,Slovan Liberec,1,2,A
+UEL,2016-08-03,Slovan Liberec,Admira Wacker,2,0,H
+UEL,2016-08-04,FC Midtjylland,Fehérvár FC,1,1,D
+UEL,2016-08-04,HJK Helsinki,IFK Goteborg,0,2,A
+UEL,2016-08-04,Kalju Nomme,Osmanlispor,0,2,A
+UEL,2016-08-04,Spartak Moscow,AEK Larnaca,0,1,A
+UEL,2016-08-04,Krasnodar,Birkirkara,3,1,H
+UEL,2016-08-04,Spartak Trnava,Austria Vienna,0,2,A
+UEL,2016-08-04,Arouca,Heracles,0,0,D
+UEL,2016-08-04,AIK Stockholm,Panathinaikos,0,2,A
+UEL,2016-08-04,Apollon Limassol,Grasshoppers,3,3,D
+UEL,2016-08-04,Qabala,Lille,1,0,H
+UEL,2016-08-04,Mlada Boleslav,Shkendija,1,0,H
+UEL,2016-08-04,Beitar Jerusalem,Jelgava,3,0,H
+UEL,2016-08-04,PAS Giannina,AZ Alkmaar,1,2,A
+UEL,2016-08-04,Vorskla Poltava,NK Lokomotiva Zagreb,2,3,A
+UEL,2016-08-04,Sonderjyske,Zaglebie Lubin,1,1,D
+UEL,2016-08-04,Maccabi Tel Aviv,Pandurii TG JIU,2,1,H
+UEL,2016-08-04,Dinamo Minsk,Vojvodina,0,2,A
+UEL,2016-08-04,AEK Athens FC,Saint Etienne,0,1,A
+UEL,2016-08-04,Brondby,Hertha Berlin,3,1,H
+UEL,2016-08-04,Maribor,Aberdeen,1,0,H
+UEL,2016-08-04,HNK Rijeka,Başakşehir,2,2,D
+UEL,2016-08-04,Viitorul Constanta,Gent,0,0,D
+UEL,2016-08-04,Sassuolo,FC Luzern,3,0,H
+UEL,2016-08-04,HNK Hajduk Split,Oleksandria,3,1,H
+UEL,2016-08-04,West Ham,NK Domzale,3,0,H
+UEL,2016-08-04,Cork City,Genk,1,2,A
+UEL,2016-08-04,Rio Ave,Slavia Praha,1,1,D
+UEL,2016-08-04,Rapid Vienna,Torpedo Zhodino,3,0,H
+UEL,2016-08-17,Beitar Jerusalem,Saint Etienne,1,2,A
+UEL,2016-08-18,FC Astana,Bate Borisov,2,0,H
+UEL,2016-08-18,Dinamo Tbilisi,PAOK,0,3,A
+UEL,2016-08-18,Sonderjyske,Sparta Praha,0,0,D
+UEL,2016-08-18,FC Midtjylland,Osmanlispor,0,1,A
+UEL,2016-08-18,Krasnodar,Partizani,4,0,H
+UEL,2016-08-18,IFK Goteborg,Qarabag,1,0,H
+UEL,2016-08-18,Slavia Praha,Anderlecht,0,3,A
+UEL,2016-08-18,Austria Vienna,Rosenborg,2,1,H
+UEL,2016-08-18,Maccabi Tel Aviv,HNK Hajduk Split,2,1,H
+UEL,2016-08-18,AEK Larnaca,Slovan Liberec,0,1,A
+UEL,2016-08-18,Qabala,Maribor,3,1,H
+UEL,2016-08-18,Başakşehir,Shakhtar Donetsk,1,2,A
+UEL,2016-08-18,Fenerbahçe,Grasshoppers,3,0,H
+UEL,2016-08-18,Panathinaikos,Brondby,3,0,H
+UEL,2016-08-18,Vojvodina,AZ Alkmaar,0,3,A
+UEL,2016-08-18,NK Lokomotiva Zagreb,Genk,2,2,D
+UEL,2016-08-18,FC Astra Giurgiu,West Ham,1,1,D
+UEL,2016-08-18,Gent,Shkendija,2,1,H
+UEL,2016-08-18,Sassuolo,FK Crvena Zvezda,3,0,H
+UEL,2016-08-18,Arouca,Olympiakos Piraeus,0,1,A
+UEL,2016-08-18,AS Trencin,Rapid Vienna,0,4,A
+UEL,2016-08-25,Qarabag,IFK Goteborg,3,0,H
+UEL,2016-08-25,Rosenborg,Austria Vienna,1,2,A
+UEL,2016-08-25,Brondby,Panathinaikos,1,1,D
+UEL,2016-08-25,Slovan Liberec,AEK Larnaca,3,0,H
+UEL,2016-08-25,Grasshoppers,Fenerbahçe,0,2,A
+UEL,2016-08-25,Partizani,Krasnodar,0,0,D
+UEL,2016-08-25,AZ Alkmaar,Vojvodina,0,0,D
+UEL,2016-08-25,Bate Borisov,FC Astana,2,2,D
+UEL,2016-08-25,Anderlecht,Slavia Praha,3,0,H
+UEL,2016-08-25,Shkendija,Gent,0,4,A
+UEL,2016-08-25,PAOK,Dinamo Tbilisi,2,0,H
+UEL,2016-08-25,Sparta Praha,Sonderjyske,3,2,H
+UEL,2016-08-25,Genk,NK Lokomotiva Zagreb,2,0,H
+UEL,2016-08-25,Osmanlispor,FC Midtjylland,2,0,H
+UEL,2016-08-25,Maribor,Qabala,1,0,H
+UEL,2016-08-25,FK Crvena Zvezda,Sassuolo,1,1,D
+UEL,2016-08-25,HNK Hajduk Split,Maccabi Tel Aviv,4,2,H
+UEL,2016-08-25,West Ham,FC Astra Giurgiu,0,1,A
+UEL,2016-08-25,Olympiakos Piraeus,Arouca,2,1,H
+UEL,2016-08-25,Saint Etienne,Beitar Jerusalem,0,0,D
+UEL,2016-08-25,Shakhtar Donetsk,Başakşehir,2,0,H
+UEL,2016-08-25,Rapid Vienna,AS Trencin,0,2,A
+UEL,2016-09-15,Qarabag,Slovan Liberec,2,2,D
+UEL,2016-09-15,FSV Mainz 05,Saint Etienne,1,1,D
+UEL,2016-09-15,AZ Alkmaar,Dundalk,1,1,D
+UEL,2016-09-15,Feyenoord,Manchester United,1,0,H
+UEL,2016-09-15,Sassuolo,Athletic Club,3,0,H
+UEL,2016-09-15,Anderlecht,Qabala,3,1,H
+UEL,2016-09-15,BSC Young Boys,Olympiakos Piraeus,0,1,A
+UEL,2016-09-15,Plzen,AS Roma,1,1,D
+UEL,2016-09-15,Zorya Luhansk,Fenerbahçe,1,1,D
+UEL,2016-09-15,Maccabi Tel Aviv,Zenit Saint Petersburg,3,4,A
+UEL,2016-09-15,FC Astra Giurgiu,Austria Vienna,2,3,A
+UEL,2016-09-15,Rapid Vienna,Genk,3,2,H
+UEL,2016-09-15,Apoel Nicosia,FC Astana,2,1,H
+UEL,2016-09-15,Southampton,Sparta Praha,3,0,H
+UEL,2016-09-15,Nice,FC Schalke 04,0,1,A
+UEL,2016-09-15,SC Braga,Gent,1,1,D
+UEL,2016-09-15,Inter,Hapoel Beer Sheva,0,2,A
+UEL,2016-09-15,Villarreal,FC Zurich,2,1,H
+UEL,2016-09-15,Red Bull Salzburg,Krasnodar,0,1,A
+UEL,2016-09-15,Konyaspor,Shakhtar Donetsk,0,1,A
+UEL,2016-09-15,Panathinaikos,Ajax,1,2,A
+UEL,2016-09-15,PAOK,Fiorentina,0,0,D
+UEL,2016-09-15,Standard Liege,Celta Vigo,1,1,D
+UEL,2016-09-15,Osmanlispor,FCSB,2,0,H
+UEL,2016-09-29,FC Astana,BSC Young Boys,0,0,D
+UEL,2016-09-29,Qabala,FSV Mainz 05,2,3,A
+UEL,2016-09-29,FC Schalke 04,Red Bull Salzburg,3,1,H
+UEL,2016-09-29,Ajax,Standard Liege,1,0,H
+UEL,2016-09-29,Fiorentina,Qarabag,5,1,H
+UEL,2016-09-29,Celta Vigo,Panathinaikos,2,0,H
+UEL,2016-09-29,Shakhtar Donetsk,SC Braga,2,0,H
+UEL,2016-09-29,FCSB,Villarreal,1,1,D
+UEL,2016-09-29,Hapoel Beer Sheva,Southampton,0,0,D
+UEL,2016-09-29,Krasnodar,Nice,5,2,H
+UEL,2016-09-29,Sparta Praha,Inter,3,1,H
+UEL,2016-09-29,Gent,Konyaspor,2,0,H
+UEL,2016-09-29,Slovan Liberec,PAOK,1,2,A
+UEL,2016-09-29,FC Zurich,Osmanlispor,2,1,H
+UEL,2016-09-29,Manchester United,Zorya Luhansk,1,0,H
+UEL,2016-09-29,AS Roma,FC Astra Giurgiu,4,0,H
+UEL,2016-09-29,Athletic Club,Rapid Vienna,1,0,H
+UEL,2016-09-29,Olympiakos Piraeus,Apoel Nicosia,0,1,A
+UEL,2016-09-29,Dundalk,Maccabi Tel Aviv,1,0,H
+UEL,2016-09-29,Zenit Saint Petersburg,AZ Alkmaar,5,0,H
+UEL,2016-09-29,Austria Vienna,Plzen,0,0,D
+UEL,2016-09-29,Fenerbahçe,Feyenoord,1,0,H
+UEL,2016-09-29,Genk,Sassuolo,3,1,H
+UEL,2016-09-29,Saint Etienne,Anderlecht,1,1,D
+UEL,2016-10-20,Inter,Southampton,1,0,H
+UEL,2016-10-20,Celta Vigo,Ajax,2,2,D
+UEL,2016-10-20,Shakhtar Donetsk,Gent,5,0,H
+UEL,2016-10-20,Qarabag,PAOK,2,0,H
+UEL,2016-10-20,FCSB,FC Zurich,1,1,D
+UEL,2016-10-20,Hapoel Beer Sheva,Sparta Praha,0,1,A
+UEL,2016-10-20,Red Bull Salzburg,Nice,0,1,A
+UEL,2016-10-20,Konyaspor,SC Braga,1,1,D
+UEL,2016-10-20,Krasnodar,FC Schalke 04,0,1,A
+UEL,2016-10-20,Standard Liege,Panathinaikos,2,2,D
+UEL,2016-10-20,Osmanlispor,Villarreal,2,2,D
+UEL,2016-10-20,Slovan Liberec,Fiorentina,1,3,A
+UEL,2016-10-20,Manchester United,Fenerbahçe,4,1,H
+UEL,2016-10-20,FSV Mainz 05,Anderlecht,1,1,D
+UEL,2016-10-20,AZ Alkmaar,Maccabi Tel Aviv,1,2,A
+UEL,2016-10-20,Feyenoord,Zorya Luhansk,1,0,H
+UEL,2016-10-20,AS Roma,Austria Vienna,3,3,D
+UEL,2016-10-20,Olympiakos Piraeus,FC Astana,4,1,H
+UEL,2016-10-20,BSC Young Boys,Apoel Nicosia,3,1,H
+UEL,2016-10-20,Plzen,FC Astra Giurgiu,1,2,A
+UEL,2016-10-20,Dundalk,Zenit Saint Petersburg,1,2,A
+UEL,2016-10-20,Genk,Athletic Club,2,0,H
+UEL,2016-10-20,Rapid Vienna,Sassuolo,1,1,D
+UEL,2016-10-20,Saint Etienne,Qabala,1,0,H
+UEL,2016-11-03,FC Astana,Olympiakos Piraeus,1,1,D
+UEL,2016-11-03,Sassuolo,Rapid Vienna,2,2,D
+UEL,2016-11-03,Athletic Club,Genk,5,3,H
+UEL,2016-11-03,Anderlecht,FSV Mainz 05,6,1,H
+UEL,2016-11-03,Zenit Saint Petersburg,Dundalk,2,1,H
+UEL,2016-11-03,Zorya Luhansk,Feyenoord,1,1,D
+UEL,2016-11-03,Austria Vienna,AS Roma,2,4,A
+UEL,2016-11-03,Maccabi Tel Aviv,AZ Alkmaar,0,0,D
+UEL,2016-11-03,Fenerbahçe,Manchester United,2,1,H
+UEL,2016-11-03,Qabala,Saint Etienne,1,2,A
+UEL,2016-11-03,FC Astra Giurgiu,Plzen,1,1,D
+UEL,2016-11-03,Apoel Nicosia,BSC Young Boys,1,0,H
+UEL,2016-11-03,Southampton,Inter,2,1,H
+UEL,2016-11-03,Nice,Red Bull Salzburg,0,2,A
+UEL,2016-11-03,FC Schalke 04,Krasnodar,2,0,H
+UEL,2016-11-03,Ajax,Celta Vigo,3,2,H
+UEL,2016-11-03,SC Braga,Konyaspor,3,1,H
+UEL,2016-11-03,Fiorentina,Slovan Liberec,3,0,H
+UEL,2016-11-03,Villarreal,Osmanlispor,1,2,A
+UEL,2016-11-03,Panathinaikos,Standard Liege,0,3,A
+UEL,2016-11-03,PAOK,Qarabag,0,1,A
+UEL,2016-11-03,Sparta Praha,Hapoel Beer Sheva,2,0,H
+UEL,2016-11-03,Gent,Shakhtar Donetsk,3,5,A
+UEL,2016-11-03,FC Zurich,FCSB,0,0,D
+UEL,2016-11-24,FC Astana,Apoel Nicosia,2,1,H
+UEL,2016-11-24,Zenit Saint Petersburg,Maccabi Tel Aviv,2,0,H
+UEL,2016-11-24,Fenerbahçe,Zorya Luhansk,2,0,H
+UEL,2016-11-24,Qabala,Anderlecht,1,3,A
+UEL,2016-11-24,FC Schalke 04,Nice,2,0,H
+UEL,2016-11-24,Ajax,Panathinaikos,2,0,H
+UEL,2016-11-24,Fiorentina,PAOK,2,3,A
+UEL,2016-11-24,Celta Vigo,Standard Liege,1,1,D
+UEL,2016-11-24,Shakhtar Donetsk,Konyaspor,4,0,H
+UEL,2016-11-24,FCSB,Osmanlispor,2,1,H
+UEL,2016-11-24,Hapoel Beer Sheva,Inter,3,2,H
+UEL,2016-11-24,Krasnodar,Red Bull Salzburg,1,1,D
+UEL,2016-11-24,Sparta Praha,Southampton,1,0,H
+UEL,2016-11-24,Gent,SC Braga,2,2,D
+UEL,2016-11-24,Slovan Liberec,Qarabag,3,0,H
+UEL,2016-11-24,FC Zurich,Villarreal,1,1,D
+UEL,2016-11-24,Manchester United,Feyenoord,4,0,H
+UEL,2016-11-24,AS Roma,Plzen,4,1,H
+UEL,2016-11-24,Athletic Club,Sassuolo,3,2,H
+UEL,2016-11-24,Olympiakos Piraeus,BSC Young Boys,1,1,D
+UEL,2016-11-24,Dundalk,AZ Alkmaar,0,1,A
+UEL,2016-11-24,Austria Vienna,FC Astra Giurgiu,1,2,A
+UEL,2016-11-24,Genk,Rapid Vienna,1,0,H
+UEL,2016-11-24,Saint Etienne,FSV Mainz 05,0,0,D
+UEL,2016-12-08,SC Braga,Shakhtar Donetsk,2,4,A
+UEL,2016-12-08,Villarreal,FCSB,2,1,H
+UEL,2016-12-08,Qarabag,Fiorentina,1,2,A
+UEL,2016-12-08,Konyaspor,Gent,0,1,A
+UEL,2016-12-08,PAOK,Slovan Liberec,2,0,H
+UEL,2016-12-08,Osmanlispor,FC Zurich,2,0,H
+UEL,2016-12-08,FSV Mainz 05,Qabala,2,0,H
+UEL,2016-12-08,AZ Alkmaar,Zenit Saint Petersburg,3,2,H
+UEL,2016-12-08,Feyenoord,Fenerbahçe,0,1,A
+UEL,2016-12-08,Anderlecht,Saint Etienne,2,3,A
+UEL,2016-12-08,BSC Young Boys,FC Astana,3,0,H
+UEL,2016-12-08,Plzen,Austria Vienna,3,2,H
+UEL,2016-12-08,Zorya Luhansk,Manchester United,0,2,A
+UEL,2016-12-08,Maccabi Tel Aviv,Dundalk,2,1,H
+UEL,2016-12-08,FC Astra Giurgiu,AS Roma,0,0,D
+UEL,2016-12-08,Rapid Vienna,Athletic Club,1,1,D
+UEL,2016-12-08,Apoel Nicosia,Olympiakos Piraeus,2,0,H
+UEL,2016-12-08,Southampton,Hapoel Beer Sheva,1,1,D
+UEL,2016-12-08,Nice,Krasnodar,2,1,H
+UEL,2016-12-08,Inter,Sparta Praha,2,1,H
+UEL,2016-12-08,Red Bull Salzburg,FC Schalke 04,2,0,H
+UEL,2016-12-08,Panathinaikos,Celta Vigo,0,2,A
+UEL,2016-12-08,Standard Liege,Ajax,1,1,D
+UEL,2016-12-09,Sassuolo,Genk,0,2,A
+UEL,2017-02-16,Krasnodar,Fenerbahçe,1,0,H
+UEL,2017-02-16,Borussia Monchengladbach,Fiorentina,0,1,A
+UEL,2017-02-16,AZ Alkmaar,Lyon,1,4,A
+UEL,2017-02-16,Celta Vigo,Shakhtar Donetsk,0,1,A
+UEL,2017-02-16,Olympiakos Piraeus,Osmanlispor,0,0,D
+UEL,2017-02-16,Ludogorets,FC Copenhagen,1,2,A
+UEL,2017-02-16,Gent,Tottenham,1,0,H
+UEL,2017-02-16,FC Astra Giurgiu,Genk,2,2,D
+UEL,2017-02-16,FC Rostov,Sparta Praha,4,0,H
+UEL,2017-02-16,Manchester United,Saint Etienne,3,0,H
+UEL,2017-02-16,Legia Warszawa,Ajax,0,0,D
+UEL,2017-02-16,Athletic Club,Apoel Nicosia,3,2,H
+UEL,2017-02-16,Villarreal,AS Roma,0,4,A
+UEL,2017-02-16,Anderlecht,Zenit Saint Petersburg,2,0,H
+UEL,2017-02-16,Hapoel Beer Sheva,Beşiktaş,1,3,A
+UEL,2017-02-16,PAOK,FC Schalke 04,0,3,A
+UEL,2017-02-22,FC Schalke 04,PAOK,1,1,D
+UEL,2017-02-22,Fenerbahçe,Krasnodar,1,1,D
+UEL,2017-02-22,Saint Etienne,Manchester United,0,1,A
+UEL,2017-02-23,Osmanlispor,Olympiakos Piraeus,0,3,A
+UEL,2017-02-23,Ajax,Legia Warszawa,1,0,H
+UEL,2017-02-23,AS Roma,Villarreal,0,1,A
+UEL,2017-02-23,Beşiktaş,Hapoel Beer Sheva,2,1,H
+UEL,2017-02-23,Zenit Saint Petersburg,Anderlecht,3,1,H
+UEL,2017-02-23,Apoel Nicosia,Athletic Club,2,0,H
+UEL,2017-02-23,Tottenham,Gent,2,2,D
+UEL,2017-02-23,Lyon,AZ Alkmaar,7,1,H
+UEL,2017-02-23,FC Copenhagen,Ludogorets,0,0,D
+UEL,2017-02-23,Fiorentina,Borussia Monchengladbach,2,4,A
+UEL,2017-02-23,Shakhtar Donetsk,Celta Vigo,0,2,A
+UEL,2017-02-23,Sparta Praha,FC Rostov,1,1,D
+UEL,2017-02-23,Genk,FC Astra Giurgiu,1,0,H
+UEL,2017-03-09,FC Copenhagen,Ajax,2,1,H
+UEL,2017-03-09,FC Rostov,Manchester United,1,1,D
+UEL,2017-03-09,Apoel Nicosia,Anderlecht,0,1,A
+UEL,2017-03-09,Lyon,AS Roma,4,2,H
+UEL,2017-03-09,FC Schalke 04,Borussia Monchengladbach,1,1,D
+UEL,2017-03-09,Celta Vigo,Krasnodar,2,1,H
+UEL,2017-03-09,Olympiakos Piraeus,Beşiktaş,1,1,D
+UEL,2017-03-09,Gent,Genk,2,5,A
+UEL,2017-03-16,Beşiktaş,Olympiakos Piraeus,4,1,H
+UEL,2017-03-16,Krasnodar,Celta Vigo,0,2,A
+UEL,2017-03-16,Genk,Gent,1,1,D
+UEL,2017-03-16,Manchester United,FC Rostov,1,0,H
+UEL,2017-03-16,Borussia Monchengladbach,FC Schalke 04,2,2,D
+UEL,2017-03-16,Ajax,FC Copenhagen,2,0,H
+UEL,2017-03-16,AS Roma,Lyon,2,1,H
+UEL,2017-03-16,Anderlecht,Apoel Nicosia,1,0,H
+UEL,2017-04-13,Lyon,Beşiktaş,2,1,H
+UEL,2017-04-13,Ajax,FC Schalke 04,2,0,H
+UEL,2017-04-13,Celta Vigo,Genk,3,2,H
+UEL,2017-04-13,Anderlecht,Manchester United,1,1,D
+UEL,2017-04-20,Manchester United,Anderlecht,2,1,H
+UEL,2017-04-20,FC Schalke 04,Ajax,3,2,H
+UEL,2017-04-20,Beşiktaş,Lyon,4,2,H
+UEL,2017-04-20,Genk,Celta Vigo,1,1,D
+UEL,2017-05-03,Ajax,Lyon,4,1,H
+UEL,2017-05-04,Celta Vigo,Manchester United,0,1,A
+UEL,2017-05-11,Manchester United,Celta Vigo,1,1,D
+UEL,2017-05-11,Lyon,Ajax,3,1,H
+UEL,2017-05-24,Ajax,Manchester United,0,2,A
+UEL,2017-06-29,Shirak,Gorica,0,2,A
+UEL,2017-06-29,Irtysh Omsk,Dunav Ruse,1,0,H
+UEL,2017-06-29,Kairat Almaty,Atlantas,6,0,H
+UEL,2017-06-29,FK Ventspils,Valur Reykjavik,0,0,D
+UEL,2017-06-29,Partizani,Botev Plovdiv,1,3,A
+UEL,2017-06-29,Pyunik Yerevan,Slovan Bratislava,1,4,A
+UEL,2017-06-29,AS Trencin,Torpedo Kutaisi,5,1,H
+UEL,2017-06-29,Dinamo Minsk,NSI Runavik,2,1,H
+UEL,2017-06-29,FC Levadia Tallinn,Cork City,0,2,A
+UEL,2017-06-29,Shakhter Soligorsk,Suduva Marijampole,0,0,D
+UEL,2017-06-29,Shkendija,Dacia,3,0,H
+UEL,2017-06-29,VPS,Olimpija Ljubljana,1,0,H
+UEL,2017-06-29,Chikhura Sachkhere,SCR Altach,0,1,A
+UEL,2017-06-29,Dinamo Batumi,Jagiellonia,0,1,A
+UEL,2017-06-29,Lyngby,Bangor City,1,0,H
+UEL,2017-06-29,Kalju Nomme,B36 Torshavn,2,1,H
+UEL,2017-06-29,Ferencvarosi TC,Jelgava,2,0,H
+UEL,2017-06-29,Beitar Jerusalem,Vasas,4,3,H
+UEL,2017-06-29,Haugesund,Coleraine FC,7,0,H
+UEL,2017-06-29,ODD Ballklubb,Ballymena United,3,0,H
+UEL,2017-06-29,AEK Larnaca,Lincoln Red Imps FC,5,0,H
+UEL,2017-06-29,Levski Sofia,Sutjeska,3,1,H
+UEL,2017-06-29,Zaria Balti,FK Sarajevo,2,1,H
+UEL,2017-06-29,Zira,FC Differdange 03,2,0,H
+UEL,2017-06-29,UE Santa Coloma,NK Osijek,0,2,A
+UEL,2017-06-29,Fola Esch,Milsami Orhei,2,1,H
+UEL,2017-06-29,Bala Town,FC Vaduz,1,2,A
+UEL,2017-06-29,GAP Connah S Quay FC,HJK Helsinki,1,0,H
+UEL,2017-06-29,IFK Norrkoping,Prishtina,5,0,H
+UEL,2017-06-29,FC Midtjylland,Derry City,6,1,H
+UEL,2017-06-29,Maccabi Tel Aviv,Tirana,2,0,H
+UEL,2017-06-29,Skenderbeu Korce,UE Sant Julia,1,0,H
+UEL,2017-06-29,KI Klaksvik,AIK Stockholm,0,0,D
+UEL,2017-06-29,Vojvodina,Ružomberok,2,1,H
+UEL,2017-06-29,FK Crvena Zvezda,Floriana,3,0,H
+UEL,2017-06-29,NK Domzale,Flora Tallinn,2,0,H
+UEL,2017-06-29,Siroki Brijeg,Ordabasy,2,0,H
+UEL,2017-06-29,FK Mladost Podgorica,Gandzasar,1,0,H
+UEL,2017-06-29,Mladost Lucani,Şamaxı FK,0,3,A
+UEL,2017-06-29,Tre Penne,FK Rabotnicki,0,1,A
+UEL,2017-06-29,Rangers,Progres Niederkorn,1,0,H
+UEL,2017-06-29,ST Johnstone,FK Trakai,1,2,A
+UEL,2017-06-29,Lech Poznan,Pelister,4,0,H
+UEL,2017-06-29,Fehérvár FC,Balzan FC,2,0,H
+UEL,2017-06-29,Zeljeznicar Sarajevo,Zeta,1,0,H
+UEL,2017-06-29,Valletta FC,Folgore,2,0,H
+UEL,2017-06-29,Crusaders FC,FK Liepaja,3,1,H
+UEL,2017-06-29,St Joseph S Fc,AEL,0,4,A
+UEL,2017-06-29,KR Reykjavik,SJK,0,0,D
+UEL,2017-06-29,Stjarnan,Shamrock Rovers,0,1,A
+UEL,2017-07-04,Balzan FC,Fehérvár FC,3,3,D
+UEL,2017-07-04,Progres Niederkorn,Rangers,2,0,H
+UEL,2017-07-06,AEL,St Joseph S Fc,6,0,H
+UEL,2017-07-06,Dacia,Shkendija,0,4,A
+UEL,2017-07-06,Suduva Marijampole,Shakhter Soligorsk,2,1,H
+UEL,2017-07-06,Milsami Orhei,Fola Esch,1,1,D
+UEL,2017-07-06,Ordabasy,Siroki Brijeg,0,0,D
+UEL,2017-07-06,Pelister,Lech Poznan,0,3,A
+UEL,2017-07-06,Tirana,Maccabi Tel Aviv,0,3,A
+UEL,2017-07-06,FK Rabotnicki,Tre Penne,6,0,H
+UEL,2017-07-06,Jelgava,Ferencvarosi TC,0,1,A
+UEL,2017-07-06,FK Trakai,ST Johnstone,1,0,H
+UEL,2017-07-06,HJK Helsinki,GAP Connah S Quay FC,3,0,H
+UEL,2017-07-06,Atlantas,Kairat Almaty,1,2,A
+UEL,2017-07-06,Flora Tallinn,NK Domzale,2,3,A
+UEL,2017-07-06,Gandzasar,FK Mladost Podgorica,0,3,A
+UEL,2017-07-06,SJK,KR Reykjavik,0,2,A
+UEL,2017-07-06,FK Liepaja,Crusaders FC,2,0,H
+UEL,2017-07-06,AIK Stockholm,KI Klaksvik,5,0,H
+UEL,2017-07-06,Botev Plovdiv,Partizani,1,0,H
+UEL,2017-07-06,Slovan Bratislava,Pyunik Yerevan,5,0,H
+UEL,2017-07-06,FC Vaduz,Bala Town,3,0,H
+UEL,2017-07-06,Şamaxı FK,Mladost Lucani,2,0,H
+UEL,2017-07-06,Dunav Ruse,Irtysh Omsk,0,2,A
+UEL,2017-07-06,FC Differdange 03,Zira,1,2,A
+UEL,2017-07-06,Torpedo Kutaisi,AS Trencin,0,3,A
+UEL,2017-07-06,Ružomberok,Vojvodina,2,0,H
+UEL,2017-07-06,Bangor City,Lyngby,0,3,A
+UEL,2017-07-06,NSI Runavik,Dinamo Minsk,0,2,A
+UEL,2017-07-06,B36 Torshavn,Kalju Nomme,1,2,A
+UEL,2017-07-06,FK Sarajevo,Zaria Balti,4,2,H
+UEL,2017-07-06,Prishtina,IFK Norrkoping,0,1,A
+UEL,2017-07-06,Olimpija Ljubljana,VPS,0,1,A
+UEL,2017-07-06,Jagiellonia,Dinamo Batumi,4,0,H
+UEL,2017-07-06,SCR Altach,Chikhura Sachkhere,1,1,D
+UEL,2017-07-06,Folgore,Valletta FC,0,1,A
+UEL,2017-07-06,Sutjeska,Levski Sofia,0,0,D
+UEL,2017-07-06,UE Sant Julia,Skenderbeu Korce,0,5,A
+UEL,2017-07-06,Vasas,Beitar Jerusalem,0,3,A
+UEL,2017-07-06,Zeta,Zeljeznicar Sarajevo,2,2,D
+UEL,2017-07-06,Gorica,Shirak,2,2,D
+UEL,2017-07-06,Floriana,FK Crvena Zvezda,3,3,D
+UEL,2017-07-06,NK Osijek,UE Santa Coloma,4,0,H
+UEL,2017-07-06,Cork City,FC Levadia Tallinn,4,2,H
+UEL,2017-07-06,Ballymena United,ODD Ballklubb,0,2,A
+UEL,2017-07-06,Coleraine FC,Haugesund,0,0,D
+UEL,2017-07-06,Derry City,FC Midtjylland,1,4,A
+UEL,2017-07-06,Shamrock Rovers,Stjarnan,1,0,H
+UEL,2017-07-06,Valur Reykjavik,FK Ventspils,1,0,H
+UEL,2017-07-06,Lincoln Red Imps FC,AEK Larnaca,1,1,D
+UEL,2017-07-12,Şamaxı FK,Fola Esch,1,0,H
+UEL,2017-07-13,Irtysh Omsk,FK Crvena Zvezda,1,1,D
+UEL,2017-07-13,Kairat Almaty,Skenderbeu Korce,1,1,D
+UEL,2017-07-13,Maccabi Tel Aviv,KR Reykjavik,3,1,H
+UEL,2017-07-13,Shkendija,HJK Helsinki,3,1,H
+UEL,2017-07-13,FK Rabotnicki,Dinamo Minsk,1,1,D
+UEL,2017-07-13,Ružomberok,Brann,0,1,A
+UEL,2017-07-13,Kalju Nomme,Fehérvár FC,0,3,A
+UEL,2017-07-13,Brondby,VPS,2,0,H
+UEL,2017-07-13,SCR Altach,Dinamo Brest,1,1,D
+UEL,2017-07-13,FK Liepaja,Suduva Marijampole,0,2,A
+UEL,2017-07-13,Haugesund,Lech Poznan,3,2,H
+UEL,2017-07-13,Ostersunds FK,Galatasaray,2,0,H
+UEL,2017-07-13,Apollon Limassol,Zaria Balti,3,0,H
+UEL,2017-07-13,Qabala,Jagiellonia,1,1,D
+UEL,2017-07-13,FC Vaduz,ODD Ballklubb,0,1,A
+UEL,2017-07-13,FC Astra Giurgiu,Zira,3,1,H
+UEL,2017-07-13,Valletta FC,Utrecht,0,0,D
+UEL,2017-07-13,Progres Niederkorn,AEL,0,1,A
+UEL,2017-07-13,IFK Norrkoping,FK Trakai,2,1,H
+UEL,2017-07-13,Beitar Jerusalem,Botev Plovdiv,1,1,D
+UEL,2017-07-13,Slovan Bratislava,Lyngby,0,1,A
+UEL,2017-07-13,HNK Hajduk Split,Levski Sofia,1,0,H
+UEL,2017-07-13,Sturm Graz,FK Mladost Podgorica,0,1,A
+UEL,2017-07-13,AS Trencin,Bnei Yehuda,1,1,D
+UEL,2017-07-13,Aberdeen,Siroki Brijeg,1,1,D
+UEL,2017-07-13,NK Osijek,FC Luzern,2,0,H
+UEL,2017-07-13,Cork City,AEK Larnaca,0,1,A
+UEL,2017-07-13,Zeljeznicar Sarajevo,AIK Stockholm,0,0,D
+UEL,2017-07-13,Panionios,Gorica,2,0,H
+UEL,2017-07-13,Ferencvarosi TC,FC Midtjylland,2,4,A
+UEL,2017-07-13,Shamrock Rovers,Mlada Boleslav,2,3,A
+UEL,2017-07-13,Valur Reykjavik,NK Domzale,1,2,A
+UEL,2017-07-20,Dinamo Minsk,FK Rabotnicki,3,0,H
+UEL,2017-07-20,Lyngby,Slovan Bratislava,2,1,H
+UEL,2017-07-20,Suduva Marijampole,FK Liepaja,0,1,A
+UEL,2017-07-20,FK Trakai,IFK Norrkoping,4,2,H
+UEL,2017-07-20,Mlada Boleslav,Shamrock Rovers,2,0,H
+UEL,2017-07-20,HJK Helsinki,Shkendija,1,1,D
+UEL,2017-07-20,VPS,Brondby,2,1,H
+UEL,2017-07-20,Dinamo Brest,SCR Altach,0,3,A
+UEL,2017-07-20,Brann,Ružomberok,0,2,A
+UEL,2017-07-20,ODD Ballklubb,FC Vaduz,1,0,H
+UEL,2017-07-20,AIK Stockholm,Zeljeznicar Sarajevo,2,0,H
+UEL,2017-07-20,FC Midtjylland,Ferencvarosi TC,3,1,H
+UEL,2017-07-20,AEK Larnaca,Cork City,1,0,H
+UEL,2017-07-20,Levski Sofia,HNK Hajduk Split,1,2,A
+UEL,2017-07-20,Zaria Balti,Apollon Limassol,1,2,A
+UEL,2017-07-20,Zira,FC Astra Giurgiu,0,0,D
+UEL,2017-07-20,Bnei Yehuda,AS Trencin,2,0,H
+UEL,2017-07-20,Utrecht,Valletta FC,3,1,H
+UEL,2017-07-20,Fola Esch,Şamaxı FK,4,1,H
+UEL,2017-07-20,Botev Plovdiv,Beitar Jerusalem,4,0,H
+UEL,2017-07-20,Galatasaray,Ostersunds FK,1,1,D
+UEL,2017-07-20,FC Luzern,NK Osijek,2,1,H
+UEL,2017-07-20,Lech Poznan,Haugesund,2,0,H
+UEL,2017-07-20,Skenderbeu Korce,Kairat Almaty,2,0,H
+UEL,2017-07-20,NK Domzale,Valur Reykjavik,3,2,H
+UEL,2017-07-20,AEL,Progres Niederkorn,2,1,H
+UEL,2017-07-20,Jagiellonia,Qabala,0,2,A
+UEL,2017-07-20,FK Crvena Zvezda,Irtysh Omsk,2,0,H
+UEL,2017-07-20,FK Mladost Podgorica,Sturm Graz,0,3,A
+UEL,2017-07-20,Siroki Brijeg,Aberdeen,0,2,A
+UEL,2017-07-20,Gorica,Panionios,2,3,A
+UEL,2017-07-20,Fehérvár FC,Kalju Nomme,1,1,D
+UEL,2017-07-20,KR Reykjavik,Maccabi Tel Aviv,0,2,A
+UEL,2017-07-27,Mlada Boleslav,Skenderbeu Korce,2,1,H
+UEL,2017-07-27,FK Trakai,Shkendija,2,1,H
+UEL,2017-07-27,Olimpik Donetsk,PAOK,1,1,D
+UEL,2017-07-27,Maccabi Tel Aviv,Panionios,1,0,H
+UEL,2017-07-27,PSV Eindhoven,NK Osijek,0,1,A
+UEL,2017-07-27,Utrecht,Lech Poznan,0,0,D
+UEL,2017-07-27,Ostersunds FK,Fola Esch,1,0,H
+UEL,2017-07-27,AIK Stockholm,SC Braga,1,1,D
+UEL,2017-07-27,Suduva Marijampole,FC Sion,3,0,H
+UEL,2017-07-27,AEK Larnaca,Dinamo Minsk,2,0,H
+UEL,2017-07-27,Krasnodar,Lyngby,2,1,H
+UEL,2017-07-27,Sturm Graz,Fenerbahçe,1,2,A
+UEL,2017-07-27,Botev Plovdiv,Maritimo,0,0,D
+UEL,2017-07-27,Dinamo Bucuresti,Athletic Club,1,1,D
+UEL,2017-07-27,FC Astra Giurgiu,Oleksandria,0,0,D
+UEL,2017-07-27,Bnei Yehuda,Zenit Saint Petersburg,0,2,A
+UEL,2017-07-27,Arka Gdynia,FC Midtjylland,3,2,H
+UEL,2017-07-27,Brondby,HNK Hajduk Split,0,0,D
+UEL,2017-07-27,CS Universitatea Craiova,AC Milan,0,1,A
+UEL,2017-07-27,Bordeaux,Fehérvár FC,2,1,H
+UEL,2017-07-27,FK Crvena Zvezda,Sparta Praha,2,0,H
+UEL,2017-07-27,Panathinaikos,Qabala,1,0,H
+UEL,2017-07-27,Gent,SCR Altach,1,1,D
+UEL,2017-07-27,Marseille,Oostende,4,2,H
+UEL,2017-07-27,Aberdeen,Apollon Limassol,2,1,H
+UEL,2017-07-27,Dinamo Zagreb,ODD Ballklubb,2,1,H
+UEL,2017-07-27,Everton,Ružomberok,1,0,H
+UEL,2017-07-27,SC Freiburg,NK Domzale,1,0,H
+UEL,2017-07-27,Austria Vienna,AEL,0,0,D
+UEL,2017-08-02,FC Sion,Suduva Marijampole,1,1,D
+UEL,2017-08-02,AEL,Austria Vienna,1,2,A
+UEL,2017-08-03,Dinamo Minsk,AEK Larnaca,1,1,D
+UEL,2017-08-03,Shkendija,FK Trakai,3,0,H
+UEL,2017-08-03,ODD Ballklubb,Dinamo Zagreb,0,0,D
+UEL,2017-08-03,Zenit Saint Petersburg,Bnei Yehuda,0,1,A
+UEL,2017-08-03,Apollon Limassol,Aberdeen,2,0,H
+UEL,2017-08-03,Fehérvár FC,Bordeaux,1,0,H
+UEL,2017-08-03,Qabala,Panathinaikos,1,2,A
+UEL,2017-08-03,Sparta Praha,FK Crvena Zvezda,0,1,A
+UEL,2017-08-03,Oleksandria,FC Astra Giurgiu,1,0,H
+UEL,2017-08-03,Fenerbahçe,Sturm Graz,1,1,D
+UEL,2017-08-03,Fola Esch,Ostersunds FK,1,2,A
+UEL,2017-08-03,Lyngby,Krasnodar,1,3,A
+UEL,2017-08-03,Maritimo,Botev Plovdiv,2,0,H
+UEL,2017-08-03,Skenderbeu Korce,Mlada Boleslav,4,2,H
+UEL,2017-08-03,PAOK,Olimpik Donetsk,2,0,H
+UEL,2017-08-03,Lech Poznan,Utrecht,2,2,D
+UEL,2017-08-03,FC Midtjylland,Arka Gdynia,2,1,H
+UEL,2017-08-03,HNK Hajduk Split,Brondby,2,0,H
+UEL,2017-08-03,SCR Altach,Gent,3,1,H
+UEL,2017-08-03,AC Milan,CS Universitatea Craiova,2,0,H
+UEL,2017-08-03,Athletic Club,Dinamo Bucuresti,3,0,H
+UEL,2017-08-03,NK Osijek,PSV Eindhoven,1,0,H
+UEL,2017-08-03,Oostende,Marseille,0,0,D
+UEL,2017-08-03,Ružomberok,Everton,0,1,A
+UEL,2017-08-03,Panionios,Maccabi Tel Aviv,0,1,A
+UEL,2017-08-03,NK Domzale,SC Freiburg,2,0,H
+UEL,2017-08-03,SC Braga,AIK Stockholm,2,1,H
+UEL,2017-08-16,Utrecht,Zenit Saint Petersburg,1,0,H
+UEL,2017-08-17,Bate Borisov,Oleksandria,1,1,D
+UEL,2017-08-17,Apollon Limassol,FC Midtjylland,3,2,H
+UEL,2017-08-17,Dinamo Zagreb,Skenderbeu Korce,1,1,D
+UEL,2017-08-17,Krasnodar,FK Crvena Zvezda,3,2,H
+UEL,2017-08-17,FH hafnarfjordur,SC Braga,1,2,A
+UEL,2017-08-17,Vardar Skopje,Fenerbahçe,2,0,H
+UEL,2017-08-17,PAOK,Ostersunds FK,3,1,H
+UEL,2017-08-17,Plzen,AEK Larnaca,3,1,H
+UEL,2017-08-17,Ludogorets,Suduva Marijampole,2,0,H
+UEL,2017-08-17,Panathinaikos,Athletic Club,2,3,A
+UEL,2017-08-17,SCR Altach,Maccabi Tel Aviv,0,1,A
+UEL,2017-08-17,Ajax,Rosenborg,0,1,A
+UEL,2017-08-17,Legia Warszawa,Sheriff Tiraspol,1,1,D
+UEL,2017-08-17,AC Milan,Shkendija,6,0,H
+UEL,2017-08-17,Club Brugge KV,AEK Athens FC,0,0,D
+UEL,2017-08-17,Viitorul Constanta,Red Bull Salzburg,1,3,A
+UEL,2017-08-17,NK Domzale,Marseille,1,1,D
+UEL,2017-08-17,NK Osijek,Austria Vienna,1,2,A
+UEL,2017-08-17,FK Partizan,Fehérvár FC,0,0,D
+UEL,2017-08-17,Everton,HNK Hajduk Split,2,0,H
+UEL,2017-08-17,Maritimo,Dynamo Kyiv,0,0,D
+UEL,2017-08-24,AEK Larnaca,Plzen,0,0,D
+UEL,2017-08-24,Dynamo Kyiv,Maritimo,3,1,H
+UEL,2017-08-24,Ostersunds FK,PAOK,2,0,H
+UEL,2017-08-24,Sheriff Tiraspol,Legia Warszawa,0,0,D
+UEL,2017-08-24,Red Bull Salzburg,Viitorul Constanta,4,0,H
+UEL,2017-08-24,Zenit Saint Petersburg,Utrecht,2,0,H
+UEL,2017-08-24,Maccabi Tel Aviv,SCR Altach,2,2,D
+UEL,2017-08-24,Oleksandria,Bate Borisov,1,2,A
+UEL,2017-08-24,Fenerbahçe,Vardar Skopje,1,2,A
+UEL,2017-08-24,Suduva Marijampole,Ludogorets,0,0,D
+UEL,2017-08-24,FC Midtjylland,Apollon Limassol,1,1,D
+UEL,2017-08-24,AEK Athens FC,Club Brugge KV,3,0,H
+UEL,2017-08-24,Skenderbeu Korce,Dinamo Zagreb,0,0,D
+UEL,2017-08-24,Fehérvár FC,FK Partizan,0,4,A
+UEL,2017-08-24,Marseille,NK Domzale,3,0,H
+UEL,2017-08-24,SC Braga,FH hafnarfjordur,3,2,H
+UEL,2017-08-24,Rosenborg,Ajax,3,2,H
+UEL,2017-08-24,Athletic Club,Panathinaikos,1,0,H
+UEL,2017-08-24,Shkendija,AC Milan,0,1,A
+UEL,2017-08-24,FK Crvena Zvezda,Krasnodar,2,1,H
+UEL,2017-08-24,HNK Hajduk Split,Everton,1,1,D
+UEL,2017-08-24,Austria Vienna,NK Osijek,0,1,A
+UEL,2017-09-14,1899 Hoffenheim,SC Braga,1,2,A
+UEL,2017-09-14,FC Copenhagen,Lokomotiv Moscow,0,0,D
+UEL,2017-09-14,Atalanta,Everton,3,0,H
+UEL,2017-09-14,Villarreal,FC Astana,3,1,H
+UEL,2017-09-14,Slavia Praha,Maccabi Tel Aviv,1,0,H
+UEL,2017-09-14,HNK Rijeka,AEK Athens FC,1,2,A
+UEL,2017-09-14,Başakşehir,Ludogorets,0,0,D
+UEL,2017-09-14,BSC Young Boys,FK Partizan,1,1,D
+UEL,2017-09-14,Dynamo Kyiv,Skenderbeu Korce,3,1,H
+UEL,2017-09-14,Austria Vienna,AC Milan,1,5,A
+UEL,2017-09-14,Apollon Limassol,Lyon,1,1,D
+UEL,2017-09-14,Zlin,Sheriff Tiraspol,0,0,D
+UEL,2017-09-14,Marseille,Konyaspor,1,0,H
+UEL,2017-09-14,Hertha Berlin,Athletic Club,0,0,D
+UEL,2017-09-14,Vitesse,Lazio,2,3,A
+UEL,2017-09-14,Guimaraes,Red Bull Salzburg,1,1,D
+UEL,2017-09-14,Real Sociedad,Rosenborg,4,0,H
+UEL,2017-09-14,FCSB,Plzen,3,0,H
+UEL,2017-09-14,Hapoel Beer Sheva,FC Lugano,2,1,H
+UEL,2017-09-14,Vardar Skopje,Zenit Saint Petersburg,0,5,A
+UEL,2017-09-14,FK Crvena Zvezda,Bate Borisov,1,1,D
+UEL,2017-09-14,Zorya Luhansk,Ostersunds FK,0,2,A
+UEL,2017-09-14,Zulte Waregem,Nice,1,5,A
+UEL,2017-09-14,Arsenal,1. FC Köln,3,1,H
+UEL,2017-09-28,FC Astana,Slavia Praha,1,1,D
+UEL,2017-09-28,Nice,Vitesse,3,0,H
+UEL,2017-09-28,1. FC Köln,FK Crvena Zvezda,0,1,A
+UEL,2017-09-28,Rosenborg,Vardar Skopje,3,1,H
+UEL,2017-09-28,Ostersunds FK,Hertha Berlin,1,0,H
+UEL,2017-09-28,Bate Borisov,Arsenal,2,4,A
+UEL,2017-09-28,Lazio,Zulte Waregem,2,0,H
+UEL,2017-09-28,Athletic Club,Zorya Luhansk,0,1,A
+UEL,2017-09-28,Plzen,Hapoel Beer Sheva,3,1,H
+UEL,2017-09-28,Red Bull Salzburg,Marseille,1,0,H
+UEL,2017-09-28,Zenit Saint Petersburg,Real Sociedad,3,1,H
+UEL,2017-09-28,FC Lugano,FCSB,1,2,A
+UEL,2017-09-28,Konyaspor,Guimaraes,2,1,H
+UEL,2017-09-28,Everton,Apollon Limassol,2,2,D
+UEL,2017-09-28,Lyon,Atalanta,1,1,D
+UEL,2017-09-28,SC Braga,Başakşehir,2,1,H
+UEL,2017-09-28,AC Milan,HNK Rijeka,3,2,H
+UEL,2017-09-28,Ludogorets,1899 Hoffenheim,2,1,H
+UEL,2017-09-28,Sheriff Tiraspol,FC Copenhagen,0,0,D
+UEL,2017-09-28,FK Partizan,Dynamo Kyiv,2,3,A
+UEL,2017-09-28,AEK Athens FC,Austria Vienna,2,2,D
+UEL,2017-09-28,Lokomotiv Moscow,Zlin,3,0,H
+UEL,2017-09-28,Maccabi Tel Aviv,Villarreal,0,0,D
+UEL,2017-09-28,Skenderbeu Korce,BSC Young Boys,1,1,D
+UEL,2017-10-19,FC Astana,Maccabi Tel Aviv,4,0,H
+UEL,2017-10-19,Marseille,Guimaraes,2,1,H
+UEL,2017-10-19,Nice,Lazio,1,3,A
+UEL,2017-10-19,Ostersunds FK,Athletic Club,2,2,D
+UEL,2017-10-19,Bate Borisov,1. FC Köln,1,0,H
+UEL,2017-10-19,Hapoel Beer Sheva,FCSB,1,2,A
+UEL,2017-10-19,Vardar Skopje,Real Sociedad,0,6,A
+UEL,2017-10-19,Zenit Saint Petersburg,Rosenborg,3,1,H
+UEL,2017-10-19,FK Crvena Zvezda,Arsenal,0,1,A
+UEL,2017-10-19,Zorya Luhansk,Hertha Berlin,2,1,H
+UEL,2017-10-19,Zulte Waregem,Vitesse,1,1,D
+UEL,2017-10-19,FC Lugano,Plzen,3,2,H
+UEL,2017-10-19,Konyaspor,Red Bull Salzburg,0,2,A
+UEL,2017-10-19,Everton,Lyon,1,2,A
+UEL,2017-10-19,1899 Hoffenheim,Başakşehir,3,1,H
+UEL,2017-10-19,SC Braga,Ludogorets,0,2,A
+UEL,2017-10-19,AC Milan,AEK Athens FC,0,0,D
+UEL,2017-10-19,Atalanta,Apollon Limassol,3,1,H
+UEL,2017-10-19,Villarreal,Slavia Praha,2,2,D
+UEL,2017-10-19,Sheriff Tiraspol,Lokomotiv Moscow,1,1,D
+UEL,2017-10-19,Dynamo Kyiv,BSC Young Boys,2,2,D
+UEL,2017-10-19,Austria Vienna,HNK Rijeka,1,3,A
+UEL,2017-10-19,Zlin,FC Copenhagen,1,1,D
+UEL,2017-10-19,Skenderbeu Korce,FK Partizan,0,0,D
+UEL,2017-11-02,Lyon,Everton,3,0,H
+UEL,2017-11-02,FC Copenhagen,Zlin,3,0,H
+UEL,2017-11-02,Slavia Praha,Villarreal,0,2,A
+UEL,2017-11-02,HNK Rijeka,Austria Vienna,1,4,A
+UEL,2017-11-02,Başakşehir,1899 Hoffenheim,1,1,D
+UEL,2017-11-02,BSC Young Boys,Dynamo Kyiv,0,1,A
+UEL,2017-11-02,Ludogorets,SC Braga,1,1,D
+UEL,2017-11-02,FK Partizan,Skenderbeu Korce,2,0,H
+UEL,2017-11-02,AEK Athens FC,AC Milan,0,0,D
+UEL,2017-11-02,Lokomotiv Moscow,Sheriff Tiraspol,1,2,A
+UEL,2017-11-02,Apollon Limassol,Atalanta,1,1,D
+UEL,2017-11-02,Maccabi Tel Aviv,FC Astana,0,1,A
+UEL,2017-11-02,Arsenal,FK Crvena Zvezda,0,0,D
+UEL,2017-11-02,Hertha Berlin,Zorya Luhansk,2,0,H
+UEL,2017-11-02,1. FC Köln,Bate Borisov,5,2,H
+UEL,2017-11-02,Vitesse,Zulte Waregem,0,2,A
+UEL,2017-11-02,Guimaraes,Marseille,1,0,H
+UEL,2017-11-02,Rosenborg,Zenit Saint Petersburg,1,1,D
+UEL,2017-11-02,Lazio,Nice,1,0,H
+UEL,2017-11-02,Athletic Club,Ostersunds FK,1,0,H
+UEL,2017-11-02,Real Sociedad,Vardar Skopje,3,0,H
+UEL,2017-11-02,FCSB,Hapoel Beer Sheva,1,1,D
+UEL,2017-11-02,Plzen,FC Lugano,4,1,H
+UEL,2017-11-02,Red Bull Salzburg,Konyaspor,0,0,D
+UEL,2017-11-23,FC Astana,Villarreal,2,3,A
+UEL,2017-11-23,Nice,Zulte Waregem,3,1,H
+UEL,2017-11-23,1. FC Köln,Arsenal,1,0,H
+UEL,2017-11-23,Rosenborg,Real Sociedad,0,1,A
+UEL,2017-11-23,Ostersunds FK,Zorya Luhansk,2,0,H
+UEL,2017-11-23,Bate Borisov,FK Crvena Zvezda,0,0,D
+UEL,2017-11-23,Lazio,Vitesse,1,1,D
+UEL,2017-11-23,Athletic Club,Hertha Berlin,3,2,H
+UEL,2017-11-23,Plzen,FCSB,2,0,H
+UEL,2017-11-23,Red Bull Salzburg,Guimaraes,3,0,H
+UEL,2017-11-23,Zenit Saint Petersburg,Vardar Skopje,2,1,H
+UEL,2017-11-23,Lokomotiv Moscow,FC Copenhagen,2,1,H
+UEL,2017-11-23,FC Lugano,Hapoel Beer Sheva,1,0,H
+UEL,2017-11-23,Konyaspor,Marseille,1,1,D
+UEL,2017-11-23,Everton,Atalanta,1,5,A
+UEL,2017-11-23,Lyon,Apollon Limassol,4,0,H
+UEL,2017-11-23,SC Braga,1899 Hoffenheim,3,1,H
+UEL,2017-11-23,AC Milan,Austria Vienna,5,1,H
+UEL,2017-11-23,Ludogorets,Başakşehir,1,2,A
+UEL,2017-11-23,Sheriff Tiraspol,Zlin,1,0,H
+UEL,2017-11-23,FK Partizan,BSC Young Boys,2,1,H
+UEL,2017-11-23,AEK Athens FC,HNK Rijeka,2,2,D
+UEL,2017-11-23,Maccabi Tel Aviv,Slavia Praha,0,2,A
+UEL,2017-11-23,Skenderbeu Korce,Dynamo Kyiv,3,2,H
+UEL,2017-12-07,1899 Hoffenheim,Ludogorets,1,1,D
+UEL,2017-12-07,FC Copenhagen,Sheriff Tiraspol,2,0,H
+UEL,2017-12-07,Atalanta,Lyon,1,0,H
+UEL,2017-12-07,Villarreal,Maccabi Tel Aviv,0,1,A
+UEL,2017-12-07,Slavia Praha,FC Astana,0,1,A
+UEL,2017-12-07,HNK Rijeka,AC Milan,2,0,H
+UEL,2017-12-07,Başakşehir,SC Braga,2,1,H
+UEL,2017-12-07,BSC Young Boys,Skenderbeu Korce,2,1,H
+UEL,2017-12-07,Dynamo Kyiv,FK Partizan,4,1,H
+UEL,2017-12-07,Austria Vienna,AEK Athens FC,0,0,D
+UEL,2017-12-07,Apollon Limassol,Everton,0,3,A
+UEL,2017-12-07,Zlin,Lokomotiv Moscow,0,2,A
+UEL,2017-12-07,Arsenal,Bate Borisov,6,0,H
+UEL,2017-12-07,Marseille,Red Bull Salzburg,0,0,D
+UEL,2017-12-07,Hertha Berlin,Ostersunds FK,1,1,D
+UEL,2017-12-07,Vitesse,Nice,1,0,H
+UEL,2017-12-07,Guimaraes,Konyaspor,1,1,D
+UEL,2017-12-07,Real Sociedad,Zenit Saint Petersburg,1,3,A
+UEL,2017-12-07,FCSB,FC Lugano,1,2,A
+UEL,2017-12-07,Hapoel Beer Sheva,Plzen,0,2,A
+UEL,2017-12-07,Vardar Skopje,Rosenborg,1,1,D
+UEL,2017-12-07,FK Crvena Zvezda,1. FC Köln,1,0,H
+UEL,2017-12-07,Zorya Luhansk,Athletic Club,0,2,A
+UEL,2017-12-07,Zulte Waregem,Lazio,3,2,H
+UEL,2018-02-13,FK Crvena Zvezda,CSKA Moscow,0,0,D
+UEL,2018-02-15,FC Astana,Sporting CP,1,3,A
+UEL,2018-02-15,Marseille,SC Braga,3,0,H
+UEL,2018-02-15,Nice,Lokomotiv Moscow,2,3,A
+UEL,2018-02-15,Borussia Dortmund,Atalanta,3,2,H
+UEL,2018-02-15,Ostersunds FK,Arsenal,0,3,A
+UEL,2018-02-15,Real Sociedad,Red Bull Salzburg,2,2,D
+UEL,2018-02-15,Spartak Moscow,Athletic Club,1,3,A
+UEL,2018-02-15,Ludogorets,AC Milan,0,3,A
+UEL,2018-02-15,Lyon,Villarreal,3,1,H
+UEL,2018-02-15,Celtic,Zenit Saint Petersburg,1,0,H
+UEL,2018-02-15,FC Copenhagen,Atletico Madrid,1,4,A
+UEL,2018-02-15,Napoli,RB Leipzig,1,3,A
+UEL,2018-02-15,FCSB,Lazio,1,0,H
+UEL,2018-02-15,FK Partizan,Plzen,1,1,D
+UEL,2018-02-15,AEK Athens FC,Dynamo Kyiv,1,1,D
+UEL,2018-02-21,CSKA Moscow,FK Crvena Zvezda,1,0,H
+UEL,2018-02-22,Lokomotiv Moscow,Nice,1,0,H
+UEL,2018-02-22,RB Leipzig,Napoli,0,2,A
+UEL,2018-02-22,Sporting CP,FC Astana,3,3,D
+UEL,2018-02-22,Lazio,FCSB,5,1,H
+UEL,2018-02-22,Atletico Madrid,FC Copenhagen,1,0,H
+UEL,2018-02-22,Villarreal,Lyon,0,1,A
+UEL,2018-02-22,Plzen,FK Partizan,2,0,H
+UEL,2018-02-22,Dynamo Kyiv,AEK Athens FC,0,0,D
+UEL,2018-02-22,Zenit Saint Petersburg,Celtic,3,0,H
+UEL,2018-02-22,Arsenal,Ostersunds FK,1,2,A
+UEL,2018-02-22,SC Braga,Marseille,1,0,H
+UEL,2018-02-22,AC Milan,Ludogorets,1,0,H
+UEL,2018-02-22,Atalanta,Borussia Dortmund,1,1,D
+UEL,2018-02-22,Athletic Club,Spartak Moscow,1,2,A
+UEL,2018-02-22,Red Bull Salzburg,Real Sociedad,2,1,H
+UEL,2018-03-08,Borussia Dortmund,Red Bull Salzburg,1,2,A
+UEL,2018-03-08,AC Milan,Arsenal,0,2,A
+UEL,2018-03-08,Atletico Madrid,Lokomotiv Moscow,3,0,H
+UEL,2018-03-08,CSKA Moscow,Lyon,0,1,A
+UEL,2018-03-08,Marseille,Athletic Club,3,1,H
+UEL,2018-03-08,RB Leipzig,Zenit Saint Petersburg,2,1,H
+UEL,2018-03-08,Sporting CP,Plzen,2,0,H
+UEL,2018-03-08,Lazio,Dynamo Kyiv,2,2,D
+UEL,2018-03-15,Lokomotiv Moscow,Atletico Madrid,1,5,A
+UEL,2018-03-15,Athletic Club,Marseille,1,2,A
+UEL,2018-03-15,Plzen,Sporting CP,2,1,H
+UEL,2018-03-15,Dynamo Kyiv,Lazio,0,2,A
+UEL,2018-03-15,Zenit Saint Petersburg,RB Leipzig,1,1,D
+UEL,2018-03-15,Arsenal,AC Milan,3,1,H
+UEL,2018-03-15,Lyon,CSKA Moscow,2,3,A
+UEL,2018-03-15,Red Bull Salzburg,Borussia Dortmund,0,0,D
+UEL,2018-04-05,Arsenal,CSKA Moscow,4,1,H
+UEL,2018-04-05,RB Leipzig,Marseille,1,0,H
+UEL,2018-04-05,Lazio,Red Bull Salzburg,4,2,H
+UEL,2018-04-05,Atletico Madrid,Sporting CP,2,0,H
+UEL,2018-04-12,Marseille,RB Leipzig,5,2,H
+UEL,2018-04-12,Sporting CP,Atletico Madrid,1,0,H
+UEL,2018-04-12,CSKA Moscow,Arsenal,2,2,D
+UEL,2018-04-12,Red Bull Salzburg,Lazio,4,1,H
+UEL,2018-04-26,Arsenal,Atletico Madrid,1,1,D
+UEL,2018-04-26,Marseille,Red Bull Salzburg,2,0,H
+UEL,2018-05-03,Atletico Madrid,Arsenal,1,0,H
+UEL,2018-05-03,Red Bull Salzburg,Marseille,2,1,H
+UEL,2018-05-16,Marseille,Atletico Madrid,0,3,A
+UEL,2018-06-26,UE Sant Julia,Gzira United,0,2,A
+UEL,2018-06-28,Europa FC,Prishtina,1,1,D
+UEL,2018-06-28,Birkirkara,KI Klaksvik,1,1,D
+UEL,2018-06-28,Cefn Druids AFC,FK Trakai,1,1,D
+UEL,2018-06-28,B36 Torshavn,St Joseph S FC,1,1,D
+UEL,2018-06-28,UE Engordany,Folgore,2,1,H
+UEL,2018-06-28,Tre Fiori,Bala Town,3,0,H
+UEL,2018-07-05,St Joseph S FC,B36 Torshavn,2,2,D
+UEL,2018-07-05,FK Trakai,Cefn Druids AFC,1,0,H
+UEL,2018-07-05,Prishtina,Europa FC,5,0,H
+UEL,2018-07-05,Gzira United,UE Sant Julia,2,1,H
+UEL,2018-07-05,Bala Town,Tre Fiori,1,0,H
+UEL,2018-07-05,KI Klaksvik,Birkirkara,2,1,H
+UEL,2018-07-05,Folgore,UE Engordany,1,1,D
+UEL,2018-07-10,Samtredia,FK Tobol Kostanay,0,1,A
+UEL,2018-07-11,FC Urartu,FK Sarajevo,1,2,A
+UEL,2018-07-11,FK Rabotnicki,Budapest Honved,2,1,H
+UEL,2018-07-11,FC Vaduz,Levski Sofia,1,0,H
+UEL,2018-07-11,Fola Esch,Prishtina,0,0,D
+UEL,2018-07-11,KI Klaksvik,FK Zalgiris Vilnius,1,2,A
+UEL,2018-07-11,Glenavon FC,Molde,2,1,H
+UEL,2018-07-12,Pyunik Yerevan,Vardar Skopje,1,0,H
+UEL,2018-07-12,FK Ventspils,Luftetari Gjirokaster,5,0,H
+UEL,2018-07-12,Chikhura Sachkhere,Beitar Jerusalem,0,0,D
+UEL,2018-07-12,Partizani,Maribor,0,1,A
+UEL,2018-07-12,Rudar Velenje,Tre Fiori,7,0,H
+UEL,2018-07-12,Qabala,Progres Niederkorn,0,2,A
+UEL,2018-07-12,FK Trakai,Irtysh Omsk,0,0,D
+UEL,2018-07-12,Balzan FC,Şamaxı FK,4,1,H
+UEL,2018-07-12,Ilves,Slavia Sofia,0,1,A
+UEL,2018-07-12,KuPS,FC Copenhagen,0,1,A
+UEL,2018-07-12,Lahti,FH Hafnarfjordur,0,3,A
+UEL,2018-07-12,FC Levadia Tallinn,Dundalk,0,1,A
+UEL,2018-07-12,Trans Narva,Zeljeznicar Sarajevo,0,2,A
+UEL,2018-07-12,FK Liepaja,BK Hacken,0,3,A
+UEL,2018-07-12,GAP Connah S Quay FC,Shakhter Soligorsk,1,3,A
+UEL,2018-07-12,Ferencvarosi TC,Maccabi Tel Aviv,1,1,D
+UEL,2018-07-12,Derry City,Dinamo Minsk,0,2,A
+UEL,2018-07-12,Milsami Orhei,Slovan Bratislava,2,4,A
+UEL,2018-07-12,Anorthosis,Laci,2,1,H
+UEL,2018-07-12,Neftchi Baku,Ujpest,3,1,H
+UEL,2018-07-12,Petrocub,NK Osijek,1,1,D
+UEL,2018-07-12,Stumbras,Apollon Limassol,1,0,H
+UEL,2018-07-12,CSKA Sofia,Riga FC,1,0,H
+UEL,2018-07-12,IBV Vestmannaeyjar,Sarpsborg 08 FF,0,4,A
+UEL,2018-07-12,Gornik Zabrze,Zaria Balti,1,0,H
+UEL,2018-07-12,Siroki Brijeg,NK Domzale,2,2,D
+UEL,2018-07-12,B36 Torshavn,FK Mladost Podgorica,0,0,D
+UEL,2018-07-12,Racing FC Union Luxembourg,Viitorul Constanta,0,2,A
+UEL,2018-07-12,UE Engordany,Kairat Almaty,0,3,A
+UEL,2018-07-12,Shamrock Rovers,AIK Stockholm,0,1,A
+UEL,2018-07-12,Rudar Pljevlja,FK Partizan,0,3,A
+UEL,2018-07-12,Buducnost Podgorica,AS Trencin,0,2,A
+UEL,2018-07-12,Hibernian,NSI Runavik,6,1,H
+UEL,2018-07-12,Rangers,Shkupi 1927,2,0,H
+UEL,2018-07-12,Lech Poznan,Gandzasar,2,0,H
+UEL,2018-07-12,FK Spartak Zdrepceva KRV,Coleraine FC,1,1,D
+UEL,2018-07-12,Cliftonville FC,FC Nordsjaelland,0,1,A
+UEL,2018-07-12,Radnicki NIS,Gzira United,4,0,H
+UEL,2018-07-12,Dunajska Streda,Dinamo Tbilisi,1,1,D
+UEL,2018-07-12,Stjarnan,Kalju Nomme,3,0,H
+UEL,2018-07-17,Levski Sofia,FC Vaduz,3,2,H
+UEL,2018-07-17,Shkupi 1927,Rangers,0,0,D
+UEL,2018-07-17,Budapest Honved,FK Rabotnicki,4,0,H
+UEL,2018-07-18,Zeljeznicar Sarajevo,Trans Narva,3,1,H
+UEL,2018-07-19,Kairat Almaty,UE Engordany,7,1,H
+UEL,2018-07-19,FK Tobol Kostanay,Samtredia,2,0,H
+UEL,2018-07-19,Dinamo Minsk,Derry City,1,2,A
+UEL,2018-07-19,Viitorul Constanta,Racing FC Union Luxembourg,0,0,D
+UEL,2018-07-19,Irtysh Omsk,	FK Trakai,0,1,A
+UEL,2018-07-19,Gandzasar,Lech Poznan,2,1,H
+UEL,2018-07-19,Laci,Anorthosis,1,0,H
+UEL,2018-07-19,Molde,Glenavon FC,5,1,H
+UEL,2018-07-19,Kalju Nomme,Stjarnan,1,0,H
+UEL,2018-07-19,Slavia Sofia,Ilves,2,1,H
+UEL,2018-07-19,Gzira United,Radnicki NIS,0,1,A
+UEL,2018-07-19,Slovan Bratislava,Milsami Orhei,5,0,H
+UEL,2018-07-19,Riga FC,CSKA Sofia,2,0,H
+UEL,2018-07-19,Sarpsborg 08 FF,IBV Vestmannaeyjar,2,0,H
+UEL,2018-07-19,BK Hacken,FK Liepaja,1,2,A
+UEL,2018-07-19,AIK Stockholm,Shamrock Rovers,1,1,D
+UEL,2018-07-19,Shakhter Soligorsk,GAP Connah S Quay FC,2,0,H
+UEL,2018-07-19,Vardar Skopje,Pyunik Yerevan,0,2,A
+UEL,2018-07-19,FK Zalgiris Vilnius,KI Klaksvik,1,1,D
+UEL,2018-07-19,Apollon Limassol,Stumbras,2,0,H
+UEL,2018-07-19,Maccabi Tel Aviv,Ferencvarosi TC,1,0,H
+UEL,2018-07-19,Zaria Balti,Gornik Zabrze,1,1,D
+UEL,2018-07-19,Şamaxı FK,Balzan FC,2,1,H
+UEL,2018-07-19,Prishtina,Fola Esch,0,0,D
+UEL,2018-07-19,Dinamo Tbilisi,Dunajska Streda,1,2,A
+UEL,2018-07-19,FC Nordsjaelland,Cliftonville FC,2,1,H
+UEL,2018-07-19,Progres Niederkorn,Qabala,0,1,A
+UEL,2018-07-19,Beitar Jerusalem,Chikhura Sachkhere,1,2,A
+UEL,2018-07-19,FC Copenhagen,KuPS,1,1,D
+UEL,2018-07-19,Luftetari Gjirokaster,FK Ventspils,3,3,D
+UEL,2018-07-19,Maribor,Partizani,2,0,H
+UEL,2018-07-19,FK Sarajevo,FC Urartu,3,0,H
+UEL,2018-07-19,FK Partizan,Rudar Pljevlja,3,0,H
+UEL,2018-07-19,FK Mladost Podgorica,B36 Torshavn,1,2,A
+UEL,2018-07-19,AS Trencin,Buducnost Podgorica,1,1,D
+UEL,2018-07-19,Dundalk,FC Levadia Tallinn,2,1,H
+UEL,2018-07-19,NK Osijek,Petrocub,2,1,H
+UEL,2018-07-19,Coleraine FC,FK Spartak Zdrepceva KRV,0,2,A
+UEL,2018-07-19,NSI Runavik,Hibernian,4,6,A
+UEL,2018-07-19,Tre Fiori,Rudar Velenje,0,3,A
+UEL,2018-07-19,NK Domzale,Siroki Brijeg,1,1,D
+UEL,2018-07-19,Ujpest,Neftchi Baku,4,0,H
+UEL,2018-07-19,FH Hafnarfjordur,Lahti,0,0,D
+UEL,2018-07-26,FC UFA,NK Domzale,0,0,D
+UEL,2018-07-26,FK Ventspils,Bordeaux,0,1,A
+UEL,2018-07-26,Viitorul Constanta,Vitesse,2,2,D
+UEL,2018-07-26,Spartaks Jurmala,La Fiorita,6,0,H
+UEL,2018-07-26,Kairat Almaty,AZ Alkmaar,2,0,H
+UEL,2018-07-26,FK Tobol Kostanay,Pyunik Yerevan,2,1,H
+UEL,2018-07-26,Rudar Velenje,FCSB,0,2,A
+UEL,2018-07-26,Torpedo Kutaisi,Vikingur Gota,3,0,H
+UEL,2018-07-26,Balzan FC,Slovan Bratislava,2,1,H
+UEL,2018-07-26,Chikhura Sachkhere,Maribor,0,0,D
+UEL,2018-07-26,Hapoel Haifa,FH Hafnarfjordur,1,1,D
+UEL,2018-07-26,RB Leipzig,BK Hacken,4,0,H
+UEL,2018-07-26,F91 Dudelange,Drita,2,1,H
+UEL,2018-07-26,Molde,Laci,3,0,H
+UEL,2018-07-26,Djurgardens IF,FC Mariupol,1,1,D
+UEL,2018-07-26,Budapest Honved,Progres Niederkorn,1,0,H
+UEL,2018-07-26,FK Zalgiris Vilnius,FC Vaduz,1,0,H
+UEL,2018-07-26,Zrinjski,Valletta FC,1,1,D
+UEL,2018-07-26,Maccabi Tel Aviv,Radnicki NIS,2,0,H
+UEL,2018-07-26,CSKA Sofia,Admira Wacker,3,0,H
+UEL,2018-07-26,Apoel Nicosia,Flora Tallinn,5,0,H
+UEL,2018-07-26,Jagiellonia,Rio Ave,1,0,H
+UEL,2018-07-26,Shakhter Soligorsk,Lech Poznan,1,1,D
+UEL,2018-07-26,Dinamo Brest,Atromitos Athinon,4,3,H
+UEL,2018-07-26,FC Nordsjaelland,AIK Stockholm,1,0,H
+UEL,2018-07-26,Lask Linz,Lillestrom,4,0,H
+UEL,2018-07-26,Gornik Zabrze,AS Trencin,0,1,A
+UEL,2018-07-26,The New Saints,Lincoln Red Imps FC,2,1,H
+UEL,2018-07-26,FC Santa Coloma,Valur Reykjavik,1,0,H
+UEL,2018-07-26,HNK Hajduk Split,Slavia Sofia,1,0,H
+UEL,2018-07-26,Sutjeska,Alashkert,0,1,A
+UEL,2018-07-26,Olimpija Ljubljana,Crusaders FC,5,1,H
+UEL,2018-07-26,B36 Torshavn,Beşiktaş,0,2,A
+UEL,2018-07-26,Genk,Fola Esch,5,0,H
+UEL,2018-07-26,FC ST. Gallen,Sarpsborg 08 FF,2,1,H
+UEL,2018-07-26,Atalanta,FK Sarajevo,2,2,D
+UEL,2018-07-26,FK Partizan,FK Trakai,1,0,H
+UEL,2018-07-26,Zeljeznicar Sarajevo,Apollon Limassol,1,2,A
+UEL,2018-07-26,Hibernian,Asteras Tripolis,3,2,H
+UEL,2018-07-26,Aberdeen,Burnley,1,1,D
+UEL,2018-07-26,Dundalk,AEK Larnaca,0,0,D
+UEL,2018-07-26,NK Osijek,Rangers,0,1,A
+UEL,2018-07-26,FK Spartak Zdrepceva KRV,Sparta Praha,2,0,H
+UEL,2018-07-26,Stjarnan,FC Copenhagen,0,2,A
+UEL,2018-07-26,Dunajska Streda,Dinamo Minsk,1,3,A
+UEL,2018-07-26,Sevilla,Ujpest,4,0,H
+UEL,2018-07-31,Pyunik Yerevan,FK Tobol Kostanay,1,0,H
+UEL,2018-08-01,Fola Esch,Genk,1,4,A
+UEL,2018-08-02,Alashkert,Sutjeska,0,0,D
+UEL,2018-08-02,Laci,Molde,0,2,A
+UEL,2018-08-02,AEK Larnaca,Dundalk,4,0,H
+UEL,2018-08-02,AS Trencin,Gornik Zabrze,4,1,H
+UEL,2018-08-02,Dinamo Minsk,Dunajska Streda,4,1,H
+UEL,2018-08-02,FK Trakai,FK Partizan,1,1,D
+UEL,2018-08-02,Valletta FC,Zrinjski,1,2,A
+UEL,2018-08-02,Flora Tallinn,Apoel Nicosia,2,0,H
+UEL,2018-08-02,Slavia Sofia,HNK Hajduk Split,2,3,A
+UEL,2018-08-02,Lillestrom,Lask Linz,1,2,A
+UEL,2018-08-02,BK Hacken,RB Leipzig,1,1,D
+UEL,2018-08-02,AIK Stockholm,FC Nordsjaelland,0,1,A
+UEL,2018-08-02,Apollon Limassol,Zeljeznicar Sarajevo,3,1,H
+UEL,2018-08-02,Sparta Praha,FK Spartak Zdrepceva KRV,2,1,H
+UEL,2018-08-02,Progres Niederkorn,Budapest Honved,2,0,H
+UEL,2018-08-02,FC Vaduz,FK Zalgiris Vilnius,1,1,D
+UEL,2018-08-02,Lincoln Red Imps FC,The New Saints,1,1,D
+UEL,2018-08-02,Admira Wacker,CSKA Sofia,1,3,A
+UEL,2018-08-02,FC Mariupol,Djurgardens IF,2,1,H
+UEL,2018-08-02,Atromitos Athinon,Dinamo Brest,1,1,D
+UEL,2018-08-02,Slovan Bratislava,Balzan FC,3,1,H
+UEL,2018-08-02,Vitesse,Viitorul Constanta,3,1,H
+UEL,2018-08-02,FC Copenhagen,Stjarnan,5,0,H
+UEL,2018-08-02,Beşiktaş,B36 Torshavn,6,0,H
+UEL,2018-08-02,Vikingur Gota,Torpedo Kutaisi,0,4,A
+UEL,2018-08-02,Asteras Tripolis,Hibernian,1,1,D
+UEL,2018-08-02,Maribor,Chikhura Sachkhere,2,0,H
+UEL,2018-08-02,FK Sarajevo,Atalanta,0,8,A
+UEL,2018-08-02,FCSB,Rudar Velenje,4,0,H
+UEL,2018-08-02,NK Domzale,FC UFA,1,1,D
+UEL,2018-08-02,Burnley,Aberdeen,3,1,H
+UEL,2018-08-02,Bordeaux,FK Ventspils,2,1,H
+UEL,2018-08-02,AZ Alkmaar,Kairat Almaty,2,1,H
+UEL,2018-08-02,Rangers,NK Osijek,1,1,D
+UEL,2018-08-02,Sarpsborg 08 FF,FC ST. Gallen,1,0,H
+UEL,2018-08-02,Lech Poznan,Shakhter Soligorsk,3,1,H
+UEL,2018-08-02,Drita,F91 Dudelange,1,1,D
+UEL,2018-08-02,La Fiorita,Spartaks Jurmala,0,3,A
+UEL,2018-08-02,Rio Ave,Jagiellonia,4,4,D
+UEL,2018-08-02,Crusaders FC,Olimpija Ljubljana,1,1,D
+UEL,2018-08-02,Radnicki NIS,Maccabi Tel Aviv,2,2,D
+UEL,2018-08-02,Ujpest,Sevilla,1,3,A
+UEL,2018-08-02,FH Hafnarfjordur,Hapoel Haifa,0,1,A
+UEL,2018-08-02,Valur Reykjavik,FC Santa Coloma,3,0,H
+UEL,2018-08-07,Pyunik Yerevan,Maccabi Tel Aviv,0,0,D
+UEL,2018-08-09,FC UFA,Progres Niederkorn,2,1,H
+UEL,2018-08-09,Alashkert,CFR 1907 Cluj,0,2,A
+UEL,2018-08-09,Spartaks Jurmala,Suduva Marijampole,0,1,A
+UEL,2018-08-09,Hapoel Haifa,Atalanta,1,4,A
+UEL,2018-08-09,RB Leipzig,CS Universitatea Craiova,3,1,H
+UEL,2018-08-09,Dinamo Minsk,Zenit Saint Petersburg,4,0,H
+UEL,2018-08-09,Hapoel Beer Sheva,Apoel Nicosia,2,2,D
+UEL,2018-08-09,Ludogorets,Zrinjski,1,0,H
+UEL,2018-08-09,Sheriff Tiraspol,Valur Reykjavik,1,0,H
+UEL,2018-08-09,Apollon Limassol,Dinamo Brest,4,0,H
+UEL,2018-08-09,Sturm Graz,AEK Larnaca,0,2,A
+UEL,2018-08-09,AS Trencin,Feyenoord,4,0,H
+UEL,2018-08-09,Torpedo Kutaisi,FK Kukesi,5,2,H
+UEL,2018-08-09,Sigma Olomouc,Kairat Almaty,2,0,H
+UEL,2018-08-09,FC Mariupol,Bordeaux,1,3,A
+UEL,2018-08-09,Jagiellonia,Gent,0,1,A
+UEL,2018-08-09,FC Nordsjaelland,FK Partizan,1,2,A
+UEL,2018-08-09,CSKA Sofia,FC Copenhagen,1,2,A
+UEL,2018-08-09,Vitesse,FC Basel 1893,0,1,A
+UEL,2018-08-09,Beşiktaş,Lask Linz,1,0,H
+UEL,2018-08-09,Olympiakos Piraeus,FC Luzern,4,0,H
+UEL,2018-08-09,Başakşehir,Burnley,0,0,D
+UEL,2018-08-09,Olimpija Ljubljana,HJK Helsinki,3,0,H
+UEL,2018-08-09,Genk,Lech Poznan,2,0,H
+UEL,2018-08-09,Zorya Luhansk,SC Braga,1,1,D
+UEL,2018-08-09,Hibernian,Molde,0,0,D
+UEL,2018-08-09,Rangers,Maribor,3,1,H
+UEL,2018-08-09,Sarpsborg 08 FF,HNK Rijeka,1,1,D
+UEL,2018-08-09,The New Saints,FC Midtjylland,0,2,A
+UEL,2018-08-09,HNK Hajduk Split,FCSB,0,0,D
+UEL,2018-08-09,Cork City,Rosenborg,0,2,A
+UEL,2018-08-09,FK Spartak Zdrepceva KRV,Brondby,0,2,A
+UEL,2018-08-09,Legia Warszawa,F91 Dudelange,1,2,A
+UEL,2018-08-09,Slovan Bratislava,Rapid Vienna,2,1,H
+UEL,2018-08-09,Sevilla,FK Zalgiris Vilnius,1,0,H
+UEL,2018-08-16,Kairat Almaty,Sigma Olomouc,1,2,A
+UEL,2018-08-16,Progres Niederkorn,FC UFA,2,2,D
+UEL,2018-08-16,AEK Larnaca,Sturm Graz,5,0,H
+UEL,2018-08-16,HJK Helsinki,Olimpija Ljubljana,1,4,A
+UEL,2018-08-16,FC Copenhagen,CSKA Sofia,2,1,H
+UEL,2018-08-16,CS Universitatea Craiova,RB Leipzig,1,1,D
+UEL,2018-08-16,Molde,Hibernian,3,0,H
+UEL,2018-08-16,FC Midtjylland,The New Saints,3,1,H
+UEL,2018-08-16,FK Kukesi,Torpedo Kutaisi,2,0,H
+UEL,2018-08-16,FK Zalgiris Vilnius,Sevilla,0,5,A
+UEL,2018-08-16,Zenit Saint Petersburg,Dinamo Minsk,8,1,H
+UEL,2018-08-16,Suduva Marijampole,Spartaks Jurmala,0,0,D
+UEL,2018-08-16,CFR 1907 Cluj,Alashkert,5,0,H
+UEL,2018-08-16,Apoel Nicosia,Hapoel Beer Sheva,3,1,H
+UEL,2018-08-16,Maccabi Tel Aviv,Pyunik Yerevan,2,1,H
+UEL,2018-08-16,FC Luzern,Olympiakos Piraeus,1,3,A
+UEL,2018-08-16,Dinamo Brest,Apollon Limassol,1,0,H
+UEL,2018-08-16,Lask Linz,Beşiktaş,2,1,H
+UEL,2018-08-16,Brondby,FK Spartak Zdrepceva KRV,2,1,H
+UEL,2018-08-16,Atalanta,Hapoel Haifa,2,0,H
+UEL,2018-08-16,FC Basel 1893,Vitesse,1,0,H
+UEL,2018-08-16,F91 Dudelange,Legia Warszawa,2,2,D
+UEL,2018-08-16,Zrinjski,Ludogorets,1,1,D
+UEL,2018-08-16,Lech Poznan,Genk,1,2,A
+UEL,2018-08-16,Maribor,Rangers,0,0,D
+UEL,2018-08-16,Feyenoord,AS Trencin,1,1,D
+UEL,2018-08-16,FCSB,HNK Hajduk Split,2,1,H
+UEL,2018-08-16,FK Partizan,FC Nordsjaelland,3,2,H
+UEL,2018-08-16,Gent,Jagiellonia,3,1,H
+UEL,2018-08-16,Rapid Vienna,Slovan Bratislava,4,0,H
+UEL,2018-08-16,Burnley,Başakşehir,1,0,H
+UEL,2018-08-16,Bordeaux,FC Mariupol,2,1,H
+UEL,2018-08-16,Rosenborg,Cork City,3,0,H
+UEL,2018-08-16,HNK Rijeka,Sarpsborg 08 FF,0,1,A
+UEL,2018-08-16,Valur Reykjavik,Sheriff Tiraspol,2,1,H
+UEL,2018-08-16,SC Braga,Zorya Luhansk,2,2,D
+UEL,2018-08-23,Zenit Saint Petersburg,Molde,3,1,H
+UEL,2018-08-23,Torpedo Kutaisi,Ludogorets,0,1,A
+UEL,2018-08-23,AS Trencin,AEK Larnaca,1,1,D
+UEL,2018-08-23,Sheriff Tiraspol,Qarabag,1,0,H
+UEL,2018-08-23,Suduva Marijampole,Celtic,1,1,D
+UEL,2018-08-23,Apoel Nicosia,FC Astana,1,0,H
+UEL,2018-08-23,Sigma Olomouc,Sevilla,0,1,A
+UEL,2018-08-23,Sarpsborg 08 FF,Maccabi Tel Aviv,3,1,H
+UEL,2018-08-23,Malmo FF,FC Midtjylland,2,2,D
+UEL,2018-08-23,Atalanta,FC Copenhagen,0,0,D
+UEL,2018-08-23,FC Basel 1893,Apollon Limassol,3,2,H
+UEL,2018-08-23,Olympiakos Piraeus,Burnley,3,1,H
+UEL,2018-08-23,F91 Dudelange,CFR 1907 Cluj,2,0,H
+UEL,2018-08-23,FK Partizan,Beşiktaş,1,1,D
+UEL,2018-08-23,Zorya Luhansk,RB Leipzig,0,0,D
+UEL,2018-08-23,Olimpija Ljubljana,Spartak Trnava,0,2,A
+UEL,2018-08-23,Genk,Brondby,5,2,H
+UEL,2018-08-23,Rapid Vienna,FCSB,3,1,H
+UEL,2018-08-23,Rangers,FC UFA,1,0,H
+UEL,2018-08-23,Rosenborg,Shkendija,3,1,H
+UEL,2018-08-23,Gent,Bordeaux,0,0,D
+UEL,2018-08-30,FC Astana,Apoel Nicosia,2,0,H
+UEL,2018-08-30,FC UFA,Rangers,1,1,D
+UEL,2018-08-30,AEK Larnaca,AS Trencin,3,0,H
+UEL,2018-08-30,RB Leipzig,Zorya Luhansk,3,2,H
+UEL,2018-08-30,FC Copenhagen,Atalanta,0,0,D
+UEL,2018-08-30,Molde,Zenit Saint Petersburg,2,1,H
+UEL,2018-08-30,Qarabag,Sheriff Tiraspol,3,0,H
+UEL,2018-08-30,Ludogorets,Torpedo Kutaisi,4,0,H
+UEL,2018-08-30,Apollon Limassol,FC Basel 1893,1,0,H
+UEL,2018-08-30,Maccabi Tel Aviv,Sarpsborg 08 FF,2,1,H
+UEL,2018-08-30,CFR 1907 Cluj,F91 Dudelange,2,3,A
+UEL,2018-08-30,FC Midtjylland,Malmo FF,0,2,A
+UEL,2018-08-30,Beşiktaş,FK Partizan,3,0,H
+UEL,2018-08-30,Shkendija,Rosenborg,0,2,A
+UEL,2018-08-30,Brondby,Genk,2,4,A
+UEL,2018-08-30,FCSB,Rapid Vienna,2,1,H
+UEL,2018-08-30,Spartak Trnava,Olimpija Ljubljana,1,1,D
+UEL,2018-08-30,Burnley,Olympiakos Piraeus,1,1,D
+UEL,2018-08-30,Bordeaux,Gent,2,0,H
+UEL,2018-08-30,Celtic,Suduva Marijampole,3,0,H
+UEL,2018-08-30,Sevilla,Sigma Olomouc,3,0,H
+UEL,2018-09-20,Marseille,Eintracht Frankfurt,1,2,A
+UEL,2018-09-20,Rennes,FK Jablonec,2,1,H
+UEL,2018-09-20,Lazio,Apollon Limassol,2,1,H
+UEL,2018-09-20,Villarreal,Rangers,2,2,D
+UEL,2018-09-20,Sevilla,Standard Liege,5,1,H
+UEL,2018-09-20,Beşiktaş,Sarpsborg 08 FF,3,1,H
+UEL,2018-09-20,Dynamo Kyiv,FC Astana,2,2,D
+UEL,2018-09-20,Fehérvár FC,Bate Borisov,0,2,A
+UEL,2018-09-20,PAOK,Chelsea,0,1,A
+UEL,2018-09-20,Genk,Malmo FF,2,0,H
+UEL,2018-09-20,Rapid Vienna,Spartak Moscow,2,0,H
+UEL,2018-09-20,Akhisarspor,Krasnodar,0,1,A
+UEL,2018-09-20,Arsenal,Vorskla Poltava,4,2,H
+UEL,2018-09-20,RB Leipzig,Red Bull Salzburg,2,3,A
+UEL,2018-09-20,Sporting CP,Qarabag,2,0,H
+UEL,2018-09-20,Celtic,Rosenborg,1,0,H
+UEL,2018-09-20,FC Copenhagen,Zenit Saint Petersburg,1,1,D
+UEL,2018-09-20,Olympiakos Piraeus,Real Betis,0,0,D
+UEL,2018-09-20,Slavia Praha,Bordeaux,1,0,H
+UEL,2018-09-20,Ludogorets,Bayer Leverkusen,2,3,A
+UEL,2018-09-20,F91 Dudelange,AC Milan,0,1,A
+UEL,2018-09-20,AEK Larnaca,FC Zurich,0,1,A
+UEL,2018-09-20,Dinamo Zagreb,Fenerbahçe,4,1,H
+UEL,2018-09-20,Spartak Trnava,Anderlecht,1,0,H
+UEL,2018-10-04,FC Astana,Rennes,2,0,H
+UEL,2018-10-04,Bordeaux,FC Copenhagen,1,2,A
+UEL,2018-10-04,Bayer Leverkusen,AEK Larnaca,4,2,H
+UEL,2018-10-04,Rosenborg,RB Leipzig,1,3,A
+UEL,2018-10-04,AC Milan,Olympiakos Piraeus,3,1,H
+UEL,2018-10-04,Real Betis,F91 Dudelange,3,0,H
+UEL,2018-10-04,Anderlecht,Dinamo Zagreb,0,2,A
+UEL,2018-10-04,Qarabag,Arsenal,0,3,A
+UEL,2018-10-04,Red Bull Salzburg,Celtic,3,1,H
+UEL,2018-10-04,Zenit Saint Petersburg,Slavia Praha,1,0,H
+UEL,2018-10-04,Fenerbahçe,Spartak Trnava,2,0,H
+UEL,2018-10-04,FC Zurich,Ludogorets,1,0,H
+UEL,2018-10-04,Vorskla Poltava,Sporting CP,1,2,A
+UEL,2018-10-04,Chelsea,Fehérvár FC,1,0,H
+UEL,2018-10-04,Eintracht Frankfurt,Lazio,4,1,H
+UEL,2018-10-04,Rangers,Rapid Vienna,3,1,H
+UEL,2018-10-04,Sarpsborg 08 FF,Genk,3,1,H
+UEL,2018-10-04,Malmo FF,Beşiktaş,2,0,H
+UEL,2018-10-04,Bate Borisov,PAOK,1,4,A
+UEL,2018-10-04,Spartak Moscow,Villarreal,3,3,D
+UEL,2018-10-04,Apollon Limassol,Marseille,2,2,D
+UEL,2018-10-04,Krasnodar,Sevilla,2,1,H
+UEL,2018-10-04,Standard Liege,Akhisarspor,2,1,H
+UEL,2018-10-04,FK Jablonec,Dynamo Kyiv,2,2,D
+UEL,2018-10-25,RB Leipzig,Celtic,2,0,H
+UEL,2018-10-25,Sporting CP,Arsenal,0,1,A
+UEL,2018-10-25,FC Copenhagen,Slavia Praha,0,1,A
+UEL,2018-10-25,AC Milan,Real Betis,1,2,A
+UEL,2018-10-25,Anderlecht,Fenerbahçe,2,2,D
+UEL,2018-10-25,Qarabag,Vorskla Poltava,0,1,A
+UEL,2018-10-25,Red Bull Salzburg,Rosenborg,3,0,H
+UEL,2018-10-25,F91 Dudelange,Olympiakos Piraeus,0,2,A
+UEL,2018-10-25,Zenit Saint Petersburg,Bordeaux,2,1,H
+UEL,2018-10-25,AEK Larnaca,Ludogorets,1,1,D
+UEL,2018-10-25,FC Zurich,Bayer Leverkusen,3,2,H
+UEL,2018-10-25,Spartak Trnava,Dinamo Zagreb,1,2,A
+UEL,2018-10-25,Chelsea,Bate Borisov,3,1,H
+UEL,2018-10-25,Marseille,Lazio,1,3,A
+UEL,2018-10-25,Rennes,Dynamo Kyiv,1,2,A
+UEL,2018-10-25,Eintracht Frankfurt,Apollon Limassol,2,0,H
+UEL,2018-10-25,Rangers,Spartak Moscow,0,0,D
+UEL,2018-10-25,Sarpsborg 08 FF,Malmo FF,1,1,D
+UEL,2018-10-25,Villarreal,Rapid Vienna,5,0,H
+UEL,2018-10-25,Sevilla,Akhisarspor,6,0,H
+UEL,2018-10-25,Beşiktaş,Genk,2,4,A
+UEL,2018-10-25,PAOK,Fehérvár FC,0,2,A
+UEL,2018-10-25,Standard Liege,Krasnodar,2,1,H
+UEL,2018-10-25,FK Jablonec,FC Astana,1,1,D
+UEL,2018-11-08,FC Astana,FK Jablonec,2,1,H
+UEL,2018-11-08,Fenerbahçe,Anderlecht,2,0,H
+UEL,2018-11-08,Malmo FF,Sarpsborg 08 FF,1,1,D
+UEL,2018-11-08,Bate Borisov,Chelsea,0,1,A
+UEL,2018-11-08,Lazio,Marseille,2,1,H
+UEL,2018-11-08,Spartak Moscow,Rangers,4,3,H
+UEL,2018-11-08,Dynamo Kyiv,Rennes,3,1,H
+UEL,2018-11-08,Apollon Limassol,Eintracht Frankfurt,2,3,A
+UEL,2018-11-08,Fehérvár FC,PAOK,1,0,H
+UEL,2018-11-08,Krasnodar,Standard Liege,2,1,H
+UEL,2018-11-08,Genk,Beşiktaş,1,1,D
+UEL,2018-11-08,Rapid Vienna,Villarreal,0,0,D
+UEL,2018-11-08,Akhisarspor,Sevilla,2,3,A
+UEL,2018-11-08,Arsenal,Sporting CP,0,0,D
+UEL,2018-11-08,Bordeaux,Zenit Saint Petersburg,1,1,D
+UEL,2018-11-08,Bayer Leverkusen,FC Zurich,1,0,H
+UEL,2018-11-08,Celtic,RB Leipzig,2,1,H
+UEL,2018-11-08,Rosenborg,Red Bull Salzburg,2,5,A
+UEL,2018-11-08,Real Betis,AC Milan,1,1,D
+UEL,2018-11-08,Olympiakos Piraeus,F91 Dudelange,5,1,H
+UEL,2018-11-08,Slavia Praha,FC Copenhagen,0,0,D
+UEL,2018-11-08,Ludogorets,AEK Larnaca,0,0,D
+UEL,2018-11-08,Dinamo Zagreb,Spartak Trnava,3,1,H
+UEL,2018-11-08,Vorskla Poltava,Qarabag,0,1,A
+UEL,2018-11-29,Spartak Moscow,Rapid Vienna,1,2,A
+UEL,2018-11-29,FC Astana,Dynamo Kyiv,0,1,A
+UEL,2018-11-29,Bordeaux,Slavia Praha,2,0,H
+UEL,2018-11-29,Bayer Leverkusen,Ludogorets,1,1,D
+UEL,2018-11-29,Rosenborg,Celtic,0,1,A
+UEL,2018-11-29,Bate Borisov,Fehérvár FC,2,0,H
+UEL,2018-11-29,AC Milan,F91 Dudelange,5,2,H
+UEL,2018-11-29,Real Betis,Olympiakos Piraeus,1,0,H
+UEL,2018-11-29,Anderlecht,Spartak Trnava,0,0,D
+UEL,2018-11-29,Qarabag,Sporting CP,1,6,A
+UEL,2018-11-29,Red Bull Salzburg,RB Leipzig,1,0,H
+UEL,2018-11-29,Zenit Saint Petersburg,FC Copenhagen,1,0,H
+UEL,2018-11-29,Fenerbahçe,Dinamo Zagreb,0,0,D
+UEL,2018-11-29,Krasnodar,Akhisarspor,2,1,H
+UEL,2018-11-29,FC Zurich,AEK Larnaca,1,2,A
+UEL,2018-11-29,Vorskla Poltava,Arsenal,0,3,A
+UEL,2018-11-29,Chelsea,PAOK,4,0,H
+UEL,2018-11-29,Eintracht Frankfurt,Marseille,4,0,H
+UEL,2018-11-29,Rangers,Villarreal,0,0,D
+UEL,2018-11-29,Sarpsborg 08 FF,Beşiktaş,2,3,A
+UEL,2018-11-29,Malmo FF,Genk,2,2,D
+UEL,2018-11-29,Apollon Limassol,Lazio,2,0,H
+UEL,2018-11-29,Standard Liege,Sevilla,1,0,H
+UEL,2018-11-29,FK Jablonec,Rennes,0,1,A
+UEL,2018-12-13,Marseille,Apollon Limassol,1,3,A
+UEL,2018-12-13,Rennes,FC Astana,2,0,H
+UEL,2018-12-13,Lazio,Eintracht Frankfurt,1,2,A
+UEL,2018-12-13,Villarreal,Spartak Moscow,2,0,H
+UEL,2018-12-13,Sevilla,Krasnodar,3,0,H
+UEL,2018-12-13,Beşiktaş,Malmo FF,0,1,A
+UEL,2018-12-13,Dynamo Kyiv,FK Jablonec,0,1,A
+UEL,2018-12-13,Fehérvár FC,Chelsea,2,2,D
+UEL,2018-12-13,PAOK,Bate Borisov,1,3,A
+UEL,2018-12-13,Genk,Sarpsborg 08 FF,4,0,H
+UEL,2018-12-13,Rapid Vienna,Rangers,1,0,H
+UEL,2018-12-13,Akhisarspor,Standard Liege,0,0,D
+UEL,2018-12-13,Arsenal,Qarabag,1,0,H
+UEL,2018-12-13,RB Leipzig,Rosenborg,1,1,D
+UEL,2018-12-13,Sporting CP,Vorskla Poltava,3,0,H
+UEL,2018-12-13,Celtic,Red Bull Salzburg,1,2,A
+UEL,2018-12-13,FC Copenhagen,Bordeaux,0,1,A
+UEL,2018-12-13,Olympiakos Piraeus,AC Milan,3,1,H
+UEL,2018-12-13,Slavia Praha,Zenit Saint Petersburg,2,0,H
+UEL,2018-12-13,Ludogorets,FC Zurich,1,1,D
+UEL,2018-12-13,F91 Dudelange,Real Betis,0,0,D
+UEL,2018-12-13,AEK Larnaca,Bayer Leverkusen,1,5,A
+UEL,2018-12-13,Dinamo Zagreb,Anderlecht,0,0,D
+UEL,2018-12-13,Spartak Trnava,Fenerbahçe,1,0,H
+UEL,2019-02-12,Fenerbahçe,Zenit Saint Petersburg,1,0,H
+UEL,2019-02-14,Rennes,Real Betis,3,3,D
+UEL,2019-02-14,Bate Borisov,Arsenal,1,0,H
+UEL,2019-02-14,Lazio,Sevilla,0,1,A
+UEL,2019-02-14,Olympiakos Piraeus,Dynamo Kyiv,2,2,D
+UEL,2019-02-14,Slavia Praha,Genk,0,0,D
+UEL,2019-02-14,Krasnodar,Bayer Leverkusen,0,0,D
+UEL,2019-02-14,Galatasaray,Benfica,1,2,A
+UEL,2019-02-14,Rapid Vienna,Inter,0,1,A
+UEL,2019-02-14,Sporting CP,Villarreal,0,1,A
+UEL,2019-02-14,Celtic,Valencia,0,2,A
+UEL,2019-02-14,Malmo FF,Chelsea,1,2,A
+UEL,2019-02-14,Shakhtar Donetsk,Eintracht Frankfurt,2,2,D
+UEL,2019-02-14,Plzen,Dinamo Zagreb,2,1,H
+UEL,2019-02-14,Club Brugge KV,Red Bull Salzburg,2,1,H
+UEL,2019-02-14,FC Zurich,Napoli,1,3,A
+UEL,2019-02-20,Sevilla,Lazio,2,0,H
+UEL,2019-02-21,Arsenal,Bate Borisov,3,0,H
+UEL,2019-02-21,Eintracht Frankfurt,Shakhtar Donetsk,4,1,H
+UEL,2019-02-21,Napoli,FC Zurich,2,0,H
+UEL,2019-02-21,Valencia,Celtic,1,0,H
+UEL,2019-02-21,Villarreal,Sporting CP,1,1,D
+UEL,2019-02-21,Red Bull Salzburg,Club Brugge KV,4,0,H
+UEL,2019-02-21,Zenit Saint Petersburg,Fenerbahçe,3,1,H
+UEL,2019-02-21,Dinamo Zagreb,Plzen,3,0,H
+UEL,2019-02-21,Chelsea,Malmo FF,3,0,H
+UEL,2019-02-21,Bayer Leverkusen,Krasnodar,1,1,D
+UEL,2019-02-21,Benfica,Galatasaray,0,0,D
+UEL,2019-02-21,Inter,Rapid Vienna,4,0,H
+UEL,2019-02-21,Real Betis,Rennes,1,3,A
+UEL,2019-02-21,Dynamo Kyiv,Olympiakos Piraeus,1,0,H
+UEL,2019-02-21,Genk,Slavia Praha,1,4,A
+UEL,2019-03-07,Rennes,Arsenal,3,1,H
+UEL,2019-03-07,Eintracht Frankfurt,Inter,0,0,D
+UEL,2019-03-07,Sevilla,Slavia Praha,2,2,D
+UEL,2019-03-07,Zenit Saint Petersburg,Villarreal,1,3,A
+UEL,2019-03-07,Dinamo Zagreb,Benfica,1,0,H
+UEL,2019-03-07,Chelsea,Dynamo Kyiv,3,0,H
+UEL,2019-03-07,Napoli,Red Bull Salzburg,3,0,H
+UEL,2019-03-07,Valencia,Krasnodar,2,1,H
+UEL,2019-03-14,Red Bull Salzburg,Napoli,3,1,H
+UEL,2019-03-14,Dynamo Kyiv,Chelsea,0,5,A
+UEL,2019-03-14,Krasnodar,Valencia,1,1,D
+UEL,2019-03-14,Arsenal,Rennes,3,0,H
+UEL,2019-03-14,Benfica,Dinamo Zagreb,3,0,H
+UEL,2019-03-14,Inter,Eintracht Frankfurt,0,1,A
+UEL,2019-03-14,Villarreal,Zenit Saint Petersburg,2,1,H
+UEL,2019-03-14,Slavia Praha,Sevilla,4,3,H
+UEL,2019-04-11,Arsenal,Napoli,2,0,H
+UEL,2019-04-11,Benfica,Eintracht Frankfurt,4,2,H
+UEL,2019-04-11,Villarreal,Valencia,1,3,A
+UEL,2019-04-11,Slavia Praha,Chelsea,0,1,A
+UEL,2019-04-18,Chelsea,Slavia Praha,4,3,H
+UEL,2019-04-18,Eintracht Frankfurt,Benfica,2,0,H
+UEL,2019-04-18,Napoli,Arsenal,0,1,A
+UEL,2019-04-18,Valencia,Villarreal,2,0,H
+UEL,2019-05-02,Arsenal,Valencia,3,1,H
+UEL,2019-05-02,Eintracht Frankfurt,Chelsea,1,1,D
+UEL,2019-05-09,Chelsea,Eintracht Frankfurt,2,2,D
+UEL,2019-05-09,Valencia,Arsenal,2,4,A
+UEL,2019-05-29,Chelsea,Arsenal,4,1,H
+UEL,2019-06-27,Barry Town,Cliftonville FC,0,0,D
+UEL,2019-06-27,Progres Niederkorn,Cardiff MET,1,0,H
+UEL,2019-06-27,UE Sant Julia,Europa,3,2,H
+UEL,2019-06-27,KI Klaksvik,Tre Fiori,5,1,H
+UEL,2019-06-27,Ballymena United,NSI Runavik,2,0,H
+UEL,2019-06-27,Prishtina,St Joseph S Fc,1,1,D
+UEL,2019-06-27,La Fiorita,UE Engordany,0,1,A
+UEL,2019-07-02,St Joseph S Fc,Prishtina,2,0,H
+UEL,2019-07-04,Cardiff MET,Progres Niederkorn,2,1,H
+UEL,2019-07-04,UE Engordany,La Fiorita,2,1,H
+UEL,2019-07-04,NSI Runavik,Ballymena United,0,0,D
+UEL,2019-07-04,Europa,UE Sant Julia,4,0,H
+UEL,2019-07-04,Tre Fiori,KI Klaksvik,0,4,A
+UEL,2019-07-04,Cliftonville FC,Barry Town,4,0,H
+UEL,2019-07-09,St Joseph S Fc,Rangers,0,4,A
+UEL,2019-07-09,Gzira United,HNK Hajduk Split,0,2,A
+UEL,2019-07-09,CSKA Sofia,FK Mladost Podgorica,4,0,H
+UEL,2019-07-10,AS Jeunesse Esch,FK Tobol Kostanay,0,0,D
+UEL,2019-07-11,Pyunik Yerevan,Shkupi 1927,3,3,D
+UEL,2019-07-11,Ordabasy,Torpedo Kutaisi,1,0,H
+UEL,2019-07-11,FK Ventspils,Teuta Durrës,3,0,H
+UEL,2019-07-11,Alashkert,Makedonija GjP,3,1,H
+UEL,2019-07-11,AEK Larnaca,Petrocub,1,0,H
+UEL,2019-07-11,Laci,Hapoel Beer Sheva,1,1,D
+UEL,2019-07-11,Trans Narva,Buducnost Podgorica,0,2,A
+UEL,2019-07-11,Flora Tallinn,Radnicki NIS,2,0,H
+UEL,2019-07-11,KuPS,FC Vitebsk,2,0,H
+UEL,2019-07-11,Səbail,CS Universitatea Craiova,2,3,A
+UEL,2019-07-11,FK Trakai,KI Klaksvik,1,1,D
+UEL,2019-07-11,Balzan FC,NK Domzale,3,4,A
+UEL,2019-07-11,Ružomberok,Levski Sofia,0,2,A
+UEL,2019-07-11,Brann,Shamrock Rovers,2,2,D
+UEL,2019-07-11,Molde,KR Reykjavik,7,1,H
+UEL,2019-07-11,Malmo FF,Ballymena United,7,0,H
+UEL,2019-07-11,Shakhter Soligorsk,Hibernians,1,0,H
+UEL,2019-07-11,Brondby,Inter Turku,4,1,H
+UEL,2019-07-11,FK Liepaja,Dinamo Minsk,1,1,D
+UEL,2019-07-11,Crusaders FC,B36 Torshavn,2,0,H
+UEL,2019-07-11,Dinamo Tbilisi,UE Engordany,6,0,H
+UEL,2019-07-11,Debreceni VSC,FK Kukesi,3,0,H
+UEL,2019-07-11,Radnik Bijeljina,Spartak Trnava,2,0,H
+UEL,2019-07-11,Kauno Žalgiris,Apollon Limassol,0,2,A
+UEL,2019-07-11,Akademija Pandev,Zrinjski,0,3,A
+UEL,2019-07-11,Maccabi Haifa,Mura,2,0,H
+UEL,2019-07-11,Speranţa Nisporeni,Neftchi Baku,0,3,A
+UEL,2019-07-11,Fola Esch,Chikhura Sachkhere,1,2,A
+UEL,2019-07-11,GAP Connah S Quay FC,Kilmarnock,1,2,A
+UEL,2019-07-11,Olimpija Ljubljana,Rīgas FS,2,3,A
+UEL,2019-07-11,FCSB,Milsami Orhei,2,0,H
+UEL,2019-07-11,Zeta,Fehérvár FC,1,5,A
+UEL,2019-07-11,Dunajska Streda,Cracovia Krakow,1,1,D
+UEL,2019-07-11,Cukaricki,FC Urartu,3,0,H
+UEL,2019-07-11,Europa,Legia Warszawa,0,0,D
+UEL,2019-07-11,Aberdeen,Rops,2,1,H
+UEL,2019-07-11,Cork City,Progres Niederkorn,0,2,A
+UEL,2019-07-11,Cliftonville FC,Haugesund,0,1,A
+UEL,2019-07-11,St Patrick's Athl.,IFK Norrkoping,0,2,A
+UEL,2019-07-11,Budapest Honved,FK Zalgiris Vilnius,3,1,H
+UEL,2019-07-11,Siroki Brijeg,Kairat Almaty,1,2,A
+UEL,2019-07-11,Stjarnan,FC Levadia Tallinn,2,1,H
+UEL,2019-07-11,Breidablik,FC Vaduz,0,0,D
+UEL,2019-07-16,FC Urartu,Cukaricki,0,5,A
+UEL,2019-07-16,KI Klaksvik,FK Trakai,0,0,D
+UEL,2019-07-16,FK Mladost Podgorica,CSKA Sofia,0,0,D
+UEL,2019-07-17,Chikhura Sachkhere,Fola Esch,2,1,H
+UEL,2019-07-18,FK Tobol Kostanay,AS Jeunesse Esch,1,1,D
+UEL,2019-07-18,Kairat Almaty,Siroki Brijeg,2,1,H
+UEL,2019-07-18,Makedonija GjP,Alashkert,0,3,A
+UEL,2019-07-18,Teuta Durrës,FK Ventspils,1,0,H
+UEL,2019-07-18,Inter Turku,Brondby,2,0,H
+UEL,2019-07-18,CS Universitatea Craiova,Səbail,3,2,H
+UEL,2019-07-18,Rops,Aberdeen,1,2,A
+UEL,2019-07-18,FC Levadia Tallinn,Stjarnan,3,2,H
+UEL,2019-07-18,Rīgas FS,Olimpija Ljubljana,0,2,A
+UEL,2019-07-18,Dinamo Minsk,FK Liepaja,1,2,A
+UEL,2019-07-18,Levski Sofia,Ružomberok,2,0,H
+UEL,2019-07-18,Haugesund,Cliftonville FC,5,1,H
+UEL,2019-07-18,Cracovia Krakow,Dunajska Streda,2,2,D
+UEL,2019-07-18,FK Zalgiris Vilnius,Budapest Honved,1,1,D
+UEL,2019-07-18,Zrinjski,Akademija Pandev,3,0,H
+UEL,2019-07-18,Apollon Limassol,Kauno Žalgiris,4,0,H
+UEL,2019-07-18,FC Vaduz,Breidablik,2,1,H
+UEL,2019-07-18,Torpedo Kutaisi,Ordabasy,0,2,A
+UEL,2019-07-18,Milsami Orhei,FCSB,1,2,A
+UEL,2019-07-18,Neftchi Baku,Speranţa Nisporeni,6,0,H
+UEL,2019-07-18,Petrocub,AEK Larnaca,0,1,A
+UEL,2019-07-18,Hapoel Beer Sheva,Laci,1,0,H
+UEL,2019-07-18,Progres Niederkorn,Cork City,1,2,A
+UEL,2019-07-18,UE Engordany,Dinamo Tbilisi,0,1,A
+UEL,2019-07-18,IFK Norrkoping,St Patrick's Athl.,2,1,H
+UEL,2019-07-18,FK Kukesi,Debreceni VSC,1,1,D
+UEL,2019-07-18,HNK Hajduk Split,Gzira United,1,3,A
+UEL,2019-07-18,Fehérvár FC,Zeta,0,0,D
+UEL,2019-07-18,B36 Torshavn,Crusaders FC,2,3,A
+UEL,2019-07-18,Hibernians,Shakhter Soligorsk,0,1,A
+UEL,2019-07-18,Mura,Maccabi Haifa,2,3,A
+UEL,2019-07-18,FC Vitebsk,KuPS,1,1,D
+UEL,2019-07-18,Shkupi 1927,Pyunik Yerevan,1,2,A
+UEL,2019-07-18,Kilmarnock,GAP Connah S Quay FC,0,2,A
+UEL,2019-07-18,Rangers,St Joseph S Fc,6,0,H
+UEL,2019-07-18,Buducnost Podgorica,Trans Narva,4,1,H
+UEL,2019-07-18,NK Domzale,Balzan FC,1,0,H
+UEL,2019-07-18,Ballymena United,Malmo FF,0,4,A
+UEL,2019-07-18,Spartak Trnava,Radnik Bijeljina,4,0,H
+UEL,2019-07-18,Radnicki NIS,Flora Tallinn,2,2,D
+UEL,2019-07-18,KR Reykjavik,Molde,0,0,D
+UEL,2019-07-18,Legia Warszawa,Europa,3,0,H
+UEL,2019-07-18,Shamrock Rovers,Brann,2,1,H
+UEL,2019-07-23,Ararat-Armenia,Lincoln Red Imps FC,2,0,H
+UEL,2019-07-23,HB Torshavn,Linfield,2,2,D
+UEL,2019-07-23,Shkendija,F91 Dudelange,1,2,A
+UEL,2019-07-23,FC Santa Coloma,FC Astana,0,0,D
+UEL,2019-07-23,Tre Penne,Suduva Marijampole,0,5,A
+UEL,2019-07-24,Slovan Bratislava,Feronikeli,2,1,H
+UEL,2019-07-25,Pyunik Yerevan,FK Jablonec,2,1,H
+UEL,2019-07-25,FK Ventspils,Gzira United,4,0,H
+UEL,2019-07-25,Qabala,Dinamo Tbilisi,0,2,A
+UEL,2019-07-25,AEK Larnaca,Levski Sofia,3,0,H
+UEL,2019-07-25,Partizani,Sheriff Tiraspol,0,1,A
+UEL,2019-07-25,Utrecht,Zrinjski,1,1,D
+UEL,2019-07-25,Chikhura Sachkhere,Aberdeen,1,1,D
+UEL,2019-07-25,Budapest Honved,CS Universitatea Craiova,0,0,D
+UEL,2019-07-25,Haugesund,Sturm Graz,2,0,H
+UEL,2019-07-25,Molde,Cukaricki,0,0,D
+UEL,2019-07-25,Lechia Gdansk,Brondby,2,1,H
+UEL,2019-07-25,Shakhter Soligorsk,Esbjerg,2,0,H
+UEL,2019-07-25,Alashkert,FCSB,0,3,A
+UEL,2019-07-25,Mlada Boleslav,Ordabasy,1,1,D
+UEL,2019-07-25,Flora Tallinn,Eintracht Frankfurt,1,2,A
+UEL,2019-07-25,Yeni Malatyaspor,Olimpija Ljubljana,2,2,D
+UEL,2019-07-25,Arsenal Tula,Neftchi Baku,0,1,A
+UEL,2019-07-25,GAP Connah S Quay FC,FK Partizan,0,1,A
+UEL,2019-07-25,Hapoel Beer Sheva,Kairat Almaty,2,0,H
+UEL,2019-07-25,CSKA Sofia,NK Osijek,1,0,H
+UEL,2019-07-25,Lokomotiv Plovdiv,Spartak Trnava,2,0,H
+UEL,2019-07-25,Piast Gliwice,Riga,3,2,H
+UEL,2019-07-25,IFK Norrkoping,FK Liepaja,2,0,H
+UEL,2019-07-25,Fehérvár FC,FC Vaduz,1,0,H
+UEL,2019-07-25,FC Luzern,KI Klaksvik,1,0,H
+UEL,2019-07-25,AZ Alkmaar,BK Hacken,0,0,D
+UEL,2019-07-25,Gent,Viitorul Constanta,6,3,H
+UEL,2019-07-25,Aris Thessalonikis,AEL,0,0,D
+UEL,2019-07-25,AS Jeunesse Esch,Guimaraes,0,1,A
+UEL,2019-07-25,Dunajska Streda,Atromitos Athinon,1,2,A
+UEL,2019-07-25,Wolves,Crusaders FC,2,0,H
+UEL,2019-07-25,Strasbourg,Maccabi Haifa,3,1,H
+UEL,2019-07-25,Rangers,Progres Niederkorn,2,0,H
+UEL,2019-07-25,Buducnost Podgorica,Zorya Luhansk,1,3,A
+UEL,2019-07-25,NK Domzale,Malmo FF,2,2,D
+UEL,2019-07-25,Valur Reykjavik,Ludogorets,1,1,D
+UEL,2019-07-25,Legia Warszawa,KuPS,1,0,H
+UEL,2019-07-25,Torino,Debreceni VSC,3,0,H
+UEL,2019-07-25,Espanyol,Stjarnan,4,0,H
+UEL,2019-07-25,Shamrock Rovers,Apollon Limassol,2,1,H
+UEL,2019-07-30,Suduva Marijampole,Tre Penne,5,0,H
+UEL,2019-07-30,Lincoln Red Imps FC,Ararat-Armenia,1,2,A
+UEL,2019-07-30,F91 Dudelange,Shkendija,1,1,D
+UEL,2019-07-30,Feronikeli,Slovan Bratislava,0,2,A
+UEL,2019-07-31,Cukaricki,Molde,1,3,A
+UEL,2019-08-01,FC Astana,FC Santa Coloma,4,1,H
+UEL,2019-08-01,Ordabasy,Mlada Boleslav,2,3,A
+UEL,2019-08-01,Kairat Almaty,Hapoel Beer Sheva,1,1,D
+UEL,2019-08-01,Viitorul Constanta,Gent,2,1,H
+UEL,2019-08-01,Zorya Luhansk,Buducnost Podgorica,1,0,H
+UEL,2019-08-01,KuPS,Legia Warszawa,0,0,D
+UEL,2019-08-01,CS Universitatea Craiova,Budapest Honved,0,0,D
+UEL,2019-08-01,BK Hacken,AZ Alkmaar,0,3,A
+UEL,2019-08-01,Levski Sofia,AEK Larnaca,0,4,A
+UEL,2019-08-01,Debreceni VSC,Torino,1,4,A
+UEL,2019-08-01,Riga,Piast Gliwice,2,1,H
+UEL,2019-08-01,Malmo FF,NK Domzale,3,2,H
+UEL,2019-08-01,Sheriff Tiraspol,Partizani,1,1,D
+UEL,2019-08-01,Zrinjski,Utrecht,2,1,H
+UEL,2019-08-01,Apollon Limassol,Shamrock Rovers,3,1,H
+UEL,2019-08-01,FC Vaduz,Fehérvár FC,2,0,H
+UEL,2019-08-01,FK Liepaja,IFK Norrkoping,0,1,A
+UEL,2019-08-01,KI Klaksvik,FC Luzern,0,1,A
+UEL,2019-08-01,Atromitos Athinon,Dunajska Streda,3,2,H
+UEL,2019-08-01,FK Jablonec,Pyunik Yerevan,0,0,D
+UEL,2019-08-01,Dinamo Tbilisi,Qabala,3,0,H
+UEL,2019-08-01,Neftchi Baku,Arsenal Tula,3,0,H
+UEL,2019-08-01,AEL,Aris Thessalonikis,0,1,A
+UEL,2019-08-01,Maccabi Haifa,Strasbourg,2,1,H
+UEL,2019-08-01,Brondby,Lechia Gdansk,4,1,H
+UEL,2019-08-01,Ludogorets,Valur Reykjavik,4,0,H
+UEL,2019-08-01,Progres Niederkorn,Rangers,0,0,D
+UEL,2019-08-01,Esbjerg,Shakhter Soligorsk,0,0,D
+UEL,2019-08-01,Olimpija Ljubljana,Yeni Malatyaspor,0,1,A
+UEL,2019-08-01,Gzira United,FK Ventspils,2,2,D
+UEL,2019-08-01,Eintracht Frankfurt,Flora Tallinn,2,1,H
+UEL,2019-08-01,FCSB,Alashkert,2,3,A
+UEL,2019-08-01,Sturm Graz,Haugesund,2,1,H
+UEL,2019-08-01,Aberdeen,Chikhura Sachkhere,5,0,H
+UEL,2019-08-01,Linfield,HB Torshavn,1,0,H
+UEL,2019-08-01,NK Osijek,CSKA Sofia,2,0,H
+UEL,2019-08-01,Spartak Trnava,Lokomotiv Plovdiv,3,1,H
+UEL,2019-08-01,Guimaraes,AS Jeunesse Esch,4,0,H
+UEL,2019-08-01,FK Partizan,GAP Connah S Quay FC,3,0,H
+UEL,2019-08-01,Crusaders FC,Wolves,1,4,A
+UEL,2019-08-01,Stjarnan,Espanyol,1,3,A
+UEL,2019-08-06,Ararat-Armenia,Saburtalo,1,2,A
+UEL,2019-08-06,Riga,HJK Helsinki,1,1,D
+UEL,2019-08-06,Sutjeska,Linfield,1,2,A
+UEL,2019-08-07,Slovan Bratislava,Dundalk,1,0,H
+UEL,2019-08-08,FC Astana,Valletta FC,5,1,H
+UEL,2019-08-08,AEK Larnaca,Gent,1,1,D
+UEL,2019-08-08,Sparta Praha,Trabzonspor,2,2,D
+UEL,2019-08-08,Pyunik Yerevan,Wolves,0,4,A
+UEL,2019-08-08,CS Universitatea Craiova,AEK Athens FC,0,2,A
+UEL,2019-08-08,Brondby,SC Braga,2,4,A
+UEL,2019-08-08,FK Ventspils,Guimaraes,0,3,A
+UEL,2019-08-08,Haugesund,PSV Eindhoven,0,1,A
+UEL,2019-08-08,Molde,Aris Thessalonikis,3,0,H
+UEL,2019-08-08,Malmo FF,Zrinjski,3,0,H
+UEL,2019-08-08,Sheriff Tiraspol,AIK Stockholm,1,2,A
+UEL,2019-08-08,FC Thun,Spartak Moscow,2,3,A
+UEL,2019-08-08,FC Mariupol,AZ Alkmaar,0,0,D
+UEL,2019-08-08,Neftchi Baku,Bnei Yehuda,2,2,D
+UEL,2019-08-08,Feyenoord,Dinamo Tbilisi,4,0,H
+UEL,2019-08-08,Ludogorets,The New Saints,5,0,H
+UEL,2019-08-08,Maccabi Tel Aviv,Suduva Marijampole,1,2,A
+UEL,2019-08-08,Antwerp,Plzen,1,0,H
+UEL,2019-08-08,CSKA Sofia,Zorya Luhansk,1,1,D
+UEL,2019-08-08,Lokomotiv Plovdiv,Strasbourg,0,1,A
+UEL,2019-08-08,FK Sarajevo,Bate Borisov,1,2,A
+UEL,2019-08-08,IFK Norrkoping,Hapoel Beer Sheva,1,1,D
+UEL,2019-08-08,FC Midtjylland,Rangers,2,4,A
+UEL,2019-08-08,HNK Rijeka,Aberdeen,2,0,H
+UEL,2019-08-08,F91 Dudelange,Kalju Nomme,3,1,H
+UEL,2019-08-08,FCSB,Mlada Boleslav,0,0,D
+UEL,2019-08-08,Austria Vienna,Apollon Limassol,1,2,A
+UEL,2019-08-08,FC Vaduz,Eintracht Frankfurt,0,5,A
+UEL,2019-08-08,Legia Warszawa,Atromitos Athinon,0,0,D
+UEL,2019-08-08,Torino,Shakhter Soligorsk,5,0,H
+UEL,2019-08-08,FK Partizan,Yeni Malatyaspor,3,1,H
+UEL,2019-08-08,FC Luzern,Espanyol,0,3,A
+UEL,2019-08-13,Kalju Nomme,F91 Dudelange,0,1,A
+UEL,2019-08-13,Linfield,Sutjeska,3,2,H
+UEL,2019-08-13,Dundalk,Slovan Bratislava,1,3,A
+UEL,2019-08-14,Guimaraes,FK Ventspils,6,0,H
+UEL,2019-08-14,Atromitos Athinon,Legia Warszawa,0,2,A
+UEL,2019-08-14,Saburtalo,Ararat-Armenia,0,2,A
+UEL,2019-08-15,HJK Helsinki,Riga,2,2,D
+UEL,2019-08-15,Dinamo Tbilisi,Feyenoord,1,1,D
+UEL,2019-08-15,Spartak Moscow,FC Thun,2,1,H
+UEL,2019-08-15,AIK Stockholm,Sheriff Tiraspol,1,1,D
+UEL,2019-08-15,Bate Borisov,FK Sarajevo,0,0,D
+UEL,2019-08-15,Shakhter Soligorsk,Torino,1,1,D
+UEL,2019-08-15,Zrinjski,Malmo FF,1,0,H
+UEL,2019-08-15,Zorya Luhansk,CSKA Sofia,1,0,H
+UEL,2019-08-15,Apollon Limassol,Austria Vienna,3,1,H
+UEL,2019-08-15,Suduva Marijampole,Maccabi Tel Aviv,2,1,H
+UEL,2019-08-15,Mlada Boleslav,FCSB,0,1,A
+UEL,2019-08-15,Yeni Malatyaspor,FK Partizan,1,0,H
+UEL,2019-08-15,Bnei Yehuda,Neftchi Baku,2,1,H
+UEL,2019-08-15,The New Saints,Ludogorets,0,4,A
+UEL,2019-08-15,Hapoel Beer Sheva,IFK Norrkoping,3,1,H
+UEL,2019-08-15,Trabzonspor,Sparta Praha,2,1,H
+UEL,2019-08-15,Plzen,Antwerp,2,1,H
+UEL,2019-08-15,AEK Athens FC,CS Universitatea Craiova,1,1,D
+UEL,2019-08-15,Valletta FC,FC Astana,0,4,A
+UEL,2019-08-15,Strasbourg,Lokomotiv Plovdiv,1,0,H
+UEL,2019-08-15,Eintracht Frankfurt,FC Vaduz,1,0,H
+UEL,2019-08-15,PSV Eindhoven,Haugesund,0,0,D
+UEL,2019-08-15,AZ Alkmaar,FC Mariupol,4,0,H
+UEL,2019-08-15,Gent,AEK Larnaca,3,0,H
+UEL,2019-08-15,Aris Thessalonikis,Molde,3,1,H
+UEL,2019-08-15,Wolves,Pyunik Yerevan,4,0,H
+UEL,2019-08-15,SC Braga,Brondby,3,1,H
+UEL,2019-08-15,Aberdeen,HNK Rijeka,0,2,A
+UEL,2019-08-15,Rangers,FC Midtjylland,3,1,H
+UEL,2019-08-15,Espanyol,FC Luzern,3,0,H
+UEL,2019-08-22,FC Astana,Bate Borisov,3,0,H
+UEL,2019-08-22,Ararat-Armenia,F91 Dudelange,2,1,H
+UEL,2019-08-22,Malmo FF,Bnei Yehuda,3,0,H
+UEL,2019-08-22,Suduva Marijampole,Ferencvarosi TC,0,0,D
+UEL,2019-08-22,Feyenoord,Hapoel Beer Sheva,3,0,H
+UEL,2019-08-22,Ludogorets,Maribor,0,0,D
+UEL,2019-08-22,FC Copenhagen,Riga,3,1,H
+UEL,2019-08-22,Legia Warszawa,Rangers,0,0,D
+UEL,2019-08-22,AEK Athens FC,Trabzonspor,1,3,A
+UEL,2019-08-22,Strasbourg,Eintracht Frankfurt,1,0,H
+UEL,2019-08-22,PSV Eindhoven,Apollon Limassol,3,0,H
+UEL,2019-08-22,AZ Alkmaar,Antwerp,1,1,D
+UEL,2019-08-22,FCSB,Guimaraes,0,0,D
+UEL,2019-08-22,Gent,HNK Rijeka,2,1,H
+UEL,2019-08-22,SC Braga,Spartak Moscow,1,0,H
+UEL,2019-08-22,Celtic,AIK Stockholm,2,0,H
+UEL,2019-08-22,Linfield,Qarabag,3,2,H
+UEL,2019-08-22,Torino,Wolves,2,3,A
+UEL,2019-08-22,Espanyol,Zorya Luhansk,3,1,H
+UEL,2019-08-22,FK Partizan,Molde,2,1,H
+UEL,2019-08-22,Slovan Bratislava,PAOK,1,0,H
+UEL,2019-08-29,Qarabag,Linfield,2,1,H
+UEL,2019-08-29,Riga,FC Copenhagen,1,0,H
+UEL,2019-08-29,Molde,FK Partizan,1,1,D
+UEL,2019-08-29,AIK Stockholm,Celtic,1,4,A
+UEL,2019-08-29,Bate Borisov,FC Astana,2,0,H
+UEL,2019-08-29,Zorya Luhansk,Espanyol,2,2,D
+UEL,2019-08-29,Apollon Limassol,PSV Eindhoven,0,4,A
+UEL,2019-08-29,PAOK,Slovan Bratislava,3,2,H
+UEL,2019-08-29,Bnei Yehuda,Malmo FF,0,1,A
+UEL,2019-08-29,Spartak Moscow,SC Braga,1,2,A
+UEL,2019-08-29,Hapoel Beer Sheva,Feyenoord,0,3,A
+UEL,2019-08-29,Antwerp,AZ Alkmaar,1,4,A
+UEL,2019-08-29,Trabzonspor,AEK Athens FC,0,2,A
+UEL,2019-08-29,HNK Rijeka,Gent,1,1,D
+UEL,2019-08-29,F91 Dudelange,Ararat-Armenia,4,2,H
+UEL,2019-08-29,Ferencvarosi TC,Suduva Marijampole,4,2,H
+UEL,2019-08-29,Maribor,Ludogorets,2,2,D
+UEL,2019-08-29,Eintracht Frankfurt,Strasbourg,3,0,H
+UEL,2019-08-29,Wolves,Torino,2,1,H
+UEL,2019-08-29,Rangers,Legia Warszawa,1,0,H
+UEL,2019-08-29,Guimaraes,FCSB,1,0,H
+UEL,2019-09-19,Rennes,Celtic,1,1,D
+UEL,2019-09-19,Eintracht Frankfurt,Arsenal,0,3,A
+UEL,2019-09-19,PSV Eindhoven,Sporting CP,3,2,H
+UEL,2019-09-19,FC Copenhagen,FC Lugano,1,0,H
+UEL,2019-09-19,Getafe,Trabzonspor,1,0,H
+UEL,2019-09-19,FC Basel 1893,Krasnodar,5,0,H
+UEL,2019-09-19,Qarabag,Sevilla,0,3,A
+UEL,2019-09-19,Dynamo Kyiv,Malmo FF,1,0,H
+UEL,2019-09-19,Standard Liege,Guimaraes,2,0,H
+UEL,2019-09-19,Lask Linz,Rosenborg,1,0,H
+UEL,2019-09-19,CFR 1907 Cluj,Lazio,2,1,H
+UEL,2019-09-19,Apoel Nicosia,F91 Dudelange,3,4,A
+UEL,2019-09-19,Manchester United,FC Astana,1,0,H
+UEL,2019-09-19,Wolves,SC Braga,0,1,A
+UEL,2019-09-19,VfL Wolfsburg,Oleksandria,3,1,H
+UEL,2019-09-19,Borussia Monchengladbach,Wolfsberger AC,0,4,A
+UEL,2019-09-19,FC Porto,BSC Young Boys,2,1,H
+UEL,2019-09-19,Rangers,Feyenoord,1,0,H
+UEL,2019-09-19,AS Roma,Başakşehir,4,0,H
+UEL,2019-09-19,Espanyol,Ferencvarosi TC,1,1,D
+UEL,2019-09-19,Ludogorets,CSKA Moscow,5,1,H
+UEL,2019-09-19,FK Partizan,AZ Alkmaar,2,2,D
+UEL,2019-09-19,Gent,Saint Etienne,3,2,H
+UEL,2019-09-19,Slovan Bratislava,Beşiktaş,4,2,H
+UEL,2019-10-03,FC Astana,FK Partizan,1,2,A
+UEL,2019-10-03,AZ Alkmaar,Manchester United,0,0,D
+UEL,2019-10-03,Feyenoord,FC Porto,2,0,H
+UEL,2019-10-03,SC Braga,Slovan Bratislava,2,2,D
+UEL,2019-10-03,Beşiktaş,Wolves,0,1,A
+UEL,2019-10-03,CSKA Moscow,Espanyol,0,2,A
+UEL,2019-10-03,Başakşehir,Borussia Monchengladbach,1,1,D
+UEL,2019-10-03,BSC Young Boys,Rangers,2,1,H
+UEL,2019-10-03,Ferencvarosi TC,Ludogorets,0,3,A
+UEL,2019-10-03,Wolfsberger AC,AS Roma,1,1,D
+UEL,2019-10-03,Saint Etienne,VfL Wolfsburg,1,1,D
+UEL,2019-10-03,Oleksandria,Gent,1,1,D
+UEL,2019-10-03,Arsenal,Standard Liege,4,0,H
+UEL,2019-10-03,Guimaraes,Eintracht Frankfurt,0,1,A
+UEL,2019-10-03,Sporting CP,Lask Linz,2,1,H
+UEL,2019-10-03,Celtic,CFR 1907 Cluj,2,0,H
+UEL,2019-10-03,Rosenborg,PSV Eindhoven,1,4,A
+UEL,2019-10-03,Malmo FF,FC Copenhagen,1,1,D
+UEL,2019-10-03,Lazio,Rennes,2,1,H
+UEL,2019-10-03,Sevilla,Apoel Nicosia,1,0,H
+UEL,2019-10-03,F91 Dudelange,Qarabag,1,4,A
+UEL,2019-10-03,FC Lugano,Dynamo Kyiv,0,0,D
+UEL,2019-10-03,Krasnodar,Getafe,1,2,A
+UEL,2019-10-03,Trabzonspor,FC Basel 1893,2,2,D
+UEL,2019-10-24,AZ Alkmaar,FC Astana,6,0,H
+UEL,2019-10-24,FC Porto,Rangers,1,1,D
+UEL,2019-10-24,AS Roma,Borussia Monchengladbach,1,1,D
+UEL,2019-10-24,Beşiktaş,SC Braga,1,2,A
+UEL,2019-10-24,CSKA Moscow,Ferencvarosi TC,0,1,A
+UEL,2019-10-24,Qarabag,Apoel Nicosia,2,2,D
+UEL,2019-10-24,Başakşehir,Wolfsberger AC,1,0,H
+UEL,2019-10-24,BSC Young Boys,Feyenoord,2,0,H
+UEL,2019-10-24,Ludogorets,Espanyol,0,1,A
+UEL,2019-10-24,FK Partizan,Manchester United,0,1,A
+UEL,2019-10-24,Gent,VfL Wolfsburg,2,2,D
+UEL,2019-10-24,Slovan Bratislava,Wolves,1,2,A
+UEL,2019-10-24,Saint Etienne,Oleksandria,1,1,D
+UEL,2019-10-24,Arsenal,Guimaraes,3,2,H
+UEL,2019-10-24,Rennes,CFR 1907 Cluj,0,1,A
+UEL,2019-10-24,Eintracht Frankfurt,Standard Liege,2,1,H
+UEL,2019-10-24,PSV Eindhoven,Lask Linz,0,0,D
+UEL,2019-10-24,Sporting CP,Rosenborg,1,0,H
+UEL,2019-10-24,Celtic,Lazio,2,1,H
+UEL,2019-10-24,Malmo FF,FC Lugano,2,1,H
+UEL,2019-10-24,Sevilla,F91 Dudelange,3,0,H
+UEL,2019-10-24,Getafe,FC Basel 1893,0,1,A
+UEL,2019-10-24,Dynamo Kyiv,FC Copenhagen,1,1,D
+UEL,2019-10-24,Trabzonspor,Krasnodar,0,2,A
+UEL,2019-11-06,Guimaraes,Arsenal,1,1,D
+UEL,2019-11-07,FC Astana,AZ Alkmaar,0,5,A
+UEL,2019-11-07,Rosenborg,Sporting CP,0,2,A
+UEL,2019-11-07,FC Copenhagen,Dynamo Kyiv,1,1,D
+UEL,2019-11-07,Lazio,Celtic,1,2,A
+UEL,2019-11-07,FC Basel 1893,Getafe,2,1,H
+UEL,2019-11-07,F91 Dudelange,Sevilla,2,5,A
+UEL,2019-11-07,FC Lugano,Malmo FF,0,0,D
+UEL,2019-11-07,Krasnodar,Trabzonspor,3,1,H
+UEL,2019-11-07,Standard Liege,Eintracht Frankfurt,2,1,H
+UEL,2019-11-07,Lask Linz,PSV Eindhoven,4,1,H
+UEL,2019-11-07,CFR 1907 Cluj,Rennes,1,0,H
+UEL,2019-11-07,Apoel Nicosia,Qarabag,2,1,H
+UEL,2019-11-07,Manchester United,FK Partizan,3,0,H
+UEL,2019-11-07,Wolves,Slovan Bratislava,1,0,H
+UEL,2019-11-07,VfL Wolfsburg,Gent,1,3,A
+UEL,2019-11-07,Borussia Monchengladbach,AS Roma,2,1,H
+UEL,2019-11-07,Feyenoord,BSC Young Boys,1,1,D
+UEL,2019-11-07,SC Braga,Beşiktaş,3,1,H
+UEL,2019-11-07,Rangers,FC Porto,2,0,H
+UEL,2019-11-07,Espanyol,Ludogorets,6,0,H
+UEL,2019-11-07,Ferencvarosi TC,CSKA Moscow,0,0,D
+UEL,2019-11-07,Wolfsberger AC,Başakşehir,0,3,A
+UEL,2019-11-07,Oleksandria,Saint Etienne,2,2,D
+UEL,2019-11-28,FC Astana,Manchester United,2,1,H
+UEL,2019-11-28,Krasnodar,FC Basel 1893,1,0,H
+UEL,2019-11-28,Trabzonspor,Getafe,0,1,A
+UEL,2019-11-28,AZ Alkmaar,FK Partizan,2,2,D
+UEL,2019-11-28,Feyenoord,Rangers,2,2,D
+UEL,2019-11-28,SC Braga,Wolves,3,3,D
+UEL,2019-11-28,Beşiktaş,Slovan Bratislava,2,1,H
+UEL,2019-11-28,CSKA Moscow,Ludogorets,1,1,D
+UEL,2019-11-28,Başakşehir,AS Roma,0,3,A
+UEL,2019-11-28,BSC Young Boys,FC Porto,1,2,A
+UEL,2019-11-28,Ferencvarosi TC,Espanyol,2,2,D
+UEL,2019-11-28,Wolfsberger AC,Borussia Monchengladbach,0,1,A
+UEL,2019-11-28,Saint Etienne,Gent,0,0,D
+UEL,2019-11-28,Oleksandria,VfL Wolfsburg,0,1,A
+UEL,2019-11-28,Arsenal,Eintracht Frankfurt,1,2,A
+UEL,2019-11-28,Guimaraes,Standard Liege,1,1,D
+UEL,2019-11-28,Sporting CP,PSV Eindhoven,4,0,H
+UEL,2019-11-28,Celtic,Rennes,3,1,H
+UEL,2019-11-28,Rosenborg,Lask Linz,1,2,A
+UEL,2019-11-28,Malmo FF,Dynamo Kyiv,4,3,H
+UEL,2019-11-28,Lazio,CFR 1907 Cluj,1,0,H
+UEL,2019-11-28,Sevilla,Qarabag,2,0,H
+UEL,2019-11-28,F91 Dudelange,Apoel Nicosia,0,2,A
+UEL,2019-11-28,FC Lugano,FC Copenhagen,0,1,A
+UEL,2019-12-12,Rennes,Lazio,2,0,H
+UEL,2019-12-12,Eintracht Frankfurt,Guimaraes,2,3,A
+UEL,2019-12-12,PSV Eindhoven,Rosenborg,1,1,D
+UEL,2019-12-12,FC Copenhagen,Malmo FF,0,1,A
+UEL,2019-12-12,Getafe,Krasnodar,3,0,H
+UEL,2019-12-12,FC Basel 1893,Trabzonspor,2,0,H
+UEL,2019-12-12,Qarabag,F91 Dudelange,1,1,D
+UEL,2019-12-12,Dynamo Kyiv,FC Lugano,1,1,D
+UEL,2019-12-12,Standard Liege,Arsenal,2,2,D
+UEL,2019-12-12,Lask Linz,Sporting CP,3,0,H
+UEL,2019-12-12,CFR 1907 Cluj,Celtic,2,0,H
+UEL,2019-12-12,Apoel Nicosia,Sevilla,1,0,H
+UEL,2019-12-12,Manchester United,AZ Alkmaar,4,0,H
+UEL,2019-12-12,Wolves,Beşiktaş,4,0,H
+UEL,2019-12-12,VfL Wolfsburg,Saint Etienne,1,0,H
+UEL,2019-12-12,Borussia Monchengladbach,Başakşehir,1,2,A
+UEL,2019-12-12,FC Porto,Feyenoord,3,2,H
+UEL,2019-12-12,Rangers,BSC Young Boys,1,1,D
+UEL,2019-12-12,AS Roma,Wolfsberger AC,2,2,D
+UEL,2019-12-12,Espanyol,CSKA Moscow,0,1,A
+UEL,2019-12-12,Ludogorets,Ferencvarosi TC,1,1,D
+UEL,2019-12-12,FK Partizan,FC Astana,4,1,H
+UEL,2019-12-12,Gent,Oleksandria,2,1,H
+UEL,2019-12-12,Slovan Bratislava,SC Braga,2,4,A
+UEL,2020-02-20,Eintracht Frankfurt,Red Bull Salzburg,4,1,H
+UEL,2020-02-20,Sporting CP,Başakşehir,3,1,H
+UEL,2020-02-20,FC Copenhagen,Celtic,1,1,D
+UEL,2020-02-20,Getafe,Ajax,2,0,H
+UEL,2020-02-20,Shakhtar Donetsk,Benfica,2,1,H
+UEL,2020-02-20,Ludogorets,Inter,0,2,A
+UEL,2020-02-20,Club Brugge KV,Manchester United,1,1,D
+UEL,2020-02-20,CFR 1907 Cluj,Sevilla,1,1,D
+UEL,2020-02-20,Wolves,Espanyol,4,0,H
+UEL,2020-02-20,VfL Wolfsburg,Malmo FF,2,1,H
+UEL,2020-02-20,Bayer Leverkusen,FC Porto,2,1,H
+UEL,2020-02-20,AZ Alkmaar,Lask Linz,1,1,D
+UEL,2020-02-20,Rangers,SC Braga,3,2,H
+UEL,2020-02-20,AS Roma,Gent,1,0,H
+UEL,2020-02-20,Olympiakos Piraeus,Arsenal,0,1,A
+UEL,2020-02-20,Apoel Nicosia,FC Basel 1893,0,3,A
+UEL,2020-02-26,SC Braga,Rangers,0,1,A
+UEL,2020-02-27,FC Porto,Bayer Leverkusen,1,3,A
+UEL,2020-02-27,Malmo FF,VfL Wolfsburg,0,3,A
+UEL,2020-02-27,Espanyol,Wolves,3,2,H
+UEL,2020-02-27,FC Basel 1893,Apoel Nicosia,1,0,H
+UEL,2020-02-27,Başakşehir,Sporting CP,4,1,H
+UEL,2020-02-27,Gent,AS Roma,1,1,D
+UEL,2020-02-27,Lask Linz,AZ Alkmaar,2,0,H
+UEL,2020-02-27,Manchester United,Club Brugge KV,5,0,H
+UEL,2020-02-27,Arsenal,Olympiakos Piraeus,1,2,A
+UEL,2020-02-27,Ajax,Getafe,2,1,H
+UEL,2020-02-27,Benfica,Shakhtar Donetsk,3,3,D
+UEL,2020-02-27,Celtic,FC Copenhagen,1,3,A
+UEL,2020-02-27,Inter,Ludogorets,2,1,H
+UEL,2020-02-27,Sevilla,CFR 1907 Cluj,0,0,D
+UEL,2020-02-28,Red Bull Salzburg,Eintracht Frankfurt,2,2,D
+UEL,2020-03-12,Eintracht Frankfurt,FC Basel 1893,0,3,A
+UEL,2020-03-12,Başakşehir,FC Copenhagen,1,0,H
+UEL,2020-03-12,Lask Linz,Manchester United,0,5,A
+UEL,2020-03-12,VfL Wolfsburg,Shakhtar Donetsk,1,2,A
+UEL,2020-03-12,Rangers,Bayer Leverkusen,1,3,A
+UEL,2020-03-12,Olympiakos Piraeus,Wolves,1,1,D
+UEL,2020-08-05,FC Copenhagen,Başakşehir,3,0,H
+UEL,2020-08-05,Shakhtar Donetsk,VfL Wolfsburg,3,0,H
+UEL,2020-08-05,Manchester United,Lask Linz,2,1,H
+UEL,2020-08-05,Inter,Getafe,2,0,H
+UEL,2020-08-06,Bayer Leverkusen,Rangers,1,0,H
+UEL,2020-08-06,Sevilla,AS Roma,2,0,H
+UEL,2020-08-06,Wolves,Olympiakos Piraeus,1,0,H
+UEL,2020-08-06,FC Basel 1893,Eintracht Frankfurt,1,0,H
+UEL,2020-08-10,Manchester United,FC Copenhagen,1,0,H
+UEL,2020-08-10,Inter,Bayer Leverkusen,2,1,H
+UEL,2020-08-11,Wolves,Sevilla,0,1,A
+UEL,2020-08-11,Shakhtar Donetsk,FC Basel 1893,4,1,H
+UEL,2020-08-16,Sevilla,Manchester United,2,1,H
+UEL,2020-08-17,Inter,Shakhtar Donetsk,5,0,H
+UEL,2020-08-21,Sevilla,Inter,3,2,H
+UEL,2020-08-18,UE Engordany,Zeta,1,3,A
+UEL,2020-08-20,St Joseph S Fc,B36 Torshavn,1,2,A
+UEL,2020-08-20,NSI Runavik,Barry Town,5,1,H
+UEL,2020-08-20,FC Santa Coloma,Iskra,0,0,D
+UEL,2020-08-20,Glentoran,HB Torshavn,1,0,H
+UEL,2020-08-20,Coleraine FC,La Fiorita,1,0,H
+UEL,2020-08-21,Tre Penne,Gjilani,1,3,A
+UEL,2020-08-22,Lincoln Red Imps FC,Prishtina,3,0,H
+UEL,2020-08-25,FK Trakai,Derry City,3,2,H
+UEL,2020-08-26,Progres Niederkorn,Zeta,3,0,H
+UEL,2020-08-27,Kairat Almaty,FC Noah,4,1,H
+UEL,2020-08-27,Ordabasy,FC Botosani,1,2,A
+UEL,2020-08-27,FK Ventspils,Dinamo-Auto,2,1,H
+UEL,2020-08-27,Teuta Durrës,Beitar Jerusalem,2,0,H
+UEL,2020-08-27,Borac Banja Luka,Sutjeska,1,0,H
+UEL,2020-08-27,Dinamo Minsk,Piast Gliwice,0,2,A
+UEL,2020-08-27,Lincoln Red Imps FC,Union Titus Petange,2,0,H
+UEL,2020-08-27,Bodo/Glimt,Kauno Žalgiris,6,1,H
+UEL,2020-08-27,Alashkert,Renova,0,1,A
+UEL,2020-08-27,Apollon Limassol,Saburtalo,5,1,H
+UEL,2020-08-27,Neftchi Baku,Shkupi 1927,2,1,H
+UEL,2020-08-27,Sumqayıt,Shkendija,0,2,A
+UEL,2020-08-27,Fehérvár FC,Bohemians,1,1,D
+UEL,2020-08-27,Olimpija Ljubljana,Vikingur Reykjavik,2,1,H
+UEL,2020-08-27,Rosenborg,Breidablik,4,2,H
+UEL,2020-08-27,Hammarby FF,Puskas Academy,3,0,H
+UEL,2020-08-27,Malmo FF,Cracovia Krakow,2,0,H
+UEL,2020-08-27,Aarhus,Honka,5,2,H
+UEL,2020-08-27,FK Zalgiris Vilnius,Paide,2,0,H
+UEL,2020-08-27,FC Vaduz,Hibernians,0,2,A
+UEL,2020-08-27,Şamaxı FK,Laci,0,0,D
+UEL,2020-08-27,CSKA Sofia,Sirens,2,1,H
+UEL,2020-08-27,Lokomotivi Tbilisi,CS Universitatea Craiova,2,1,H
+UEL,2020-08-27,Gjilani,Apoel Nicosia,0,2,A
+UEL,2020-08-27,FH hafnarfjordur,Dunajska Streda,0,2,A
+UEL,2020-08-27,The New Saints,Žilina,3,1,H
+UEL,2020-08-27,Shakhter Soligorsk,Sfîntul Gheorghe,0,0,D
+UEL,2020-08-27,Hapoel Beer Sheva,Dinamo Batumi,3,0,H
+UEL,2020-08-27,FK Kukesi,Slavia Sofia,2,1,H
+UEL,2020-08-27,Zrinjski,FC Differdange 03,3,0,H
+UEL,2020-08-27,Valletta FC,Bala Town,0,1,A
+UEL,2020-08-27,B36 Torshavn,FC Levadia Tallinn,4,3,H
+UEL,2020-08-27,Petrocub,TSC Backa Topola,0,2,A
+UEL,2020-08-27,Iskra,Lokomotiv Plovdiv,0,1,A
+UEL,2020-08-27,Servette FC,Ružomberok,3,0,H
+UEL,2020-08-27,FCSB,Shirak,3,0,H
+UEL,2020-08-27,Aberdeen,NSI Runavik,6,0,H
+UEL,2020-08-27,Motherwell,Glentoran,5,1,H
+UEL,2020-08-27,Maribor,Coleraine FC,1,1,D
+UEL,2020-08-27,Lech Poznan,Valmiera / BSS,3,0,H
+UEL,2020-08-27,FK Partizan,Rīgas FS,1,0,H
+UEL,2020-08-27,Budapest Honved,Inter Turku,2,1,H
+UEL,2020-08-27,Shamrock Rovers,Ilves,2,2,D
+UEL,2020-09-09,Maccabi Haifa,Zeljeznicar Sarajevo,3,1,H
+UEL,2020-09-10,Kalju Nomme,Mura,0,4,A
+UEL,2020-09-16,Progres Niederkorn,Willem II,0,5,A
+UEL,2020-09-16,Hammarby FF,Lech Poznan,0,3,A
+UEL,2020-09-16,B36 Torshavn,The New Saints,2,2,D
+UEL,2020-09-17,Kaisar,Apoel Nicosia,1,4,A
+UEL,2020-09-17,FK Ventspils,Rosenborg,1,5,A
+UEL,2020-09-17,Renova,HNK Hajduk Split,0,1,A
+UEL,2020-09-17,FC Astana,Buducnost Podgorica,0,1,A
+UEL,2020-09-17,Teuta Durrës,Granada CF,0,4,A
+UEL,2020-09-17,Ararat-Armenia,Fola Esch,4,3,H
+UEL,2020-09-17,Lincoln Red Imps FC,Rangers,0,5,A
+UEL,2020-09-17,KuPS,Slovan Bratislava,1,1,D
+UEL,2020-09-17,FC Botosani,Shkendija,0,1,A
+UEL,2020-09-17,Bodo/Glimt,FK Zalgiris Vilnius,3,1,H
+UEL,2020-09-17,IFK Goteborg,FC Copenhagen,1,2,A
+UEL,2020-09-17,FK Trakai,Slovan Liberec,1,5,A
+UEL,2020-09-17,Lokomotiv Plovdiv,Tottenham,1,2,A
+UEL,2020-09-17,Neftchi Baku,Galatasaray,1,3,A
+UEL,2020-09-17,Olimpija Ljubljana,Zrinjski,2,3,A
+UEL,2020-09-17,Flora Tallinn,KR Reykjavik,2,1,H
+UEL,2020-09-17,GAP Connah S Quay FC,Dinamo Tbilisi,0,1,A
+UEL,2020-09-17,Djurgardens IF,Europa Fc,2,1,H
+UEL,2020-09-17,CSKA Sofia,Bate Borisov,2,0,H
+UEL,2020-09-17,OFI,Apollon Limassol,0,1,A
+UEL,2020-09-17,Laci,Hapoel Beer Sheva,1,2,A
+UEL,2020-09-17,Lokomotivi Tbilisi,Dinamo Moscow,2,1,H
+UEL,2020-09-17,Hibernians,Fehérvár FC,0,1,A
+UEL,2020-09-17,Maccabi Haifa,Kairat Almaty,2,1,H
+UEL,2020-09-17,Sfîntul Gheorghe,FK Partizan,0,1,A
+UEL,2020-09-17,Inter Club d'Escaldes,Dundalk,0,1,A
+UEL,2020-09-17,Piast Gliwice,TSV Hartberg,3,2,H
+UEL,2020-09-17,FK Kukesi,VfL Wolfsburg,0,4,A
+UEL,2020-09-17,Shamrock Rovers,AC Milan,0,2,A
+UEL,2020-09-17,Standard Liege,Bala Town,2,0,H
+UEL,2020-09-17,Aris Thessalonikis,Kolos Kovalivka,1,2,A
+UEL,2020-09-17,Borac Banja Luka,Rio Ave,0,2,A
+UEL,2020-09-17,Sileks,Drita,0,2,A
+UEL,2020-09-17,Mura,Aarhus,3,0,H
+UEL,2020-09-17,Coleraine FC,Motherwell,2,2,D
+UEL,2020-09-17,Viking,Aberdeen,0,2,A
+UEL,2020-09-17,Linfield,Floriana,0,1,A
+UEL,2020-09-17,NK Osijek,FC Basel 1893,1,2,A
+UEL,2020-09-17,Servette FC,Reims,0,1,A
+UEL,2020-09-17,Dunajska Streda,FK Jablonec,5,3,H
+UEL,2020-09-17,TSC Backa Topola,FCSB,6,6,D
+UEL,2020-09-17,Budapest Honved,Malmo FF,0,2,A
+UEL,2020-09-18,Riga,Tre Fiori,1,0,H
+UEL,2020-09-23,Apollon Limassol,Lech Poznan,0,5,A
+UEL,2020-09-24,Ararat-Armenia,Celje,1,0,H
+UEL,2020-09-24,KuPS,Suduva Marijampole,2,0,H
+UEL,2020-09-24,Plzen,Sonderjyske,3,0,H
+UEL,2020-09-24,Fehérvár FC,Reims,0,0,D
+UEL,2020-09-24,FC Rostov,Maccabi Haifa,1,2,A
+UEL,2020-09-24,Rosenborg,Alanyaspor,1,0,H
+UEL,2020-09-24,Djurgardens IF,CFR 1907 Cluj,0,1,A
+UEL,2020-09-24,Malmo FF,NK Lokomotiva Zagreb,5,0,H
+UEL,2020-09-24,Beşiktaş,Rio Ave,1,1,D
+UEL,2020-09-24,Charleroi,FK Partizan,2,1,H
+UEL,2020-09-24,CSKA Sofia,B36 Torshavn,3,1,H
+UEL,2020-09-24,Mura,PSV Eindhoven,1,5,A
+UEL,2020-09-24,Floriana,Flora Tallinn,0,0,D
+UEL,2020-09-24,Riga,Celtic,0,1,A
+UEL,2020-09-24,FCSB,Slovan Liberec,0,2,A
+UEL,2020-09-24,Hapoel Beer Sheva,Motherwell,3,0,H
+UEL,2020-09-24,FC Copenhagen,Piast Gliwice,3,0,H
+UEL,2020-09-24,Sheriff Tiraspol,Dundalk,1,1,D
+UEL,2020-09-24,Shkendija,Tottenham,1,3,A
+UEL,2020-09-24,Galatasaray,HNK Hajduk Split,2,0,H
+UEL,2020-09-24,FK Sarajevo,Buducnost Podgorica,2,1,H
+UEL,2020-09-24,KI Klaksvik,Dinamo Tbilisi,6,1,H
+UEL,2020-09-24,Granada CF,Lokomotivi Tbilisi,2,0,H
+UEL,2020-09-24,Standard Liege,Vojvodina,2,1,H
+UEL,2020-09-24,Apoel Nicosia,Zrinjski,2,2,D
+UEL,2020-09-24,VfL Wolfsburg,Desna,2,0,H
+UEL,2020-09-24,Legia Warszawa,Drita,2,0,H
+UEL,2020-09-24,AC Milan,Bodo/Glimt,3,2,H
+UEL,2020-09-24,FC Basel 1893,Anorthosis,3,2,H
+UEL,2020-09-24,FC ST. Gallen,AEK Athens FC,0,1,A
+UEL,2020-09-24,Lask Linz,Dunajska Streda,7,0,H
+UEL,2020-09-24,HNK Rijeka,Kolos Kovalivka,2,0,H
+UEL,2020-09-24,Willem II,Rangers,0,4,A
+UEL,2020-09-24,Sporting CP,Aberdeen,1,0,H
+UEL,2020-10-01,CFR 1907 Cluj,KuPS,3,1,H
+UEL,2020-10-01,Rosenborg,PSV Eindhoven,0,2,A
+UEL,2020-10-01,Malmo FF,Granada CF,1,3,A
+UEL,2020-10-01,Dinamo Zagreb,Flora Tallinn,3,1,H
+UEL,2020-10-01,Charleroi,Lech Poznan,1,2,A
+UEL,2020-10-01,Slovan Liberec,Apoel Nicosia,1,0,H
+UEL,2020-10-01,Ararat-Armenia,FK Crvena Zvezda,1,2,A
+UEL,2020-10-01,Hapoel Beer Sheva,Plzen,1,0,H
+UEL,2020-10-01,Legia Warszawa,Qarabag,0,3,A
+UEL,2020-10-01,Dinamo Brest,Ludogorets,0,2,A
+UEL,2020-10-01,FC Copenhagen,HNK Rijeka,0,1,A
+UEL,2020-10-01,FK Sarajevo,Celtic,0,1,A
+UEL,2020-10-01,Standard Liege,Fehérvár FC,3,1,H
+UEL,2020-10-01,FC Basel 1893,CSKA Sofia,1,3,A
+UEL,2020-10-01,BSC Young Boys,Tirana,3,0,H
+UEL,2020-10-01,Dundalk,KI Klaksvik,3,1,H
+UEL,2020-10-01,Rangers,Galatasaray,2,1,H
+UEL,2020-10-01,AEK Athens FC,VfL Wolfsburg,2,1,H
+UEL,2020-10-01,Tottenham,Maccabi Haifa,7,2,H
+UEL,2020-10-01,Rio Ave,AC Milan,2,2,D
+UEL,2020-10-01,Sporting CP,Lask Linz,1,4,A
+UEL,2020-10-22,Bayer Leverkusen,Nice,6,2,H
+UEL,2020-10-22,PSV Eindhoven,Granada CF,1,2,A
+UEL,2020-10-22,Lech Poznan,Benfica,2,4,A
+UEL,2020-10-22,Napoli,AZ Alkmaar,0,1,A
+UEL,2020-10-22,HNK Rijeka,Real Sociedad,0,1,A
+UEL,2020-10-22,Hapoel Beer Sheva,Slavia Praha,3,1,H
+UEL,2020-10-22,BSC Young Boys,AS Roma,1,2,A
+UEL,2020-10-22,Dundalk,Molde,1,2,A
+UEL,2020-10-22,PAOK,Omonia Nicosia,1,1,D
+UEL,2020-10-22,Standard Liege,Rangers,0,2,A
+UEL,2020-10-22,Rapid Vienna,Arsenal,1,2,A
+UEL,2020-10-22,CSKA Sofia,CFR 1907 Cluj,0,2,A
+UEL,2020-10-22,Leicester,Zorya Luhansk,3,0,H
+UEL,2020-10-22,Tottenham,Lask Linz,3,0,H
+UEL,2020-10-22,1899 Hoffenheim,FK Crvena Zvezda,2,0,H
+UEL,2020-10-22,SC Braga,AEK Athens FC,3,0,H
+UEL,2020-10-22,Celtic,AC Milan,1,3,A
+UEL,2020-10-22,Villarreal,Sivasspor,5,3,H
+UEL,2020-10-22,Ludogorets,Antwerp,1,2,A
+UEL,2020-10-22,Maccabi Tel Aviv,Qarabag,1,0,H
+UEL,2020-10-22,Dinamo Zagreb,Feyenoord,0,0,D
+UEL,2020-10-22,Sparta Praha,Lille,1,4,A
+UEL,2020-10-22,Slovan Liberec,Gent,1,0,H
+UEL,2020-10-22,Wolfsberger AC,CSKA Moscow,1,1,D
+UEL,2020-10-29,Lille,Celtic,2,2,D
+UEL,2020-10-29,Feyenoord,Wolfsberger AC,1,4,A
+UEL,2020-10-29,AC Milan,Sparta Praha,3,0,H
+UEL,2020-10-29,CSKA Moscow,Dinamo Zagreb,0,0,D
+UEL,2020-10-29,Qarabag,Villarreal,1,3,A
+UEL,2020-10-29,AEK Athens FC,Leicester,1,2,A
+UEL,2020-10-29,FK Crvena Zvezda,Slovan Liberec,5,1,H
+UEL,2020-10-29,Zorya Luhansk,SC Braga,1,2,A
+UEL,2020-10-29,Gent,1899 Hoffenheim,1,4,A
+UEL,2020-10-29,Antwerp,Tottenham,1,0,H
+UEL,2020-10-29,Sivasspor,Maccabi Tel Aviv,1,2,A
+UEL,2020-10-29,Lask Linz,Ludogorets,4,3,H
+UEL,2020-10-29,Arsenal,Dundalk,3,0,H
+UEL,2020-10-29,Nice,Hapoel Beer Sheva,1,0,H
+UEL,2020-10-29,AZ Alkmaar,HNK Rijeka,4,1,H
+UEL,2020-10-29,Benfica,Standard Liege,3,0,H
+UEL,2020-10-29,Rangers,Lech Poznan,1,0,H
+UEL,2020-10-29,Molde,Rapid Vienna,1,0,H
+UEL,2020-10-29,AS Roma,CSKA Sofia,0,0,D
+UEL,2020-10-29,Real Sociedad,Napoli,0,1,A
+UEL,2020-10-29,Slavia Praha,Bayer Leverkusen,1,0,H
+UEL,2020-10-29,Granada CF,PAOK,0,0,D
+UEL,2020-10-29,CFR 1907 Cluj,BSC Young Boys,1,1,D
+UEL,2020-10-29,Omonia Nicosia,PSV Eindhoven,1,2,A
+UEL,2020-11-05,Benfica,Rangers,3,3,D
+UEL,2020-11-05,Lech Poznan,Standard Liege,3,1,H
+UEL,2020-11-05,AS Roma,CFR 1907 Cluj,5,0,H
+UEL,2020-11-05,Real Sociedad,AZ Alkmaar,1,0,H
+UEL,2020-11-05,Slavia Praha,Nice,3,2,H
+UEL,2020-11-05,HNK Rijeka,Napoli,1,2,A
+UEL,2020-11-05,Hapoel Beer Sheva,Bayer Leverkusen,2,4,A
+UEL,2020-11-05,Ludogorets,Tottenham,1,3,A
+UEL,2020-11-05,PAOK,PSV Eindhoven,4,1,H
+UEL,2020-11-05,Rapid Vienna,Dundalk,4,3,H
+UEL,2020-11-05,Sivasspor,Qarabag,2,0,H
+UEL,2020-11-05,Omonia Nicosia,Granada CF,0,2,A
+UEL,2020-11-05,Arsenal,Molde,4,1,H
+UEL,2020-11-05,Leicester,SC Braga,4,0,H
+UEL,2020-11-05,1899 Hoffenheim,Slovan Liberec,5,0,H
+UEL,2020-11-05,Feyenoord,CSKA Moscow,3,1,H
+UEL,2020-11-05,Celtic,Sparta Praha,1,4,A
+UEL,2020-11-05,AC Milan,Lille,0,3,A
+UEL,2020-11-05,BSC Young Boys,CSKA Sofia,3,0,H
+UEL,2020-11-05,FK Crvena Zvezda,Gent,2,1,H
+UEL,2020-11-05,Zorya Luhansk,AEK Athens FC,1,4,A
+UEL,2020-11-05,Dinamo Zagreb,Wolfsberger AC,1,0,H
+UEL,2020-11-05,Antwerp,Lask Linz,0,1,A
+UEL,2020-11-05,Villarreal,Maccabi Tel Aviv,4,0,H
+UEL,2020-11-26,Lille,AC Milan,1,1,D
+UEL,2020-11-26,SC Braga,Leicester,3,3,D
+UEL,2020-11-26,Molde,Arsenal,0,3,A
+UEL,2020-11-26,CSKA Moscow,Feyenoord,0,0,D
+UEL,2020-11-26,Qarabag,Sivasspor,2,3,A
+UEL,2020-11-26,AEK Athens FC,Zorya Luhansk,0,3,A
+UEL,2020-11-26,Maccabi Tel Aviv,Villarreal,1,1,D
+UEL,2020-11-26,Sparta Praha,Celtic,4,1,H
+UEL,2020-11-26,Gent,FK Crvena Zvezda,0,2,A
+UEL,2020-11-26,Slovan Liberec,1899 Hoffenheim,0,2,A
+UEL,2020-11-26,CSKA Sofia,BSC Young Boys,0,1,A
+UEL,2020-11-26,Wolfsberger AC,Dinamo Zagreb,0,3,A
+UEL,2020-11-26,Lask Linz,Antwerp,0,2,A
+UEL,2020-11-26,Tottenham,Ludogorets,4,0,H
+UEL,2020-11-26,Nice,Slavia Praha,1,3,A
+UEL,2020-11-26,Bayer Leverkusen,Hapoel Beer Sheva,4,1,H
+UEL,2020-11-26,PSV Eindhoven,PAOK,3,2,H
+UEL,2020-11-26,AZ Alkmaar,Real Sociedad,0,0,D
+UEL,2020-11-26,Rangers,Benfica,2,2,D
+UEL,2020-11-26,Napoli,HNK Rijeka,2,0,H
+UEL,2020-11-26,Dundalk,Rapid Vienna,1,3,A
+UEL,2020-11-26,Granada CF,Omonia Nicosia,2,1,H
+UEL,2020-11-26,Standard Liege,Lech Poznan,2,1,H
+UEL,2020-11-26,CFR 1907 Cluj,AS Roma,0,2,A
+UEL,2020-12-03,Lille,Sparta Praha,2,1,H
+UEL,2020-12-03,Feyenoord,Dinamo Zagreb,0,2,A
+UEL,2020-12-03,AC Milan,Celtic,4,2,H
+UEL,2020-12-03,CSKA Moscow,Wolfsberger AC,0,1,A
+UEL,2020-12-03,Qarabag,Maccabi Tel Aviv,1,1,D
+UEL,2020-12-03,AEK Athens FC,SC Braga,2,4,A
+UEL,2020-12-03,FK Crvena Zvezda,1899 Hoffenheim,0,0,D
+UEL,2020-12-03,Zorya Luhansk,Leicester,1,0,H
+UEL,2020-12-03,Gent,Slovan Liberec,1,2,A
+UEL,2020-12-03,Antwerp,Ludogorets,3,1,H
+UEL,2020-12-03,Sivasspor,Villarreal,0,1,A
+UEL,2020-12-03,Lask Linz,Tottenham,3,3,D
+UEL,2020-12-03,Arsenal,Rapid Vienna,4,1,H
+UEL,2020-12-03,Nice,Bayer Leverkusen,2,3,A
+UEL,2020-12-03,AZ Alkmaar,Napoli,1,1,D
+UEL,2020-12-03,Benfica,Lech Poznan,4,0,H
+UEL,2020-12-03,Rangers,Standard Liege,3,2,H
+UEL,2020-12-03,Molde,Dundalk,3,1,H
+UEL,2020-12-03,AS Roma,BSC Young Boys,3,1,H
+UEL,2020-12-03,Real Sociedad,HNK Rijeka,2,2,D
+UEL,2020-12-03,Slavia Praha,Hapoel Beer Sheva,3,0,H
+UEL,2020-12-03,Granada CF,PSV Eindhoven,0,1,A
+UEL,2020-12-03,CFR 1907 Cluj,CSKA Sofia,0,0,D
+UEL,2020-12-03,Omonia Nicosia,PAOK,2,1,H
+UEL,2020-12-10,Bayer Leverkusen,Slavia Praha,4,0,H
+UEL,2020-12-10,PSV Eindhoven,Omonia Nicosia,4,0,H
+UEL,2020-12-10,Lech Poznan,Rangers,0,2,A
+UEL,2020-12-10,Napoli,Real Sociedad,1,1,D
+UEL,2020-12-10,HNK Rijeka,AZ Alkmaar,2,1,H
+UEL,2020-12-10,Hapoel Beer Sheva,Nice,1,0,H
+UEL,2020-12-10,BSC Young Boys,CFR 1907 Cluj,2,1,H
+UEL,2020-12-10,Dundalk,Arsenal,2,4,A
+UEL,2020-12-10,PAOK,Granada CF,0,0,D
+UEL,2020-12-10,Standard Liege,Benfica,2,2,D
+UEL,2020-12-10,Rapid Vienna,Molde,2,2,D
+UEL,2020-12-10,CSKA Sofia,AS Roma,3,1,H
+UEL,2020-12-10,Leicester,AEK Athens FC,2,0,H
+UEL,2020-12-10,Tottenham,Antwerp,2,0,H
+UEL,2020-12-10,1899 Hoffenheim,Gent,4,1,H
+UEL,2020-12-10,SC Braga,Zorya Luhansk,2,0,H
+UEL,2020-12-10,Celtic,Lille,3,2,H
+UEL,2020-12-10,Villarreal,Qarabag,3,0,H
+UEL,2020-12-10,Ludogorets,Lask Linz,1,3,A
+UEL,2020-12-10,Maccabi Tel Aviv,Sivasspor,1,0,H
+UEL,2020-12-10,Dinamo Zagreb,CSKA Moscow,3,1,H
+UEL,2020-12-10,Sparta Praha,AC Milan,0,1,A
+UEL,2020-12-10,Slovan Liberec,FK Crvena Zvezda,0,0,D
+UEL,2020-12-10,Wolfsberger AC,Feyenoord,1,0,H
+UEL,2021-02-18,Dynamo Kyiv,Club Brugge KV,1,1,D
+UEL,2021-02-18,SC Braga,AS Roma,0,2,A
+UEL,2021-02-18,Real Sociedad,Manchester United,0,4,A
+UEL,2021-02-18,Olympiakos Piraeus,PSV Eindhoven,4,2,H
+UEL,2021-02-18,Slavia Praha,Leicester,0,0,D
+UEL,2021-02-18,BSC Young Boys,Bayer Leverkusen,4,3,H
+UEL,2021-02-18,FK Crvena Zvezda,AC Milan,2,2,D
+UEL,2021-02-18,Krasnodar,Dinamo Zagreb,2,3,A
+UEL,2021-02-18,Wolfsberger AC,Tottenham,1,4,A
+UEL,2021-02-18,Lille,Ajax,1,2,A
+UEL,2021-02-18,Benfica,Arsenal,1,1,D
+UEL,2021-02-18,Molde,1899 Hoffenheim,3,3,D
+UEL,2021-02-18,Red Bull Salzburg,Villarreal,0,2,A
+UEL,2021-02-18,Maccabi Tel Aviv,Shakhtar Donetsk,0,2,A
+UEL,2021-02-18,Granada CF,Napoli,2,0,H
+UEL,2021-02-18,Antwerp,Rangers,3,4,A
+UEL,2021-02-24,Tottenham,Wolfsberger AC,4,0,H
+UEL,2021-02-25,Arsenal,Benfica,3,2,H
+UEL,2021-02-25,1899 Hoffenheim,Molde,0,2,A
+UEL,2021-02-25,Ajax,Lille,2,1,H
+UEL,2021-02-25,Rangers,Antwerp,5,2,H
+UEL,2021-02-25,Napoli,Granada CF,2,1,H
+UEL,2021-02-25,Villarreal,Red Bull Salzburg,2,1,H
+UEL,2021-02-25,Shakhtar Donetsk,Maccabi Tel Aviv,1,0,H
+UEL,2021-02-25,Manchester United,Real Sociedad,0,0,D
+UEL,2021-02-25,Leicester,Slavia Praha,0,2,A
+UEL,2021-02-25,Bayer Leverkusen,BSC Young Boys,0,2,A
+UEL,2021-02-25,PSV Eindhoven,Olympiakos Piraeus,2,1,H
+UEL,2021-02-25,AC Milan,FK Crvena Zvezda,1,1,D
+UEL,2021-02-25,AS Roma,SC Braga,3,1,H
+UEL,2021-02-25,Club Brugge KV,Dynamo Kyiv,0,1,A
+UEL,2021-02-25,Dinamo Zagreb,Krasnodar,1,0,H
+UEL,2021-03-11,Manchester United,AC Milan,1,1,D
+UEL,2021-03-11,Ajax,BSC Young Boys,3,0,H
+UEL,2021-03-11,Slavia Praha,Rangers,1,1,D
+UEL,2021-03-11,Dynamo Kyiv,Villarreal,0,2,A
+UEL,2021-03-11,Tottenham,Dinamo Zagreb,2,0,H
+UEL,2021-03-11,AS Roma,Shakhtar Donetsk,3,0,H
+UEL,2021-03-11,Olympiakos Piraeus,Arsenal,1,3,A
+UEL,2021-03-11,Granada CF,Molde,2,0,H
+UEL,2021-03-18,Arsenal,Olympiakos Piraeus,0,1,A
+UEL,2021-03-18,Molde,Granada CF,2,1,H
+UEL,2021-03-18,Shakhtar Donetsk,AS Roma,1,2,A
+UEL,2021-03-18,Dinamo Zagreb,Tottenham,3,0,H
+UEL,2021-03-18,Rangers,Slavia Praha,0,2,A
+UEL,2021-03-18,AC Milan,Manchester United,0,1,A
+UEL,2021-03-18,Villarreal,Dynamo Kyiv,2,0,H
+UEL,2021-03-18,BSC Young Boys,Ajax,0,2,A
+UEL,2021-04-08,Arsenal,Slavia Praha,1,1,D
+UEL,2021-04-08,Ajax,AS Roma,1,2,A
+UEL,2021-04-08,Dinamo Zagreb,Villarreal,0,1,A
+UEL,2021-04-08,Granada CF,Manchester United,0,2,A
+UEL,2021-04-15,Manchester United,Granada CF,2,0,H
+UEL,2021-04-15,AS Roma,Ajax,1,1,D
+UEL,2021-04-15,Villarreal,Dinamo Zagreb,2,1,H
+UEL,2021-04-15,Slavia Praha,Arsenal,0,4,A
+UEL,2021-04-29,Manchester United,AS Roma,6,2,H
+UEL,2021-04-29,Villarreal,Arsenal,2,1,H
+UEL,2021-05-06,Arsenal,Villarreal,0,0,D
+UEL,2021-05-06,AS Roma,Manchester United,3,2,H
+UEL,2021-05-26,Villarreal,Manchester United,1,1,D
+UEL,2021-08-03,Neftchi Baku,HJK Helsinki,2,2,D
+UEL,2021-08-05,Kairat Almaty,Alashkert,0,0,D
+UEL,2021-08-05,FK Jablonec,Celtic,2,4,A
+UEL,2021-08-05,Lincoln Red Imps FC,Slovan Bratislava,1,3,A
+UEL,2021-08-05,Omonia Nicosia,Flora Tallinn,1,0,H
+UEL,2021-08-05,Galatasaray,ST Johnstone,1,1,D
+UEL,2021-08-05,Mura,FK Zalgiris Vilnius,0,0,D
+UEL,2021-08-05,Rapid Vienna,Anorthosis,3,0,H
+UEL,2021-08-10,Flora Tallinn,Omonia Nicosia,2,1,H
+UEL,2021-08-10,Slovan Bratislava,Lincoln Red Imps FC,1,1,D
+UEL,2021-08-12,Alashkert,Kairat Almaty,3,2,H
+UEL,2021-08-12,HJK Helsinki,Neftchi Baku,3,0,H
+UEL,2021-08-12,FK Zalgiris Vilnius,Mura,0,1,A
+UEL,2021-08-12,Anorthosis,Rapid Vienna,2,1,H
+UEL,2021-08-12,ST Johnstone,Galatasaray,2,4,A
+UEL,2021-08-12,Celtic,FK Jablonec,3,0,H
+UEL,2021-08-17,FK Crvena Zvezda,CFR 1907 Cluj,4,0,H
+UEL,2021-08-18,Celtic,AZ Alkmaar,2,0,H
+UEL,2021-08-19,Randers FC,Galatasaray,1,1,D
+UEL,2021-08-19,Slavia Praha,Legia Warszawa,2,2,D
+UEL,2021-08-19,Omonia Nicosia,Antwerp,4,2,H
+UEL,2021-08-19,Mura,Sturm Graz,1,3,A
+UEL,2021-08-19,Fenerbahçe,HJK Helsinki,1,0,H
+UEL,2021-08-19,Rangers,Alashkert,1,0,H
+UEL,2021-08-19,Olympiakos Piraeus,Slovan Bratislava,3,0,H
+UEL,2021-08-19,Rapid Vienna,Zorya Luhansk,3,0,H
+UEL,2021-08-26,Alashkert,Rangers,0,0,D
+UEL,2021-08-26,HJK Helsinki,Fenerbahçe,2,5,A
+UEL,2021-08-26,Zorya Luhansk,Rapid Vienna,2,3,A
+UEL,2021-08-26,Galatasaray,Randers FC,2,1,H
+UEL,2021-08-26,AZ Alkmaar,Celtic,2,1,H
+UEL,2021-08-26,CFR 1907 Cluj,FK Crvena Zvezda,1,2,A
+UEL,2021-08-26,Slovan Bratislava,Olympiakos Piraeus,2,2,D
+UEL,2021-08-26,Legia Warszawa,Slavia Praha,2,1,H
+UEL,2021-08-26,Sturm Graz,Mura,2,0,H
+UEL,2021-08-26,Antwerp,Omonia Nicosia,2,0,H
+UEL,2021-09-15,Spartak Moscow,Legia Warszawa,0,1,A
+UEL,2021-09-16,Bayer Leverkusen,Ferencvarosi TC,2,1,H
+UEL,2021-09-16,FC Midtjylland,Ludogorets,1,1,D
+UEL,2021-09-16,Real Betis,Celtic,4,3,H
+UEL,2021-09-16,Lokomotiv Moscow,Marseille,1,1,D
+UEL,2021-09-16,FK Crvena Zvezda,SC Braga,2,1,H
+UEL,2021-09-16,Dinamo Zagreb,West Ham,0,2,A
+UEL,2021-09-16,Galatasaray,Lazio,1,0,H
+UEL,2021-09-16,Rapid Vienna,Genk,0,1,A
+UEL,2021-09-16,Leicester,Napoli,2,2,D
+UEL,2021-09-16,Monaco,Sturm Graz,1,0,H
+UEL,2021-09-16,Eintracht Frankfurt,Fenerbahçe,1,1,D
+UEL,2021-09-16,PSV Eindhoven,Real Sociedad,2,2,D
+UEL,2021-09-16,Rangers,Lyon,0,2,A
+UEL,2021-09-16,Brondby,Sparta Praha,0,0,D
+UEL,2021-09-16,Olympiakos Piraeus,Antwerp,2,1,H
+UEL,2021-09-30,Lyon,Brondby,3,0,H
+UEL,2021-09-30,Legia Warszawa,Leicester,1,0,H
+UEL,2021-09-30,Napoli,Spartak Moscow,2,3,A
+UEL,2021-09-30,Real Sociedad,Monaco,1,1,D
+UEL,2021-09-30,Fenerbahçe,Olympiakos Piraeus,0,3,A
+UEL,2021-09-30,Sparta Praha,Rangers,1,0,H
+UEL,2021-09-30,Sturm Graz,PSV Eindhoven,1,4,A
+UEL,2021-09-30,Antwerp,Eintracht Frankfurt,0,1,A
+UEL,2021-09-30,West Ham,Rapid Vienna,2,0,H
+UEL,2021-09-30,Marseille,Galatasaray,0,0,D
+UEL,2021-09-30,SC Braga,FC Midtjylland,3,1,H
+UEL,2021-09-30,Celtic,Bayer Leverkusen,0,4,A
+UEL,2021-09-30,Lazio,Lokomotiv Moscow,2,0,H
+UEL,2021-09-30,Ludogorets,FK Crvena Zvezda,0,1,A
+UEL,2021-09-30,Ferencvarosi TC,Real Betis,1,3,A
+UEL,2021-09-30,Genk,Dinamo Zagreb,0,3,A
+UEL,2021-10-19,Celtic,Ferencvarosi TC,2,0,H
+UEL,2021-10-20,Spartak Moscow,Leicester,3,4,A
+UEL,2021-10-21,FC Midtjylland,FK Crvena Zvezda,1,1,D
+UEL,2021-10-21,Lazio,Marseille,0,0,D
+UEL,2021-10-21,Real Betis,Bayer Leverkusen,1,1,D
+UEL,2021-10-21,Ludogorets,SC Braga,0,1,A
+UEL,2021-10-21,Fenerbahçe,Antwerp,2,2,D
+UEL,2021-10-21,Rapid Vienna,Dinamo Zagreb,2,1,H
+UEL,2021-10-21,West Ham,Genk,3,0,H
+UEL,2021-10-21,Eintracht Frankfurt,Olympiakos Piraeus,3,1,H
+UEL,2021-10-21,PSV Eindhoven,Monaco,1,2,A
+UEL,2021-10-21,Rangers,Brondby,2,0,H
+UEL,2021-10-21,Napoli,Legia Warszawa,3,0,H
+UEL,2021-10-21,Lokomotiv Moscow,Galatasaray,0,1,A
+UEL,2021-10-21,Sparta Praha,Lyon,3,4,A
+UEL,2021-10-21,Sturm Graz,Real Sociedad,0,1,A
+UEL,2021-11-04,Lyon,Sparta Praha,3,0,H
+UEL,2021-11-04,Monaco,PSV Eindhoven,0,0,D
+UEL,2021-11-04,Legia Warszawa,Napoli,1,4,A
+UEL,2021-11-04,Brondby,Rangers,1,1,D
+UEL,2021-11-04,Real Sociedad,Sturm Graz,1,1,D
+UEL,2021-11-04,Olympiakos Piraeus,Eintracht Frankfurt,1,2,A
+UEL,2021-11-04,Galatasaray,Lokomotiv Moscow,1,1,D
+UEL,2021-11-04,Genk,West Ham,2,2,D
+UEL,2021-11-04,Leicester,Spartak Moscow,1,1,D
+UEL,2021-11-04,Marseille,Lazio,2,2,D
+UEL,2021-11-04,Bayer Leverkusen,Real Betis,4,0,H
+UEL,2021-11-04,SC Braga,Ludogorets,4,2,H
+UEL,2021-11-04,FK Crvena Zvezda,FC Midtjylland,0,1,A
+UEL,2021-11-04,Dinamo Zagreb,Rapid Vienna,3,1,H
+UEL,2021-11-04,Ferencvarosi TC,Celtic,2,3,A
+UEL,2021-11-04,Antwerp,Fenerbahçe,0,3,A
+UEL,2021-11-24,Spartak Moscow,Napoli,2,1,H
+UEL,2021-11-25,Bayer Leverkusen,Celtic,3,2,H
+UEL,2021-11-25,FC Midtjylland,SC Braga,3,2,H
+UEL,2021-11-25,Real Betis,Ferencvarosi TC,2,0,H
+UEL,2021-11-25,Lokomotiv Moscow,Lazio,0,3,A
+UEL,2021-11-25,FK Crvena Zvezda,Ludogorets,1,0,H
+UEL,2021-11-25,Dinamo Zagreb,Genk,1,1,D
+UEL,2021-11-25,Galatasaray,Marseille,4,2,H
+UEL,2021-11-25,Rapid Vienna,West Ham,0,2,A
+UEL,2021-11-25,Leicester,Legia Warszawa,3,1,H
+UEL,2021-11-25,Monaco,Real Sociedad,2,1,H
+UEL,2021-11-25,Eintracht Frankfurt,Antwerp,2,2,D
+UEL,2021-11-25,PSV Eindhoven,Sturm Graz,2,0,H
+UEL,2021-11-25,Rangers,Sparta Praha,2,0,H
+UEL,2021-11-25,Brondby,Lyon,1,3,A
+UEL,2021-11-25,Olympiakos Piraeus,Fenerbahçe,1,0,H
+UEL,2021-12-09,Lyon,Rangers,1,1,D
+UEL,2021-12-09,Legia Warszawa,Spartak Moscow,0,1,A
+UEL,2021-12-09,Napoli,Leicester,3,2,H
+UEL,2021-12-09,Real Sociedad,PSV Eindhoven,3,0,H
+UEL,2021-12-09,Fenerbahçe,Eintracht Frankfurt,1,1,D
+UEL,2021-12-09,Sparta Praha,Brondby,2,0,H
+UEL,2021-12-09,Sturm Graz,Monaco,1,1,D
+UEL,2021-12-09,Antwerp,Olympiakos Piraeus,1,0,H
+UEL,2021-12-09,West Ham,Dinamo Zagreb,0,1,A
+UEL,2021-12-09,Marseille,Lokomotiv Moscow,1,0,H
+UEL,2021-12-09,SC Braga,FK Crvena Zvezda,1,1,D
+UEL,2021-12-09,Celtic,Real Betis,3,2,H
+UEL,2021-12-09,Lazio,Galatasaray,0,0,D
+UEL,2021-12-09,Ludogorets,FC Midtjylland,0,0,D
+UEL,2021-12-09,Ferencvarosi TC,Bayer Leverkusen,1,0,H
+UEL,2021-12-09,Genk,Rapid Vienna,0,1,A
+UEL,2022-02-17,Borussia Dortmund,Rangers,2,4,A
+UEL,2022-02-17,Barcelona,Napoli,1,1,D
+UEL,2022-02-17,Sheriff Tiraspol,SC Braga,2,0,H
+UEL,2022-02-17,Zenit Saint Petersburg,Real Betis,2,3,A
+UEL,2022-02-17,RB Leipzig,Real Sociedad,2,2,D
+UEL,2022-02-17,FC Porto,Lazio,2,1,H
+UEL,2022-02-17,Atalanta,Olympiakos Piraeus,2,1,H
+UEL,2022-02-17,Sevilla,Dinamo Zagreb,3,1,H
+UEL,2022-02-24,Lazio,FC Porto,2,2,D
+UEL,2022-02-24,Real Sociedad,RB Leipzig,1,3,A
+UEL,2022-02-24,Olympiakos Piraeus,Atalanta,0,3,A
+UEL,2022-02-24,Dinamo Zagreb,Sevilla,1,0,H
+UEL,2022-02-24,SC Braga,Sheriff Tiraspol,2,0,H
+UEL,2022-02-24,Rangers,Borussia Dortmund,2,2,D
+UEL,2022-02-24,Napoli,Barcelona,2,4,A
+UEL,2022-02-24,Real Betis,Zenit Saint Petersburg,0,0,D
+UEL,2022-03-09,FC Porto,Lyon,0,1,A
+UEL,2022-03-09,Real Betis,Eintracht Frankfurt,1,2,A
+UEL,2022-03-10,Sevilla,West Ham,1,0,H
+UEL,2022-03-10,SC Braga,Monaco,2,0,H
+UEL,2022-03-10,Rangers,FK Crvena Zvezda,3,0,H
+UEL,2022-03-10,Atalanta,Bayer Leverkusen,3,2,H
+UEL,2022-03-10,Barcelona,Galatasaray,0,0,D
+UEL,2022-03-17,Monaco,SC Braga,1,1,D
+UEL,2022-03-17,Bayer Leverkusen,Atalanta,0,1,A
+UEL,2022-03-17,FK Crvena Zvezda,Rangers,2,1,H
+UEL,2022-03-17,Galatasaray,Barcelona,1,2,A
+UEL,2022-03-17,West Ham,Sevilla,2,0,H
+UEL,2022-03-17,Lyon,FC Porto,1,1,D
+UEL,2022-03-17,Eintracht Frankfurt,Real Betis,1,1,D
+UEL,2022-04-07,RB Leipzig,Atalanta,1,1,D
+UEL,2022-04-07,West Ham,Lyon,1,1,D
+UEL,2022-04-07,Eintracht Frankfurt,Barcelona,1,1,D
+UEL,2022-04-07,SC Braga,Rangers,1,0,H
+UEL,2022-04-14,Atalanta,RB Leipzig,0,2,A
+UEL,2022-04-14,Lyon,West Ham,0,3,A
+UEL,2022-04-14,Rangers,SC Braga,3,1,H
+UEL,2022-04-14,Barcelona,Eintracht Frankfurt,2,3,A
+UEL,2022-04-28,West Ham,Eintracht Frankfurt,1,2,A
+UEL,2022-04-28,RB Leipzig,Rangers,1,0,H
+UEL,2022-05-05,Eintracht Frankfurt,West Ham,1,0,H
+UEL,2022-05-05,Rangers,RB Leipzig,3,1,H
+UEL,2022-05-18,Eintracht Frankfurt,Rangers,1,1,D
+UEL,2022-08-04,AEK Larnaca,FK Partizan,2,1,H
+UEL,2022-08-04,Malmo FF,F91 Dudelange,3,0,H
+UEL,2022-08-04,Fenerbahçe,Slovácko,3,0,H
+UEL,2022-08-04,Maribor,HJK Helsinki,0,2,A
+UEL,2022-08-04,Linfield,FC Zurich,0,2,A
+UEL,2022-08-04,Olympiakos Piraeus,Slovan Bratislava,1,1,D
+UEL,2022-08-04,Shamrock Rovers,Shkupi 1927,3,1,H
+UEL,2022-08-09,Shkupi 1927,Shamrock Rovers,1,2,A
+UEL,2022-08-11,HJK Helsinki,Maribor,1,0,H
+UEL,2022-08-11,FC Zurich,Linfield,3,0,H
+UEL,2022-08-11,Slovácko,Fenerbahçe,1,1,D
+UEL,2022-08-11,F91 Dudelange,Malmo FF,2,2,D
+UEL,2022-08-11,Slovan Bratislava,Olympiakos Piraeus,2,2,D
+UEL,2022-08-11,FK Partizan,AEK Larnaca,2,2,D
+UEL,2022-08-18,HJK Helsinki,Silkeborg,1,0,H
+UEL,2022-08-18,Ferencvarosi TC,Shamrock Rovers,4,0,H
+UEL,2022-08-18,Malmo FF,Sivasspor,3,1,H
+UEL,2022-08-18,Apollon Limassol,Olympiakos Piraeus,1,1,D
+UEL,2022-08-18,Pyunik Yerevan,Sheriff Tiraspol,0,0,D
+UEL,2022-08-18,FC Zurich,Heart Of Midlothian,2,1,H
+UEL,2022-08-18,Ludogorets,FK Zalgiris Vilnius,1,0,H
+UEL,2022-08-18,Dnipro-1,AEK Larnaca,1,2,A
+UEL,2022-08-18,Gent,Omonia Nicosia,0,2,A
+UEL,2022-08-18,Austria Vienna,Fenerbahçe,0,2,A
+UEL,2022-08-25,FK Zalgiris Vilnius,Ludogorets,3,3,D
+UEL,2022-08-25,AEK Larnaca,Dnipro-1,3,0,H
+UEL,2022-08-25,Silkeborg,HJK Helsinki,1,1,D
+UEL,2022-08-25,Sheriff Tiraspol,Pyunik Yerevan,0,0,D
+UEL,2022-08-25,Fenerbahçe,Austria Vienna,4,1,H
+UEL,2022-08-25,Sivasspor,Malmo FF,0,2,A
+UEL,2022-08-25,Omonia Nicosia,Gent,2,0,H
+UEL,2022-08-25,Heart Of Midlothian,FC Zurich,0,1,A
+UEL,2022-08-25,Olympiakos Piraeus,Apollon Limassol,1,1,D
+UEL,2022-08-25,Shamrock Rovers,Ferencvarosi TC,1,0,H
+UEL,2022-09-08,Union Berlin,Union St. Gilloise,0,1,A
+UEL,2022-09-08,PSV Eindhoven,Bodo/Glimt,1,1,D
+UEL,2022-09-08,Malmo FF,SC Braga,0,2,A
+UEL,2022-09-08,Ludogorets,AS Roma,2,1,H
+UEL,2022-09-08,Fenerbahçe,Dynamo Kyiv,2,1,H
+UEL,2022-09-08,AEK Larnaca,Rennes,1,2,A
+UEL,2022-09-08,HJK Helsinki,Real Betis,0,2,A
+UEL,2022-09-08,FC Zurich,Arsenal,1,2,A
+UEL,2022-09-08,Manchester United,Real Sociedad,0,1,A
+UEL,2022-09-08,Nantes,Olympiakos Piraeus,2,1,H
+UEL,2022-09-08,SC Freiburg,Qarabag,2,1,H
+UEL,2022-09-08,Lazio,Feyenoord,4,2,H
+UEL,2022-09-08,FK Crvena Zvezda,Monaco,0,1,A
+UEL,2022-09-08,Sturm Graz,FC Midtjylland,1,0,H
+UEL,2022-09-08,Ferencvarosi TC,Trabzonspor,3,2,H
+UEL,2022-09-08,Omonia Nicosia,Sheriff Tiraspol,0,3,A
+UEL,2022-09-15,Monaco,Ferencvarosi TC,0,1,A
+UEL,2022-09-15,Feyenoord,Sturm Graz,6,0,H
+UEL,2022-09-15,FC Midtjylland,Lazio,5,1,H
+UEL,2022-09-15,Real Sociedad,Omonia Nicosia,2,1,H
+UEL,2022-09-15,Olympiakos Piraeus,SC Freiburg,0,3,A
+UEL,2022-09-15,Qarabag,Nantes,3,0,H
+UEL,2022-09-15,Sheriff Tiraspol,Manchester United,0,2,A
+UEL,2022-09-15,Trabzonspor,FK Crvena Zvezda,2,1,H
+UEL,2022-09-15,Rennes,Fenerbahçe,2,2,D
+UEL,2022-09-15,SC Braga,Union Berlin,1,0,H
+UEL,2022-09-15,Bodo/Glimt,FC Zurich,2,1,H
+UEL,2022-09-15,AS Roma,HJK Helsinki,3,0,H
+UEL,2022-09-15,Real Betis,Ludogorets,3,2,H
+UEL,2022-09-15,Dynamo Kyiv,AEK Larnaca,0,1,A
+UEL,2022-09-15,Union St. Gilloise,Malmo FF,3,2,H
+UEL,2022-10-06,Monaco,Trabzonspor,3,1,H
+UEL,2022-10-06,Malmo FF,Union Berlin,0,1,A
+UEL,2022-10-06,Sheriff Tiraspol,Real Sociedad,0,2,A
+UEL,2022-10-06,FK Crvena Zvezda,Ferencvarosi TC,4,1,H
+UEL,2022-10-06,Sturm Graz,Lazio,0,0,D
+UEL,2022-10-06,HJK Helsinki,Ludogorets,1,1,D
+UEL,2022-10-06,FC Zurich,PSV Eindhoven,1,5,A
+UEL,2022-10-06,Omonia Nicosia,Manchester United,2,3,A
+UEL,2022-10-06,Arsenal,Bodo/Glimt,3,0,H
+UEL,2022-10-06,Rennes,Dynamo Kyiv,2,1,H
+UEL,2022-10-06,SC Freiburg,Nantes,2,0,H
+UEL,2022-10-06,SC Braga,Union St. Gilloise,1,2,A
+UEL,2022-10-06,FC Midtjylland,Feyenoord,2,2,D
+UEL,2022-10-06,AS Roma,Real Betis,1,2,A
+UEL,2022-10-06,Olympiakos Piraeus,Qarabag,0,3,A
+UEL,2022-10-06,Fenerbahçe,AEK Larnaca,2,0,H
+UEL,2022-10-13,Nantes,SC Freiburg,0,4,A
+UEL,2022-10-13,Feyenoord,FC Midtjylland,2,2,D
+UEL,2022-10-13,Bodo/Glimt,Arsenal,0,1,A
+UEL,2022-10-13,Real Betis,AS Roma,1,1,D
+UEL,2022-10-13,Qarabag,Olympiakos Piraeus,0,0,D
+UEL,2022-10-13,Dynamo Kyiv,Rennes,0,1,A
+UEL,2022-10-13,AEK Larnaca,Fenerbahçe,1,2,A
+UEL,2022-10-13,Union St. Gilloise,SC Braga,3,3,D
+UEL,2022-10-13,Manchester United,Omonia Nicosia,1,0,H
+UEL,2022-10-13,Union Berlin,Malmo FF,1,0,H
+UEL,2022-10-13,PSV Eindhoven,FC Zurich,5,0,H
+UEL,2022-10-13,Lazio,Sturm Graz,2,2,D
+UEL,2022-10-13,Real Sociedad,Sheriff Tiraspol,3,0,H
+UEL,2022-10-13,Ludogorets,HJK Helsinki,2,0,H
+UEL,2022-10-13,Ferencvarosi TC,FK Crvena Zvezda,2,1,H
+UEL,2022-10-13,Trabzonspor,Monaco,4,0,H
+UEL,2022-10-20,Arsenal,PSV Eindhoven,1,0,H
+UEL,2022-10-27,Union Berlin,SC Braga,1,0,H
+UEL,2022-10-27,PSV Eindhoven,Arsenal,2,0,H
+UEL,2022-10-27,Malmo FF,Union St. Gilloise,0,2,A
+UEL,2022-10-27,Lazio,FC Midtjylland,2,1,H
+UEL,2022-10-27,Ludogorets,Real Betis,0,1,A
+UEL,2022-10-27,Fenerbahçe,Rennes,3,3,D
+UEL,2022-10-27,AEK Larnaca,Dynamo Kyiv,3,3,D
+UEL,2022-10-27,FC Zurich,Bodo/Glimt,2,1,H
+UEL,2022-10-27,Manchester United,Sheriff Tiraspol,3,0,H
+UEL,2022-10-27,Nantes,Qarabag,2,1,H
+UEL,2022-10-27,SC Freiburg,Olympiakos Piraeus,1,1,D
+UEL,2022-10-27,FK Crvena Zvezda,Trabzonspor,2,1,H
+UEL,2022-10-27,Sturm Graz,Feyenoord,1,0,H
+UEL,2022-10-27,HJK Helsinki,AS Roma,1,2,A
+UEL,2022-10-27,Ferencvarosi TC,Monaco,1,1,D
+UEL,2022-10-27,Omonia Nicosia,Real Sociedad,0,2,A
+UEL,2022-11-03,Monaco,FK Crvena Zvezda,4,1,H
+UEL,2022-11-03,Feyenoord,Lazio,1,0,H
+UEL,2022-11-03,FC Midtjylland,Sturm Graz,2,0,H
+UEL,2022-11-03,Real Sociedad,Manchester United,0,1,A
+UEL,2022-11-03,Olympiakos Piraeus,Nantes,0,2,A
+UEL,2022-11-03,Qarabag,SC Freiburg,1,1,D
+UEL,2022-11-03,Sheriff Tiraspol,Omonia Nicosia,1,0,H
+UEL,2022-11-03,Trabzonspor,Ferencvarosi TC,1,0,H
+UEL,2022-11-03,Arsenal,FC Zurich,1,0,H
+UEL,2022-11-03,Rennes,AEK Larnaca,1,1,D
+UEL,2022-11-03,SC Braga,Malmo FF,2,1,H
+UEL,2022-11-03,Bodo/Glimt,PSV Eindhoven,1,2,A
+UEL,2022-11-03,AS Roma,Ludogorets,3,1,H
+UEL,2022-11-03,Real Betis,HJK Helsinki,3,0,H
+UEL,2022-11-03,Dynamo Kyiv,Fenerbahçe,0,2,A
+UEL,2022-11-03,Union St. Gilloise,Union Berlin,0,1,A
+UEL,2023-02-16,Ajax,Union Berlin,0,0,D
+UEL,2023-02-16,Barcelona,Manchester United,2,2,D
+UEL,2023-02-16,Shakhtar Donetsk,Rennes,2,1,H
+UEL,2023-02-16,Red Bull Salzburg,AS Roma,1,0,H
+UEL,2023-02-16,Bayer Leverkusen,Monaco,2,3,A
+UEL,2023-02-16,Sporting CP,FC Midtjylland,1,1,D
+UEL,2023-02-16,Juventus,Nantes,1,1,D
+UEL,2023-02-16,Sevilla,PSV Eindhoven,3,0,H
+UEL,2023-02-23,Nantes,Juventus,0,3,A
+UEL,2023-02-23,Monaco,Bayer Leverkusen,2,3,A
+UEL,2023-02-23,PSV Eindhoven,Sevilla,2,0,H
+UEL,2023-02-23,FC Midtjylland,Sporting CP,0,4,A
+UEL,2023-02-23,Manchester United,Barcelona,2,1,H
+UEL,2023-02-23,Rennes,Shakhtar Donetsk,2,1,H
+UEL,2023-02-23,Union Berlin,Ajax,3,1,H
+UEL,2023-02-23,AS Roma,Red Bull Salzburg,2,0,H
+UEL,2023-03-09,Bayer Leverkusen,Ferencvarosi TC,2,0,H
+UEL,2023-03-09,Union Berlin,Union St. Gilloise,3,3,D
+UEL,2023-03-09,Sporting CP,Arsenal,2,2,D
+UEL,2023-03-09,AS Roma,Real Sociedad,2,0,H
+UEL,2023-03-09,Manchester United,Real Betis,4,1,H
+UEL,2023-03-09,Juventus,SC Freiburg,1,0,H
+UEL,2023-03-09,Sevilla,Fenerbahçe,2,0,H
+UEL,2023-03-09,Shakhtar Donetsk,Feyenoord,1,1,D
+UEL,2023-03-16,SC Freiburg,Juventus,0,2,A
+UEL,2023-03-16,Feyenoord,Shakhtar Donetsk,7,1,H
+UEL,2023-03-16,Real Betis,Manchester United,0,1,A
+UEL,2023-03-16,Fenerbahçe,Sevilla,1,0,H
+UEL,2023-03-16,Arsenal,Sporting CP,1,1,D
+UEL,2023-03-16,Real Sociedad,AS Roma,0,0,D
+UEL,2023-03-16,Ferencvarosi TC,Bayer Leverkusen,0,2,A
+UEL,2023-03-16,Union St. Gilloise,Union Berlin,3,0,H
+UEL,2023-04-13,Feyenoord,AS Roma,1,0,H
+UEL,2023-04-13,Manchester United,Sevilla,2,2,D
+UEL,2023-04-13,Bayer Leverkusen,Union St. Gilloise,1,1,D
+UEL,2023-04-13,Juventus,Sporting CP,1,0,H
+UEL,2023-04-20,Sporting CP,Juventus,1,1,D
+UEL,2023-04-20,AS Roma,Feyenoord,4,1,H
+UEL,2023-04-20,Sevilla,Manchester United,3,0,H
+UEL,2023-04-20,Union St. Gilloise,Bayer Leverkusen,1,4,A
+UEL,2023-05-11,Juventus,Sevilla,1,1,D
+UEL,2023-05-11,AS Roma,Bayer Leverkusen,1,0,H
+UEL,2023-05-18,Bayer Leverkusen,AS Roma,0,0,D
+UEL,2023-05-18,Sevilla,Juventus,2,1,H
+UEL,2023-05-31,Sevilla,AS Roma,1,1,D
+UEL,2023-08-08,FC Astana,Ludogorets,2,1,H
+UEL,2023-08-10,Qarabag,HJK Helsinki,2,1,H
+UEL,2023-08-10,FK Zalgiris Vilnius,BK Hacken,1,3,A
+UEL,2023-08-10,Slavia Praha,Dnipro-1,3,0,H
+UEL,2023-08-10,Sheriff Tiraspol,Bate Borisov,5,1,H
+UEL,2023-08-10,Olympiakos Piraeus,Genk,1,0,H
+UEL,2023-08-10,Zrinjski,Breidablik,6,2,H
+UEL,2023-08-17,HJK Helsinki,Qarabag,1,2,A
+UEL,2023-08-17,BK Hacken,FK Zalgiris Vilnius,5,0,H
+UEL,2023-08-17,Breidablik,Zrinjski,1,0,H
+UEL,2023-08-17,Bate Borisov,Sheriff Tiraspol,2,2,D
+UEL,2023-08-17,Ludogorets,FC Astana,5,1,H
+UEL,2023-08-17,Genk,Olympiakos Piraeus,1,1,D
+UEL,2023-08-17,Dnipro-1,Slavia Praha,1,1,D
+UEL,2023-08-24,BK Hacken,Aberdeen,2,2,D
+UEL,2023-08-24,Slavia Praha,Zorya Luhansk,2,0,H
+UEL,2023-08-24,Ludogorets,Ajax,1,4,A
+UEL,2023-08-24,Dinamo Zagreb,Sparta Praha,3,1,H
+UEL,2023-08-24,Olimpija Ljubljana,Qarabag,0,2,A
+UEL,2023-08-24,Slovan Bratislava,Aris,2,1,H
+UEL,2023-08-24,Union St. Gilloise,FC Lugano,2,0,H
+UEL,2023-08-24,KI Klaksvik,Sheriff Tiraspol,1,1,D
+UEL,2023-08-24,Olympiakos Piraeus,Cukaricki,3,1,H
+UEL,2023-08-24,Lask Linz,Zrinjski,2,1,H
+UEL,2023-08-31,Qarabag,Olimpija Ljubljana,1,1,D
+UEL,2023-08-31,Sheriff Tiraspol,KI Klaksvik,2,1,H
+UEL,2023-08-31,Zorya Luhansk,Slavia Praha,2,1,H
+UEL,2023-08-31,Sparta Praha,Dinamo Zagreb,4,1,H
+UEL,2023-08-31,Aris,Slovan Bratislava,6,2,H
+UEL,2023-08-31,Ajax,Ludogorets,0,1,A
+UEL,2023-08-31,Cukaricki,Olympiakos Piraeus,0,3,A
+UEL,2023-08-31,FC Lugano,Union St. Gilloise,0,1,A
+UEL,2023-08-31,Aberdeen,BK Hacken,1,3,A
+UEL,2023-08-31,Zrinjski,Lask Linz,1,1,D
+UEL,2023-09-21,Rennes,Maccabi Haifa,3,0,H
+UEL,2023-09-21,Bayer Leverkusen,BK Hacken,4,0,H
+UEL,2023-09-21,Qarabag,Molde,1,0,H
+UEL,2023-09-21,Sheriff Tiraspol,AS Roma,1,2,A
+UEL,2023-09-21,Panathinaikos,Villarreal,2,0,H
+UEL,2023-09-21,Lask Linz,Liverpool,1,3,A
+UEL,2023-09-21,Union St. Gilloise,Toulouse,1,1,D
+UEL,2023-09-21,Servette FC,Slavia Praha,0,2,A
+UEL,2023-09-21,West Ham,TSC Backa Topola,3,1,H
+UEL,2023-09-21,Brighton,AEK Athens FC,2,3,A
+UEL,2023-09-21,Ajax,Marseille,3,3,D
+UEL,2023-09-21,Rangers,Real Betis,1,0,H
+UEL,2023-09-21,Atalanta,Raków Częstochowa,2,0,H
+UEL,2023-09-21,Olympiakos Piraeus,SC Freiburg,2,3,A
+UEL,2023-09-21,Sparta Praha,Aris,3,2,H
+UEL,2023-09-21,Sturm Graz,Sporting CP,1,2,A
+UEL,2023-10-05,Marseille,Brighton,2,2,D
+UEL,2023-10-05,SC Freiburg,West Ham,1,2,A
+UEL,2023-10-05,Sporting CP,Atalanta,1,2,A
+UEL,2023-10-05,Real Betis,Sparta Praha,2,1,H
+UEL,2023-10-05,AEK Athens FC,Ajax,1,1,D
+UEL,2023-10-05,TSC Backa Topola,Olympiakos Piraeus,2,2,D
+UEL,2023-10-05,Aris,Rangers,2,1,H
+UEL,2023-10-05,Raków Częstochowa,Sturm Graz,0,1,A
+UEL,2023-10-05,Liverpool,Union St. Gilloise,2,0,H
+UEL,2023-10-05,Toulouse,Lask Linz,1,0,H
+UEL,2023-10-05,Molde,Bayer Leverkusen,1,2,A
+UEL,2023-10-05,BK Hacken,Qarabag,0,1,A
+UEL,2023-10-05,AS Roma,Servette FC,4,0,H
+UEL,2023-10-05,Villarreal,Rennes,1,0,H
+UEL,2023-10-05,Slavia Praha,Sheriff Tiraspol,6,0,H
+UEL,2023-10-05,Maccabi Haifa,Panathinaikos,0,0,D
+UEL,2023-10-26,Marseille,AEK Athens FC,3,1,H
+UEL,2023-10-26,Molde,BK Hacken,5,1,H
+UEL,2023-10-26,Olympiakos Piraeus,West Ham,2,1,H
+UEL,2023-10-26,Sparta Praha,Rangers,0,0,D
+UEL,2023-10-26,Sturm Graz,Atalanta,2,2,D
+UEL,2023-10-26,TSC Backa Topola,SC Freiburg,1,3,A
+UEL,2023-10-26,Aris,Real Betis,0,1,A
+UEL,2023-10-26,Raków Częstochowa,Sporting CP,1,1,D
+UEL,2023-10-26,Liverpool,Toulouse,5,1,H
+UEL,2023-10-26,Brighton,Ajax,2,0,H
+UEL,2023-10-26,Bayer Leverkusen,Qarabag,5,1,H
+UEL,2023-10-26,AS Roma,Slavia Praha,2,0,H
+UEL,2023-10-26,Sheriff Tiraspol,Servette FC,1,1,D
+UEL,2023-10-26,Panathinaikos,Rennes,1,2,A
+UEL,2023-10-26,Union St. Gilloise,Lask Linz,2,1,H
+UEL,2023-11-09,Rennes,Panathinaikos,3,1,H
+UEL,2023-11-09,Toulouse,Liverpool,3,2,H
+UEL,2023-11-09,Ajax,Brighton,0,2,A
+UEL,2023-11-09,Qarabag,Bayer Leverkusen,0,1,A
+UEL,2023-11-09,Slavia Praha,AS Roma,2,0,H
+UEL,2023-11-09,Lask Linz,Union St. Gilloise,3,0,H
+UEL,2023-11-09,Servette FC,Sheriff Tiraspol,2,1,H
+UEL,2023-11-09,Maccabi Haifa,Villarreal,1,2,A
+UEL,2023-11-09,West Ham,Olympiakos Piraeus,1,0,H
+UEL,2023-11-09,SC Freiburg,TSC Backa Topola,5,0,H
+UEL,2023-11-09,Sporting CP,Raków Częstochowa,2,1,H
+UEL,2023-11-09,Rangers,Sparta Praha,2,1,H
+UEL,2023-11-09,BK Hacken,Molde,1,3,A
+UEL,2023-11-09,Atalanta,Sturm Graz,1,0,H
+UEL,2023-11-09,Real Betis,Aris,4,1,H
+UEL,2023-11-09,AEK Athens FC,Marseille,0,2,A
+UEL,2023-11-30,SC Freiburg,Olympiakos Piraeus,5,0,H
+UEL,2023-11-30,Atalanta,Sporting CP,1,1,D
+UEL,2023-11-30,AEK Athens FC,Brighton,0,1,A
+UEL,2023-11-30,Sparta Praha,Real Betis,1,0,H
+UEL,2023-11-30,Sturm Graz,Raków Częstochowa,0,1,A
+UEL,2023-11-30,TSC Backa Topola,West Ham,0,1,A
+UEL,2023-11-30,Maccabi Haifa,Rennes,0,3,A
+UEL,2023-11-30,Liverpool,Lask Linz,4,0,H
+UEL,2023-11-30,Marseille,Ajax,4,3,H
+UEL,2023-11-30,Toulouse,Union St. Gilloise,0,0,D
+UEL,2023-11-30,Rangers,Aris,1,1,D
+UEL,2023-11-30,Molde,Qarabag,2,2,D
+UEL,2023-11-30,BK Hacken,Bayer Leverkusen,0,2,A
+UEL,2023-11-30,Villarreal,Panathinaikos,3,2,H
+UEL,2023-11-30,Sheriff Tiraspol,Slavia Praha,2,3,A
+UEL,2023-11-30,Servette FC,AS Roma,1,1,D
+UEL,2023-12-06,Villarreal,Maccabi Haifa,0,0,D
+UEL,2023-12-14,Rennes,Villarreal,2,3,A
+UEL,2023-12-14,Bayer Leverkusen,Molde,5,1,H
+UEL,2023-12-14,AS Roma,Sheriff Tiraspol,3,0,H
+UEL,2023-12-14,Qarabag,BK Hacken,2,1,H
+UEL,2023-12-14,Slavia Praha,Servette FC,4,0,H
+UEL,2023-12-14,Panathinaikos,Maccabi Haifa,1,2,A
+UEL,2023-12-14,Lask Linz,Toulouse,1,2,A
+UEL,2023-12-14,Union St. Gilloise,Liverpool,2,1,H
+UEL,2023-12-14,West Ham,SC Freiburg,2,0,H
+UEL,2023-12-14,Brighton,Marseille,1,0,H
+UEL,2023-12-14,Ajax,AEK Athens FC,3,1,H
+UEL,2023-12-14,Sporting CP,Sturm Graz,3,0,H
+UEL,2023-12-14,Real Betis,Rangers,2,3,A
+UEL,2023-12-14,Olympiakos Piraeus,TSC Backa Topola,5,2,H
+UEL,2023-12-14,Aris,Sparta Praha,1,3,A
+UEL,2023-12-14,Raków Częstochowa,Atalanta,0,4,A
+UEL,2024-02-15,Feyenoord,AS Roma,1,1,D
+UEL,2024-02-15,Shakhtar Donetsk,Marseille,2,2,D
+UEL,2024-02-15,BSC Young Boys,Sporting CP,1,3,A
+UEL,2024-02-15,Galatasaray,Sparta Praha,3,2,H
+UEL,2024-02-15,Lens,SC Freiburg,0,0,D
+UEL,2024-02-15,Benfica,Toulouse,2,1,H
+UEL,2024-02-15,SC Braga,Qarabag,2,4,A
+UEL,2024-02-15,AC Milan,Rennes,3,0,H
+UEL,2024-02-22,Rennes,AC Milan,3,2,H
+UEL,2024-02-22,Toulouse,Benfica,0,0,D
+UEL,2024-02-22,SC Freiburg,Lens,3,2,H
+UEL,2024-02-22,Qarabag,SC Braga,2,3,A
+UEL,2024-02-22,Marseille,Shakhtar Donetsk,3,1,H
+UEL,2024-02-22,Sporting CP,BSC Young Boys,1,1,D
+UEL,2024-02-22,AS Roma,Feyenoord,1,1,D
+UEL,2024-02-22,Sparta Praha,Galatasaray,4,1,H
+UEL,2024-03-06,Sporting CP,Atalanta,1,1,D
+UEL,2024-03-07,AS Roma,Brighton,4,0,H
+UEL,2024-03-07,Qarabag,Bayer Leverkusen,2,2,D
+UEL,2024-03-07,Sparta Praha,Liverpool,1,5,A
+UEL,2024-03-07,Marseille,Villarreal,4,0,H
+UEL,2024-03-07,SC Freiburg,West Ham,1,0,H
+UEL,2024-03-07,Benfica,Rangers,2,2,D
+UEL,2024-03-07,AC Milan,Slavia Praha,4,2,H
+UEL,2024-03-14,West Ham,SC Freiburg,5,0,H
+UEL,2024-03-14,Rangers,Benfica,0,1,A
+UEL,2024-03-14,Villarreal,Marseille,3,1,H
+UEL,2024-03-14,Slavia Praha,AC Milan,1,3,A
+UEL,2024-03-14,Liverpool,Sparta Praha,6,1,H
+UEL,2024-03-14,Brighton,AS Roma,1,0,H
+UEL,2024-03-14,Bayer Leverkusen,Qarabag,3,2,H
+UEL,2024-03-14,Atalanta,Sporting CP,2,1,H
+UEL,2024-04-11,Liverpool,Atalanta,0,3,A
+UEL,2024-04-11,Bayer Leverkusen,West Ham,2,0,H
+UEL,2024-04-11,Benfica,Marseille,2,1,H
+UEL,2024-04-11,AC Milan,AS Roma,0,1,A
+UEL,2024-04-18,West Ham,Bayer Leverkusen,1,1,D
+UEL,2024-04-18,Marseille,Benfica,1,0,H
+UEL,2024-04-18,AS Roma,AC Milan,2,1,H
+UEL,2024-04-18,Atalanta,Liverpool,0,1,A
+UEL,2024-05-02,Marseille,Atalanta,1,1,D
+UEL,2024-05-02,AS Roma,Bayer Leverkusen,0,2,A
+UEL,2024-05-09,Bayer Leverkusen,AS Roma,2,2,D
+UEL,2024-05-09,Atalanta,Marseille,3,0,H
+UEL,2024-05-22,Atalanta,Bayer Leverkusen,3,0,H
+UEL,2024-07-11,IF Elfsborg,Pafos,3,0,H
+UEL,2024-07-11,Sheriff Tiraspol,Zira,0,1,A
+UEL,2024-07-11,Paks,Corvinul Hunedoara,0,4,A
+UEL,2024-07-11,Ružomberok,FK Tobol Kostanay,5,2,H
+UEL,2024-07-11,Botev Plovdiv,Maribor,2,1,H
+UEL,2024-07-11,Wisla Krakow,Llapi,2,0,H
+UEL,2024-07-18,Llapi,Wisla Krakow,1,2,A
+UEL,2024-07-18,FK Tobol Kostanay,Ružomberok,1,0,H
+UEL,2024-07-18,Zira,Sheriff Tiraspol,1,2,A
+UEL,2024-07-18,Pafos,IF Elfsborg,2,5,A
+UEL,2024-07-18,Corvinul Hunedoara,Paks,0,2,A
+UEL,2024-07-18,Maribor,Botev Plovdiv,2,2,D
+UEL,2024-07-25,Wisla Krakow,Rapid Vienna,1,2,A
+UEL,2024-07-25,Ružomberok,Trabzonspor,0,2,A
+UEL,2024-07-25,Molde,Silkeborg,3,1,H
+UEL,2024-07-25,Sheriff Tiraspol,IF Elfsborg,0,1,A
+UEL,2024-07-25,Corvinul Hunedoara,HNK Rijeka,0,0,D
+UEL,2024-07-25,Panathinaikos,Botev Plovdiv,2,1,H
+UEL,2024-07-25,Ajax,Vojvodina,1,0,H
+UEL,2024-07-25,Kilmarnock,Cercle Brugge,1,1,D
+UEL,2024-07-25,SC Braga,Maccabi Petah Tikva,2,0,H
+UEL,2024-08-01,IF Elfsborg,Sheriff Tiraspol,2,0,H
+UEL,2024-08-01,Silkeborg,Molde,3,2,H
+UEL,2024-08-01,Trabzonspor,Ružomberok,1,0,H
+UEL,2024-08-01,Maccabi Petah Tikva,SC Braga,0,5,A
+UEL,2024-08-01,HNK Rijeka,Corvinul Hunedoara,1,0,H
+UEL,2024-08-01,Botev Plovdiv,Panathinaikos,0,4,A
+UEL,2024-08-01,Vojvodina,Ajax,1,3,A
+UEL,2024-08-01,Cercle Brugge,Kilmarnock,1,0,H
+UEL,2024-08-01,Rapid Vienna,Wisla Krakow,6,1,H
+UEL,2024-08-06,Panevėžys,Maccabi Tel Aviv,1,2,A
+UEL,2024-08-06,Petrocub,The New Saints,1,0,H
+UEL,2024-08-08,Molde,Cercle Brugge,3,0,H
+UEL,2024-08-08,KI Klaksvik,Borac Banja Luka,2,1,H
+UEL,2024-08-08,Trabzonspor,Rapid Vienna,0,1,A
+UEL,2024-08-08,HNK Rijeka,IF Elfsborg,1,1,D
+UEL,2024-08-08,FK Partizan,FC Lugano,0,1,A
+UEL,2024-08-08,Panathinaikos,Ajax,0,1,A
+UEL,2024-08-08,UE Santa Coloma,Rīgas FS,0,2,A
+UEL,2024-08-08,Kryvbas KR,Plzen,1,2,A
+UEL,2024-08-08,Celje,Shamrock Rovers,1,0,H
+UEL,2024-08-08,Dinamo Minsk,Lincoln Red Imps FC,2,0,H
+UEL,2024-08-08,SC Braga,Servette FC,0,0,D
+UEL,2024-08-13,The New Saints,Petrocub,0,0,D
+UEL,2024-08-14,Rīgas FS,UE Santa Coloma,7,0,H
+UEL,2024-08-15,Lincoln Red Imps FC,Dinamo Minsk,2,1,H
+UEL,2024-08-15,Rapid Vienna,Trabzonspor,2,0,H
+UEL,2024-08-15,IF Elfsborg,HNK Rijeka,2,0,H
+UEL,2024-08-15,Plzen,Kryvbas KR,1,0,H
+UEL,2024-08-15,Cercle Brugge,Molde,1,0,H
+UEL,2024-08-15,Ajax,Panathinaikos,0,1,A
+UEL,2024-08-15,Maccabi Tel Aviv,Panevėžys,3,0,H
+UEL,2024-08-15,FC Lugano,FK Partizan,2,2,D
+UEL,2024-08-15,Servette FC,SC Braga,1,2,A
+UEL,2024-08-15,Shamrock Rovers,Celje,3,1,H
+UEL,2024-08-15,Borac Banja Luka,KI Klaksvik,3,1,H
+UEL,2024-08-22,Molde,IF Elfsborg,0,1,A
+UEL,2024-08-22,Plzen,Heart Of Midlothian,1,0,H
+UEL,2024-08-22,Lask Linz,FCSB,1,1,D
+UEL,2024-08-22,Rīgas FS,Apoel Nicosia,2,1,H
+UEL,2024-08-22,PAOK,Shamrock Rovers,4,0,H
+UEL,2024-08-22,Ludogorets,Petrocub,4,0,H
+UEL,2024-08-22,Maccabi Tel Aviv,TSC Backa Topola,3,0,H
+UEL,2024-08-22,FC Lugano,Beşiktaş,3,3,D
+UEL,2024-08-22,Jagiellonia,Ajax,1,4,A
+UEL,2024-08-22,Dinamo Minsk,Anderlecht,0,1,A
+UEL,2024-08-22,Ferencvarosi TC,Borac Banja Luka,0,0,D
+UEL,2024-08-22,SC Braga,Rapid Vienna,2,1,H
+UEL,2024-08-29,IF Elfsborg,Molde,0,1,A
+UEL,2024-08-29,Apoel Nicosia,Rīgas FS,2,1,H
+UEL,2024-08-29,Petrocub,Ludogorets,1,2,A
+UEL,2024-08-29,Ajax,Jagiellonia,3,0,H
+UEL,2024-08-29,Beşiktaş,FC Lugano,5,1,H
+UEL,2024-08-29,Anderlecht,Dinamo Minsk,1,0,H
+UEL,2024-08-29,FCSB,Lask Linz,1,0,H
+UEL,2024-08-29,Heart Of Midlothian,Plzen,0,1,A
+UEL,2024-08-29,Shamrock Rovers,PAOK,0,2,A
+UEL,2024-08-29,Rapid Vienna,SC Braga,2,2,D
+UEL,2024-08-29,TSC Backa Topola,Maccabi Tel Aviv,1,5,A
+UEL,2024-08-29,Borac Banja Luka,Ferencvarosi TC,1,1,D
+UEL,2024-09-25,AZ Alkmaar,IF Elfsborg,3,2,H
+UEL,2024-09-25,Bodo/Glimt,FC Porto,3,2,H
+UEL,2024-09-25,Manchester United,Twente,1,1,D
+UEL,2024-09-25,Nice,Real Sociedad,1,1,D
+UEL,2024-09-25,FC Midtjylland,1899 Hoffenheim,1,1,D
+UEL,2024-09-25,Anderlecht,Ferencvarosi TC,2,1,H
+UEL,2024-09-25,Ludogorets,Slavia Praha,0,2,A
+UEL,2024-09-25,Dynamo Kyiv,Lazio,0,3,A
+UEL,2024-09-25,Galatasaray,PAOK,3,1,H
+UEL,2024-09-26,Malmo FF,Rangers,0,2,A
+UEL,2024-09-26,Fenerbahçe,Union St. Gilloise,2,1,H
+UEL,2024-09-26,Tottenham,Qarabag,3,0,H
+UEL,2024-09-26,Lyon,Olympiakos Piraeus,2,0,H
+UEL,2024-09-26,Eintracht Frankfurt,Plzen,3,3,D
+UEL,2024-09-26,Ajax,Beşiktaş,4,0,H
+UEL,2024-09-26,SC Braga,Maccabi Tel Aviv,2,1,H
+UEL,2024-09-26,AS Roma,Athletic Club,1,1,D
+UEL,2024-09-26,FCSB,Rīgas FS,4,1,H
+UEL,2024-10-03,1899 Hoffenheim,Dynamo Kyiv,2,0,H
+UEL,2024-10-03,Lazio,Nice,4,1,H
+UEL,2024-10-03,Real Sociedad,Anderlecht,1,2,A
+UEL,2024-10-03,Olympiakos Piraeus,SC Braga,3,0,H
+UEL,2024-10-03,Qarabag,Malmo FF,1,2,A
+UEL,2024-10-03,Slavia Praha,Ajax,1,1,D
+UEL,2024-10-03,Maccabi Tel Aviv,FC Midtjylland,0,2,A
+UEL,2024-10-03,Ferencvarosi TC,Tottenham,1,2,A
+UEL,2024-10-03,Rīgas FS,Galatasaray,2,2,D
+UEL,2024-10-03,FC Porto,Manchester United,3,3,D
+UEL,2024-10-03,Rangers,Lyon,1,4,A
+UEL,2024-10-03,IF Elfsborg,AS Roma,1,0,H
+UEL,2024-10-03,Twente,Fenerbahçe,1,1,D
+UEL,2024-10-03,Athletic Club,AZ Alkmaar,2,0,H
+UEL,2024-10-03,Beşiktaş,Eintracht Frankfurt,1,3,A
+UEL,2024-10-03,Plzen,Ludogorets,0,0,D
+UEL,2024-10-03,PAOK,FCSB,0,1,A
+UEL,2024-10-03,Union St. Gilloise,Bodo/Glimt,0,0,D
+UEL,2024-10-23,SC Braga,Bodo/Glimt,1,2,A
+UEL,2024-10-23,Galatasaray,IF Elfsborg,4,3,H
+UEL,2024-10-24,Eintracht Frankfurt,Rīgas FS,1,0,H
+UEL,2024-10-24,FC Midtjylland,Union St. Gilloise,1,0,H
+UEL,2024-10-24,AS Roma,Dynamo Kyiv,1,0,H
+UEL,2024-10-24,Qarabag,Ajax,0,3,A
+UEL,2024-10-24,Maccabi Tel Aviv,Real Sociedad,1,2,A
+UEL,2024-10-24,PAOK,Plzen,2,2,D
+UEL,2024-10-24,Ferencvarosi TC,Nice,1,0,H
+UEL,2024-10-24,Tottenham,AZ Alkmaar,1,0,H
+UEL,2024-10-24,Lyon,Beşiktaş,0,1,A
+UEL,2024-10-24,FC Porto,1899 Hoffenheim,2,0,H
+UEL,2024-10-24,Rangers,FCSB,4,0,H
+UEL,2024-10-24,Malmo FF,Olympiakos Piraeus,0,1,A
+UEL,2024-10-24,Twente,Lazio,0,2,A
+UEL,2024-10-24,Athletic Club,Slavia Praha,1,0,H
+UEL,2024-10-24,Anderlecht,Ludogorets,2,0,H
+UEL,2024-10-24,Fenerbahçe,Manchester United,1,1,D
+UEL,2024-11-06,Beşiktaş,Malmo FF,2,1,H
+UEL,2024-11-07,Nice,Twente,2,2,D
+UEL,2024-11-07,Eintracht Frankfurt,Slavia Praha,1,0,H
+UEL,2024-11-07,Bodo/Glimt,Qarabag,1,2,A
+UEL,2024-11-07,IF Elfsborg,SC Braga,1,1,D
+UEL,2024-11-07,Olympiakos Piraeus,Rangers,1,1,D
+UEL,2024-11-07,FCSB,FC Midtjylland,2,0,H
+UEL,2024-11-07,Ludogorets,Athletic Club,1,2,A
+UEL,2024-11-07,Galatasaray,Tottenham,3,2,H
+UEL,2024-11-07,Union St. Gilloise,AS Roma,1,1,D
+UEL,2024-11-07,Manchester United,PAOK,2,0,H
+UEL,2024-11-07,1899 Hoffenheim,Lyon,2,2,D
+UEL,2024-11-07,Ajax,Maccabi Tel Aviv,5,0,H
+UEL,2024-11-07,AZ Alkmaar,Fenerbahçe,3,1,H
+UEL,2024-11-07,Lazio,FC Porto,2,1,H
+UEL,2024-11-07,Plzen,Real Sociedad,2,1,H
+UEL,2024-11-07,Dynamo Kyiv,Ferencvarosi TC,0,4,A
+UEL,2024-11-07,Rīgas FS,Anderlecht,1,1,D
+UEL,2024-11-28,AZ Alkmaar,Galatasaray,1,1,D
+UEL,2024-11-28,Lazio,Ludogorets,0,0,D
+UEL,2024-11-28,Athletic Club,IF Elfsborg,3,0,H
+UEL,2024-11-28,Beşiktaş,Maccabi Tel Aviv,1,3,A
+UEL,2024-11-28,Anderlecht,FC Porto,2,2,D
+UEL,2024-11-28,Qarabag,Lyon,1,4,A
+UEL,2024-11-28,Dynamo Kyiv,Plzen,1,2,A
+UEL,2024-11-28,Rīgas FS,PAOK,0,2,A
+UEL,2024-11-28,Manchester United,Bodo/Glimt,3,2,H
+UEL,2024-11-28,Tottenham,AS Roma,2,2,D
+UEL,2024-11-28,Nice,Rangers,1,4,A
+UEL,2024-11-28,SC Braga,1899 Hoffenheim,3,0,H
+UEL,2024-11-28,FC Midtjylland,Eintracht Frankfurt,1,2,A
+UEL,2024-11-28,Twente,Union St. Gilloise,0,1,A
+UEL,2024-11-28,Real Sociedad,Ajax,2,0,H
+UEL,2024-11-28,FCSB,Olympiakos Piraeus,0,0,D
+UEL,2024-11-28,Slavia Praha,Fenerbahçe,1,2,A
+UEL,2024-11-28,Ferencvarosi TC,Malmo FF,4,1,H
+UEL,2024-12-11,Fenerbahçe,Athletic Club,0,2,A
+UEL,2024-12-12,1899 Hoffenheim,FCSB,0,0,D
+UEL,2024-12-12,Malmo FF,Galatasaray,2,2,D
+UEL,2024-12-12,AS Roma,SC Braga,3,0,H
+UEL,2024-12-12,Olympiakos Piraeus,Twente,0,0,D
+UEL,2024-12-12,Ludogorets,AZ Alkmaar,2,2,D
+UEL,2024-12-12,Plzen,Manchester United,1,2,A
+UEL,2024-12-12,PAOK,Ferencvarosi TC,5,0,H
+UEL,2024-12-12,Union St. Gilloise,Nice,2,1,H
+UEL,2024-12-12,Lyon,Eintracht Frankfurt,3,2,H
+UEL,2024-12-12,Ajax,Lazio,1,3,A
+UEL,2024-12-12,FC Porto,FC Midtjylland,2,0,H
+UEL,2024-12-12,Rangers,Tottenham,1,1,D
+UEL,2024-12-12,Bodo/Glimt,Beşiktaş,2,1,H
+UEL,2024-12-12,IF Elfsborg,Qarabag,1,0,H
+UEL,2024-12-12,Real Sociedad,Dynamo Kyiv,3,0,H
+UEL,2024-12-12,Slavia Praha,Anderlecht,1,2,A
+UEL,2024-12-12,Maccabi Tel Aviv,Rīgas FS,2,1,H
+UEL,2025-01-21,Galatasaray,Dynamo Kyiv,3,3,D
+UEL,2025-01-22,Beşiktaş,Athletic Club,4,1,H
+UEL,2025-01-23,1899 Hoffenheim,Tottenham,2,3,A
+UEL,2025-01-23,AZ Alkmaar,AS Roma,1,0,H
+UEL,2025-01-23,FC Porto,Olympiakos Piraeus,0,1,A
+UEL,2025-01-23,Bodo/Glimt,Maccabi Tel Aviv,3,1,H
+UEL,2025-01-23,Malmo FF,Twente,2,3,A
+UEL,2025-01-23,Qarabag,FCSB,2,3,A
+UEL,2025-01-23,Plzen,Anderlecht,2,0,H
+UEL,2025-01-23,Fenerbahçe,Lyon,0,0,D
+UEL,2025-01-23,Manchester United,Rangers,2,1,H
+UEL,2025-01-23,Eintracht Frankfurt,Ferencvarosi TC,2,0,H
+UEL,2025-01-23,IF Elfsborg,Nice,1,0,H
+UEL,2025-01-23,Lazio,Real Sociedad,3,1,H
+UEL,2025-01-23,Ludogorets,FC Midtjylland,0,2,A
+UEL,2025-01-23,PAOK,Slavia Praha,2,0,H
+UEL,2025-01-23,Union St. Gilloise,SC Braga,2,1,H
+UEL,2025-01-23,Rīgas FS,Ajax,1,0,H
+UEL,2025-01-30,Tottenham,IF Elfsborg,3,0,H
+UEL,2025-01-30,Lyon,Ludogorets,1,1,D
+UEL,2025-01-30,Nice,Bodo/Glimt,1,1,D
+UEL,2025-01-30,Ajax,Galatasaray,2,1,H
+UEL,2025-01-30,SC Braga,Lazio,1,0,H
+UEL,2025-01-30,Rangers,Union St. Gilloise,2,1,H
+UEL,2025-01-30,FC Midtjylland,Fenerbahçe,2,2,D
+UEL,2025-01-30,Twente,Beşiktaş,1,0,H
+UEL,2025-01-30,AS Roma,Eintracht Frankfurt,2,0,H
+UEL,2025-01-30,Athletic Club,Plzen,3,1,H
+UEL,2025-01-30,Real Sociedad,PAOK,2,0,H
+UEL,2025-01-30,Olympiakos Piraeus,Qarabag,3,0,H
+UEL,2025-01-30,Anderlecht,1899 Hoffenheim,3,4,A
+UEL,2025-01-30,FCSB,Manchester United,0,2,A
+UEL,2025-01-30,Slavia Praha,Malmo FF,2,2,D
+UEL,2025-01-30,Dynamo Kyiv,Rīgas FS,1,0,H
+UEL,2025-01-30,Maccabi Tel Aviv,FC Porto,0,1,A
+UEL,2025-01-30,Ferencvarosi TC,AZ Alkmaar,4,3,H
+UEL,2025-02-13,FC Midtjylland,Real Sociedad,1,2,A
+UEL,2025-02-13,Fenerbahçe,Anderlecht,3,0,H
+UEL,2025-02-13,Ferencvarosi TC,Plzen,1,0,H
+UEL,2025-02-13,Union St. Gilloise,Ajax,0,2,A
+UEL,2025-02-13,AZ Alkmaar,Galatasaray,4,1,H
+UEL,2025-02-13,FC Porto,AS Roma,1,1,D
+UEL,2025-02-13,Twente,Bodo/Glimt,2,1,H
+UEL,2025-02-13,PAOK,FCSB,1,2,A
+UEL,2025-02-20,Bodo/Glimt,Twente,5,2,H
+UEL,2025-02-20,AS Roma,FC Porto,3,2,H
+UEL,2025-02-20,FCSB,PAOK,2,0,H
+UEL,2025-02-20,Galatasaray,AZ Alkmaar,2,2,D
+UEL,2025-02-20,Ajax,Union St. Gilloise,1,2,A
+UEL,2025-02-20,Real Sociedad,FC Midtjylland,5,2,H
+UEL,2025-02-20,Anderlecht,Fenerbahçe,2,2,D
+UEL,2025-02-20,Plzen,Ferencvarosi TC,3,0,H
+UEL,2025-03-06,AZ Alkmaar,Tottenham,1,0,H
+UEL,2025-03-06,Real Sociedad,Manchester United,1,1,D
+UEL,2025-03-06,FCSB,Lyon,1,3,A
+UEL,2025-03-06,Fenerbahçe,Rangers,1,3,A
+UEL,2025-03-06,Ajax,Eintracht Frankfurt,1,2,A
+UEL,2025-03-06,Bodo/Glimt,Olympiakos Piraeus,3,0,H
+UEL,2025-03-06,AS Roma,Athletic Club,2,1,H
+UEL,2025-03-06,Plzen,Lazio,1,2,A
+UEL,2025-03-13,Eintracht Frankfurt,Ajax,4,1,H
+UEL,2025-03-13,Lazio,Plzen,1,1,D
+UEL,2025-03-13,Athletic Club,AS Roma,3,1,H
+UEL,2025-03-13,Olympiakos Piraeus,Bodo/Glimt,2,1,H
+UEL,2025-03-13,Manchester United,Real Sociedad,4,1,H
+UEL,2025-03-13,Tottenham,AZ Alkmaar,3,1,H
+UEL,2025-03-13,Lyon,FCSB,4,0,H
+UEL,2025-03-13,Rangers,Fenerbahçe,0,2,A
+UEL,2025-04-10,Bodo/Glimt,Lazio,2,0,H
+UEL,2025-04-10,Tottenham,Eintracht Frankfurt,1,1,D
+UEL,2025-04-10,Lyon,Manchester United,2,2,D
+UEL,2025-04-10,Rangers,Athletic Club,0,0,D
+UEL,2025-04-17,Manchester United,Lyon,5,4,H
+UEL,2025-04-17,Eintracht Frankfurt,Tottenham,0,1,A
+UEL,2025-04-17,Lazio,Bodo/Glimt,3,1,H
+UEL,2025-04-17,Athletic Club,Rangers,2,0,H
+UEL,2025-05-01,Tottenham,Bodo/Glimt,3,1,H
+UEL,2025-05-01,Athletic Club,Manchester United,0,3,A
+UEL,2025-05-08,Manchester United,Athletic Club,4,1,H
+UEL,2025-05-08,Bodo/Glimt,Tottenham,0,2,A
+UEL,2025-05-21,Tottenham,Manchester United,1,0,H
+UEL,2025-07-10,Sabah FA,Celje,2,3,A
+UEL,2025-07-10,AEK Larnaca,FK Partizan,1,0,H
+UEL,2025-07-10,Sheriff Tiraspol,Prishtina,4,0,H
+UEL,2025-07-10,Paks,CFR 1907 Cluj,0,0,D
+UEL,2025-07-10,Levski Sofia,Hapoel Beer Sheva,0,0,D
+UEL,2025-07-10,Shakhtar Donetsk,Ilves,6,0,H
+UEL,2025-07-10,Spartak Trnava,BK Hacken,0,1,A
+UEL,2025-07-10,Legia Warszawa,Aktobe,1,0,H
+UEL,2025-07-17,Ilves,Shakhtar Donetsk,0,0,D
+UEL,2025-07-17,Aktobe,Legia Warszawa,0,1,A
+UEL,2025-07-17,BK Hacken,Spartak Trnava,2,2,D
+UEL,2025-07-17,CFR 1907 Cluj,Paks,3,0,H
+UEL,2025-07-17,Hapoel Beer Sheva,Levski Sofia,0,0,D
+UEL,2025-07-17,Prishtina,Sheriff Tiraspol,2,1,H
+UEL,2025-07-17,Celje,Sabah FA,3,3,D
+UEL,2025-07-17,FK Partizan,AEK Larnaca,1,0,H
+UEL,2025-07-24,Sheriff Tiraspol,Utrecht,1,3,A
+UEL,2025-07-24,Baník Ostrava,Legia Warszawa,2,2,D
+UEL,2025-07-24,FC Midtjylland,Hibernian,1,1,D
+UEL,2025-07-24,Levski Sofia,SC Braga,0,0,D
+UEL,2025-07-24,Beşiktaş,Shakhtar Donetsk,2,4,A
+UEL,2025-07-24,Anderlecht,BK Hacken,1,0,H
+UEL,2025-07-24,Celje,AEK Larnaca,1,1,D
+UEL,2025-07-24,FC Lugano,CFR 1907 Cluj,0,0,D
+UEL,2025-07-31,AEK Larnaca,Celje,2,1,H
+UEL,2025-07-31,BK Hacken,Anderlecht,2,1,H
+UEL,2025-07-31,CFR 1907 Cluj,FC Lugano,1,0,H
+UEL,2025-07-31,Utrecht,Sheriff Tiraspol,4,1,H
+UEL,2025-07-31,Shakhtar Donetsk,Beşiktaş,2,0,H
+UEL,2025-07-31,SC Braga,Levski Sofia,1,0,H
+UEL,2025-07-31,Hibernian,FC Midtjylland,1,2,A
+UEL,2025-07-31,Legia Warszawa,Baník Ostrava,2,1,H
+UEL,2025-08-05,Hamrun Spartans,Maccabi Tel Aviv,1,2,A
+UEL,2025-08-06,Rīgas FS,KuPS,1,2,A
+UEL,2025-08-06,HNK Rijeka,Shelbourne,1,2,A
+UEL,2025-08-07,Lincoln Red Imps FC,FC Noah,1,1,D
+UEL,2025-08-07,Fredrikstad,FC Midtjylland,1,3,A
+UEL,2025-08-07,AEK Larnaca,Legia Warszawa,4,1,H
+UEL,2025-08-07,CFR 1907 Cluj,SC Braga,1,2,A
+UEL,2025-08-07,BK Hacken,Brann,0,2,A
+UEL,2025-08-07,PAOK,Wolfsberger AC,0,0,D
+UEL,2025-08-07,Zrinjski,Breidablik,1,1,D
+UEL,2025-08-07,Panathinaikos,Shakhtar Donetsk,0,0,D
+UEL,2025-08-07,FCSB,Drita,3,2,H
+UEL,2025-08-07,Servette FC,Utrecht,1,3,A
+UEL,2025-08-12,Shelbourne,HNK Rijeka,1,3,A
+UEL,2025-08-14,KuPS,Rīgas FS,1,0,H
+UEL,2025-08-14,FC Midtjylland,Fredrikstad,2,0,H
+UEL,2025-08-14,Brann,BK Hacken,0,1,A
+UEL,2025-08-14,Wolfsberger AC,PAOK,0,1,A
+UEL,2025-08-14,FC Noah,Lincoln Red Imps FC,0,0,D
+UEL,2025-08-14,Breidablik,Zrinjski,1,2,A
+UEL,2025-08-14,Utrecht,Servette FC,2,1,H
+UEL,2025-08-14,Shakhtar Donetsk,Panathinaikos,0,0,D
+UEL,2025-08-14,Maccabi Tel Aviv,Hamrun Spartans,3,1,H
+UEL,2025-08-14,Drita,FCSB,1,3,A
+UEL,2025-08-14,SC Braga,CFR 1907 Cluj,2,0,H
+UEL,2025-08-14,Legia Warszawa,AEK Larnaca,2,1,H
+UEL,2025-08-21,FC Midtjylland,KuPS,4,0,H
+UEL,2025-08-21,Brann,AEK Larnaca,2,1,H
+UEL,2025-08-21,Malmo FF,Sigma Olomouc,3,0,H
+UEL,2025-08-21,Zrinjski,Utrecht,0,2,A
+UEL,2025-08-21,Maccabi Tel Aviv,Dynamo Kyiv,3,1,H
+UEL,2025-08-21,Shkendija,Ludogorets,2,1,H
+UEL,2025-08-21,Panathinaikos,Samsunspor,2,1,H
+UEL,2025-08-21,Slovan Bratislava,BSC Young Boys,0,1,A
+UEL,2025-08-21,Lech Poznan,Genk,1,5,A
+UEL,2025-08-21,Aberdeen,FCSB,2,2,D
+UEL,2025-08-21,HNK Rijeka,PAOK,1,0,H
+UEL,2025-08-21,Lincoln Red Imps FC,SC Braga,0,4,A
+UEL,2025-08-27,AEK Larnaca,Brann,0,4,A
+UEL,2025-08-28,KuPS,FC Midtjylland,0,2,A
+UEL,2025-08-28,Sigma Olomouc,Malmo FF,0,2,A
+UEL,2025-08-28,Samsunspor,Panathinaikos,0,0,D
+UEL,2025-08-28,Ludogorets,Shkendija,4,1,H
+UEL,2025-08-28,PAOK,HNK Rijeka,5,0,H
+UEL,2025-08-28,Utrecht,Zrinjski,0,0,D
+UEL,2025-08-28,BSC Young Boys,Slovan Bratislava,3,2,H
+UEL,2025-08-28,Dynamo Kyiv,Maccabi Tel Aviv,1,0,H
+UEL,2025-08-28,Genk,Lech Poznan,1,2,A
+UEL,2025-08-28,FCSB,Aberdeen,3,0,H
+UEL,2025-08-28,SC Braga,Lincoln Red Imps FC,5,1,H
+UEL,2025-09-24,FC Midtjylland,Sturm Graz,2,0,H
+UEL,2025-09-24,PAOK,Maccabi Tel Aviv,0,0,D
+UEL,2025-09-24,Nice,AS Roma,1,2,A
+UEL,2025-09-24,SC Freiburg,FC Basel 1893,2,1,H
+UEL,2025-09-24,SC Braga,Feyenoord,1,0,H
+UEL,2025-09-24,Malmo FF,Ludogorets,1,2,A
+UEL,2025-09-24,Real Betis,Nottingham Forest,2,2,D
+UEL,2025-09-24,FK Crvena Zvezda,Celtic,1,1,D
+UEL,2025-09-24,Dinamo Zagreb,Fenerbahçe,3,1,H
+UEL,2025-09-25,Lille,Brann,2,1,H
+UEL,2025-09-25,GO Ahead Eagles,FCSB,0,1,A
+UEL,2025-09-25,Aston Villa,Bologna,1,0,H
+UEL,2025-09-25,VfB Stuttgart,Celta Vigo,2,1,H
+UEL,2025-09-25,Utrecht,Lyon,0,1,A
+UEL,2025-09-25,Rangers,Genk,0,1,A
+UEL,2025-09-25,BSC Young Boys,Panathinaikos,1,4,A
+UEL,2025-09-25,Red Bull Salzburg,FC Porto,0,1,A
+UEL,2025-09-25,Ferencvarosi TC,Plzen,1,1,D
+UEL,2025-10-02,Celtic,SC Braga,0,2,A
+UEL,2025-10-02,Brann,Utrecht,1,0,H
+UEL,2025-10-02,AS Roma,Lille,0,1,A
+UEL,2025-10-02,Bologna,SC Freiburg,1,1,D
+UEL,2025-10-02,FCSB,BSC Young Boys,0,2,A
+UEL,2025-10-02,Ludogorets,Real Betis,0,2,A
+UEL,2025-10-02,Plzen,Malmo FF,3,0,H
+UEL,2025-10-02,Fenerbahçe,Nice,2,1,H
+UEL,2025-10-02,Panathinaikos,GO Ahead Eagles,1,2,A
+UEL,2025-10-02,Nottingham Forest,FC Midtjylland,2,3,A
+UEL,2025-10-02,Lyon,Red Bull Salzburg,2,0,H
+UEL,2025-10-02,Feyenoord,Aston Villa,0,2,A
+UEL,2025-10-02,FC Porto,FK Crvena Zvezda,2,1,H
+UEL,2025-10-02,Celta Vigo,PAOK,3,1,H
+UEL,2025-10-02,FC Basel 1893,VfB Stuttgart,2,0,H
+UEL,2025-10-02,Maccabi Tel Aviv,Dinamo Zagreb,1,3,A
+UEL,2025-10-02,Sturm Graz,Rangers,2,1,H
+UEL,2025-10-02,Genk,Ferencvarosi TC,0,1,A
+UEL,2025-10-23,Lyon,FC Basel 1893,2,0,H
+UEL,2025-10-23,SC Braga,FK Crvena Zvezda,2,0,H
+UEL,2025-10-23,Brann,Rangers,3,0,H
+UEL,2025-10-23,GO Ahead Eagles,Aston Villa,2,1,H
+UEL,2025-10-23,FCSB,Bologna,1,2,A
+UEL,2025-10-23,Red Bull Salzburg,Ferencvarosi TC,2,3,A
+UEL,2025-10-23,Fenerbahçe,VfB Stuttgart,1,0,H
+UEL,2025-10-23,Genk,Real Betis,0,0,D
+UEL,2025-10-23,Nottingham Forest,FC Porto,2,0,H
+UEL,2025-10-23,Lille,PAOK,3,4,A
+UEL,2025-10-23,SC Freiburg,Utrecht,2,0,H
+UEL,2025-10-23,Feyenoord,Panathinaikos,3,1,H
+UEL,2025-10-23,Celtic,Sturm Graz,2,1,H
+UEL,2025-10-23,Malmo FF,Dinamo Zagreb,1,1,D
+UEL,2025-10-23,AS Roma,Plzen,1,2,A
+UEL,2025-10-23,Celta Vigo,Nice,2,1,H
+UEL,2025-10-23,BSC Young Boys,Ludogorets,3,2,H
+UEL,2025-10-23,Maccabi Tel Aviv,FC Midtjylland,0,3,A
+UEL,2025-11-06,Nice,SC Freiburg,1,3,A
+UEL,2025-11-06,Utrecht,FC Porto,1,1,D
+UEL,2025-11-06,Malmo FF,Panathinaikos,0,1,A
+UEL,2025-11-06,FC Midtjylland,Celtic,3,1,H
+UEL,2025-11-06,FC Basel 1893,FCSB,3,1,H
+UEL,2025-11-06,Red Bull Salzburg,GO Ahead Eagles,2,0,H
+UEL,2025-11-06,FK Crvena Zvezda,Lille,1,0,H
+UEL,2025-11-06,Dinamo Zagreb,Celta Vigo,0,3,A
+UEL,2025-11-06,Sturm Graz,Nottingham Forest,0,0,D
+UEL,2025-11-06,Aston Villa,Maccabi Tel Aviv,2,0,H
+UEL,2025-11-06,VfB Stuttgart,Feyenoord,2,0,H
+UEL,2025-11-06,SC Braga,Genk,3,4,A
+UEL,2025-11-06,Rangers,AS Roma,0,2,A
+UEL,2025-11-06,Bologna,Brann,0,0,D
+UEL,2025-11-06,Real Betis,Lyon,2,0,H
+UEL,2025-11-06,Plzen,Fenerbahçe,0,0,D
+UEL,2025-11-06,PAOK,BSC Young Boys,4,0,H
+UEL,2025-11-06,Ferencvarosi TC,Ludogorets,3,1,H
+UEL,2025-11-27,Aston Villa,BSC Young Boys,2,1,H
+UEL,2025-11-27,Lille,Dinamo Zagreb,4,0,H
+UEL,2025-11-27,Feyenoord,Celtic,1,3,A
+UEL,2025-11-27,FC Porto,Nice,3,0,H
+UEL,2025-11-27,AS Roma,FC Midtjylland,2,1,H
+UEL,2025-11-27,Ludogorets,Celta Vigo,3,2,H
+UEL,2025-11-27,Plzen,SC Freiburg,0,0,D
+UEL,2025-11-27,Fenerbahçe,Ferencvarosi TC,1,1,D
+UEL,2025-11-27,PAOK,Brann,1,1,D
+UEL,2025-11-27,Nottingham Forest,Malmo FF,3,0,H
+UEL,2025-11-27,Rangers,SC Braga,1,1,D
+UEL,2025-11-27,GO Ahead Eagles,VfB Stuttgart,0,4,A
+UEL,2025-11-27,Bologna,Red Bull Salzburg,4,1,H
+UEL,2025-11-27,Real Betis,Utrecht,2,1,H
+UEL,2025-11-27,FK Crvena Zvezda,FCSB,1,0,H
+UEL,2025-11-27,Maccabi Tel Aviv,Lyon,0,6,A
+UEL,2025-11-27,Panathinaikos,Sturm Graz,2,1,H
+UEL,2025-11-27,Genk,FC Basel 1893,2,1,H
+UEL,2025-12-11,Nice,SC Braga,0,1,A
+UEL,2025-12-11,VfB Stuttgart,Maccabi Tel Aviv,4,1,H
+UEL,2025-12-11,Utrecht,Nottingham Forest,1,2,A
+UEL,2025-12-11,FC Midtjylland,Genk,1,0,H
+UEL,2025-12-11,BSC Young Boys,Lille,1,0,H
+UEL,2025-12-11,Ludogorets,PAOK,3,3,D
+UEL,2025-12-11,Dinamo Zagreb,Real Betis,1,3,A
+UEL,2025-12-11,Sturm Graz,FK Crvena Zvezda,0,1,A
+UEL,2025-12-11,Ferencvarosi TC,Rangers,2,1,H
+UEL,2025-12-11,Lyon,GO Ahead Eagles,2,1,H
+UEL,2025-12-11,SC Freiburg,Red Bull Salzburg,1,0,H
+UEL,2025-12-11,FC Porto,Malmo FF,2,1,H
+UEL,2025-12-11,Celtic,AS Roma,0,3,A
+UEL,2025-12-11,Brann,Fenerbahçe,0,4,A
+UEL,2025-12-11,Celta Vigo,Bologna,1,2,A
+UEL,2025-12-11,FC Basel 1893,Aston Villa,1,2,A
+UEL,2025-12-11,FCSB,Feyenoord,4,3,H
+UEL,2025-12-11,Panathinaikos,Plzen,0,0,D
+UEL,2026-01-22,SC Freiburg,Maccabi Tel Aviv,1,0,H
+UEL,2026-01-22,Feyenoord,Sturm Graz,3,0,H
+UEL,2026-01-22,Brann,FC Midtjylland,3,3,D
+UEL,2026-01-22,Malmo FF,FK Crvena Zvezda,0,1,A
+UEL,2026-01-22,Bologna,Celtic,2,2,D
+UEL,2026-01-22,BSC Young Boys,Lyon,0,1,A
+UEL,2026-01-22,Plzen,FC Porto,1,1,D
+UEL,2026-01-22,Fenerbahçe,Aston Villa,0,1,A
+UEL,2026-01-22,PAOK,Real Betis,2,0,H
+UEL,2026-01-22,Nice,GO Ahead Eagles,3,1,H
+UEL,2026-01-22,Utrecht,Genk,0,2,A
+UEL,2026-01-22,SC Braga,Nottingham Forest,1,0,H
+UEL,2026-01-22,Rangers,Ludogorets,1,0,H
+UEL,2026-01-22,AS Roma,VfB Stuttgart,2,0,H
+UEL,2026-01-22,Celta Vigo,Lille,2,1,H
+UEL,2026-01-22,Red Bull Salzburg,FC Basel 1893,3,1,H
+UEL,2026-01-22,Dinamo Zagreb,FCSB,4,1,H
+UEL,2026-01-22,Ferencvarosi TC,Panathinaikos,1,1,D
+UEL,2026-01-29,Nottingham Forest,Ferencvarosi TC,4,0,H
+UEL,2026-01-29,Aston Villa,Red Bull Salzburg,3,2,H
+UEL,2026-01-29,Lille,SC Freiburg,1,0,H
+UEL,2026-01-29,Lyon,PAOK,4,2,H
+UEL,2026-01-29,VfB Stuttgart,BSC Young Boys,3,2,H
+UEL,2026-01-29,FC Porto,Rangers,3,1,H
+UEL,2026-01-29,Celtic,Utrecht,4,2,H
+UEL,2026-01-29,FC Midtjylland,Dinamo Zagreb,2,0,H
+UEL,2026-01-29,GO Ahead Eagles,SC Braga,0,0,D
+UEL,2026-01-29,Real Betis,Feyenoord,2,1,H
+UEL,2026-01-29,FC Basel 1893,Plzen,0,1,A
+UEL,2026-01-29,FCSB,Fenerbahçe,1,1,D
+UEL,2026-01-29,Ludogorets,Nice,1,0,H
+UEL,2026-01-29,FK Crvena Zvezda,Celta Vigo,1,1,D
+UEL,2026-01-29,Maccabi Tel Aviv,Bologna,0,3,A
+UEL,2026-01-29,Panathinaikos,AS Roma,1,1,D
+UEL,2026-01-29,Sturm Graz,Brann,1,0,H
+UEL,2026-01-29,Genk,Malmo FF,2,1,H
+UEL,2026-02-19,Brann,Bologna,0,1,A
+UEL,2026-02-19,Fenerbahçe,Nottingham Forest,0,3,A
+UEL,2026-02-19,PAOK,Celta Vigo,1,2,A
+UEL,2026-02-19,Dinamo Zagreb,Genk,1,3,A
+UEL,2026-02-19,Lille,FK Crvena Zvezda,0,1,A
+UEL,2026-02-19,Celtic,VfB Stuttgart,1,4,A
+UEL,2026-02-19,Ludogorets,Ferencvarosi TC,2,1,H
+UEL,2026-02-19,Panathinaikos,Plzen,2,2,D
+UEL,2026-02-26,VfB Stuttgart,Celtic,0,1,A
+UEL,2026-02-26,Plzen,Panathinaikos,1,1,D
+UEL,2026-02-26,FK Crvena Zvezda,Lille,0,1,A
+UEL,2026-02-26,Ferencvarosi TC,Ludogorets,2,0,H
+UEL,2026-02-26,Nottingham Forest,Fenerbahçe,1,2,A
+UEL,2026-02-26,Bologna,Brann,1,0,H
+UEL,2026-02-26,Celta Vigo,PAOK,1,0,H
+UEL,2026-02-26,Genk,Dinamo Zagreb,3,3,D
+UEL,2026-03-12,Lille,Aston Villa,0,1,A
+UEL,2026-03-12,VfB Stuttgart,FC Porto,1,2,A
+UEL,2026-03-12,Bologna,AS Roma,1,1,D
+UEL,2026-03-12,Panathinaikos,Real Betis,1,0,H
+UEL,2026-03-12,Nottingham Forest,FC Midtjylland,0,1,A
+UEL,2026-03-12,Celta Vigo,Lyon,1,1,D
+UEL,2026-03-12,Ferencvarosi TC,SC Braga,2,0,H
+UEL,2026-03-12,Genk,SC Freiburg,1,0,H
+UEL,2026-03-18,SC Braga,Ferencvarosi TC,4,0,H
+UEL,2026-03-19,Lyon,Celta Vigo,0,2,A
+UEL,2026-03-19,SC Freiburg,Genk,5,1,H
+UEL,2026-03-19,FC Midtjylland,Nottingham Forest,1,2,A
+UEL,2026-03-19,Aston Villa,Lille,2,0,H
+UEL,2026-03-19,FC Porto,VfB Stuttgart,2,0,H
+UEL,2026-03-19,AS Roma,Bologna,3,4,A
+UEL,2026-03-19,Real Betis,Panathinaikos,4,0,H
+UEL,2026-04-08,SC Braga,Real Betis,1,1,D

@@ -15,6 +15,8 @@ warnings.filterwarnings("ignore", category=UserWarning)
 CARTELLA_CSV = r"C:\Users\Mario\Desktop\Mariocalcio"
 CARTELLA_PL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_pl")
 CARTELLA_LL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_laliga")
+CARTELLA_UCL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_ucl")
+CARTELLA_UEL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_uel")
 
 COLONNE_NECESSARIE = [
     "Div", "Date", "HomeTeam", "AwayTeam",
@@ -41,6 +43,10 @@ def load_all_data(league="I1") -> pd.DataFrame:
         cartella = CARTELLA_PL
     elif league == "SP1":
         cartella = CARTELLA_LL
+    elif league == "UCL":
+        cartella = CARTELLA_UCL
+    elif league == "UEL":
+        cartella = CARTELLA_UEL
     else:
         cartella = CARTELLA_CSV
 

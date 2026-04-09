@@ -59,12 +59,16 @@ app.include_router(payments_router)
 _df = None
 _df_pl = None
 _df_ll = None
+_df_ucl = None
+_df_uel = None
 LIMITE_FREE = 2
 
 LEAGUES = {
     "serie-a": {"id": 135, "season": 2025, "name": "Serie A", "country": "Italy"},
     "premier-league": {"id": 39, "season": 2025, "name": "Premier League", "country": "England"},
     "la-liga": {"id": 140, "season": 2025, "name": "La Liga", "country": "Spain"},
+    "champions-league": {"id": 2, "season": 2025, "name": "Champions League", "country": "Europe"},
+    "europa-league": {"id": 3, "season": 2025, "name": "Europa League", "country": "Europe"},
 }
 
 # Mapping nomi API Football -> nomi nostri (per ogni league)
@@ -142,12 +146,12 @@ def _map_team_name(name, league_key):
     return nm.get(name, name)
 
 # Cache multi-league
-CLASSIFICA_CACHE = {"serie-a": None, "premier-league": None, "la-liga": None}
-CLASSIFICA_LAST_UPDATE = {"serie-a": "", "premier-league": "", "la-liga": ""}
-MARCATORI_CACHE = {"serie-a": None, "premier-league": None, "la-liga": None}
-LIVE_RESULTS_CACHE_ML = {"serie-a": None, "premier-league": None, "la-liga": None}
-RISULTATI_STAGIONE_CACHE_ML = {"serie-a": None, "premier-league": None, "la-liga": None}
-LIVE_IN_CORSO_ML = {"serie-a": False, "premier-league": False, "la-liga": False}
+CLASSIFICA_CACHE = {"serie-a": None, "premier-league": None, "la-liga": None, "champions-league": None, "europa-league": None}
+CLASSIFICA_LAST_UPDATE = {"serie-a": "", "premier-league": "", "la-liga": "", "champions-league": "", "europa-league": ""}
+MARCATORI_CACHE = {"serie-a": None, "premier-league": None, "la-liga": None, "champions-league": None, "europa-league": None}
+LIVE_RESULTS_CACHE_ML = {"serie-a": None, "premier-league": None, "la-liga": None, "champions-league": None, "europa-league": None}
+RISULTATI_STAGIONE_CACHE_ML = {"serie-a": None, "premier-league": None, "la-liga": None, "champions-league": None, "europa-league": None}
+LIVE_IN_CORSO_ML = {"serie-a": False, "premier-league": False, "la-liga": False, "champions-league": False, "europa-league": False}
 
 # Dati live (aggiornati automaticamente)
 import threading, time, urllib.request, re as regex_module
@@ -350,6 +354,8 @@ def _live_updater():
                 _fetch_risultati_stagione()
                 _fetch_league_data("premier-league")
                 _fetch_league_data("la-liga")
+                _fetch_league_data("champions-league")
+                _fetch_league_data("europa-league")
         except Exception:
             pass
         if LIVE_IN_CORSO:
@@ -362,7 +368,7 @@ def _live_updater():
 # ─────────────────────────────
 @app.on_event("startup")
 async def startup():
-    global _df, _df_pl, _df_ll
+    global _df, _df_pl, _df_ll, _df_ucl, _df_uel
 
     print("\n🚀 AVVIO SERVER MATCHIQ\n")
 
@@ -395,6 +401,20 @@ async def startup():
         except Exception as e:
             print(f"⚠️ DATI LA LIGA NON DISPONIBILI: {e}")
             _df_ll = None
+        # Carica Champions League
+        try:
+            _df_ucl = load_all_data(league="UCL")
+            print(f"✅ DATI CHAMPIONS LEAGUE: {len(_df_ucl)} partite")
+        except Exception as e:
+            print(f"⚠️ DATI UCL NON DISPONIBILI: {e}")
+            _df_ucl = None
+        # Carica Europa League
+        try:
+            _df_uel = load_all_data(league="UEL")
+            print(f"✅ DATI EUROPA LEAGUE: {len(_df_uel)} partite")
+        except Exception as e:
+            print(f"⚠️ DATI UEL NON DISPONIBILI: {e}")
+            _df_uel = None
     else:
         print("⚠️ MOTORE NON DISPONIBILE - il server usa dati hardcoded")
 
@@ -438,6 +458,14 @@ async def startup():
             pass
         try:
             _fetch_league_data("la-liga")
+        except Exception:
+            pass
+        try:
+            _fetch_league_data("champions-league")
+        except Exception:
+            pass
+        try:
+            _fetch_league_data("europa-league")
         except Exception:
             pass
     t = threading.Thread(target=_live_updater, daemon=True)
@@ -3550,6 +3578,20 @@ async def pronostico_league(league: str, home: str, away: str):
             hs = get_team_stats(_df_ll, home, opponent=away)
             aw = get_team_stats(_df_ll, away, opponent=home)
             raw = get_prediction(hs, aw, df=_df_ll)
+        except Exception:
+            raw = genera_pronostico(home, away)
+    elif league == "champions-league" and _df_ucl is not None and len(_df_ucl) > 100:
+        try:
+            hs = get_team_stats(_df_ucl, home, opponent=away)
+            aw = get_team_stats(_df_ucl, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_ucl)
+        except Exception:
+            raw = genera_pronostico(home, away)
+    elif league == "europa-league" and _df_uel is not None and len(_df_uel) > 100:
+        try:
+            hs = get_team_stats(_df_uel, home, opponent=away)
+            aw = get_team_stats(_df_uel, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_uel)
         except Exception:
             raw = genera_pronostico(home, away)
     else:
