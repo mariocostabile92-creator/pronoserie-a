@@ -1714,6 +1714,33 @@ _TEAM_IDS = {
 }
 _RUOLO_MAP = {"Goalkeeper":"P","Defender":"D","Midfielder":"C","Attacker":"A"}
 
+# Tutti i team IDs delle squadre europee (UCL/UEL/UECL)
+_ALL_EURO_IDS = {
+    "Ajax":194,"Arsenal":42,"Atalanta":499,"Athletic Club":531,"Atletico Madrid":530,
+    "Barcelona":529,"Bayer Leverkusen":168,"Bayern Munchen":157,"Bayern München":157,
+    "Benfica":211,"Bodo/Glimt":327,"Borussia Dortmund":165,"Chelsea":49,
+    "Club Brugge KV":569,"Eintracht Frankfurt":169,"FC Copenhagen":400,"Galatasaray":645,
+    "Inter":505,"Juventus":496,"Liverpool":40,"Manchester City":50,"Marseille":81,
+    "Monaco":91,"Napoli":492,"Newcastle":34,"Olympiakos Piraeus":553,"PSV Eindhoven":197,
+    "Pafos":3403,"Paris Saint Germain":85,"Qarabag":556,"Real Madrid":541,
+    "Slavia Praha":560,"Sporting CP":228,"Tottenham":47,"Union St. Gilloise":1393,
+    "Villarreal":533,"AS Roma":497,"Aston Villa":66,"Bologna":500,"Brann":319,
+    "Celta Vigo":538,"Celtic":247,"Dinamo Zagreb":620,"FC Basel 1893":551,
+    "FC Midtjylland":397,"FC Porto":212,"FCSB":559,"FK Crvena Zvezda":598,
+    "Fenerbahce":611,"Fenerbahçe":611,"Ferencvarosi TC":651,"Feyenoord":209,
+    "GO Ahead Eagles":410,"Genk":742,"Lille":79,"Ludogorets":566,"Lyon":80,
+    "Maccabi Tel Aviv":604,"Malmo FF":375,"Nice":84,"Nottingham Forest":65,
+    "PAOK":619,"Panathinaikos":617,"Plzen":567,"Rangers":257,"Real Betis":543,
+    "Red Bull Salzburg":571,"SC Braga":217,"SC Freiburg":160,"Sturm Graz":637,
+    "Utrecht":207,"VfB Stuttgart":172,"BSC Young Boys":565,"Shakhtar Donetsk":550,
+    "AEK Athens FC":575,"AEK Larnaca":614,"AZ Alkmaar":201,"Aberdeen":252,
+    "BK Hacken":367,"Breidablik":276,"Celje":4360,"Crystal Palace":52,"Drita":14281,
+    "Dynamo Kyiv":572,"FC Noah":3684,"FSV Mainz 05":164,"Fiorentina":502,
+    "HNK Rijeka":561,"Jagiellonia":336,"KuPS":1165,"Lech Poznan":347,
+    "Legia Warszawa":339,"Omonia Nicosia":3402,"Rapid Vienna":781,"Rayo Vallecano":728,
+    "Shamrock Rovers":652,"Slovan Bratislava":656,"Sparta Praha":628,"Strasbourg":95,
+}
+
 def _fetch_rose_live(team_ids=None):
     """Scarica rose complete di tutte le squadre da API Football."""
     global ROSE_LIVE, ALLENATORI_LIVE, ROSE_LAST_UPDATE
@@ -1958,7 +1985,7 @@ def _get_last_lineup(team_name):
     if team_name in _FORMAZIONE_CACHE:
         return _FORMAZIONE_CACHE[team_name]
     # Cerca team_id in entrambi i campionati
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return None
     try:
@@ -2003,7 +2030,7 @@ def _get_coach_ondemand(team_name):
     """Scarica l'allenatore attuale da API Football."""
     if team_name in _COACH_CACHE:
         return _COACH_CACHE[team_name]
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return None
     try:
@@ -2036,7 +2063,7 @@ def _get_squad_ondemand(team_name):
     """Scarica la rosa di una squadra on-demand da API Football."""
     if team_name in _ROSA_CACHE_OD:
         return _ROSA_CACHE_OD[team_name]
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return []
     try:
@@ -2061,7 +2088,7 @@ def _get_squad_ondemand(team_name):
 
 def _get_injuries_ondemand(team_name):
     """Scarica SOLO infortunati attuali di una squadra (ultimi 2 fixture)."""
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return []
     try:
