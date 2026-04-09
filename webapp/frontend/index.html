@@ -626,7 +626,7 @@ async function pageCalendario(){
     <p style="color:var(--muted);font-size:.85rem;margin-bottom:12px">${gCorrente.data||""}</p>`;
 
   if(userPlan==="pro" && !gCorrente.live && gCorrente.stato!=="completata"){
-    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata(${gc})">Simula Pronostici Giornata</button>`;
+    html+=`<button class="btn btn-green" style="margin-bottom:12px;font-size:.9rem" onclick="simulaGiornata('${gc}')">Simula Pronostici Giornata</button>`;
   }
 
   gCorrente.partite.forEach(p=>{
