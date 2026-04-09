@@ -3632,7 +3632,8 @@ async def pronostico_league(league: str, home: str, away: str):
         if raw_euro:
             sources.append((raw_euro, 0.20))  # Dati europei H2H
         if raw_classifica:
-            sources.append((raw_classifica, 0.35 if raw_domestic else 0.80))  # Classifica + bookmaker
+            # Se non abbiamo dati nazionali, la classifica live diventa la fonte principale
+            sources.append((raw_classifica, 0.35 if raw_domestic else 0.80))
 
         if sources:
             raw = {}
@@ -3649,29 +3650,33 @@ async def pronostico_league(league: str, home: str, away: str):
             raw["suggerimento"] = "1" if mp == raw.get("prob_1") else ("X" if mp == raw.get("prob_x") else "2")
             raw["sugg_label"] = "Vittoria Casa" if raw["suggerimento"] == "1" else ("Pareggio" if raw["suggerimento"] == "X" else "Vittoria Ospite")
 
-            # Ricalcola confidence basata sullo spread delle probabilita'
+            # Confidence: usa la fonte migliore, non il blend
+            best_conf = max((s.get("confidence", 0) for s, w in sources if isinstance(s.get("confidence"), (int, float))), default=0)
             sp = sorted([raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0)], reverse=True)
             if sp[0] > 1:
                 spread = (sp[0] - sp[1]) / 100
             else:
                 spread = sp[0] - sp[1]
-            raw["confidence"] = round(min(1.0, spread * 2.5), 3)
+            raw["confidence"] = round(max(best_conf, min(1.0, spread * 2.5)), 3)
             raw["confidence_label"] = "Alta" if raw["confidence"] >= 0.82 else ("Media" if raw["confidence"] >= 0.50 else "Bassa")
             raw["sicura"] = raw["confidence"] >= 0.82 and sp[0] > 45
 
-            # Fix Over/Under: ricalcola correttamente
+            # O/U: calibra sulla media gol reale della competizione
+            # UCL/UEL/UECL hanno media gol alta (~2.7-3.0)
             ov = raw.get("over_25", 50)
             un = raw.get("under_25", 50)
-            if ov + un > 0:
-                raw["over_25"] = round(ov, 1)
-                raw["under_25"] = round(100 - ov, 1) if ov > 1 else round(un, 1)
+            gol_att = raw.get("gol_attesi", 2.5)
+            if isinstance(gol_att, (int, float)) and gol_att > 2.5:
+                # Se gol attesi > 2.5, boost Over
+                ov = max(ov, 50 + (gol_att - 2.5) * 8)
+                ov = min(ov, 75)
+            raw["over_25"] = round(ov, 1)
+            raw["under_25"] = round(100 - ov, 1) if ov > 1 else round(un, 1)
 
-            # Fix Goal
+            # Goal: calibra
             gsi = raw.get("goal_si", 50)
-            gno = raw.get("goal_no", 50)
-            if gsi + gno > 0:
-                raw["goal_si"] = round(gsi, 1)
-                raw["goal_no"] = round(100 - gsi, 1) if gsi > 1 else round(gno, 1)
+            raw["goal_si"] = round(gsi, 1)
+            raw["goal_no"] = round(100 - gsi, 1) if gsi > 1 else round(raw.get("goal_no", 50), 1)
 
             # Quote
             for tip in ["1", "x", "2"]:
