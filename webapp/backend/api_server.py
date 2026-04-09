@@ -1268,7 +1268,10 @@ async def register(data: dict):
     threading.Thread(target=send_welcome_email, args=(email,), daemon=True).start()
 
     # Notifica admin (in background)
-    threading.Thread(target=_notify_admin_new_user, args=(email, user["piano"]), daemon=True).start()
+    try:
+        threading.Thread(target=_notify_admin_new_user, args=(email, user.get("piano", "free")), daemon=True).start()
+    except Exception as e:
+        print(f"⚠️ Errore avvio notifica admin: {e}")
 
     return {"access_token": token, "piano": user["piano"]}
 
