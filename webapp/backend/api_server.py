@@ -3594,26 +3594,49 @@ async def pronostico_league(league: str, home: str, away: str):
             raw = get_prediction(hs, aw, df=_df_ll)
         except Exception:
             raw = genera_pronostico(home, away)
-    elif league == "champions-league" and _df_ucl is not None and len(_df_ucl) > 100:
-        try:
-            hs = get_team_stats(_df_ucl, home, opponent=away)
-            aw = get_team_stats(_df_ucl, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_ucl)
-        except Exception:
-            raw = genera_pronostico(home, away)
-    elif league == "europa-league" and _df_uel is not None and len(_df_uel) > 100:
-        try:
-            hs = get_team_stats(_df_uel, home, opponent=away)
-            aw = get_team_stats(_df_uel, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_uel)
-        except Exception:
-            raw = genera_pronostico(home, away)
-    elif league == "conference-league" and _df_uecl is not None and len(_df_uecl) > 100:
-        try:
-            hs = get_team_stats(_df_uecl, home, opponent=away)
-            aw = get_team_stats(_df_uecl, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_uecl)
-        except Exception:
+    elif league in ("champions-league", "europa-league", "conference-league"):
+        # Per competizioni europee: blend dati europei + dati campionato nazionale
+        euro_df = _df_ucl if league == "champions-league" else (_df_uel if league == "europa-league" else _df_uecl)
+        raw = None
+        # 1. Prova con dati europei
+        if euro_df is not None and len(euro_df) > 100:
+            try:
+                hs = get_team_stats(euro_df, home, opponent=away)
+                aw = get_team_stats(euro_df, away, opponent=home)
+                raw_euro = get_prediction(hs, aw, df=euro_df)
+            except Exception:
+                raw_euro = None
+        else:
+            raw_euro = None
+        # 2. Prova con dati del campionato nazionale della squadra
+        raw_domestic = None
+        for dom_df in [_df, _df_pl, _df_ll]:
+            if dom_df is None:
+                continue
+            try:
+                hs_d = get_team_stats(dom_df, home, opponent=away)
+                aw_d = get_team_stats(dom_df, away, opponent=home)
+                raw_domestic = get_prediction(hs_d, aw_d, df=dom_df)
+                break
+            except Exception:
+                continue
+        # 3. Blend: 40% europeo + 60% domestico (domestico piu' affidabile)
+        if raw_euro and raw_domestic:
+            raw = {}
+            for k in raw_euro:
+                if isinstance(raw_euro[k], (int, float)) and isinstance(raw_domestic.get(k), (int, float)):
+                    raw[k] = round(raw_euro[k] * 0.4 + raw_domestic[k] * 0.6, 2)
+                else:
+                    raw[k] = raw_domestic.get(k, raw_euro[k])
+            # Ricalcola suggerimento dal blend
+            mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
+            raw["suggerimento"] = "1" if mp == raw.get("prob_1") else ("X" if mp == raw.get("prob_x") else "2")
+            raw["sugg_label"] = "Vittoria Casa" if raw["suggerimento"] == "1" else ("Pareggio" if raw["suggerimento"] == "X" else "Vittoria Ospite")
+        elif raw_euro:
+            raw = raw_euro
+        elif raw_domestic:
+            raw = raw_domestic
+        if not raw:
             raw = genera_pronostico(home, away)
     else:
         raw = genera_pronostico(home, away)
