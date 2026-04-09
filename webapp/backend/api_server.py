@@ -3595,10 +3595,12 @@ async def pronostico_league(league: str, home: str, away: str):
         except Exception:
             raw = genera_pronostico(home, away)
     elif league in ("champions-league", "europa-league", "conference-league"):
-        # Per competizioni europee: blend dati europei + dati campionato nazionale
+        # Per competizioni europee: blend dati europei + nazionali + classifica live
         euro_df = _df_ucl if league == "champions-league" else (_df_uel if league == "europa-league" else _df_uecl)
         raw = None
-        # 1. Prova con dati europei
+
+        # 1. Prova dati europei H2H
+        raw_euro = None
         if euro_df is not None and len(euro_df) > 100:
             try:
                 hs = get_team_stats(euro_df, home, opponent=away)
@@ -3606,9 +3608,8 @@ async def pronostico_league(league: str, home: str, away: str):
                 raw_euro = get_prediction(hs, aw, df=euro_df)
             except Exception:
                 raw_euro = None
-        else:
-            raw_euro = None
-        # 2. Prova con dati del campionato nazionale della squadra
+
+        # 2. Prova dati campionato nazionale
         raw_domestic = None
         for dom_df in [_df, _df_pl, _df_ll]:
             if dom_df is None:
@@ -3620,24 +3621,44 @@ async def pronostico_league(league: str, home: str, away: str):
                 break
             except Exception:
                 continue
-        # 3. Blend: 40% europeo + 60% domestico (domestico piu' affidabile)
-        if raw_euro and raw_domestic:
+
+        # 3. Classifica live europea (sempre disponibile)
+        raw_classifica = genera_pronostico(home, away)
+
+        # 4. Blend intelligente
+        sources = []
+        if raw_domestic:
+            sources.append((raw_domestic, 0.45))  # Nazionale piu' affidabile
+        if raw_euro:
+            sources.append((raw_euro, 0.20))  # Dati europei H2H
+        if raw_classifica:
+            sources.append((raw_classifica, 0.35 if raw_domestic else 0.80))  # Classifica + bookmaker
+
+        if sources:
             raw = {}
-            for k in raw_euro:
-                if isinstance(raw_euro[k], (int, float)) and isinstance(raw_domestic.get(k), (int, float)):
-                    raw[k] = round(raw_euro[k] * 0.4 + raw_domestic[k] * 0.6, 2)
+            total_w = sum(w for _, w in sources)
+            for k in (sources[0][0] or {}).keys():
+                vals = [(s.get(k), w) for s, w in sources if isinstance(s.get(k), (int, float))]
+                if vals:
+                    raw[k] = round(sum(v * w for v, w in vals) / sum(w for _, w in vals), 2)
                 else:
-                    raw[k] = raw_domestic.get(k, raw_euro[k])
-            # Ricalcola suggerimento dal blend
+                    raw[k] = sources[0][0].get(k)
+            # Ricalcola suggerimento
             mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
             raw["suggerimento"] = "1" if mp == raw.get("prob_1") else ("X" if mp == raw.get("prob_x") else "2")
             raw["sugg_label"] = "Vittoria Casa" if raw["suggerimento"] == "1" else ("Pareggio" if raw["suggerimento"] == "X" else "Vittoria Ospite")
-        elif raw_euro:
-            raw = raw_euro
-        elif raw_domestic:
-            raw = raw_domestic
-        if not raw:
-            raw = genera_pronostico(home, away)
+            # Ricalcola confidence
+            sp = sorted([raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0)], reverse=True)
+            spread = (sp[0] - sp[1]) / 100 if sp[0] > 1 else sp[0] - sp[1]
+            raw["confidence"] = min(1.0, spread * 2)
+            raw["confidence_label"] = "Alta" if raw["confidence"] >= 0.82 else ("Media" if raw["confidence"] >= 0.50 else "Bassa")
+            raw["sicura"] = raw["confidence"] >= 0.82 and sp[0] > 45
+            # Quote
+            for tip in ["1", "x", "2"]:
+                p = raw.get(f"prob_{tip}", 33)
+                raw[f"quota_{tip}"] = round(105 / max(1, p), 2)
+        else:
+            raw = raw_classifica or genera_pronostico(home, away)
     else:
         raw = genera_pronostico(home, away)
     # Formazioni e marcatori (fetch on-demand per PL)
