@@ -149,6 +149,42 @@ def get_xg_media_laliga() -> dict:
     }
 
 # ──────────────────────────────────────────────
+# Expected Goals (xG) Bundesliga 2025-2026
+# ──────────────────────────────────────────────
+XG_BL = {
+    "1. FC Heidenheim": {"xG_pg": 1.08, "xGA_pg": 2.27},
+    "1. FC Koln": {"xG_pg": 1.49, "xGA_pg": 1.75},
+    "Hoffenheim": {"xG_pg": 2.01, "xGA_pg": 1.43},
+    "Bayer Leverkusen": {"xG_pg": 2.12, "xGA_pg": 1.37},
+    "Bayern Munich": {"xG_pg": 3.6, "xGA_pg": 0.95},
+    "Borussia Dortmund": {"xG_pg": 2.17, "xGA_pg": 0.99},
+    "Monchengladbach": {"xG_pg": 1.26, "xGA_pg": 1.69},
+    "Eintracht Frankfurt": {"xG_pg": 1.85, "xGA_pg": 1.85},
+    "Augsburg": {"xG_pg": 1.27, "xGA_pg": 1.79},
+    "St Pauli": {"xG_pg": 0.92, "xGA_pg": 1.59},
+    "Mainz": {"xG_pg": 1.25, "xGA_pg": 1.52},
+    "Hamburger SV": {"xG_pg": 1.13, "xGA_pg": 1.47},
+    "RB Leipzig": {"xG_pg": 2.0, "xGA_pg": 1.3},
+    "Freiburg": {"xG_pg": 1.54, "xGA_pg": 1.67},
+    "Union Berlin": {"xG_pg": 1.18, "xGA_pg": 1.69},
+    "Stuttgart": {"xG_pg": 1.96, "xGA_pg": 1.31},
+    "Wolfsburg": {"xG_pg": 1.35, "xGA_pg": 2.24},
+    "Werder Bremen": {"xG_pg": 1.1, "xGA_pg": 1.76},
+}
+
+def get_xg_bl(team_name: str) -> dict:
+    return XG_BL.get(team_name)
+
+def get_xg_media_bl() -> dict:
+    n = len(XG_BL)
+    if n == 0:
+        return {"xG_pg_medio": 1.5, "xGA_pg_medio": 1.5}
+    return {
+        "xG_pg_medio": round(sum(v["xG_pg"] for v in XG_BL.values()) / n, 2),
+        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in XG_BL.values()) / n, 2),
+    }
+
+# ──────────────────────────────────────────────
 # Calendario ufficiale giornate 31-38
 # Fonte: legaseriea.it + transfermarkt.it
 # ──────────────────────────────────────────────
