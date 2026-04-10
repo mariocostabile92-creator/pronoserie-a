@@ -2716,6 +2716,14 @@ async def accuratezza():
             csv_df = _df_pl
         elif league_key == "la-liga":
             csv_df = _df_ll
+        elif league_key == "bundesliga":
+            csv_df = _df_bl
+        elif league_key == "champions-league":
+            csv_df = _df_ucl
+        elif league_key == "europa-league":
+            csv_df = _df_uel
+        elif league_key == "conference-league":
+            csv_df = _df_uecl
         else:
             csv_df = None
 
