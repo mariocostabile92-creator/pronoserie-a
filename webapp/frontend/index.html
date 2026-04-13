@@ -1821,6 +1821,7 @@ async function pageFantacalcio(){
   const ruoli = [
     {key:"portieri",nome:"Portieri",icon:"&#129351;",col:"var(--accent)"},
     {key:"difensori",nome:"Difensori",icon:"&#128737;",col:"var(--green)"},
+    {key:"centrocampisti",nome:"Centrocampisti",icon:"&#127939;",col:"var(--yellow)"},
     {key:"attaccanti",nome:"Attaccanti",icon:"&#9917;",col:"var(--red)"}
   ];
 
@@ -1844,6 +1845,24 @@ async function pageFantacalcio(){
     });
     html+='</div>';
   });
+
+  // Chi evitare
+  const evitare = c.evitare || [];
+  if(evitare.length > 0){
+    html+=`<div class="card" style="padding:12px;margin-bottom:10px;border-left:3px solid var(--red);background:rgba(231,76,60,.05)">
+      <h3 style="color:var(--red);margin-bottom:8px">&#9888; Chi evitare</h3>`;
+    evitare.forEach(p=>{
+      const icon = p.tipo==="infortunato" ? "&#129657;" : "&#128308;";
+      html+=`<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #1f3460;font-size:.85rem">
+        <span style="min-width:20px">${icon}</span>
+        <div style="flex:1">
+          <strong>${p.giocatore||p.squadra}</strong> ${badge(p.squadra,14)}
+          <br><span style="color:var(--red);font-size:.75rem">${p.motivazione}</span>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
 
   // Consiglio
   html+=`<div class="card" style="text-align:center;padding:16px;background:#0d1b2a;border-color:var(--accent)">

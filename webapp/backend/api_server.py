@@ -2715,21 +2715,17 @@ async def fantacalcio_consigli(giornata: int):
         if not cal:
             return {"giornata": giornata, "consigli": [], "error": "Giornata non trovata"}
 
-        consigli = {"portieri": [], "difensori": [], "centrocampisti": [], "attaccanti": []}
+        consigli = {"portieri": [], "difensori": [], "centrocampisti": [], "attaccanti": [], "evitare": []}
         
         for home, away in cal["partite"]:
-            # Pronostico della partita
             try:
                 raw = genera_pronostico(home, away)
             except:
                 continue
 
-            gol_att_h = raw.get("gol_attesi", 2.5) * raw.get("prob_1", 33) / 100 if raw.get("prob_1") else 1.0
-            gol_att_a = raw.get("gol_attesi", 2.5) * raw.get("prob_2", 33) / 100 if raw.get("prob_2") else 1.0
             clean_h = 1.0 - (raw.get("goal_si", 50) / 100) if raw.get("goal_si") else 0.5
             clean_a = 1.0 - (raw.get("goal_si", 50) / 100) if raw.get("goal_si") else 0.5
 
-            # Cerca marcatori della squadra
             marc_h = []
             marc_a = []
             for lk in ["serie-a"]:
@@ -2739,23 +2735,43 @@ async def fantacalcio_consigli(giornata: int):
                     elif m.get("squadra") == away:
                         marc_a.append(m)
 
-            # Portieri: consiglia quelli delle squadre favorite (clean sheet probabile)
+            # Portieri
             if raw.get("prob_1", 0) > 40:
                 consigli["portieri"].append({"squadra": home, "motivazione": f"Favorita ({raw['prob_1']:.0f}%), clean sheet {clean_h*100:.0f}%", "rating": round(clean_h * 10, 1), "avversario": away, "casa": True})
             if raw.get("prob_2", 0) > 40:
                 consigli["portieri"].append({"squadra": away, "motivazione": f"Favorita ({raw['prob_2']:.0f}%), clean sheet {clean_a*100:.0f}%", "rating": round(clean_a * 10, 1), "avversario": home, "casa": False})
 
-            # Difensori: squadre con alta % clean sheet
+            # Difensori
             if clean_h > 0.4:
                 consigli["difensori"].append({"squadra": home, "motivazione": f"Clean sheet {clean_h*100:.0f}% vs {away}", "rating": round(clean_h * 9, 1), "avversario": away, "casa": True})
             if clean_a > 0.4:
                 consigli["difensori"].append({"squadra": away, "motivazione": f"Clean sheet {clean_a*100:.0f}% vs {home}", "rating": round(clean_a * 9, 1), "avversario": home, "casa": False})
 
-            # Centrocampisti e Attaccanti: top scorer
+            # Centrocampisti: goleador con rating medio (assist + gol)
+            for m in marc_h:
+                if m["gol"] >= 5:
+                    consigli["centrocampisti"].append({"giocatore": m["giocatore"], "squadra": home, "gol": m["gol"], "motivazione": f"{m['gol']} gol, casa vs {away}", "rating": round(min(9, m["gol"] * 0.5 + raw.get("prob_1", 30) / 15), 1), "avversario": away, "casa": True})
+            for m in marc_a:
+                if m["gol"] >= 5:
+                    consigli["centrocampisti"].append({"giocatore": m["giocatore"], "squadra": away, "gol": m["gol"], "motivazione": f"{m['gol']} gol, trasferta vs {home}", "rating": round(min(9, m["gol"] * 0.5 + raw.get("prob_2", 30) / 15), 1), "avversario": home, "casa": False})
+
+            # Attaccanti: top scorer
             for m in marc_h[:2]:
                 consigli["attaccanti"].append({"giocatore": m["giocatore"], "squadra": home, "gol": m["gol"], "motivazione": f"{m['gol']} gol, gioca vs {away}", "rating": round(min(10, m["gol"] * 0.7 + raw.get("prob_1", 30) / 20), 1), "avversario": away, "casa": True})
             for m in marc_a[:2]:
                 consigli["attaccanti"].append({"giocatore": m["giocatore"], "squadra": away, "gol": m["gol"], "motivazione": f"{m['gol']} gol, gioca vs {home}", "rating": round(min(10, m["gol"] * 0.7 + raw.get("prob_2", 30) / 20), 1), "avversario": home, "casa": False})
+
+            # Chi evitare: squadre sfavorite + infortunati
+            if raw.get("prob_1", 0) < 20:
+                consigli["evitare"].append({"squadra": home, "motivazione": f"Solo {raw['prob_1']:.0f}% di vittoria vs {away}", "tipo": "sfavorita"})
+            if raw.get("prob_2", 0) < 20:
+                consigli["evitare"].append({"squadra": away, "motivazione": f"Solo {raw['prob_2']:.0f}% di vittoria vs {home}", "tipo": "sfavorita"})
+
+        # Aggiungi infortunati alla lista evitare
+        for squadra in [h for h, a in cal["partite"]] + [a for h, a in cal["partite"]]:
+            inj = INFORTUNATI_LIVE.get(squadra) or LIVE_INFORTUNATI.get(squadra) or []
+            for i in inj[:2]:
+                consigli["evitare"].append({"giocatore": i.get("nome", "?"), "squadra": squadra, "motivazione": i.get("dettaglio", "Indisponibile"), "tipo": "infortunato"})
 
         # Ordina per rating
         for ruolo in consigli:
