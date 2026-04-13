@@ -2735,17 +2735,34 @@ async def fantacalcio_consigli(giornata: int):
                     elif m.get("squadra") == away:
                         marc_a.append(m)
 
-            # Portieri
+            # Portieri: prendi il portiere titolare dalla formazione
             if raw.get("prob_1", 0) > 40:
-                consigli["portieri"].append({"squadra": home, "motivazione": f"Favorita ({raw['prob_1']:.0f}%), clean sheet {clean_h*100:.0f}%", "rating": round(clean_h * 10, 1), "avversario": away, "casa": True})
+                port_h = None
+                form_h = LIVE_FORMAZIONI.get(home) or FORMAZIONI.get(home) or _get_last_lineup(home)
+                rosa_h = ROSE_LIVE.get(home) or [{"nome":g[0],"ruolo":g[1]} for g in ROSE.get(home,[])]
+                if rosa_h:
+                    port_h = next((p["nome"] for p in rosa_h if p.get("ruolo") == "P"), None)
+                if port_h:
+                    consigli["portieri"].append({"giocatore": port_h, "squadra": home, "motivazione": f"Favorita ({raw['prob_1']:.0f}%), clean sheet {clean_h*100:.0f}%", "rating": round(clean_h * 10, 1), "avversario": away, "casa": True})
             if raw.get("prob_2", 0) > 40:
-                consigli["portieri"].append({"squadra": away, "motivazione": f"Favorita ({raw['prob_2']:.0f}%), clean sheet {clean_a*100:.0f}%", "rating": round(clean_a * 10, 1), "avversario": home, "casa": False})
+                port_a = None
+                rosa_a = ROSE_LIVE.get(away) or [{"nome":g[0],"ruolo":g[1]} for g in ROSE.get(away,[])]
+                if rosa_a:
+                    port_a = next((p["nome"] for p in rosa_a if p.get("ruolo") == "P"), None)
+                if port_a:
+                    consigli["portieri"].append({"giocatore": port_a, "squadra": away, "motivazione": f"Favorita ({raw['prob_2']:.0f}%), clean sheet {clean_a*100:.0f}%", "rating": round(clean_a * 10, 1), "avversario": home, "casa": False})
 
-            # Difensori
+            # Difensori: prendi i difensori dalla rosa della squadra con alta clean sheet
             if clean_h > 0.4:
-                consigli["difensori"].append({"squadra": home, "motivazione": f"Clean sheet {clean_h*100:.0f}% vs {away}", "rating": round(clean_h * 9, 1), "avversario": away, "casa": True})
+                rosa_h = ROSE_LIVE.get(home) or [{"nome":g[0],"ruolo":g[1]} for g in ROSE.get(home,[])]
+                difs = [p["nome"] for p in rosa_h if p.get("ruolo") == "D"][:3]
+                for d in difs:
+                    consigli["difensori"].append({"giocatore": d, "squadra": home, "motivazione": f"Clean sheet {clean_h*100:.0f}% vs {away}", "rating": round(clean_h * 9, 1), "avversario": away, "casa": True})
             if clean_a > 0.4:
-                consigli["difensori"].append({"squadra": away, "motivazione": f"Clean sheet {clean_a*100:.0f}% vs {home}", "rating": round(clean_a * 9, 1), "avversario": home, "casa": False})
+                rosa_a = ROSE_LIVE.get(away) or [{"nome":g[0],"ruolo":g[1]} for g in ROSE.get(away,[])]
+                difs = [p["nome"] for p in rosa_a if p.get("ruolo") == "D"][:3]
+                for d in difs:
+                    consigli["difensori"].append({"giocatore": d, "squadra": away, "motivazione": f"Clean sheet {clean_a*100:.0f}% vs {home}", "rating": round(clean_a * 9, 1), "avversario": home, "casa": False})
 
             # Centrocampisti: goleador con rating medio (assist + gol)
             for m in marc_h:
