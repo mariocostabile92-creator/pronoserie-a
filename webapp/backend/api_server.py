@@ -2704,6 +2704,69 @@ async def apply_referral(data: dict):
     return {"status": "ok", "reward": "1 mese Pro gratis"}
 
 # ─────────────────────────────
+# FANTACALCIO
+# ─────────────────────────────
+@app.get("/api/fantacalcio/consigli/{giornata}")
+async def fantacalcio_consigli(giornata: int):
+    """Consigli formazione fantacalcio per la giornata Serie A."""
+    try:
+        # Prendi le partite della giornata dal calendario
+        cal = CAL_HARDCODED.get(giornata)
+        if not cal:
+            return {"giornata": giornata, "consigli": [], "error": "Giornata non trovata"}
+
+        consigli = {"portieri": [], "difensori": [], "centrocampisti": [], "attaccanti": []}
+        
+        for home, away in cal["partite"]:
+            # Pronostico della partita
+            try:
+                raw = genera_pronostico(home, away)
+            except:
+                continue
+
+            gol_att_h = raw.get("gol_attesi", 2.5) * raw.get("prob_1", 33) / 100 if raw.get("prob_1") else 1.0
+            gol_att_a = raw.get("gol_attesi", 2.5) * raw.get("prob_2", 33) / 100 if raw.get("prob_2") else 1.0
+            clean_h = 1.0 - (raw.get("goal_si", 50) / 100) if raw.get("goal_si") else 0.5
+            clean_a = 1.0 - (raw.get("goal_si", 50) / 100) if raw.get("goal_si") else 0.5
+
+            # Cerca marcatori della squadra
+            marc_h = []
+            marc_a = []
+            for lk in ["serie-a"]:
+                for m in (MARCATORI_CACHE.get(lk) or []):
+                    if m.get("squadra") == home:
+                        marc_h.append(m)
+                    elif m.get("squadra") == away:
+                        marc_a.append(m)
+
+            # Portieri: consiglia quelli delle squadre favorite (clean sheet probabile)
+            if raw.get("prob_1", 0) > 40:
+                consigli["portieri"].append({"squadra": home, "motivazione": f"Favorita ({raw['prob_1']:.0f}%), clean sheet {clean_h*100:.0f}%", "rating": round(clean_h * 10, 1), "avversario": away, "casa": True})
+            if raw.get("prob_2", 0) > 40:
+                consigli["portieri"].append({"squadra": away, "motivazione": f"Favorita ({raw['prob_2']:.0f}%), clean sheet {clean_a*100:.0f}%", "rating": round(clean_a * 10, 1), "avversario": home, "casa": False})
+
+            # Difensori: squadre con alta % clean sheet
+            if clean_h > 0.4:
+                consigli["difensori"].append({"squadra": home, "motivazione": f"Clean sheet {clean_h*100:.0f}% vs {away}", "rating": round(clean_h * 9, 1), "avversario": away, "casa": True})
+            if clean_a > 0.4:
+                consigli["difensori"].append({"squadra": away, "motivazione": f"Clean sheet {clean_a*100:.0f}% vs {home}", "rating": round(clean_a * 9, 1), "avversario": home, "casa": False})
+
+            # Centrocampisti e Attaccanti: top scorer
+            for m in marc_h[:2]:
+                consigli["attaccanti"].append({"giocatore": m["giocatore"], "squadra": home, "gol": m["gol"], "motivazione": f"{m['gol']} gol, gioca vs {away}", "rating": round(min(10, m["gol"] * 0.7 + raw.get("prob_1", 30) / 20), 1), "avversario": away, "casa": True})
+            for m in marc_a[:2]:
+                consigli["attaccanti"].append({"giocatore": m["giocatore"], "squadra": away, "gol": m["gol"], "motivazione": f"{m['gol']} gol, gioca vs {home}", "rating": round(min(10, m["gol"] * 0.7 + raw.get("prob_2", 30) / 20), 1), "avversario": home, "casa": False})
+
+        # Ordina per rating
+        for ruolo in consigli:
+            consigli[ruolo].sort(key=lambda x: -x.get("rating", 0))
+            consigli[ruolo] = consigli[ruolo][:5]
+
+        return {"giornata": giornata, "data": cal.get("data", ""), "consigli": consigli}
+    except Exception as e:
+        return {"giornata": giornata, "consigli": {}, "error": str(e)}
+
+# ─────────────────────────────
 # STORICO PRONOSTICI UTENTE
 # ─────────────────────────────
 @app.post("/api/user/save-prediction")

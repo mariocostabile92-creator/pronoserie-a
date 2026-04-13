@@ -57,6 +57,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
 <nav class="nav">
   <div class="logo" style="display:flex;align-items:center;gap:8px"><img src="/logo.png" alt="MatchIQ" style="height:32px;width:32px;border-radius:6px">MatchIQ</div>
   <a href="#home">Home</a>
+  <a href="#fantacalcio">Fantacalcio</a>
   <a href="#pronostici">Pronostici</a>
   <a href="#calendario">Calendario</a>
   <a href="#classifica">Classifiche</a>
@@ -1793,8 +1794,69 @@ async function pageAccuratezza(){
   return html;
 }
 
+// ── FANTACALCIO ──
+async function pageFantacalcio(){
+  if(userPlan!=="pro") return `<div class="container"><div class="lock-msg card" style="text-align:center;padding:32px">
+    <div style="font-size:3rem;margin-bottom:12px">&#9917;</div>
+    <h2 style="color:var(--green)">Fantacalcio IA</h2>
+    <p style="color:var(--muted);margin:16px 0">L'IA ti dice chi schierare, chi evitare e i probabili marcatori della giornata.</p>
+    <button class="btn btn-green" onclick="abbonarPro()">Sblocca con Pro - 9.99&euro;/mese</button>
+  </div></div>`;
+
+  // Trova giornata corrente
+  let gc = 32;
+  try {
+    const cal = await fetchAPI("/api/calendario");
+    if(cal) gc = cal.giornata_corrente || 32;
+  } catch(e){}
+
+  const data = await fetchAPI("/api/fantacalcio/consigli/"+gc, true);
+  if(!data || !data.consigli) return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento consigli</div></div>';
+
+  const c = data.consigli;
+  let html='<div class="container">';
+  html+=`<h1>&#9917; Fantacalcio IA</h1><p class="sub">Chi schierare - Giornata ${data.giornata} ${data.data||""}</p>`;
+
+  // Sezioni per ruolo
+  const ruoli = [
+    {key:"portieri",nome:"Portieri",icon:"&#129351;",col:"var(--accent)"},
+    {key:"difensori",nome:"Difensori",icon:"&#128737;",col:"var(--green)"},
+    {key:"attaccanti",nome:"Attaccanti",icon:"&#9917;",col:"var(--red)"}
+  ];
+
+  ruoli.forEach(r=>{
+    const lista = c[r.key] || [];
+    if(lista.length===0) return;
+    html+=`<div class="card" style="padding:12px;margin-bottom:10px;border-left:3px solid ${r.col}">
+      <h3 style="color:${r.col};margin-bottom:8px">${r.icon} ${r.nome} consigliati</h3>`;
+    lista.forEach((p,i)=>{
+      const stars = p.rating >= 8 ? "&#11088;&#11088;&#11088;" : p.rating >= 6 ? "&#11088;&#11088;" : "&#11088;";
+      html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1f3460">
+        <div>
+          <strong style="font-size:.9rem">${p.giocatore||p.squadra}</strong> ${badge(p.squadra,14)}
+          <br><span style="color:var(--muted);font-size:.75rem">${p.motivazione}</span>
+        </div>
+        <div style="text-align:right">
+          <span style="font-size:.8rem">${stars}</span>
+          <br><span style="color:${r.col};font-weight:800;font-size:.9rem">${p.rating}/10</span>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+
+  // Consiglio
+  html+=`<div class="card" style="text-align:center;padding:16px;background:#0d1b2a;border-color:var(--accent)">
+    <p style="color:var(--muted);font-size:.85rem">Consigli basati su: pronostici IA, classifica marcatori live, probabilita' clean sheet, forza avversario.</p>
+    <a href="#pronostici" class="btn btn-blue" style="margin-top:8px;font-size:.85rem">Analizza una partita specifica</a>
+  </div>`;
+
+  html+='</div>';
+  return html;
+}
+
 // ROUTER
-const routes={home:pageHome,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,risultati:pageRisultati,pricing:pagePricing,login:pageLogin,privacy:pagePrivacy,termini:pageTermini,accuratezza:pageAccuratezza,miei:pageMyPredictions};
+const routes={home:pageHome,fantacalcio:pageFantacalcio,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,risultati:pageRisultati,pricing:pagePricing,login:pageLogin,privacy:pagePrivacy,termini:pageTermini,accuratezza:pageAccuratezza,miei:pageMyPredictions};
 
 function pagePrivacy(){
   return `<div class="container" style="max-width:800px">
