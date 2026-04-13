@@ -315,6 +315,8 @@ function pageHome(){
     <div id="schedina-home"></div>
     <div id="schedina-pl-home"></div>
     <div id="schedina-ll-home"></div>
+    <div id="schedina-bl-home"></div>
+    <div id="schedina-l1-home"></div>
     <div class="card" style="margin-top:16px;padding:20px;text-align:center;background:linear-gradient(135deg,#1a237e,#0d3b1e);border-color:var(--accent);border-width:2px">
       <div style="font-size:2.5rem;margin-bottom:8px">&#127942;&#127758;</div>
       <h2 style="color:var(--accent);margin-bottom:8px">Mondiali 2026 - Coming Soon</h2>
@@ -478,6 +480,34 @@ async function loadSchedinaLL(){
     el.innerHTML=html;
     currentLeague = oldLeague;
   }catch(e){/* timeout */}
+}
+
+async function loadSchedinaBL(){
+  const el=$("schedina-bl-home"); if(!el)return;
+  try{ const c=new AbortController(); const t=setTimeout(()=>c.abort(),10000); const h={}; if(userToken) h["Authorization"]="Bearer "+userToken;
+    const r=await fetch(API+"/api/schedina-bl?_t="+Date.now(),{headers:h,signal:c.signal}); clearTimeout(t); if(!r.ok)return; const d=await r.json(); if(!d||!d.giocate||!d.giocate.length)return;
+    const ol=currentLeague; currentLeague="bundesliga";
+    let html='<div class="card" style="border-color:#d50000;border-width:2px"><h2 style="color:#d50000;text-align:center;font-size:1.1rem">Pronostico del Giorno - Bundesliga G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:12px;font-size:.8rem">'+d.tipo+'</p>';
+    const ms=userPlan==="pro"?d.giocate.length:2; d.giocate.slice(0,ms).forEach(g=>{
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><div style="font-size:.85rem">${badge(g.home,16)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,16)}<br><span style="color:var(--muted);font-size:.7rem">Conf. ${Math.round(g.confidence*100)}%${g.over_under?' | '+g.over_under:''}${g.goal?' | '+g.goal:''}</span></div><div style="text-align:right"><span class="tag" style="background:#d50000;color:#fff;font-size:.9rem;padding:4px 12px">${g.tip}</span><br><span style="color:var(--muted);font-size:.7rem">Quota ${g.quota}</span></div></div>`;
+    }); if(userPlan!=="pro"&&d.giocate.length>2) html+=`<div style="text-align:center;padding:12px;color:var(--muted);font-size:.8rem"><p>+ ${d.giocate.length-2} altri pronostici</p><button class="btn btn-green" style="margin-top:6px;font-size:.8rem;padding:8px 16px" onclick="abbonarPro()">Sblocca con Pro</button></div>`;
+    if(userPlan==="pro"&&d.quota_totale) html+=`<div style="text-align:center;margin-top:10px;padding:10px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted);font-size:.8rem">Quota totale:</span> <span style="font-size:1.3rem;font-weight:800;color:#d50000">${d.quota_totale}</span></div>`;
+    html+='</div>'; el.innerHTML=html; currentLeague=ol;
+  }catch(e){}
+}
+
+async function loadSchedinaL1(){
+  const el=$("schedina-l1-home"); if(!el)return;
+  try{ const c=new AbortController(); const t=setTimeout(()=>c.abort(),10000); const h={}; if(userToken) h["Authorization"]="Bearer "+userToken;
+    const r=await fetch(API+"/api/schedina-l1?_t="+Date.now(),{headers:h,signal:c.signal}); clearTimeout(t); if(!r.ok)return; const d=await r.json(); if(!d||!d.giocate||!d.giocate.length)return;
+    const ol=currentLeague; currentLeague="ligue-1";
+    let html='<div class="card" style="border-color:#003189;border-width:2px"><h2 style="color:#003189;text-align:center;font-size:1.1rem">Pronostico del Giorno - Ligue 1 G.'+d.giornata+'</h2><p style="text-align:center;color:var(--muted);margin-bottom:12px;font-size:.8rem">'+d.tipo+'</p>';
+    const ms=userPlan==="pro"?d.giocate.length:2; d.giocate.slice(0,ms).forEach(g=>{
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f3460"><div style="font-size:.85rem">${badge(g.home,16)}<strong>${g.home}</strong> vs <strong>${g.away}</strong>${badge(g.away,16)}<br><span style="color:var(--muted);font-size:.7rem">Conf. ${Math.round(g.confidence*100)}%${g.over_under?' | '+g.over_under:''}${g.goal?' | '+g.goal:''}</span></div><div style="text-align:right"><span class="tag" style="background:#003189;color:#fff;font-size:.9rem;padding:4px 12px">${g.tip}</span><br><span style="color:var(--muted);font-size:.7rem">Quota ${g.quota}</span></div></div>`;
+    }); if(userPlan!=="pro"&&d.giocate.length>2) html+=`<div style="text-align:center;padding:12px;color:var(--muted);font-size:.8rem"><p>+ ${d.giocate.length-2} altri pronostici</p><button class="btn btn-green" style="margin-top:6px;font-size:.8rem;padding:8px 16px" onclick="abbonarPro()">Sblocca con Pro</button></div>`;
+    if(userPlan==="pro"&&d.quota_totale) html+=`<div style="text-align:center;margin-top:10px;padding:10px;background:#0d1b2a;border-radius:8px"><span style="color:var(--muted);font-size:.8rem">Quota totale:</span> <span style="font-size:1.3rem;font-weight:800;color:#003189">${d.quota_totale}</span></div>`;
+    html+='</div>'; el.innerHTML=html; currentLeague=ol;
+  }catch(e){}
 }
 
 //  -- PRONOSTICI (2 gratis/giorno)  -  - &euro;
@@ -1904,6 +1934,8 @@ async function navigate(){
     setTimeout(()=>loadSchedina(),2000);
     setTimeout(()=>loadSchedinaPL(),3000);
     setTimeout(()=>loadSchedinaLL(),4000);
+    setTimeout(()=>loadSchedinaBL(),5000);
+    setTimeout(()=>loadSchedinaL1(),6000);
     setTimeout(()=>{fetchAPI("/api/classifica")},5000);
   }
   updateNavAuth();

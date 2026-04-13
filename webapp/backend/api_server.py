@@ -432,6 +432,8 @@ def _live_updater():
             if _updater_count % 6 == 0:
                 _fetch_rose_live()
                 _fetch_rose_live(PL_TEAM_IDS)
+                _fetch_rose_live(BL_TEAM_IDS)
+                _fetch_rose_live(L1_TEAM_IDS)
                 _fetch_risultati_stagione()
             # Competizioni europee: aggiorna ogni ciclo se partite in corso, altrimenti ogni 3 cicli
             if _updater_count % 3 == 0 or any(LIVE_IN_CORSO_ML.get(k) for k in ["champions-league","europa-league","conference-league","bundesliga","ligue-1"]):
@@ -556,6 +558,14 @@ async def startup():
             pass
         try:
             _fetch_rose_live(PL_TEAM_IDS)
+        except Exception:
+            pass
+        try:
+            _fetch_rose_live(BL_TEAM_IDS)
+        except Exception:
+            pass
+        try:
+            _fetch_rose_live(L1_TEAM_IDS)
         except Exception:
             pass
         # Premier League + La Liga
@@ -2093,7 +2103,7 @@ def _get_last_lineup(team_name):
     if team_name in _FORMAZIONE_CACHE:
         return _FORMAZIONE_CACHE[team_name]
     # Cerca team_id in entrambi i campionati
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return None
     try:
@@ -2138,7 +2148,7 @@ def _get_coach_ondemand(team_name):
     """Scarica l'allenatore attuale da API Football."""
     if team_name in _COACH_CACHE:
         return _COACH_CACHE[team_name]
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return None
     try:
@@ -2171,7 +2181,7 @@ def _get_squad_ondemand(team_name):
     """Scarica la rosa di una squadra on-demand da API Football."""
     if team_name in _ROSA_CACHE_OD:
         return _ROSA_CACHE_OD[team_name]
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return []
     try:
@@ -2196,7 +2206,7 @@ def _get_squad_ondemand(team_name):
 
 def _get_injuries_ondemand(team_name):
     """Scarica SOLO infortunati attuali di una squadra (ultimi 2 fixture)."""
-    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
+    team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return []
     try:
@@ -2461,6 +2471,60 @@ async def schedina_ll():
         }
     except Exception as e:
         return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
+
+@app.get("/api/schedina-bl")
+async def schedina_bl():
+    """Schedina del giorno Bundesliga."""
+    try:
+        if not CLASSIFICA_CACHE.get("bundesliga"):
+            _fetch_league_data("bundesliga")
+        req = urllib.request.Request(f"https://{FOOTBALL_API_HOST}/fixtures?league=78&season=2025&next=10", headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+        if not data.get("response"): return {"giornata":"?","giocate":[],"n_giocate":0,"quota_totale":0,"tipo":"Nessuna partita"}
+        nome_map = _get_nome_map("bundesliga"); giornata_num = ""; giocate = []
+        for fix in data["response"][:10]:
+            teams=fix.get("teams",{}); lg=fix.get("league",{})
+            home=nome_map.get(teams.get("home",{}).get("name","?"),teams.get("home",{}).get("name","?"))
+            away=nome_map.get(teams.get("away",{}).get("name","?"),teams.get("away",{}).get("name","?"))
+            if not giornata_num: giornata_num=lg.get("round","").split(" - ")[-1] if " - " in lg.get("round","") else "?"
+            try:
+                raw=genera_pronostico(home,away); mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
+                if conf>=0.70 or mp>50:
+                    giocate.append({"home":home,"away":away,"tip":raw.get("suggerimento","?"),"prob":mp,"quota":raw.get(f"quota_{raw.get('suggerimento','1').lower()}",1.5),"confidence":conf,"over_under":("Over 2.5 "+str(raw.get("over_25",50))+"%") if raw.get("over_25",0)>50 else ("Under 2.5 "+str(raw.get("under_25",50))+"%"),"goal":("Goal Si "+str(raw.get("goal_si",50))+"%") if raw.get("goal_si",0)>50 else ("Goal No "+str(raw.get("goal_no",50))+"%")})
+            except: continue
+        giocate.sort(key=lambda x:-x["confidence"]); top=giocate[:5]; qt=1.0
+        for g in top:
+            if g.get("quota",1.5)>1: qt*=g["quota"]
+        return {"giornata":giornata_num,"giocate":top,"n_giocate":len(top),"quota_totale":round(qt,2),"tipo":"Pronostici ad alta confidenza selezionati dall'IA"}
+    except Exception as e: return {"giornata":"?","giocate":[],"n_giocate":0,"quota_totale":0,"tipo":f"Errore: {e}"}
+
+@app.get("/api/schedina-l1")
+async def schedina_l1():
+    """Schedina del giorno Ligue 1."""
+    try:
+        if not CLASSIFICA_CACHE.get("ligue-1"):
+            _fetch_league_data("ligue-1")
+        req = urllib.request.Request(f"https://{FOOTBALL_API_HOST}/fixtures?league=61&season=2025&next=10", headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+        if not data.get("response"): return {"giornata":"?","giocate":[],"n_giocate":0,"quota_totale":0,"tipo":"Nessuna partita"}
+        nome_map = _get_nome_map("ligue-1"); giornata_num = ""; giocate = []
+        for fix in data["response"][:10]:
+            teams=fix.get("teams",{}); lg=fix.get("league",{})
+            home=nome_map.get(teams.get("home",{}).get("name","?"),teams.get("home",{}).get("name","?"))
+            away=nome_map.get(teams.get("away",{}).get("name","?"),teams.get("away",{}).get("name","?"))
+            if not giornata_num: giornata_num=lg.get("round","").split(" - ")[-1] if " - " in lg.get("round","") else "?"
+            try:
+                raw=genera_pronostico(home,away); mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
+                if conf>=0.70 or mp>50:
+                    giocate.append({"home":home,"away":away,"tip":raw.get("suggerimento","?"),"prob":mp,"quota":raw.get(f"quota_{raw.get('suggerimento','1').lower()}",1.5),"confidence":conf,"over_under":("Over 2.5 "+str(raw.get("over_25",50))+"%") if raw.get("over_25",0)>50 else ("Under 2.5 "+str(raw.get("under_25",50))+"%"),"goal":("Goal Si "+str(raw.get("goal_si",50))+"%") if raw.get("goal_si",0)>50 else ("Goal No "+str(raw.get("goal_no",50))+"%")})
+            except: continue
+        giocate.sort(key=lambda x:-x["confidence"]); top=giocate[:5]; qt=1.0
+        for g in top:
+            if g.get("quota",1.5)>1: qt*=g["quota"]
+        return {"giornata":giornata_num,"giocate":top,"n_giocate":len(top),"quota_totale":round(qt,2),"tipo":"Pronostici ad alta confidenza selezionati dall'IA"}
+    except Exception as e: return {"giornata":"?","giocate":[],"n_giocate":0,"quota_totale":0,"tipo":f"Errore: {e}"}
 
 @app.get("/api/{league}/squadre-attive")
 async def squadre_attive(league: str):
