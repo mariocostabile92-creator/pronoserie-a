@@ -386,7 +386,7 @@ def _live_updater():
                 _fetch_rose_live(PL_TEAM_IDS)
                 _fetch_risultati_stagione()
             # Competizioni europee: aggiorna ogni ciclo se partite in corso, altrimenti ogni 3 cicli
-            if _updater_count % 3 == 0 or any(LIVE_IN_CORSO_ML.get(k) for k in ["champions-league","europa-league","conference-league"]):
+            if _updater_count % 3 == 0 or any(LIVE_IN_CORSO_ML.get(k) for k in ["champions-league","europa-league","conference-league","bundesliga"]):
                 _fetch_league_data("premier-league")
                 _fetch_league_data("la-liga")
                 _fetch_league_data("champions-league")
