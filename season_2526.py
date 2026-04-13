@@ -185,6 +185,42 @@ def get_xg_media_bl() -> dict:
     }
 
 # ──────────────────────────────────────────────
+# Expected Goals (xG) Ligue 1 2025-2026
+# ──────────────────────────────────────────────
+XG_L1 = {
+    "Angers": {"xG_pg": 0.88, "xGA_pg": 1.33},
+    "Auxerre": {"xG_pg": 0.81, "xGA_pg": 1.27},
+    "Le Havre": {"xG_pg": 0.88, "xGA_pg": 1.26},
+    "Lens": {"xG_pg": 1.93, "xGA_pg": 0.92},
+    "Lille": {"xG_pg": 1.65, "xGA_pg": 1.14},
+    "Lorient": {"xG_pg": 1.36, "xGA_pg": 1.49},
+    "Lyon": {"xG_pg": 1.47, "xGA_pg": 0.97},
+    "Marseille": {"xG_pg": 2.05, "xGA_pg": 1.29},
+    "Metz": {"xG_pg": 0.9, "xGA_pg": 2.1},
+    "Monaco": {"xG_pg": 1.79, "xGA_pg": 1.44},
+    "Nantes": {"xG_pg": 0.86, "xGA_pg": 1.67},
+    "Nice": {"xG_pg": 1.16, "xGA_pg": 1.88},
+    "Paris FC": {"xG_pg": 1.33, "xGA_pg": 1.58},
+    "Paris Saint Germain": {"xG_pg": 2.29, "xGA_pg": 0.83},
+    "Rennes": {"xG_pg": 1.66, "xGA_pg": 1.41},
+    "Stade Brestois 29": {"xG_pg": 1.33, "xGA_pg": 1.52},
+    "Strasbourg": {"xG_pg": 1.66, "xGA_pg": 1.15},
+    "Toulouse": {"xG_pg": 1.35, "xGA_pg": 1.35},
+}
+
+def get_xg_l1(team_name: str) -> dict:
+    return XG_L1.get(team_name)
+
+def get_xg_media_l1() -> dict:
+    n = len(XG_L1)
+    if n == 0:
+        return {"xG_pg_medio": 1.35, "xGA_pg_medio": 1.35}
+    return {
+        "xG_pg_medio": round(sum(v["xG_pg"] for v in XG_L1.values()) / n, 2),
+        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in XG_L1.values()) / n, 2),
+    }
+
+# ──────────────────────────────────────────────
 # Calendario ufficiale giornate 31-38
 # Fonte: legaseriea.it + transfermarkt.it
 # ──────────────────────────────────────────────

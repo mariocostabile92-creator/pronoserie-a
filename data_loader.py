@@ -19,6 +19,7 @@ CARTELLA_UCL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_uc
 CARTELLA_UEL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_uel")
 CARTELLA_UECL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_uecl")
 CARTELLA_BL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_bundesliga")
+CARTELLA_L1 = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_ligue1")
 
 COLONNE_NECESSARIE = [
     "Div", "Date", "HomeTeam", "AwayTeam",
@@ -53,6 +54,8 @@ def load_all_data(league="I1") -> pd.DataFrame:
         cartella = CARTELLA_UECL
     elif league == "D1":
         cartella = CARTELLA_BL
+    elif league == "F1":
+        cartella = CARTELLA_L1
     else:
         cartella = CARTELLA_CSV
 
