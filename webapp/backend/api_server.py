@@ -2377,7 +2377,7 @@ async def schedina_pl():
                 raw = genera_pronostico(home, away)
                 mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
                 conf = raw.get("confidence", 0)
-                if conf >= 0.70 or mp > 50:
+                if conf >= 0.30 or mp > 35:
                     giocate.append({
                         "home": home, "away": away,
                         "tip": raw.get("suggerimento", "?"),
@@ -2442,7 +2442,7 @@ async def schedina_ll():
                 raw = genera_pronostico(home, away)
                 mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
                 conf = raw.get("confidence", 0)
-                if conf >= 0.70 or mp > 50:
+                if conf >= 0.30 or mp > 35:
                     giocate.append({
                         "home": home, "away": away,
                         "tip": raw.get("suggerimento", "?"),
@@ -2490,7 +2490,7 @@ async def schedina_bl():
             if not giornata_num: giornata_num=lg.get("round","").split(" - ")[-1] if " - " in lg.get("round","") else "?"
             try:
                 raw=genera_pronostico(home,away); mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
-                if conf>=0.70 or mp>50:
+                if conf>=0.30 or mp>35:
                     giocate.append({"home":home,"away":away,"tip":raw.get("suggerimento","?"),"prob":mp,"quota":raw.get(f"quota_{raw.get('suggerimento','1').lower()}",1.5),"confidence":conf,"over_under":("Over 2.5 "+str(raw.get("over_25",50))+"%") if raw.get("over_25",0)>50 else ("Under 2.5 "+str(raw.get("under_25",50))+"%"),"goal":("Goal Si "+str(raw.get("goal_si",50))+"%") if raw.get("goal_si",0)>50 else ("Goal No "+str(raw.get("goal_no",50))+"%")})
             except: continue
         giocate.sort(key=lambda x:-x["confidence"]); top=giocate[:5]; qt=1.0
@@ -2517,7 +2517,7 @@ async def schedina_l1():
             if not giornata_num: giornata_num=lg.get("round","").split(" - ")[-1] if " - " in lg.get("round","") else "?"
             try:
                 raw=genera_pronostico(home,away); mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
-                if conf>=0.70 or mp>50:
+                if conf>=0.30 or mp>35:
                     giocate.append({"home":home,"away":away,"tip":raw.get("suggerimento","?"),"prob":mp,"quota":raw.get(f"quota_{raw.get('suggerimento','1').lower()}",1.5),"confidence":conf,"over_under":("Over 2.5 "+str(raw.get("over_25",50))+"%") if raw.get("over_25",0)>50 else ("Under 2.5 "+str(raw.get("under_25",50))+"%"),"goal":("Goal Si "+str(raw.get("goal_si",50))+"%") if raw.get("goal_si",0)>50 else ("Goal No "+str(raw.get("goal_no",50))+"%")})
             except: continue
         giocate.sort(key=lambda x:-x["confidence"]); top=giocate[:5]; qt=1.0
