@@ -924,7 +924,7 @@ async function showMatch(h,a){
     return;
   }
   app.innerHTML='<div class="spinner"></div>';
-  const d=await fetchAPI("/api/pronostico/"+encodeURIComponent(h)+"/"+encodeURIComponent(a));
+  const d=await fetchAPI("/api"+leagueApiPrefix()+"/pronostico/"+encodeURIComponent(h)+"/"+encodeURIComponent(a));
   if(!d){app.innerHTML='<div class="container"><div class="card" style="color:var(--red)">Errore calcolo pronostico. <a href="#calendario">Torna</a></div></div>';return}
   if(userPlan!=="pro"){freeUsed++;localStorage.setItem("freeUsed",freeUsed)}
   const best=d.suggerimento||"?";

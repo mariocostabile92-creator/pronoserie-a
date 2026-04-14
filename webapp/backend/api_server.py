@@ -1463,15 +1463,138 @@ async def change_password(data: dict, user: Optional[dict] = Depends(get_optiona
     return {"status": "ok"}
 
 # ─────────────────────────────
-# PRONOSTICO
+# PRONOSTICO - Helper unificato
 # ─────────────────────────────
-@app.get("/api/pronostico/{home}/{away}")
-async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_optional_user)):
-    check_limit(user)
+def _compute_pronostico(league: str, home: str, away: str) -> dict:
+    """Calcola pronostico unificato per qualsiasi campionato.
+    Usato da ENTRAMBI gli endpoint (con e senza league).
+    Include: dati CSV per league + blend bookmaker + formazioni + marcatori.
+    """
+    # ── STEP 1: Calcolo raw in base al campionato ──
+    raw = None
+    if league == "premier-league" and _df_pl is not None and len(_df_pl) > 100:
+        try:
+            hs = get_team_stats(_df_pl, home, opponent=away)
+            aw = get_team_stats(_df_pl, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_pl)
+        except Exception:
+            raw = None
+    elif league == "la-liga" and _df_ll is not None and len(_df_ll) > 100:
+        try:
+            hs = get_team_stats(_df_ll, home, opponent=away)
+            aw = get_team_stats(_df_ll, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_ll)
+        except Exception:
+            raw = None
+    elif league == "bundesliga" and _df_bl is not None and len(_df_bl) > 100:
+        try:
+            hs = get_team_stats(_df_bl, home, opponent=away)
+            aw = get_team_stats(_df_bl, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_bl)
+        except Exception:
+            raw = None
+    elif league == "ligue-1" and _df_l1 is not None and len(_df_l1) > 100:
+        try:
+            hs = get_team_stats(_df_l1, home, opponent=away)
+            aw = get_team_stats(_df_l1, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_l1)
+        except Exception:
+            raw = None
+    elif league in ("champions-league", "europa-league", "conference-league"):
+        euro_df = _df_ucl if league == "champions-league" else (_df_uel if league == "europa-league" else _df_uecl)
+        # 1. Prova dati europei H2H
+        raw_euro = None
+        if euro_df is not None and len(euro_df) > 100:
+            try:
+                hs = get_team_stats(euro_df, home, opponent=away)
+                aw = get_team_stats(euro_df, away, opponent=home)
+                raw_euro = get_prediction(hs, aw, df=euro_df)
+            except Exception:
+                raw_euro = None
+        # 2. Prova dati campionato nazionale
+        raw_domestic = None
+        for dom_df in [_df, _df_pl, _df_ll, _df_bl, _df_l1]:
+            if dom_df is None:
+                continue
+            try:
+                hs_d = get_team_stats(dom_df, home, opponent=away)
+                aw_d = get_team_stats(dom_df, away, opponent=home)
+                raw_domestic = get_prediction(hs_d, aw_d, df=dom_df)
+                break
+            except Exception:
+                continue
+        # 3. Classifica live europea
+        raw_classifica = genera_pronostico(home, away)
+        # 4. Blend intelligente
+        sources = []
+        if raw_domestic:
+            sources.append((raw_domestic, 0.45))
+        if raw_euro:
+            sources.append((raw_euro, 0.20))
+        if raw_classifica:
+            sources.append((raw_classifica, 0.35 if raw_domestic else 0.80))
+        if sources:
+            raw = {}
+            for k in (sources[0][0] or {}).keys():
+                vals = [(s.get(k), w) for s, w in sources if isinstance(s.get(k), (int, float))]
+                if vals:
+                    raw[k] = round(sum(v * w for v, w in vals) / sum(w for _, w in vals), 2)
+                else:
+                    raw[k] = sources[0][0].get(k)
+            # Ricalcola suggerimento
+            mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
+            raw["suggerimento"] = "1" if mp == raw.get("prob_1") else ("X" if mp == raw.get("prob_x") else "2")
+            raw["sugg_label"] = "Vittoria Casa" if raw["suggerimento"] == "1" else ("Pareggio" if raw["suggerimento"] == "X" else "Vittoria Ospite")
+            # Confidence
+            best_conf = max((s.get("confidence", 0) for s, w in sources if isinstance(s.get("confidence"), (int, float))), default=0)
+            sp = sorted([raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0)], reverse=True)
+            if sp[0] > 1:
+                spread = (sp[0] - sp[1]) / 100
+            else:
+                spread = sp[0] - sp[1]
+            raw["confidence"] = round(max(best_conf, min(1.0, spread * 2.5)), 3)
+            raw["confidence_label"] = "Alta" if raw["confidence"] >= 0.82 else ("Media" if raw["confidence"] >= 0.50 else "Bassa")
+            raw["sicura"] = raw["confidence"] >= 0.82 and sp[0] > 45
+            # O/U calibra sulla media gol reale
+            ov = raw.get("over_25", 50)
+            un = raw.get("under_25", 50)
+            gol_att = raw.get("gol_attesi", 2.5)
+            if isinstance(gol_att, (int, float)) and gol_att > 2.5:
+                ov = max(ov, 50 + (gol_att - 2.5) * 8)
+                ov = min(ov, 75)
+            raw["over_25"] = round(ov, 1)
+            raw["under_25"] = round(100 - ov, 1) if ov > 1 else round(un, 1)
+            # Goal Si/No: ricalcola dalla fonte piu' affidabile
+            best_source = raw_domestic or raw_classifica or raw_euro or {}
+            gsi_best = best_source.get("goal_si", 50)
+            gno_best = best_source.get("goal_no", 50)
+            if isinstance(gsi_best, (int, float)) and gsi_best < 1:
+                gsi_best = gsi_best * 100
+            if isinstance(gno_best, (int, float)) and gno_best < 1:
+                gno_best = gno_best * 100
+            if gsi_best + gno_best > 110:
+                tot_g = gsi_best + gno_best
+                gsi_best = gsi_best / tot_g * 100
+            raw["goal_si"] = round(gsi_best, 1)
+            raw["goal_no"] = round(100 - gsi_best, 1)
+            ga = raw.get("gol_attesi", 2.5)
+            if isinstance(ga, (int, float)) and ga > 2.3 and raw["goal_si"] < 50:
+                raw["goal_si"] = round(50 + (ga - 2.3) * 5, 1)
+                raw["goal_no"] = round(100 - raw["goal_si"], 1)
+            # Quote
+            for tip in ["1", "x", "2"]:
+                p = raw.get(f"prob_{tip}", 33)
+                raw[f"quota_{tip}"] = round(105 / max(1, p), 2)
+            raw["risultati_esatti"] = (raw_domestic or raw_euro or raw_classifica or {}).get("risultati_esatti", [])
+            raw["gol_attesi"] = round(raw.get("gol_attesi", 2.5), 2) if isinstance(raw.get("gol_attesi"), (int, float)) else 2.5
+        else:
+            raw = raw_classifica or genera_pronostico(home, away)
 
-    raw = genera_pronostico(home, away)
+    # Fallback: Serie A o qualsiasi league senza dati CSV
+    if raw is None:
+        raw = genera_pronostico(home, away)
 
-    # ── BLEND CON QUOTE BOOKMAKER LIVE (the-odds-api) ──
+    # ── STEP 2: Blend con quote bookmaker live ──
     p1 = raw.get("prob_1", 0)
     px = raw.get("prob_x", 0)
     p2 = raw.get("prob_2", 0)
@@ -1479,7 +1602,6 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
     bk_used_live = False
     if bk_live and bk_live.get("prob_1"):
         bk_used_live = True
-        # Blend 65% modello + 35% bookmaker live (le quote live sono molto accurate)
         ALPHA_LIVE = 0.35
         bp1 = bk_live["prob_1"] / 100
         bpx = bk_live["prob_x"] / 100
@@ -1487,13 +1609,11 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         p1 = (1 - ALPHA_LIVE) * (p1 / 100) + ALPHA_LIVE * bp1
         px = (1 - ALPHA_LIVE) * (px / 100) + ALPHA_LIVE * bpx
         p2 = (1 - ALPHA_LIVE) * (p2 / 100) + ALPHA_LIVE * bp2
-        # Normalizza
         tot = p1 + px + p2
         if tot > 0:
             p1 = round(p1 / tot * 100, 1)
             px = round(px / tot * 100, 1)
             p2 = round(p2 / tot * 100, 1)
-        # Ricalcola suggerimento
         mp = max(p1, px, p2)
         if mp == p1:
             sugg, sugg_label = "1", "Vittoria Casa"
@@ -1501,16 +1621,13 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
             sugg, sugg_label = "X", "Pareggio"
         else:
             sugg, sugg_label = "2", "Vittoria Ospite"
-        # Ricalcola quote
         q1 = round(1.05 / (p1/100), 2) if p1 > 0 else 99
         qx = round(1.05 / (px/100), 2) if px > 0 else 99
         q2 = round(1.05 / (p2/100), 2) if p2 > 0 else 99
-        # Ricalcola confidence (boost se modello e bookmaker concordano)
         conf_raw = raw.get("confidence", 0.5)
         if sugg == raw.get("suggerimento", ""):
-            conf_raw = min(1.0, conf_raw * 1.08)  # +8% se concordano
+            conf_raw = min(1.0, conf_raw * 1.08)
         conf_label = "Alta" if conf_raw >= 0.82 else ("Media" if conf_raw >= 0.50 else "Bassa")
-        # Blend Over/Under con bookmaker live
         ov25 = raw.get("over_25", 50)
         un25 = raw.get("under_25", 50)
         if bk_live.get("bk_over_25"):
@@ -1527,26 +1644,33 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         ov25 = raw.get("over_25")
         un25 = raw.get("under_25")
 
-    # Marcatori live (cerca in cache API Football + fallback hardcoded)
+    # ── STEP 3: Marcatori e formazioni live ──
     h_t = home.strip().title()
     a_t = away.strip().title()
     mc_h = raw.get("marcatori_casa") or []
     mc_a = raw.get("marcatori_ospite") or []
+    all_leagues = [league, "serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1",
+                   "champions-league", "europa-league", "conference-league"]
     if not mc_h:
-        for lk in ["serie-a", "premier-league", "la-liga"]:
+        for lk in all_leagues:
             for m in (MARCATORI_CACHE.get(lk) or []):
-                if m.get("squadra") == h_t:
-                    mc_h.append(f"{m['giocatore']} ({m['gol']} gol)")
+                if m.get("squadra") == h_t and len(mc_h) < 3:
+                    entry = f"{m['giocatore']} ({m['gol']} gol)"
+                    if entry not in mc_h:
+                        mc_h.append(entry)
         if not mc_h:
             mc_h = _filtra_marcatori(TOP_SCORER.get(h_t, []), INFORTUNATI.get(h_t, []))
     if not mc_a:
-        for lk in ["serie-a", "premier-league", "la-liga"]:
+        for lk in all_leagues:
             for m in (MARCATORI_CACHE.get(lk) or []):
-                if m.get("squadra") == a_t:
-                    mc_a.append(f"{m['giocatore']} ({m['gol']} gol)")
+                if m.get("squadra") == a_t and len(mc_a) < 3:
+                    entry = f"{m['giocatore']} ({m['gol']} gol)"
+                    if entry not in mc_a:
+                        mc_a.append(entry)
         if not mc_a:
             mc_a = _filtra_marcatori(TOP_SCORER.get(a_t, []), INFORTUNATI.get(a_t, []))
 
+    # ── STEP 4: Risposta unificata ──
     return {
         "home": home,
         "away": away,
@@ -1566,7 +1690,7 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "goal_no": raw.get("goal_no"),
         "gol_attesi": raw.get("gol_attesi"),
         "risultati_esatti": raw.get("risultati_esatti", []),
-        "sicura": bool(conf_raw >= 0.82 and max(p1,px,p2) > 45),
+        "sicura": bool(conf_raw >= 0.82 and max(p1, px, p2) > 45),
         "marcatori_casa": mc_h[:3],
         "marcatori_ospite": mc_a[:3],
         "formazione_casa": raw.get("formazione_casa") or _get_last_lineup(h_t),
@@ -1577,11 +1701,10 @@ async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_op
         "bookmaker_live_data": bk_live if bk_used_live else None,
     }
 
-    # Salva predizione per tracking (in background)
-    import threading as _th
-    _th.Thread(target=save_prediction, args=(home, away, None, response_data, bk_used_live), daemon=True).start()
-
-    return response_data
+@app.get("/api/pronostico/{home}/{away}")
+async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_optional_user)):
+    check_limit(user)
+    return _compute_pronostico("serie-a", home, away)
 
 # ─────────────────────────────
 # CALENDARIO (FIX DEFINITIVO)
@@ -4052,187 +4175,11 @@ async def risultati_league(league: str):
     return {"giornate":giornate,"live":LIVE_IN_CORSO_ML.get(league,False),"aggiornamento":CLASSIFICA_LAST_UPDATE.get(league,"")}
 
 @app.get("/api/{league}/pronostico/{home}/{away}")
-async def pronostico_league(league: str, home: str, away: str):
+async def pronostico_league(league: str, home: str, away: str, user: Optional[dict] = Depends(get_optional_user)):
     if league not in LEAGUES:
         raise HTTPException(404, "Campionato non trovato")
-    # Per PL/LL usa dati CSV se disponibili, altrimenti fallback
-    if league == "premier-league" and _df_pl is not None and len(_df_pl) > 100:
-        try:
-            hs = get_team_stats(_df_pl, home, opponent=away)
-            aw = get_team_stats(_df_pl, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_pl)
-        except Exception:
-            raw = genera_pronostico(home, away)
-    elif league == "la-liga" and _df_ll is not None and len(_df_ll) > 100:
-        try:
-            hs = get_team_stats(_df_ll, home, opponent=away)
-            aw = get_team_stats(_df_ll, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_ll)
-        except Exception:
-            raw = genera_pronostico(home, away)
-    elif league == "bundesliga" and _df_bl is not None and len(_df_bl) > 100:
-        try:
-            hs = get_team_stats(_df_bl, home, opponent=away)
-            aw = get_team_stats(_df_bl, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_bl)
-        except Exception:
-            raw = genera_pronostico(home, away)
-    elif league == "ligue-1" and _df_l1 is not None and len(_df_l1) > 100:
-        try:
-            hs = get_team_stats(_df_l1, home, opponent=away)
-            aw = get_team_stats(_df_l1, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_l1)
-        except Exception:
-            raw = genera_pronostico(home, away)
-    elif league in ("champions-league", "europa-league", "conference-league"):
-        # Per competizioni europee: blend dati europei + nazionali + classifica live
-        euro_df = _df_ucl if league == "champions-league" else (_df_uel if league == "europa-league" else _df_uecl)
-        raw = None
-
-        # 1. Prova dati europei H2H
-        raw_euro = None
-        if euro_df is not None and len(euro_df) > 100:
-            try:
-                hs = get_team_stats(euro_df, home, opponent=away)
-                aw = get_team_stats(euro_df, away, opponent=home)
-                raw_euro = get_prediction(hs, aw, df=euro_df)
-            except Exception:
-                raw_euro = None
-
-        # 2. Prova dati campionato nazionale
-        raw_domestic = None
-        for dom_df in [_df, _df_pl, _df_ll, _df_bl]:
-            if dom_df is None:
-                continue
-            try:
-                hs_d = get_team_stats(dom_df, home, opponent=away)
-                aw_d = get_team_stats(dom_df, away, opponent=home)
-                raw_domestic = get_prediction(hs_d, aw_d, df=dom_df)
-                break
-            except Exception:
-                continue
-
-        # 3. Classifica live europea (sempre disponibile)
-        raw_classifica = genera_pronostico(home, away)
-
-        # 4. Blend intelligente
-        sources = []
-        if raw_domestic:
-            sources.append((raw_domestic, 0.45))  # Nazionale piu' affidabile
-        if raw_euro:
-            sources.append((raw_euro, 0.20))  # Dati europei H2H
-        if raw_classifica:
-            # Se non abbiamo dati nazionali, la classifica live diventa la fonte principale
-            sources.append((raw_classifica, 0.35 if raw_domestic else 0.80))
-
-        if sources:
-            raw = {}
-            total_w = sum(w for _, w in sources)
-            for k in (sources[0][0] or {}).keys():
-                vals = [(s.get(k), w) for s, w in sources if isinstance(s.get(k), (int, float))]
-                if vals:
-                    raw[k] = round(sum(v * w for v, w in vals) / sum(w for _, w in vals), 2)
-                else:
-                    raw[k] = sources[0][0].get(k)
-
-            # Ricalcola suggerimento
-            mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
-            raw["suggerimento"] = "1" if mp == raw.get("prob_1") else ("X" if mp == raw.get("prob_x") else "2")
-            raw["sugg_label"] = "Vittoria Casa" if raw["suggerimento"] == "1" else ("Pareggio" if raw["suggerimento"] == "X" else "Vittoria Ospite")
-
-            # Confidence: usa la fonte migliore, non il blend
-            best_conf = max((s.get("confidence", 0) for s, w in sources if isinstance(s.get("confidence"), (int, float))), default=0)
-            sp = sorted([raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0)], reverse=True)
-            if sp[0] > 1:
-                spread = (sp[0] - sp[1]) / 100
-            else:
-                spread = sp[0] - sp[1]
-            raw["confidence"] = round(max(best_conf, min(1.0, spread * 2.5)), 3)
-            raw["confidence_label"] = "Alta" if raw["confidence"] >= 0.82 else ("Media" if raw["confidence"] >= 0.50 else "Bassa")
-            raw["sicura"] = raw["confidence"] >= 0.82 and sp[0] > 45
-
-            # O/U: calibra sulla media gol reale della competizione
-            # UCL/UEL/UECL hanno media gol alta (~2.7-3.0)
-            ov = raw.get("over_25", 50)
-            un = raw.get("under_25", 50)
-            gol_att = raw.get("gol_attesi", 2.5)
-            if isinstance(gol_att, (int, float)) and gol_att > 2.5:
-                # Se gol attesi > 2.5, boost Over
-                ov = max(ov, 50 + (gol_att - 2.5) * 8)
-                ov = min(ov, 75)
-            raw["over_25"] = round(ov, 1)
-            raw["under_25"] = round(100 - ov, 1) if ov > 1 else round(un, 1)
-
-            # Goal Si/No: ricalcola dalla fonte piu' affidabile, non dal blend
-            # Il blend dei valori Goal produce risultati incoerenti
-            best_source = raw_domestic or raw_classifica or raw_euro or {}
-            gsi_best = best_source.get("goal_si", 50)
-            gno_best = best_source.get("goal_no", 50)
-            # Normalizza: se sono decimali (0-1) converti in percentuali
-            if isinstance(gsi_best, (int, float)) and gsi_best < 1:
-                gsi_best = gsi_best * 100
-            if isinstance(gno_best, (int, float)) and gno_best < 1:
-                gno_best = gno_best * 100
-            # Assicura coerenza
-            if gsi_best + gno_best > 110:
-                tot_g = gsi_best + gno_best
-                gsi_best = gsi_best / tot_g * 100
-            raw["goal_si"] = round(gsi_best, 1)
-            raw["goal_no"] = round(100 - gsi_best, 1)
-            # Boost se gol attesi alti
-            ga = raw.get("gol_attesi", 2.5)
-            if isinstance(ga, (int, float)) and ga > 2.3 and raw["goal_si"] < 50:
-                raw["goal_si"] = round(50 + (ga - 2.3) * 5, 1)
-                raw["goal_no"] = round(100 - raw["goal_si"], 1)
-
-            # Quote
-            for tip in ["1", "x", "2"]:
-                p = raw.get(f"prob_{tip}", 33)
-                raw[f"quota_{tip}"] = round(105 / max(1, p), 2)
-
-            # Risultati esatti e altri campi non numerici
-            raw["risultati_esatti"] = (raw_domestic or raw_euro or raw_classifica or {}).get("risultati_esatti", [])
-            raw["gol_attesi"] = round(raw.get("gol_attesi", 2.5), 2) if isinstance(raw.get("gol_attesi"), (int, float)) else 2.5
-        else:
-            raw = raw_classifica or genera_pronostico(home, away)
-    else:
-        raw = genera_pronostico(home, away)
-    # Formazioni e marcatori (fetch on-demand per PL)
-    h_title = home.strip().title()
-    a_title = away.strip().title()
-    form_casa = _get_last_lineup(h_title)
-    form_ospite = _get_last_lineup(a_title)
-    # Marcatori: cerca in TUTTI i campionati per trovare i goleador
-    marc_casa = []
-    marc_ospite = []
-    for lk in [league, "serie-a", "premier-league", "la-liga", "champions-league", "europa-league", "conference-league"]:
-        mc = MARCATORI_CACHE.get(lk) or []
-        for m in mc:
-            if m.get("squadra") == h_title and len(marc_casa) < 3:
-                entry = f"{m['giocatore']} ({m['gol']} gol)"
-                if entry not in marc_casa:
-                    marc_casa.append(entry)
-            elif m.get("squadra") == a_title and len(marc_ospite) < 3:
-                entry = f"{m['giocatore']} ({m['gol']} gol)"
-                if entry not in marc_ospite:
-                    marc_ospite.append(entry)
-
-    return {
-        "home":home,"away":away,
-        "prob_1":raw.get("prob_1",0),"prob_x":raw.get("prob_x",0),"prob_2":raw.get("prob_2",0),
-        "quota_1":raw.get("quota_1",0),"quota_x":raw.get("quota_x",0),"quota_2":raw.get("quota_2",0),
-        "suggerimento":raw.get("suggerimento",""),"sugg_label":raw.get("sugg_label",""),
-        "confidence":raw.get("confidence",0),"confidence_label":raw.get("confidence_label",""),
-        "over_25":raw.get("over_25"),"under_25":raw.get("under_25"),
-        "goal_si":raw.get("goal_si"),"goal_no":raw.get("goal_no"),
-        "gol_attesi":raw.get("gol_attesi"),
-        "risultati_esatti":raw.get("risultati_esatti",[]),
-        "sicura":bool(raw.get("sicura",False)),
-        "formazione_casa": form_casa,
-        "formazione_ospite": form_ospite,
-        "marcatori_casa": marc_casa[:3],
-        "marcatori_ospite": marc_ospite[:3],
-    }
+    check_limit(user)
+    return _compute_pronostico(league, home, away)
 
 # ─────────────────────────────
 # HEALTH CHECK
