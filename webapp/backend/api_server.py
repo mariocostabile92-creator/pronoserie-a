@@ -435,6 +435,13 @@ def _live_updater():
                 _fetch_rose_live(BL_TEAM_IDS)
                 _fetch_rose_live(L1_TEAM_IDS)
                 _fetch_risultati_stagione()
+                # Statistiche giocatori fantacalcio
+                for flk in FANTACALCIO_LEAGUES:
+                    try:
+                        _fetch_player_stats(flk)
+                        time.sleep(1)
+                    except Exception:
+                        pass
             # Competizioni europee: aggiorna ogni ciclo se partite in corso, altrimenti ogni 3 cicli
             if _updater_count % 3 == 0 or any(LIVE_IN_CORSO_ML.get(k) for k in ["champions-league","europa-league","conference-league","bundesliga","ligue-1"]):
                 _fetch_league_data("premier-league")
@@ -1946,6 +1953,80 @@ ALLENATORI_LIVE = {}
 INFORTUNATI_LIVE = {}
 ROSE_LAST_UPDATE = ""
 
+# ─────────────────────────────
+# FANTACALCIO - Cache statistiche giocatori
+# ─────────────────────────────
+PLAYER_STATS_CACHE = {}   # {league: {player_name_lower: {media, gol, assist, minuti, presenze, gialli, rossi, rigori_segnati, posizione, forma, forma_trend}}}
+PLAYER_STATS_LAST = 0
+FANTACALCIO_LEAGUES = ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]
+MATCHDAY_CACHE = {}  # {league: {round_num: {"data": str, "partite": [(home, away), ...]}}}
+
+
+def _fetch_player_stats(league_key):
+    """Fetch statistiche giocatori da API Football per il fantacalcio."""
+    global PLAYER_STATS_CACHE, PLAYER_STATS_LAST
+    lid = LEAGUES.get(league_key, {}).get("id")
+    if not lid:
+        return
+    stats = {}
+    pos_map = {"Goalkeeper": "P", "Defender": "D", "Midfielder": "C", "Attacker": "A"}
+
+    # Fetch topscorers
+    for endpoint in ["topscorers", "topassists"]:
+        try:
+            req = urllib.request.Request(
+                f"https://{FOOTBALL_API_HOST}/players/{endpoint}?league={lid}&season=2025",
+                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+            )
+            with urllib.request.urlopen(req, timeout=15) as r:
+                data = json.loads(r.read().decode())
+            for p in data.get("response", []):
+                pname = p.get("player", {}).get("name", "")
+                if not pname:
+                    continue
+                s = p.get("statistics", [{}])[0]
+                key = pname.lower()
+                existing = stats.get(key, {})
+                goals_data = s.get("goals", {})
+                games_data = s.get("games", {})
+                cards_data = s.get("cards", {})
+                penalty_data = s.get("penalty", {})
+                stats[key] = {
+                    "nome": pname,
+                    "gol": max(existing.get("gol", 0), goals_data.get("total") or 0),
+                    "assist": max(existing.get("assist", 0), goals_data.get("assists") or 0),
+                    "media": float(games_data.get("rating") or existing.get("media", 0) or 0),
+                    "minuti": max(existing.get("minuti", 0), games_data.get("minutes") or 0),
+                    "presenze": max(existing.get("presenze", 0), games_data.get("appearences") or 0),
+                    "gialli": max(existing.get("gialli", 0), cards_data.get("yellow") or 0),
+                    "rossi": max(existing.get("rossi", 0), cards_data.get("red") or 0),
+                    "rigori_segnati": max(existing.get("rigori_segnati", 0), penalty_data.get("scored") or 0),
+                    "posizione": pos_map.get(games_data.get("position", ""), existing.get("posizione", "A")),
+                    "squadra": s.get("team", {}).get("name", existing.get("squadra", "")),
+                }
+        except Exception as e:
+            print(f"\u26a0\ufe0f Fetch player stats {league_key}/{endpoint}: {e}")
+
+    # Calcola forma: controlla se il giocatore ha segnato/assistito di recente nei marcatori
+    marc = MARCATORI_CACHE.get(league_key) or []
+    marc_nomi = set(m.get("giocatore", "").lower().split()[-1] for m in marc if m.get("gol", 0) >= 3)
+    for key, ps in stats.items():
+        cognome = ps["nome"].split()[-1].lower()
+        if cognome in marc_nomi:
+            ps["forma"] = 1.15
+            ps["forma_trend"] = "crescita"
+        elif ps.get("media", 0) >= 7.0:
+            ps["forma"] = 1.05
+            ps["forma_trend"] = "stabile"
+        else:
+            ps["forma"] = 0.95
+            ps["forma_trend"] = "calo"
+
+    PLAYER_STATS_CACHE[league_key] = stats
+    PLAYER_STATS_LAST = time.time()
+    print(f"\U0001f4ca Player stats {league_key}: {len(stats)} giocatori")
+
+
 # Team IDs per API Football
 _TEAM_IDS = {
     "Inter":505,"Milan":489,"Napoli":492,"Como":895,"Juventus":496,
@@ -2915,65 +2996,174 @@ def _is_titolare(nome, titolari_set):
             return True
     return False
 
+
+def _get_titolarita_prob(nome, squadra):
+    """Restituisce (prob, status, fonte) per la titolarita' di un giocatore."""
+    if _is_injured(nome, squadra):
+        return (0, "INDISPONIBILE", "infortunato")
+
+    # Formazione ufficiale
+    form_off = LIVE_FORMAZIONI.get(squadra)
+    if form_off and _is_titolare(nome, _get_titolari(squadra)):
+        return (95, "TITOLARE", "ufficiale")
+
+    # Ultima formazione + non infortunato
+    titolari = _get_titolari(squadra)
+    if titolari and _is_titolare(nome, titolari):
+        # Boost se ha molti minuti stagionali
+        stats = PLAYER_STATS_CACHE.get("serie-a", {})
+        cognome = nome.split()[-1].lower()
+        minuti = 0
+        for k, v in stats.items():
+            if cognome and cognome in k:
+                minuti = v.get("minuti", 0)
+                break
+        prob = 75
+        if minuti > 1500:
+            prob = 85
+        return (prob, "PROBABILE" if prob < 90 else "TITOLARE", "ultima_partita")
+
+    # Nella rosa ma non in formazione
+    rosa = ROSE_LIVE.get(squadra) or []
+    for p in rosa:
+        if _is_titolare(nome, {p.get("nome", "")}):
+            return (30, "PANCA", "rosa")
+
+    return (20, "PANCA", "sconosciuto")
+
+
 # ─────────────────────────────
 # FANTACALCIO - Consigli
 # ─────────────────────────────
-@app.get("/api/fantacalcio/consigli/{giornata}")
-async def fantacalcio_consigli(giornata: int):
-    """Consigli formazione fantacalcio per la giornata Serie A con dati live."""
+
+def _fetch_matchday(league_key, giornata):
+    """Fetch partite di una giornata da API Football."""
+    lid = LEAGUES.get(league_key, {}).get("id")
+    if not lid:
+        return None
+    # Controlla cache
+    if league_key in MATCHDAY_CACHE and giornata in MATCHDAY_CACHE[league_key]:
+        return MATCHDAY_CACHE[league_key][giornata]
     try:
-        cal = CAL_HARDCODED.get(giornata)
-        if not cal:
-            return {"giornata": giornata, "consigli": [], "error": "Giornata non trovata"}
+        nome_map = _get_nome_map(league_key)
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league={lid}&season=2025&round=Regular Season - {giornata}",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
+        partite = []
+        data_str = ""
+        for fix in data.get("response", []):
+            home = fix.get("teams", {}).get("home", {}).get("name", "")
+            away = fix.get("teams", {}).get("away", {}).get("name", "")
+            home = nome_map.get(home, home)
+            away = nome_map.get(away, away)
+            partite.append((home, away))
+            if not data_str:
+                data_str = fix.get("fixture", {}).get("date", "")[:10]
+        if partite:
+            if league_key not in MATCHDAY_CACHE:
+                MATCHDAY_CACHE[league_key] = {}
+            MATCHDAY_CACHE[league_key][giornata] = {"data": data_str, "partite": partite}
+            return MATCHDAY_CACHE[league_key][giornata]
+    except Exception as e:
+        print(f"\u26a0\ufe0f Fetch matchday {league_key} G{giornata}: {e}")
+    return None
+
+
+def _build_squadra_tipo(consigli, league):
+    """Costruisce la squadra tipo consigliata con modulo adattivo."""
+    port = [p for p in consigli.get("portieri", []) if p.get("rating", 0) >= 5]
+    difs = [p for p in consigli.get("difensori", []) if p.get("rating", 0) >= 5]
+    cent = [p for p in consigli.get("centrocampisti", []) if p.get("rating", 0) >= 5]
+    atts = [p for p in consigli.get("attaccanti", []) if p.get("rating", 0) >= 5]
+
+    # Modulo adattivo
+    n_d = len(difs)
+    n_c = len(cent)
+    n_a = len(atts)
+
+    if n_d >= 4 and n_a >= 3:
+        modulo = "4-3-3"
+        nd, nc, na = 4, 3, 3
+    elif n_c >= 4:
+        modulo = "4-4-2"
+        nd, nc, na = 4, 4, 2
+    elif n_d < 4 and n_a >= 3:
+        modulo = "3-4-3"
+        nd, nc, na = 3, 4, 3
+    else:
+        modulo = "4-3-3"
+        nd, nc, na = min(4, n_d), min(3, n_c), min(3, n_a)
+
+    sel_port = port[0] if port else None
+    sel_dif = difs[:nd]
+    sel_cen = cent[:nc]
+    sel_att = atts[:na]
+
+    # Panchina: giocatori non selezionati
+    used = set()
+    if sel_port:
+        used.add(sel_port.get("giocatore", ""))
+    for lst in [sel_dif, sel_cen, sel_att]:
+        for p in lst:
+            used.add(p.get("giocatore", ""))
+
+    panchina = []
+    for lst in [port[1:], difs[nd:], cent[nc:], atts[na:]]:
+        for p in lst:
+            if p.get("giocatore", "") not in used and len(panchina) < 4:
+                panchina.append(p)
+                used.add(p.get("giocatore", ""))
+
+    # Capitano: rating piu' alto tra centrocampisti e attaccanti selezionati
+    capitano = ""
+    max_rat = 0
+    for p in sel_cen + sel_att:
+        if p.get("rating", 0) > max_rat:
+            max_rat = p["rating"]
+            capitano = p.get("giocatore", "")
+
+    return {
+        "modulo": modulo,
+        "portiere": sel_port,
+        "difensori": sel_dif,
+        "centrocampisti": sel_cen,
+        "attaccanti": sel_att,
+        "panchina": panchina,
+        "capitano": capitano,
+    }
+
+
+def _fantacalcio_impl(league, giornata):
+    """Implementazione condivisa fantacalcio per qualsiasi campionato."""
+    try:
+        # Ottieni partite della giornata
+        if league == "serie-a":
+            cal = CAL_HARDCODED.get(giornata)
+            if not cal:
+                return {"giornata": giornata, "consigli": {}, "error": "Giornata non trovata"}
+            partite = cal["partite"]
+            data_str = cal.get("data", "")
+        else:
+            md = _fetch_matchday(league, giornata)
+            if not md or not md.get("partite"):
+                return {"giornata": giornata, "consigli": {}, "error": "Giornata non trovata"}
+            partite = md["partite"]
+            data_str = md.get("data", "")
 
         consigli = {"portieri": [], "difensori": [], "centrocampisti": [], "attaccanti": [], "evitare": []}
+        player_stats = PLAYER_STATS_CACHE.get(league, {})
 
-        # Fetch top assist live da API Football (per separare centrocampisti)
-        assist_map = {}  # nome -> assist
-        try:
-            req = urllib.request.Request(
-                f"https://{FOOTBALL_API_HOST}/players/topassists?league=135&season=2025",
-                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-            )
-            with urllib.request.urlopen(req, timeout=15) as r:
-                adata = json.loads(r.read().decode())
-            for p in adata.get("response", []):
-                pname = p.get("player", {}).get("name", "")
-                stats = p.get("statistics", [{}])[0]
-                assists = stats.get("goals", {}).get("assists") or 0
-                if pname:
-                    assist_map[pname.lower()] = assists
-        except Exception:
-            pass
+        # Fetch topscorers/topassists live se cache vuota
+        if not player_stats:
+            _fetch_player_stats(league)
+            player_stats = PLAYER_STATS_CACHE.get(league, {})
 
-        # Mappa marcatori con posizione reale
-        scorers_with_pos = {}  # nome_lower -> {gol, assist, posizione, squadra}
-        try:
-            req = urllib.request.Request(
-                f"https://{FOOTBALL_API_HOST}/players/topscorers?league=135&season=2025",
-                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-            )
-            with urllib.request.urlopen(req, timeout=15) as r:
-                sdata = json.loads(r.read().decode())
-            for p in sdata.get("response", []):
-                pname = p.get("player", {}).get("name", "")
-                stats = p.get("statistics", [{}])[0]
-                gol = stats.get("goals", {}).get("total") or 0
-                pos = stats.get("games", {}).get("position", "")
-                team = stats.get("team", {}).get("name", "")
-                assists = stats.get("goals", {}).get("assists") or 0
-                pos_map = {"Attacker": "A", "Midfielder": "C", "Defender": "D", "Goalkeeper": "P"}
-                if pname:
-                    scorers_with_pos[pname.lower()] = {
-                        "nome": pname, "gol": gol, "assist": assists,
-                        "posizione": pos_map.get(pos, "A"), "squadra": team
-                    }
-        except Exception:
-            pass
-
-        for home, away in cal["partite"]:
+        for home, away in partite:
             try:
-                raw = genera_pronostico(home, away)
+                raw = _compute_pronostico(league, home, away)
             except Exception:
                 continue
 
@@ -2986,153 +3176,138 @@ async def fantacalcio_consigli(giornata: int):
             titolari_h = _get_titolari(home)
             titolari_a = _get_titolari(away)
 
-            # ── PORTIERI ──
             for squadra, prob, clean, avv, casa, titolari in [
                 (home, prob_h, clean_h, away, True, titolari_h),
                 (away, prob_a, clean_a, home, False, titolari_a)
             ]:
-                if prob < 30:
-                    continue
                 rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
+
                 for p in rosa:
-                    if p.get("ruolo") == "P" and not _is_injured(p["nome"], squadra):
-                        if _is_titolare(p["nome"], titolari):
-                            rating = round(prob * 0.04 + clean * 6, 1)
-                            consigli["portieri"].append({
-                                "giocatore": p["nome"], "squadra": squadra,
-                                "motivazione": f"Titolare, clean sheet {clean*100:.0f}% vs {avv}",
-                                "rating": min(10, rating), "avversario": avv, "casa": casa
-                            })
+                    nome = p.get("nome", "")
+                    ruolo = p.get("ruolo", "")
+                    if not nome or not ruolo:
+                        continue
+                    if _is_injured(nome, squadra):
+                        continue
+
+                    # Titolarita' con probabilita'
+                    tit_prob, tit_status, tit_fonte = _get_titolarita_prob(nome, squadra)
+                    if tit_prob < 30:
+                        continue
+
+                    # Cerca stats del giocatore
+                    cognome = nome.split()[-1].lower()
+                    ps = {}
+                    for k, v in player_stats.items():
+                        if cognome and cognome in k:
+                            ps = v
+                            break
+
+                    gol = ps.get("gol", 0)
+                    assist = ps.get("assist", 0)
+                    media = ps.get("media", 0)
+                    forma = ps.get("forma", 1.0)
+                    forma_trend = ps.get("forma_trend", "stabile")
+                    rigori = ps.get("rigori_segnati", 0)
+                    gialli = ps.get("gialli", 0)
+
+                    # Cerca anche nei marcatori cache
+                    if gol == 0:
+                        for m in (MARCATORI_CACHE.get(league) or []):
+                            m_cog = m.get("giocatore", "").split()[-1].lower()
+                            if cognome and cognome == m_cog:
+                                gol = m.get("gol", 0)
+                                break
+
+                    base_info = {
+                        "giocatore": nome, "squadra": squadra,
+                        "avversario": avv, "casa": casa,
+                        "tit_prob": tit_prob, "tit_status": tit_status,
+                        "media": round(media, 1) if media else 0,
+                        "gol": gol, "assist": assist,
+                        "forma": forma, "forma_trend": forma_trend,
+                        "rigori": rigori, "gialli": gialli,
+                    }
+
+                    if ruolo == "P":
+                        if prob < 30:
+                            continue
+                        rating = round(min(10, prob * 0.04 + clean * 6), 1)
+                        base_info["motivazione"] = f"{'Titolare' if tit_prob>=75 else 'Probabile'}, clean sheet {clean*100:.0f}% vs {avv}"
+                        base_info["rating"] = rating
+                        consigli["portieri"].append(base_info)
                         break  # Solo 1 portiere per squadra
 
-            # ── DIFENSORI ──
-            for squadra, prob, clean, avv, casa, titolari in [
-                (home, prob_h, clean_h, away, True, titolari_h),
-                (away, prob_a, clean_a, home, False, titolari_a)
-            ]:
-                if clean < 0.35:
-                    continue
-                rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
-                count = 0
-                for p in rosa:
-                    if p.get("ruolo") == "D" and not _is_injured(p["nome"], squadra):
-                        if _is_titolare(p["nome"], titolari):
-                            rating = round(clean * 8 + prob * 0.02, 1)
-                            consigli["difensori"].append({
-                                "giocatore": p["nome"], "squadra": squadra,
-                                "motivazione": f"Titolare, clean sheet {clean*100:.0f}% vs {avv}",
-                                "rating": min(10, rating), "avversario": avv, "casa": casa
-                            })
-                            count += 1
-                            if count >= 2:
-                                break
+                    elif ruolo == "D":
+                        if clean < 0.3:
+                            continue
+                        rating = round(min(10, clean * 8 + prob * 0.02 + (media * 0.3 if media else 0)), 1)
+                        base_info["motivazione"] = f"{'Titolare' if tit_prob>=75 else 'Probabile'}, clean sheet {clean*100:.0f}% vs {avv}"
+                        base_info["rating"] = rating
+                        consigli["difensori"].append(base_info)
 
-            # ── CENTROCAMPISTI (ruolo C) ──
-            for squadra, prob, avv, casa, titolari in [
-                (home, prob_h, away, True, titolari_h),
-                (away, prob_a, home, False, titolari_a)
-            ]:
-                rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
-                for p in rosa:
-                    if p.get("ruolo") != "C":
-                        continue
-                    if _is_injured(p["nome"], squadra):
-                        continue
-                    if not _is_titolare(p["nome"], titolari):
-                        continue
-                    nome_lower = p["nome"].lower()
-                    cognome = p["nome"].split()[-1].lower()
-                    # Cerca gol e assist
-                    gol = 0
-                    assist = 0
-                    # Cerca nei marcatori
-                    for lk in ["serie-a"]:
-                        for m in (MARCATORI_CACHE.get(lk) or []):
-                            m_cognome = m.get("giocatore", "").split()[-1].lower()
-                            if cognome and cognome == m_cognome:
-                                gol = m.get("gol", 0)
-                                break
-                    # Cerca negli assist
-                    for ak, av in assist_map.items():
-                        if cognome and cognome in ak:
-                            assist = av
-                            break
-                    # Cerca nei scorers con posizione
-                    for sk, sv in scorers_with_pos.items():
-                        if cognome and cognome in sk and sv.get("posizione") == "C":
-                            gol = max(gol, sv["gol"])
-                            assist = max(assist, sv["assist"])
-                            break
-                    if gol + assist >= 3:
-                        rating = round(min(10, (gol + assist) * 0.6 + prob / 20), 1)
-                        consigli["centrocampisti"].append({
-                            "giocatore": p["nome"], "squadra": squadra,
-                            "motivazione": f"{gol} gol, {assist} assist, vs {avv}",
-                            "rating": rating, "avversario": avv, "casa": casa,
-                            "gol": gol, "assist": assist
-                        })
+                    elif ruolo == "C":
+                        if gol + assist < 2 and media < 6.5:
+                            continue
+                        rating = round(min(10, (gol + assist) * 0.5 * forma + prob / 20 + (media * 0.2 if media else 0)), 1)
+                        base_info["motivazione"] = f"{gol} gol, {assist} assist, media {media:.1f}" if media else f"{gol} gol, {assist} assist vs {avv}"
+                        base_info["rating"] = rating
+                        consigli["centrocampisti"].append(base_info)
 
-            # ── ATTACCANTI (ruolo A) ──
-            for squadra, prob, avv, casa, titolari in [
-                (home, prob_h, away, True, titolari_h),
-                (away, prob_a, home, False, titolari_a)
-            ]:
-                rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
-                for p in rosa:
-                    if p.get("ruolo") != "A":
-                        continue
-                    if _is_injured(p["nome"], squadra):
-                        continue
-                    if not _is_titolare(p["nome"], titolari):
-                        continue
-                    nome_lower = p["nome"].lower()
-                    cognome = p["nome"].split()[-1].lower()
-                    gol = 0
-                    # Cerca nei marcatori
-                    for lk in ["serie-a"]:
-                        for m in (MARCATORI_CACHE.get(lk) or []):
-                            m_cognome = m.get("giocatore", "").split()[-1].lower()
-                            if cognome and cognome == m_cognome:
-                                gol = m.get("gol", 0)
-                                break
-                    # Cerca nei scorers con posizione
-                    for sk, sv in scorers_with_pos.items():
-                        if cognome and cognome in sk and sv.get("posizione") == "A":
-                            gol = max(gol, sv["gol"])
-                            break
-                    if gol >= 2:
-                        rating = round(min(10, gol * 0.8 + prob / 25), 1)
-                        consigli["attaccanti"].append({
-                            "giocatore": p["nome"], "squadra": squadra,
-                            "motivazione": f"{gol} gol stagionali, vs {avv}",
-                            "rating": rating, "avversario": avv, "casa": casa,
-                            "gol": gol
-                        })
+                    elif ruolo == "A":
+                        if gol < 1 and media < 6.5:
+                            continue
+                        rating = round(min(10, gol * 0.7 * forma + prob / 25 + (media * 0.2 if media else 0)), 1)
+                        base_info["motivazione"] = f"{gol} gol stagionali, media {media:.1f}" if media else f"{gol} gol vs {avv}"
+                        base_info["rating"] = rating
+                        consigli["attaccanti"].append(base_info)
 
-            # ── CHI EVITARE ──
+            # Chi evitare
             if prob_h < 20:
                 consigli["evitare"].append({"squadra": home, "motivazione": f"Solo {prob_h:.0f}% vittoria vs {away}", "tipo": "sfavorita"})
             if prob_a < 20:
                 consigli["evitare"].append({"squadra": away, "motivazione": f"Solo {prob_a:.0f}% vittoria vs {home}", "tipo": "sfavorita"})
 
-        # Aggiungi infortunati alla lista evitare
-        for squadra in [h for h, a in cal["partite"]] + [a for h, a in cal["partite"]]:
-            inj = INFORTUNATI_LIVE.get(squadra) or LIVE_INFORTUNATI.get(squadra) or []
-            for i in inj[:2]:
-                consigli["evitare"].append({
-                    "giocatore": i.get("nome", "?"), "squadra": squadra,
-                    "motivazione": i.get("dettaglio", "Indisponibile"), "tipo": "infortunato"
-                })
+        # Infortunati nella lista evitare
+        for home, away in partite:
+            for squadra in [home, away]:
+                inj = INFORTUNATI_LIVE.get(squadra) or LIVE_INFORTUNATI.get(squadra) or []
+                for i in inj[:2]:
+                    consigli["evitare"].append({
+                        "giocatore": i.get("nome", "?"), "squadra": squadra,
+                        "motivazione": i.get("dettaglio", "Indisponibile"), "tipo": "infortunato"
+                    })
 
-        # Ordina e limita per ruolo
+        # Ordina e limita 5-8 per ruolo
         for ruolo in ["portieri", "difensori", "centrocampisti", "attaccanti"]:
             consigli[ruolo].sort(key=lambda x: -x.get("rating", 0))
-            consigli[ruolo] = consigli[ruolo][:5]
+            consigli[ruolo] = consigli[ruolo][:8]
         consigli["evitare"] = consigli["evitare"][:10]
 
-        return {"giornata": giornata, "data": cal.get("data", ""), "consigli": consigli}
+        # Squadra tipo
+        squadra_tipo = _build_squadra_tipo(consigli, league)
+
+        return {
+            "giornata": giornata, "data": data_str,
+            "consigli": consigli,
+            "squadra_tipo": squadra_tipo,
+        }
     except Exception as e:
+        print(f"\u26a0\ufe0f Fantacalcio {league} G{giornata}: {e}")
         return {"giornata": giornata, "consigli": {}, "error": str(e)}
+
+
+@app.get("/api/fantacalcio/consigli/{giornata}")
+async def fantacalcio_consigli(giornata: int):
+    return _fantacalcio_impl("serie-a", giornata)
+
+
+@app.get("/api/{league}/fantacalcio/consigli/{giornata}")
+async def fantacalcio_consigli_league(league: str, giornata: int):
+    if league not in FANTACALCIO_LEAGUES:
+        raise HTTPException(404, "Campionato non supportato per il fantacalcio")
+    return _fantacalcio_impl(league, giornata)
+
 
 # ─────────────────────────────
 # STORICO PRONOSTICI UTENTE
