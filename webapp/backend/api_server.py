@@ -3192,16 +3192,22 @@ def _fantacalcio_impl(league, giornata):
 
                     # Titolarita' con probabilita'
                     tit_prob, tit_status, tit_fonte = _get_titolarita_prob(nome, squadra)
-                    if tit_prob < 30:
+                    if tit_prob < 75:  # SOLO titolari probabili (>=75%), no panca
                         continue
 
-                    # Cerca stats del giocatore
+                    # Cerca stats del giocatore per verificare ruolo corretto
                     cognome = nome.split()[-1].lower()
                     ps = {}
                     for k, v in player_stats.items():
                         if cognome and cognome in k:
                             ps = v
                             break
+                    
+                    # Verifica ruolo da stats API se disponibile (piu' affidabile)
+                    ruolo_api = ps.get("posizione", "")
+                    if ruolo_api and ruolo_api != ruolo:
+                        # Salta se il ruolo API e' diverso (es. Esposito e' A, non C)
+                        continue
 
                     gol = ps.get("gol", 0)
                     assist = ps.get("assist", 0)
