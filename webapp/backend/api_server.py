@@ -2853,96 +2853,282 @@ async def apply_referral(data: dict):
     return {"status": "ok", "reward": "1 mese Pro gratis"}
 
 # ─────────────────────────────
-# FANTACALCIO
+# FANTACALCIO - Helper
+# ─────────────────────────────
+def _is_injured(nome, squadra):
+    """Controlla se un giocatore e' infortunato (matching fuzzy sul cognome)."""
+    cognome = nome.split()[-1].lower() if nome else ""
+    for src in [INFORTUNATI_LIVE, LIVE_INFORTUNATI, INFORTUNATI]:
+        lista = src.get(squadra) or []
+        for inj in lista:
+            inj_nome = inj.get("nome", "") if isinstance(inj, dict) else str(inj)
+            if cognome and cognome in inj_nome.lower():
+                return True
+            if inj_nome.lower() in nome.lower() or nome.lower() in inj_nome.lower():
+                return True
+    return False
+
+def _get_titolari(squadra):
+    """Recupera set di nomi titolari dalla formazione piu' recente."""
+    form = LIVE_FORMAZIONI.get(squadra) or FORMAZIONI.get(squadra) or _get_last_lineup(squadra)
+    if not form:
+        return set()
+    titolari = set()
+    if isinstance(form, list):
+        for p in form:
+            if isinstance(p, str):
+                titolari.add(p)
+            elif isinstance(p, dict):
+                titolari.add(p.get("nome", p.get("name", "")))
+    elif isinstance(form, dict):
+        for ruolo, giocatori in form.items():
+            if isinstance(giocatori, list):
+                for g in giocatori:
+                    if isinstance(g, str):
+                        titolari.add(g)
+                    elif isinstance(g, dict):
+                        titolari.add(g.get("nome", g.get("name", "")))
+    return titolari
+
+def _get_player_role(nome, squadra):
+    """Cerca il ruolo del giocatore nella rosa (P/D/C/A)."""
+    rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
+    cognome = nome.split()[-1].lower() if nome else ""
+    for p in rosa:
+        p_nome = p.get("nome", "")
+        if cognome and cognome in p_nome.lower():
+            return p.get("ruolo", "")
+        if p_nome.lower() in nome.lower() or nome.lower() in p_nome.lower():
+            return p.get("ruolo", "")
+    return ""
+
+def _is_titolare(nome, titolari_set):
+    """Controlla se un giocatore e' tra i titolari (matching fuzzy)."""
+    if not titolari_set:
+        return True  # Se non abbiamo formazione, consideriamo tutti
+    cognome = nome.split()[-1].lower() if nome else ""
+    for t in titolari_set:
+        t_lower = t.lower()
+        if cognome and cognome in t_lower:
+            return True
+        if nome.lower() in t_lower or t_lower in nome.lower():
+            return True
+    return False
+
+# ─────────────────────────────
+# FANTACALCIO - Consigli
 # ─────────────────────────────
 @app.get("/api/fantacalcio/consigli/{giornata}")
 async def fantacalcio_consigli(giornata: int):
-    """Consigli formazione fantacalcio per la giornata Serie A."""
+    """Consigli formazione fantacalcio per la giornata Serie A con dati live."""
     try:
-        # Prendi le partite della giornata dal calendario
         cal = CAL_HARDCODED.get(giornata)
         if not cal:
             return {"giornata": giornata, "consigli": [], "error": "Giornata non trovata"}
 
         consigli = {"portieri": [], "difensori": [], "centrocampisti": [], "attaccanti": [], "evitare": []}
-        
+
+        # Fetch top assist live da API Football (per separare centrocampisti)
+        assist_map = {}  # nome -> assist
+        try:
+            req = urllib.request.Request(
+                f"https://{FOOTBALL_API_HOST}/players/topassists?league=135&season=2025",
+                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+            )
+            with urllib.request.urlopen(req, timeout=15) as r:
+                adata = json.loads(r.read().decode())
+            for p in adata.get("response", []):
+                pname = p.get("player", {}).get("name", "")
+                stats = p.get("statistics", [{}])[0]
+                assists = stats.get("goals", {}).get("assists") or 0
+                if pname:
+                    assist_map[pname.lower()] = assists
+        except Exception:
+            pass
+
+        # Mappa marcatori con posizione reale
+        scorers_with_pos = {}  # nome_lower -> {gol, assist, posizione, squadra}
+        try:
+            req = urllib.request.Request(
+                f"https://{FOOTBALL_API_HOST}/players/topscorers?league=135&season=2025",
+                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+            )
+            with urllib.request.urlopen(req, timeout=15) as r:
+                sdata = json.loads(r.read().decode())
+            for p in sdata.get("response", []):
+                pname = p.get("player", {}).get("name", "")
+                stats = p.get("statistics", [{}])[0]
+                gol = stats.get("goals", {}).get("total") or 0
+                pos = stats.get("games", {}).get("position", "")
+                team = stats.get("team", {}).get("name", "")
+                assists = stats.get("goals", {}).get("assists") or 0
+                pos_map = {"Attacker": "A", "Midfielder": "C", "Defender": "D", "Goalkeeper": "P"}
+                if pname:
+                    scorers_with_pos[pname.lower()] = {
+                        "nome": pname, "gol": gol, "assist": assists,
+                        "posizione": pos_map.get(pos, "A"), "squadra": team
+                    }
+        except Exception:
+            pass
+
         for home, away in cal["partite"]:
             try:
                 raw = genera_pronostico(home, away)
-            except:
+            except Exception:
                 continue
 
-            clean_h = 1.0 - (raw.get("goal_si", 50) / 100) if raw.get("goal_si") else 0.5
-            clean_a = 1.0 - (raw.get("goal_si", 50) / 100) if raw.get("goal_si") else 0.5
+            prob_h = raw.get("prob_1", 30)
+            prob_a = raw.get("prob_2", 30)
+            goal_si = raw.get("goal_si", 50)
+            clean_h = max(0, min(1, 1.0 - (goal_si / 100))) if isinstance(goal_si, (int, float)) else 0.5
+            clean_a = max(0, min(1, 1.0 - (goal_si / 100))) if isinstance(goal_si, (int, float)) else 0.5
 
-            marc_h = []
-            marc_a = []
-            for lk in ["serie-a"]:
-                for m in (MARCATORI_CACHE.get(lk) or []):
-                    if m.get("squadra") == home:
-                        marc_h.append(m)
-                    elif m.get("squadra") == away:
-                        marc_a.append(m)
+            titolari_h = _get_titolari(home)
+            titolari_a = _get_titolari(away)
 
-            # Portieri: prendi il portiere titolare dalla formazione
-            if raw.get("prob_1", 0) > 40:
-                port_h = None
-                form_h = LIVE_FORMAZIONI.get(home) or FORMAZIONI.get(home) or _get_last_lineup(home)
-                rosa_h = ROSE_LIVE.get(home) or [{"nome":g[0],"ruolo":g[1]} for g in ROSE.get(home,[])]
-                if rosa_h:
-                    port_h = next((p["nome"] for p in rosa_h if p.get("ruolo") == "P"), None)
-                if port_h:
-                    consigli["portieri"].append({"giocatore": port_h, "squadra": home, "motivazione": f"Favorita ({raw['prob_1']:.0f}%), clean sheet {clean_h*100:.0f}%", "rating": round(clean_h * 10, 1), "avversario": away, "casa": True})
-            if raw.get("prob_2", 0) > 40:
-                port_a = None
-                rosa_a = ROSE_LIVE.get(away) or [{"nome":g[0],"ruolo":g[1]} for g in ROSE.get(away,[])]
-                if rosa_a:
-                    port_a = next((p["nome"] for p in rosa_a if p.get("ruolo") == "P"), None)
-                if port_a:
-                    consigli["portieri"].append({"giocatore": port_a, "squadra": away, "motivazione": f"Favorita ({raw['prob_2']:.0f}%), clean sheet {clean_a*100:.0f}%", "rating": round(clean_a * 10, 1), "avversario": home, "casa": False})
+            # ── PORTIERI ──
+            for squadra, prob, clean, avv, casa, titolari in [
+                (home, prob_h, clean_h, away, True, titolari_h),
+                (away, prob_a, clean_a, home, False, titolari_a)
+            ]:
+                if prob < 30:
+                    continue
+                rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
+                for p in rosa:
+                    if p.get("ruolo") == "P" and not _is_injured(p["nome"], squadra):
+                        if _is_titolare(p["nome"], titolari):
+                            rating = round(prob * 0.04 + clean * 6, 1)
+                            consigli["portieri"].append({
+                                "giocatore": p["nome"], "squadra": squadra,
+                                "motivazione": f"Titolare, clean sheet {clean*100:.0f}% vs {avv}",
+                                "rating": min(10, rating), "avversario": avv, "casa": casa
+                            })
+                        break  # Solo 1 portiere per squadra
 
-            # Difensori: prendi i difensori dalla rosa della squadra con alta clean sheet
-            if clean_h > 0.4:
-                rosa_h = ROSE_LIVE.get(home) or [{"nome":g[0],"ruolo":g[1]} for g in ROSE.get(home,[])]
-                difs = [p["nome"] for p in rosa_h if p.get("ruolo") == "D"][:3]
-                for d in difs:
-                    consigli["difensori"].append({"giocatore": d, "squadra": home, "motivazione": f"Clean sheet {clean_h*100:.0f}% vs {away}", "rating": round(clean_h * 9, 1), "avversario": away, "casa": True})
-            if clean_a > 0.4:
-                rosa_a = ROSE_LIVE.get(away) or [{"nome":g[0],"ruolo":g[1]} for g in ROSE.get(away,[])]
-                difs = [p["nome"] for p in rosa_a if p.get("ruolo") == "D"][:3]
-                for d in difs:
-                    consigli["difensori"].append({"giocatore": d, "squadra": away, "motivazione": f"Clean sheet {clean_a*100:.0f}% vs {home}", "rating": round(clean_a * 9, 1), "avversario": home, "casa": False})
+            # ── DIFENSORI ──
+            for squadra, prob, clean, avv, casa, titolari in [
+                (home, prob_h, clean_h, away, True, titolari_h),
+                (away, prob_a, clean_a, home, False, titolari_a)
+            ]:
+                if clean < 0.35:
+                    continue
+                rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
+                count = 0
+                for p in rosa:
+                    if p.get("ruolo") == "D" and not _is_injured(p["nome"], squadra):
+                        if _is_titolare(p["nome"], titolari):
+                            rating = round(clean * 8 + prob * 0.02, 1)
+                            consigli["difensori"].append({
+                                "giocatore": p["nome"], "squadra": squadra,
+                                "motivazione": f"Titolare, clean sheet {clean*100:.0f}% vs {avv}",
+                                "rating": min(10, rating), "avversario": avv, "casa": casa
+                            })
+                            count += 1
+                            if count >= 2:
+                                break
 
-            # Centrocampisti: goleador con rating medio (assist + gol)
-            for m in marc_h:
-                if m["gol"] >= 5:
-                    consigli["centrocampisti"].append({"giocatore": m["giocatore"], "squadra": home, "gol": m["gol"], "motivazione": f"{m['gol']} gol, casa vs {away}", "rating": round(min(9, m["gol"] * 0.5 + raw.get("prob_1", 30) / 15), 1), "avversario": away, "casa": True})
-            for m in marc_a:
-                if m["gol"] >= 5:
-                    consigli["centrocampisti"].append({"giocatore": m["giocatore"], "squadra": away, "gol": m["gol"], "motivazione": f"{m['gol']} gol, trasferta vs {home}", "rating": round(min(9, m["gol"] * 0.5 + raw.get("prob_2", 30) / 15), 1), "avversario": home, "casa": False})
+            # ── CENTROCAMPISTI (ruolo C) ──
+            for squadra, prob, avv, casa, titolari in [
+                (home, prob_h, away, True, titolari_h),
+                (away, prob_a, home, False, titolari_a)
+            ]:
+                rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
+                for p in rosa:
+                    if p.get("ruolo") != "C":
+                        continue
+                    if _is_injured(p["nome"], squadra):
+                        continue
+                    if not _is_titolare(p["nome"], titolari):
+                        continue
+                    nome_lower = p["nome"].lower()
+                    cognome = p["nome"].split()[-1].lower()
+                    # Cerca gol e assist
+                    gol = 0
+                    assist = 0
+                    # Cerca nei marcatori
+                    for lk in ["serie-a"]:
+                        for m in (MARCATORI_CACHE.get(lk) or []):
+                            m_cognome = m.get("giocatore", "").split()[-1].lower()
+                            if cognome and cognome == m_cognome:
+                                gol = m.get("gol", 0)
+                                break
+                    # Cerca negli assist
+                    for ak, av in assist_map.items():
+                        if cognome and cognome in ak:
+                            assist = av
+                            break
+                    # Cerca nei scorers con posizione
+                    for sk, sv in scorers_with_pos.items():
+                        if cognome and cognome in sk and sv.get("posizione") == "C":
+                            gol = max(gol, sv["gol"])
+                            assist = max(assist, sv["assist"])
+                            break
+                    if gol + assist >= 3:
+                        rating = round(min(10, (gol + assist) * 0.6 + prob / 20), 1)
+                        consigli["centrocampisti"].append({
+                            "giocatore": p["nome"], "squadra": squadra,
+                            "motivazione": f"{gol} gol, {assist} assist, vs {avv}",
+                            "rating": rating, "avversario": avv, "casa": casa,
+                            "gol": gol, "assist": assist
+                        })
 
-            # Attaccanti: top scorer
-            for m in marc_h[:2]:
-                consigli["attaccanti"].append({"giocatore": m["giocatore"], "squadra": home, "gol": m["gol"], "motivazione": f"{m['gol']} gol, gioca vs {away}", "rating": round(min(10, m["gol"] * 0.7 + raw.get("prob_1", 30) / 20), 1), "avversario": away, "casa": True})
-            for m in marc_a[:2]:
-                consigli["attaccanti"].append({"giocatore": m["giocatore"], "squadra": away, "gol": m["gol"], "motivazione": f"{m['gol']} gol, gioca vs {home}", "rating": round(min(10, m["gol"] * 0.7 + raw.get("prob_2", 30) / 20), 1), "avversario": home, "casa": False})
+            # ── ATTACCANTI (ruolo A) ──
+            for squadra, prob, avv, casa, titolari in [
+                (home, prob_h, away, True, titolari_h),
+                (away, prob_a, home, False, titolari_a)
+            ]:
+                rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
+                for p in rosa:
+                    if p.get("ruolo") != "A":
+                        continue
+                    if _is_injured(p["nome"], squadra):
+                        continue
+                    if not _is_titolare(p["nome"], titolari):
+                        continue
+                    nome_lower = p["nome"].lower()
+                    cognome = p["nome"].split()[-1].lower()
+                    gol = 0
+                    # Cerca nei marcatori
+                    for lk in ["serie-a"]:
+                        for m in (MARCATORI_CACHE.get(lk) or []):
+                            m_cognome = m.get("giocatore", "").split()[-1].lower()
+                            if cognome and cognome == m_cognome:
+                                gol = m.get("gol", 0)
+                                break
+                    # Cerca nei scorers con posizione
+                    for sk, sv in scorers_with_pos.items():
+                        if cognome and cognome in sk and sv.get("posizione") == "A":
+                            gol = max(gol, sv["gol"])
+                            break
+                    if gol >= 2:
+                        rating = round(min(10, gol * 0.8 + prob / 25), 1)
+                        consigli["attaccanti"].append({
+                            "giocatore": p["nome"], "squadra": squadra,
+                            "motivazione": f"{gol} gol stagionali, vs {avv}",
+                            "rating": rating, "avversario": avv, "casa": casa,
+                            "gol": gol
+                        })
 
-            # Chi evitare: squadre sfavorite + infortunati
-            if raw.get("prob_1", 0) < 20:
-                consigli["evitare"].append({"squadra": home, "motivazione": f"Solo {raw['prob_1']:.0f}% di vittoria vs {away}", "tipo": "sfavorita"})
-            if raw.get("prob_2", 0) < 20:
-                consigli["evitare"].append({"squadra": away, "motivazione": f"Solo {raw['prob_2']:.0f}% di vittoria vs {home}", "tipo": "sfavorita"})
+            # ── CHI EVITARE ──
+            if prob_h < 20:
+                consigli["evitare"].append({"squadra": home, "motivazione": f"Solo {prob_h:.0f}% vittoria vs {away}", "tipo": "sfavorita"})
+            if prob_a < 20:
+                consigli["evitare"].append({"squadra": away, "motivazione": f"Solo {prob_a:.0f}% vittoria vs {home}", "tipo": "sfavorita"})
 
         # Aggiungi infortunati alla lista evitare
         for squadra in [h for h, a in cal["partite"]] + [a for h, a in cal["partite"]]:
             inj = INFORTUNATI_LIVE.get(squadra) or LIVE_INFORTUNATI.get(squadra) or []
             for i in inj[:2]:
-                consigli["evitare"].append({"giocatore": i.get("nome", "?"), "squadra": squadra, "motivazione": i.get("dettaglio", "Indisponibile"), "tipo": "infortunato"})
+                consigli["evitare"].append({
+                    "giocatore": i.get("nome", "?"), "squadra": squadra,
+                    "motivazione": i.get("dettaglio", "Indisponibile"), "tipo": "infortunato"
+                })
 
-        # Ordina per rating
-        for ruolo in consigli:
+        # Ordina e limita per ruolo
+        for ruolo in ["portieri", "difensori", "centrocampisti", "attaccanti"]:
             consigli[ruolo].sort(key=lambda x: -x.get("rating", 0))
             consigli[ruolo] = consigli[ruolo][:5]
+        consigli["evitare"] = consigli["evitare"][:10]
 
         return {"giornata": giornata, "data": cal.get("data", ""), "consigli": consigli}
     except Exception as e:
