@@ -3986,13 +3986,17 @@ async def calendario_league(league: str):
                 partite = per_round[rd]
                 g_num = rd.split(" - ")[-1] if " - " in rd else rd
 
-                tutte_finite = all(p["status"] in ("FT", "AET", "PEN") for p in partite)
+                total = len(partite)
+                ft_count = sum(1 for p in partite if p["status"] in ("FT", "AET", "PEN"))
+                ns_count = sum(1 for p in partite if p["status"] in ("NS", "TBD"))
                 ha_live = any(p["live"] for p in partite)
-                ha_da_giocare = any(p["status"] in ("NS", "TBD") for p in partite)
-                # Se nessuna partita da giocare e nessuna live -> completata
-                nessuna_futura = not ha_da_giocare and not ha_live
+                
+                # Se almeno 70% delle partite sono finite, considera la giornata completata
+                # Questo gestisce il caso di partite rinviate o in corso
+                tutte_finite = ft_count >= total * 0.7
+                ha_da_giocare = ns_count > 0
 
-                if tutte_finite or nessuna_futura:
+                if tutte_finite:
                     stato = "completata"
                 elif ha_live:
                     stato = "live"
