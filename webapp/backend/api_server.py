@@ -3437,7 +3437,7 @@ async def accuratezza():
     """Calcola accuratezza pronostici vs risultati reali per ogni giornata."""
     risultati = []
 
-    for league_key in ["serie-a", "premier-league", "la-liga"]:
+    for league_key in ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]:
         league = LEAGUES.get(league_key)
         if not league:
             continue
