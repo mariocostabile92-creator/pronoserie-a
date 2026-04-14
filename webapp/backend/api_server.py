@@ -2485,11 +2485,24 @@ async def schedina_bl():
         nome_map = _get_nome_map("bundesliga"); giornata_num = ""; giocate = []
         for fix in data["response"][:10]:
             teams=fix.get("teams",{}); lg=fix.get("league",{})
-            home=nome_map.get(teams.get("home",{}).get("name","?"),teams.get("home",{}).get("name","?"))
-            away=nome_map.get(teams.get("away",{}).get("name","?"),teams.get("away",{}).get("name","?"))
+            home_api=teams.get("home",{}).get("name","?")
+            away_api=teams.get("away",{}).get("name","?")
+            home=nome_map.get(home_api, home_api)
+            away=nome_map.get(away_api, away_api)
             if not giornata_num: giornata_num=lg.get("round","").split(" - ")[-1] if " - " in lg.get("round","") else "?"
             try:
-                raw=genera_pronostico(home,away); mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
+                # Usa CSV Bundesliga - prova nome mappato, poi originale
+                if _df_bl is not None and len(_df_bl) > 100:
+                    try:
+                        hs = get_team_stats(_df_bl, home, opponent=away)
+                        aws = get_team_stats(_df_bl, away, opponent=home)
+                    except:
+                        hs = get_team_stats(_df_bl, home_api, opponent=away_api)
+                        aws = get_team_stats(_df_bl, away_api, opponent=home_api)
+                    raw = get_prediction(hs, aws, df=_df_bl)
+                else:
+                    raw = genera_pronostico(home, away)
+                mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
                 if conf>=0.30 or mp>35:
                     giocate.append({"home":home,"away":away,"tip":raw.get("suggerimento","?"),"prob":mp,"quota":raw.get(f"quota_{raw.get('suggerimento','1').lower()}",1.5),"confidence":conf,"over_under":("Over 2.5 "+str(raw.get("over_25",50))+"%") if raw.get("over_25",0)>50 else ("Under 2.5 "+str(raw.get("under_25",50))+"%"),"goal":("Goal Si "+str(raw.get("goal_si",50))+"%") if raw.get("goal_si",0)>50 else ("Goal No "+str(raw.get("goal_no",50))+"%")})
             except: continue
@@ -2512,11 +2525,24 @@ async def schedina_l1():
         nome_map = _get_nome_map("ligue-1"); giornata_num = ""; giocate = []
         for fix in data["response"][:10]:
             teams=fix.get("teams",{}); lg=fix.get("league",{})
-            home=nome_map.get(teams.get("home",{}).get("name","?"),teams.get("home",{}).get("name","?"))
-            away=nome_map.get(teams.get("away",{}).get("name","?"),teams.get("away",{}).get("name","?"))
+            home_api=teams.get("home",{}).get("name","?")
+            away_api=teams.get("away",{}).get("name","?")
+            home=nome_map.get(home_api, home_api)
+            away=nome_map.get(away_api, away_api)
             if not giornata_num: giornata_num=lg.get("round","").split(" - ")[-1] if " - " in lg.get("round","") else "?"
             try:
-                raw=genera_pronostico(home,away); mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
+                # Usa CSV Ligue 1 - prova nome mappato, poi originale
+                if _df_l1 is not None and len(_df_l1) > 100:
+                    try:
+                        hs = get_team_stats(_df_l1, home, opponent=away)
+                        aws = get_team_stats(_df_l1, away, opponent=home)
+                    except:
+                        hs = get_team_stats(_df_l1, home_api, opponent=away_api)
+                        aws = get_team_stats(_df_l1, away_api, opponent=home_api)
+                    raw = get_prediction(hs, aws, df=_df_l1)
+                else:
+                    raw = genera_pronostico(home, away)
+                mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
                 if conf>=0.30 or mp>35:
                     giocate.append({"home":home,"away":away,"tip":raw.get("suggerimento","?"),"prob":mp,"quota":raw.get(f"quota_{raw.get('suggerimento','1').lower()}",1.5),"confidence":conf,"over_under":("Over 2.5 "+str(raw.get("over_25",50))+"%") if raw.get("over_25",0)>50 else ("Under 2.5 "+str(raw.get("under_25",50))+"%"),"goal":("Goal Si "+str(raw.get("goal_si",50))+"%") if raw.get("goal_si",0)>50 else ("Goal No "+str(raw.get("goal_no",50))+"%")})
             except: continue
