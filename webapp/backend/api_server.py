@@ -64,6 +64,7 @@ _df_uel = None
 _df_uecl = None
 _df_bl = None
 _df_l1 = None
+_df_wc = None    # World Cup
 LIMITE_FREE = 2
 
 LEAGUES = {
@@ -75,6 +76,7 @@ LEAGUES = {
     "conference-league": {"id": 848, "season": 2025, "name": "Conference League", "country": "Europe"},
     "bundesliga": {"id": 78, "season": 2025, "name": "Bundesliga", "country": "Germany"},
     "ligue-1": {"id": 61, "season": 2025, "name": "Ligue 1", "country": "France"},
+    "mondiali-2026": {"id": 1, "season": 2026, "name": "FIFA World Cup 2026", "country": "World", "type": "tournament"},
 }
 
 # Mapping nomi API Football -> nomi nostri (per ogni league)
@@ -209,6 +211,8 @@ def _get_nome_map(league_key):
         return BL_NOME_MAP
     if league_key == "ligue-1":
         return L1_NOME_MAP
+    if league_key == "mondiali-2026":
+        return WC_NOME_MAP
     return FOOTBALL_NOME_MAP
 
 def _get_team_ids(league_key):
@@ -442,6 +446,11 @@ def _live_updater():
                         time.sleep(1)
                     except Exception:
                         pass
+                # Mondiali 2026
+                try:
+                    _fetch_worldcup_data()
+                except Exception:
+                    pass
             # Competizioni europee: aggiorna ogni ciclo se partite in corso, altrimenti ogni 3 cicli
             if _updater_count % 3 == 0 or any(LIVE_IN_CORSO_ML.get(k) for k in ["champions-league","europa-league","conference-league","bundesliga","ligue-1"]):
                 _fetch_league_data("premier-league")
@@ -1597,6 +1606,10 @@ def _compute_pronostico(league: str, home: str, away: str) -> dict:
         else:
             raw = raw_classifica or genera_pronostico(home, away)
 
+    elif league == "mondiali-2026":
+        # Mondiali: usa genera_pronostico con fallback
+        raw = genera_pronostico(home, away)
+
     # Fallback: Serie A o qualsiasi league senza dati CSV
     if raw is None:
         raw = genera_pronostico(home, away)
@@ -1960,6 +1973,142 @@ PLAYER_STATS_CACHE = {}   # {league: {player_name_lower: {media, gol, assist, mi
 PLAYER_STATS_LAST = 0
 FANTACALCIO_LEAGUES = ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]
 MATCHDAY_CACHE = {}  # {league: {round_num: {"data": str, "partite": [(home, away), ...]}}}
+
+# ── Mondiali 2026 ──
+WC_GIRONI_CACHE = {}   # {girone_letter: [{squadra, punti, gf, gs, diff, team_id}, ...]}
+WC_FIXTURES_CACHE = [] # Lista di tutte le partite WC
+WC_LAST_UPDATE = 0
+
+WC_NOME_MAP = {
+    "United States": "USA", "USA": "USA",
+    "England": "Inghilterra", "France": "Francia",
+    "Germany": "Germania", "Spain": "Spagna",
+    "Brazil": "Brasile", "Argentina": "Argentina",
+    "Netherlands": "Olanda", "Belgium": "Belgio",
+    "Portugal": "Portogallo", "Croatia": "Croazia",
+    "Switzerland": "Svizzera", "Sweden": "Svezia",
+    "South Korea": "Corea del Sud", "Japan": "Giappone",
+    "Mexico": "Messico", "Canada": "Canada",
+    "Australia": "Australia", "Morocco": "Marocco",
+    "Senegal": "Senegal", "Tunisia": "Tunisia",
+    "Ivory Coast": "Costa d'Avorio", "Ghana": "Ghana",
+    "Egypt": "Egitto", "Algeria": "Algeria",
+    "South Africa": "Sudafrica", "Cape Verde Islands": "Capo Verde",
+    "Congo DR": "Congo DR", "Cameroon": "Camerun",
+    "Saudi Arabia": "Arabia Saudita", "Qatar": "Qatar",
+    "Iran": "Iran", "Iraq": "Iraq",
+    "Jordan": "Giordania", "Uzbekistan": "Uzbekistan",
+    "New Zealand": "Nuova Zelanda", "Haiti": "Haiti",
+    "Panama": "Panama", "Paraguay": "Paraguay",
+    "Uruguay": "Uruguay", "Colombia": "Colombia",
+    "Ecuador": "Ecuador", "Bolivia": "Bolivia",
+    "Türkiye": "Turchia", "Austria": "Austria",
+    "Norway": "Norvegia", "Scotland": "Scozia",
+    "Czech Republic": "Rep. Ceca", "Curaçao": "Curacao",
+    "Bosnia & Herzegovina": "Bosnia",
+}
+
+WC_TEAM_IDS = {
+    "USA": 2384, "Messico": 16, "Canada": 1997,
+    "Brasile": 6, "Argentina": 26, "Uruguay": 27,
+    "Colombia": 1560, "Ecuador": 2285, "Paraguay": 28,
+    "Francia": 2, "Inghilterra": 10, "Germania": 25,
+    "Spagna": 9, "Portogallo": 27, "Olanda": 1118,
+    "Belgio": 1, "Croazia": 3, "Svizzera": 15,
+    "Svezia": 22, "Austria": 775, "Norvegia": 1090,
+    "Scozia": 1569, "Rep. Ceca": 770, "Turchia": 3589,
+    "Bosnia": 764, "Giappone": 2232, "Corea del Sud": 17,
+    "Australia": 20, "Arabia Saudita": 23, "Qatar": 1569,
+    "Iran": 22, "Iraq": 2378, "Giordania": 99,
+    "Uzbekistan": 2385, "Nuova Zelanda": 1530,
+    "Marocco": 31, "Senegal": 34, "Tunisia": 28,
+    "Costa d'Avorio": 2282, "Ghana": 867, "Egitto": 3568,
+    "Algeria": 1538, "Sudafrica": 1530, "Capo Verde": 1535,
+    "Congo DR": 2286, "Haiti": 2380, "Panama": 2381,
+    "Curacao": 2382,
+}
+
+def _fetch_worldcup_data():
+    """Fetch gironi e partite Mondiali 2026 da API Football."""
+    global WC_GIRONI_CACHE, WC_FIXTURES_CACHE, WC_LAST_UPDATE
+    import time as _time
+    if _time.time() - WC_LAST_UPDATE < 1800:  # Cache 30 min
+        return
+
+    try:
+        # Standings (gironi)
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/standings?league=1&season=2026",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode())
+
+        gironi = {}
+        for resp in data.get("response", []):
+            for grp_list in resp.get("league", {}).get("standings", []):
+                if not grp_list:
+                    continue
+                g_name = grp_list[0].get("group", "")
+                # Estrai lettera girone: "Group A" -> "A"
+                g_letter = g_name.replace("Group ", "").strip()
+                if g_letter.startswith("Ranking"):
+                    continue  # Skip ranking terze
+                squadre = []
+                for team in grp_list:
+                    t_name = team.get("team", {}).get("name", "")
+                    display = WC_NOME_MAP.get(t_name, t_name)
+                    squadre.append({
+                        "pos": team.get("rank", 0),
+                        "squadra": display,
+                        "squadra_api": t_name,
+                        "team_id": team.get("team", {}).get("id", 0),
+                        "punti": team.get("points", 0),
+                        "g": team.get("all", {}).get("played", 0),
+                        "v": team.get("all", {}).get("win", 0),
+                        "p": team.get("all", {}).get("draw", 0),
+                        "s": team.get("all", {}).get("lose", 0),
+                        "gf": team.get("all", {}).get("goals", {}).get("for", 0),
+                        "gs": team.get("all", {}).get("goals", {}).get("against", 0),
+                        "diff": team.get("goalsDiff", 0),
+                    })
+                if g_letter:
+                    gironi[g_letter] = squadre
+
+        WC_GIRONI_CACHE = gironi
+
+        # Fixtures
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=1&season=2026",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode())
+
+        fixtures = []
+        for fix in data.get("response", []):
+            home_api = fix.get("teams", {}).get("home", {}).get("name", "")
+            away_api = fix.get("teams", {}).get("away", {}).get("name", "")
+            fixtures.append({
+                "home": WC_NOME_MAP.get(home_api, home_api),
+                "away": WC_NOME_MAP.get(away_api, away_api),
+                "home_api": home_api,
+                "away_api": away_api,
+                "home_id": fix.get("teams", {}).get("home", {}).get("id", 0),
+                "away_id": fix.get("teams", {}).get("away", {}).get("id", 0),
+                "data": fix.get("fixture", {}).get("date", "")[:10],
+                "ora": fix.get("fixture", {}).get("date", "")[11:16] if "T" in fix.get("fixture", {}).get("date", "") else "",
+                "round": fix.get("league", {}).get("round", ""),
+                "status": fix.get("fixture", {}).get("status", {}).get("short", "NS"),
+                "gol_h": fix.get("goals", {}).get("home"),
+                "gol_a": fix.get("goals", {}).get("away"),
+            })
+
+        WC_FIXTURES_CACHE = sorted(fixtures, key=lambda x: x.get("data", ""))
+        WC_LAST_UPDATE = _time.time()
+        print(f"🏆 Mondiali 2026: {len(gironi)} gironi, {len(fixtures)} partite")
+    except Exception as e:
+        print(f"⚠️ Fetch WC data: {e}")
 
 
 def _fetch_player_stats(league_key):
@@ -4547,6 +4696,56 @@ async def pronostico_league(league: str, home: str, away: str, user: Optional[di
         raise HTTPException(404, "Campionato non trovato")
     check_limit(user)
     return _compute_pronostico(league, home, away)
+
+# ─────────────────────────────
+# MONDIALI 2026
+# ─────────────────────────────
+@app.get("/api/mondiali-2026/gironi")
+async def worldcup_gironi():
+    """Restituisce gironi e partite del Mondiale 2026."""
+    if not WC_GIRONI_CACHE:
+        _fetch_worldcup_data()
+
+    # Raggruppa fixtures per girone
+    fixtures_per_girone = {}
+    for f in WC_FIXTURES_CACHE:
+        rd = f.get("round", "")
+        if "Group" in rd:
+            # Trova il girone di questa partita
+            for g_letter, squadre in WC_GIRONI_CACHE.items():
+                nomi_girone = [s["squadra"] for s in squadre]
+                if f["home"] in nomi_girone or f["away"] in nomi_girone:
+                    if g_letter not in fixtures_per_girone:
+                        fixtures_per_girone[g_letter] = []
+                    fixtures_per_girone[g_letter].append(f)
+                    break
+
+    # Fixtures fase finale
+    fasi = {}
+    for f in WC_FIXTURES_CACHE:
+        rd = f.get("round", "")
+        if "Group" not in rd and rd:
+            fase = rd
+            if fase not in fasi:
+                fasi[fase] = []
+            fasi[fase].append(f)
+
+    return {
+        "gironi": WC_GIRONI_CACHE,
+        "partite_gironi": fixtures_per_girone,
+        "fasi_finale": fasi,
+        "totale_partite": len(WC_FIXTURES_CACHE),
+    }
+
+
+@app.get("/api/mondiali-2026/standings/{girone}")
+async def worldcup_standings(girone: str):
+    if not WC_GIRONI_CACHE:
+        _fetch_worldcup_data()
+    g = girone.upper()
+    standings = WC_GIRONI_CACHE.get(g, [])
+    return {"girone": g, "classifica": standings}
+
 
 # ─────────────────────────────
 # HEALTH CHECK

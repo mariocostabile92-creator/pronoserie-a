@@ -64,6 +64,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:8px 6px;text-align:cente
   <a href="#squadre">Squadre</a>
   <a href="#notizie">Notizie</a>
   <a href="#accuratezza">Accuratezza</a>
+  <a href="#mondiali" onclick="navigate('mondiali')">&#127942; Mondiali 2026</a>
   <a href="#risultati">Risultati Live</a>
   <a href="#pricing">Pricing</a>
   <a href="#login" id="nav-auth" style="margin-left:auto;background:#1f3460;display:flex;align-items:center;gap:6px">&#128100; Accedi</a>
@@ -128,7 +129,7 @@ async function loadActiveTeams(){
     }
   }catch(e){}
 }
-function leagueTabs(){return `<div style="display:flex;gap:0;margin-bottom:16px;flex-wrap:wrap"><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;border-radius:10px 0 0 10px;${currentLeague==='serie-a'?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('serie-a')">ITA</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='premier-league'?'background:var(--accent);color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('premier-league')">ENG</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='la-liga'?'background:#f39c12;color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('la-liga')">ESP</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='bundesliga'?'background:#d50000;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('bundesliga')">GER</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='ligue-1'?'background:#003189;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('ligue-1')">FRA</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='champions-league'?'background:#1a237e;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('champions-league')">UCL</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='europa-league'?'background:#ff6f00;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('europa-league')">UEL</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;border-radius:0 10px 10px 0;${currentLeague==='conference-league'?'background:#4caf50;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('conference-league')">UECL</button></div>`}
+function leagueTabs(){return `<div style="display:flex;gap:0;margin-bottom:16px;flex-wrap:wrap"><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;border-radius:10px 0 0 10px;${currentLeague==='serie-a'?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('serie-a')">ITA</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='premier-league'?'background:var(--accent);color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('premier-league')">ENG</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='la-liga'?'background:#f39c12;color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('la-liga')">ESP</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='bundesliga'?'background:#d50000;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('bundesliga')">GER</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='ligue-1'?'background:#003189;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('ligue-1')">FRA</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='champions-league'?'background:#1a237e;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('champions-league')">UCL</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='europa-league'?'background:#ff6f00;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('europa-league')">UEL</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;${currentLeague==='conference-league'?'background:#4caf50;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('conference-league')">UECL</button><button style="flex:1;padding:5px;border:none;cursor:pointer;font-weight:600;font-size:.6rem;border-radius:0 10px 10px 0;${currentLeague==='mondiali-2026'?'background:#f39c12;color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('mondiali-2026')">&#127942;WC</button></div>`}
 function switchLeague(l){currentLeague=l;navigate()}
 function showGiornataCal(){
   var sel=document.getElementById("sel-giornata-cal");
@@ -215,7 +216,7 @@ function pageHome(){
     <img src="/logo.png" style="height:80px;margin-bottom:16px;filter:drop-shadow(0 4px 20px rgba(46,204,113,.4))">
     <h1>MatchIQ</h1>
     <p style="color:var(--green);font-size:1.2rem;font-weight:700;margin-bottom:8px">Simulatore Pronostici Calcistici</p>
-    <p class="sub" style="font-size:1rem;max-width:550px;margin:0 auto 24px">L'intelligenza artificiale che analizza ogni partita per te.<br>Serie A + Premier League + La Liga + Bundesliga + Ligue 1 + UCL + UEL + UECL.</p>
+    <p class="sub" style="font-size:1rem;max-width:550px;margin:0 auto 24px">L'intelligenza artificiale che analizza ogni partita per te.<br>Serie A + Premier League + La Liga + Bundesliga + Ligue 1 + UCL + UEL + UECL + Mondiali 2026.</p>
     <a href="#pronostici" class="btn btn-green" style="font-size:1.1rem;padding:16px 40px">Prova Gratis - Calcola Pronostico</a>
     <div style="margin-top:20px;padding:16px;background:rgba(31,52,96,.5);border-radius:12px;max-width:500px;margin-left:auto;margin-right:auto">
       <p style="color:var(--accent);font-weight:700;font-size:.9rem;margin-bottom:8px">Installa l'app sul tuo smartphone</p>
@@ -244,7 +245,7 @@ function pageHome(){
     <h2 style="text-align:center;margin:24px 0 16px">I nostri numeri parlano chiaro</h2>
     <div class="grid3" style="margin-bottom:24px">
       <div class="card" style="text-align:center;border-color:var(--green)"><div style="font-size:2.5rem;font-weight:800;color:var(--green)">36.659</div><p style="color:var(--muted)">Partite analizzate</p></div>
-      <div class="card" style="text-align:center;border-color:var(--accent)"><div style="font-size:2.5rem;font-weight:800;color:var(--accent)">8</div><p style="color:var(--muted)">Competizioni coperte</p><p style="color:var(--muted);font-size:.7rem;margin-top:4px">Serie A - Premier League - La Liga - Bundesliga - Ligue 1<br>Champions League - Europa League - Conference League</p></div>
+      <div class="card" style="text-align:center;border-color:var(--accent)"><div style="font-size:2.5rem;font-weight:800;color:var(--accent)">9</div><p style="color:var(--muted)">Competizioni coperte</p><p style="color:var(--muted);font-size:.7rem;margin-top:4px">Serie A - Premier League - La Liga - Bundesliga - Ligue 1<br>Champions League - Europa League - Conference League<br>+ Mondiali 2026</p></div>
       <div class="card" style="text-align:center;border-color:var(--yellow)"><div style="font-size:2.5rem;font-weight:800;color:var(--yellow)">8</div><p style="color:var(--muted)">Fonti dati combinate</p></div>
     </div>
     <h2 style="text-align:center;margin:24px 0 12px">Le nostre 8 fonti dati</h2>
@@ -298,9 +299,10 @@ function pageHome(){
     <div id="schedina-l1-home"></div>
     <div class="card" style="margin-top:16px;padding:20px;text-align:center;background:linear-gradient(135deg,#1a237e,#0d3b1e);border-color:var(--accent);border-width:2px">
       <div style="font-size:2.5rem;margin-bottom:8px">&#127942;&#127758;</div>
-      <h2 style="color:var(--accent);margin-bottom:8px">Mondiali 2026 - Coming Soon</h2>
-      <p style="color:var(--text);font-size:.9rem;line-height:1.6">Da fine maggio l'IA di MatchIQ analizzera' anche i <strong style="color:var(--green)">Mondiali FIFA 2026</strong> (USA, Canada, Messico).<br>48 nazionali, pronostici per ogni partita, classifiche gironi live.</p>
+      <h2 style="color:var(--accent);margin-bottom:8px">Mondiali 2026 - LIVE</h2>
+      <p style="color:var(--text);font-size:.9rem;line-height:1.6">L'IA di MatchIQ analizza i <strong style="color:var(--green)">Mondiali FIFA 2026</strong> (USA, Canada, Messico).<br>48 nazionali, gironi live, pronostici per ogni partita.</p>
       <p style="color:var(--muted);font-size:.8rem;margin-top:8px">11 Giugno - 19 Luglio 2026</p>
+      <a href="#mondiali" class="btn btn-green" style="margin-top:12px;display:inline-block">Vedi Gironi e Calendario &#127942;</a>
     </div>
   </div>`;
 }
@@ -1951,8 +1953,122 @@ async function pageFantacalcio(){
   return html;
 }
 
+async function pageMondiali(){
+  const data = await fetchAPI("/api/mondiali-2026/gironi", true);
+  if(!data || !data.gironi) return '<div class="container"><div class="card" style="color:var(--red)">Errore caricamento dati Mondiali 2026</div></div>';
+
+  const gironi = data.gironi;
+  const partite_g = data.partite_gironi || {};
+  const fasi = data.fasi_finale || {};
+  const letters = Object.keys(gironi).sort();
+
+  let html='<div class="container">';
+  html+='<h1 style="text-align:center">&#127942; FIFA World Cup 2026</h1>';
+  html+='<p class="sub" style="text-align:center">USA - Canada - Messico | 11 giugno - 19 luglio 2026</p>';
+  html+=`<p style="text-align:center;color:var(--green);font-weight:700;margin-bottom:16px">${data.totale_partite || 72} partite | 48 squadre | 12 gironi</p>`;
+
+  // Tab gironi
+  html+='<div style="display:flex;flex-wrap:wrap;gap:2px;margin-bottom:16px;justify-content:center">';
+  letters.forEach((g,i)=>{
+    const active = i===0;
+    html+=`<button class="wc-tab" data-girone="${g}" style="padding:6px 10px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;border-radius:6px;${active?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="showWCGirone('${g}')">${g}</button>`;
+  });
+  html+='</div>';
+
+  // Contenuto gironi
+  letters.forEach((g,i)=>{
+    const squadre = gironi[g] || [];
+    const partite = partite_g[g] || [];
+    const display = i===0 ? 'block' : 'none';
+
+    html+=`<div id="wc-girone-${g}" class="wc-girone-panel" style="display:${display}">`;
+    html+=`<div class="card" style="padding:12px;margin-bottom:10px;border-left:3px solid var(--green)">`;
+    html+=`<h3 style="color:var(--green);margin-bottom:10px">Girone ${g}</h3>`;
+
+    // Tabella classifica
+    html+='<table style="width:100%;font-size:.8rem;border-collapse:collapse">';
+    html+='<tr style="color:var(--muted);border-bottom:1px solid #1f3460"><th style="text-align:left;padding:4px">Pos</th><th style="text-align:left">Squadra</th><th>G</th><th>V</th><th>P</th><th>S</th><th>GF</th><th>GS</th><th>Diff</th><th style="font-weight:800">Pt</th></tr>';
+    squadre.forEach((s,idx)=>{
+      const rowColor = idx < 2 ? 'color:#2ecc71' : idx === 2 ? 'color:#f39c12' : 'color:var(--text)';
+      const bg = idx < 2 ? 'background:rgba(46,204,113,.08)' : idx === 2 ? 'background:rgba(243,156,18,.05)' : '';
+      html+=`<tr style="${rowColor};${bg};border-bottom:1px solid #0d1b2a">
+        <td style="padding:4px;font-weight:700">${s.pos}</td>
+        <td style="font-weight:600">${s.squadra}</td>
+        <td style="text-align:center">${s.g}</td>
+        <td style="text-align:center">${s.v}</td>
+        <td style="text-align:center">${s.p}</td>
+        <td style="text-align:center">${s.s}</td>
+        <td style="text-align:center">${s.gf}</td>
+        <td style="text-align:center">${s.gs}</td>
+        <td style="text-align:center">${s.diff>0?'+':''}${s.diff}</td>
+        <td style="text-align:center;font-weight:800;font-size:1rem">${s.punti}</td>
+      </tr>`;
+    });
+    html+='</table>';
+    html+='<div style="margin-top:6px;font-size:.7rem"><span style="color:#2ecc71">&#9632;</span> Qualificate &nbsp;<span style="color:#f39c12">&#9632;</span> Possibile miglior terza</div>';
+    html+='</div>';
+
+    // Partite del girone
+    if(partite.length > 0){
+      html+=`<div class="card" style="padding:12px;margin-bottom:10px">`;
+      html+=`<h4 style="color:var(--accent);margin-bottom:8px">Partite Girone ${g}</h4>`;
+      partite.forEach(p=>{
+        const score = p.gol_h !== null ? `${p.gol_h} - ${p.gol_a}` : 'vs';
+        const statusLabel = p.status === 'FT' ? '<span style="color:#2ecc71;font-size:.7rem"> FT</span>' :
+                           p.status === 'NS' ? `<span style="color:var(--muted);font-size:.7rem"> ${p.data} ${p.ora}</span>` :
+                           `<span style="color:#e74c3c;font-size:.7rem"> LIVE</span>`;
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0d1b2a;cursor:pointer" onclick="switchLeague('mondiali-2026');navigate('pronostici')">
+          <span style="flex:1;text-align:right;font-size:.85rem;font-weight:600">${p.home}</span>
+          <span style="min-width:60px;text-align:center;font-weight:800;font-size:.9rem;color:var(--green)">${score}</span>
+          <span style="flex:1;text-align:left;font-size:.85rem;font-weight:600">${p.away}</span>
+          ${statusLabel}
+        </div>`;
+      });
+      html+='</div>';
+    }
+
+    html+='</div>';
+  });
+
+  // Fasi finali (se disponibili)
+  const fasiKeys = Object.keys(fasi);
+  if(fasiKeys.length > 0){
+    html+=`<div class="card" style="padding:12px;margin-top:16px;border-left:3px solid var(--accent)">`;
+    html+=`<h3 style="color:var(--accent);margin-bottom:10px">&#127942; Fase a eliminazione diretta</h3>`;
+    fasiKeys.forEach(fase=>{
+      html+=`<h4 style="color:var(--yellow);margin:10px 0 6px">${fase}</h4>`;
+      fasi[fase].forEach(p=>{
+        const score = p.gol_h !== null ? `${p.gol_h} - ${p.gol_a}` : 'vs';
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0d1b2a">
+          <span style="flex:1;text-align:right;font-size:.85rem;font-weight:600">${p.home}</span>
+          <span style="min-width:60px;text-align:center;font-weight:800;font-size:.9rem;color:var(--accent)">${score}</span>
+          <span style="flex:1;text-align:left;font-size:.85rem;font-weight:600">${p.away}</span>
+          <span style="color:var(--muted);font-size:.7rem">${p.data}</span>
+        </div>`;
+      });
+    });
+    html+='</div>';
+  }
+
+  html+=`<div class="card" style="text-align:center;padding:12px;margin-top:16px;background:#0d1b2a">
+    <p style="color:var(--muted);font-size:.75rem">Dati aggiornati live da API Football. Clicca su una partita per il pronostico IA.</p>
+  </div>`;
+
+  html+='</div>';
+  return html;
+}
+
+function showWCGirone(g){
+  document.querySelectorAll('.wc-girone-panel').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.wc-tab').forEach(el=>{el.style.background='#1f3460';el.style.color='var(--muted)';});
+  const panel = document.getElementById('wc-girone-'+g);
+  if(panel) panel.style.display='block';
+  const tab = document.querySelector(`.wc-tab[data-girone="${g}"]`);
+  if(tab){tab.style.background='var(--green)';tab.style.color='#000';}
+}
+
 // ROUTER
-const routes={home:pageHome,fantacalcio:pageFantacalcio,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,risultati:pageRisultati,pricing:pagePricing,login:pageLogin,privacy:pagePrivacy,termini:pageTermini,accuratezza:pageAccuratezza,miei:pageMyPredictions};
+const routes={home:pageHome,mondiali:pageMondiali,fantacalcio:pageFantacalcio,pronostici:pagePronostici,calendario:pageCalendario,classifica:pageClassifica,squadre:pageSquadre,notizie:pageNotizie,risultati:pageRisultati,pricing:pagePricing,login:pageLogin,privacy:pagePrivacy,termini:pageTermini,accuratezza:pageAccuratezza,miei:pageMyPredictions};
 
 function pagePrivacy(){
   return `<div class="container" style="max-width:800px">
