@@ -1973,6 +1973,7 @@ PLAYER_STATS_CACHE = {}   # {league: {player_name_lower: {media, gol, assist, mi
 PLAYER_STATS_LAST = 0
 FANTACALCIO_LEAGUES = ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]
 MATCHDAY_CACHE = {}  # {league: {round_num: {"data": str, "partite": [(home, away), ...]}}}
+TEAM_STATS_CACHE = {}  # {league: {"data": {...}, "timestamp": 0}}
 
 # ── Mondiali 2026 ──
 WC_GIRONI_CACHE = {}   # {girone_letter: [{squadra, punti, gf, gs, diff, team_id}, ...]}
@@ -2339,6 +2340,7 @@ async def classifica():
         "marcatori": mc,
         "aggiornamento": CLASSIFICA_LAST_UPDATE.get("serie-a", "") or "Dati base",
         "live": CLASSIFICA_CACHE.get("serie-a") is not None,
+        "stats_squadre": _compute_best_stats("serie-a"),
     }
 
 # ─────────────────────────────
@@ -4546,7 +4548,15 @@ async def classifica_league(league: str):
         raise HTTPException(404, "Campionato non trovato")
     cl = CLASSIFICA_CACHE.get(league)
     mc = MARCATORI_CACHE.get(league)
-    return {"classifica": cl or [], "marcatori": mc or [], "aggiornamento": CLASSIFICA_LAST_UPDATE.get(league, ""), "live": cl is not None}
+    # Statistiche squadre (solo campionati domestici)
+    stats_squadre = None
+    if league in ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]:
+        stats_squadre = _compute_best_stats(league)
+        if not stats_squadre:
+            # Avvia fetch in background
+            import threading
+            threading.Thread(target=_fetch_team_stats_league, args=(league,), daemon=True).start()
+    return {"classifica": cl or [], "marcatori": mc or [], "aggiornamento": CLASSIFICA_LAST_UPDATE.get(league, ""), "live": cl is not None, "stats_squadre": stats_squadre}
 
 @app.get("/api/{league}/calendario")
 async def calendario_league(league: str):
@@ -4696,6 +4706,103 @@ async def pronostico_league(league: str, home: str, away: str, user: Optional[di
         raise HTTPException(404, "Campionato non trovato")
     check_limit(user)
     return _compute_pronostico(league, home, away)
+
+# ─────────────────────────────
+# STATISTICHE SQUADRE PER CLASSIFICA
+# ─────────────────────────────
+def _fetch_team_stats_league(league_key):
+    """Fetch statistiche squadre da API Football per un campionato."""
+    if league_key not in ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]:
+        return
+    cached = TEAM_STATS_CACHE.get(league_key)
+    if cached and time.time() - cached.get("timestamp", 0) < 3600:
+        return cached.get("data")
+    league_id = LEAGUES[league_key]["id"]
+    season = LEAGUES[league_key]["season"]
+    team_ids = _get_team_ids(league_key)
+    stats = {}
+    for team_name, team_id in team_ids.items():
+        try:
+            req = urllib.request.Request(
+                f"https://{FOOTBALL_API_HOST}/teams/statistics?league={league_id}&season={season}&team={team_id}",
+                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+            )
+            with urllib.request.urlopen(req, timeout=10) as r:
+                data = json.loads(r.read().decode())
+            resp = data.get("response", {})
+            fixtures = resp.get("fixtures", {})
+            goals = resp.get("goals", {})
+            stats[team_name] = {
+                "giocate": fixtures.get("played", {}).get("total", 0) or 0,
+                "vinte": fixtures.get("wins", {}).get("total", 0) or 0,
+                "pareggi": fixtures.get("draws", {}).get("total", 0) or 0,
+                "perse": fixtures.get("loses", {}).get("total", 0) or 0,
+                "gf": goals.get("for", {}).get("total", {}).get("total", 0) or 0,
+                "gs": goals.get("against", {}).get("total", {}).get("total", 0) or 0,
+                "clean_sheet": resp.get("clean_sheet", {}).get("total", 0) or 0,
+                "form": resp.get("form", "") or "",
+            }
+            time.sleep(1)
+        except Exception as e:
+            print(f"Stats {team_name}: {e}")
+            continue
+    if stats:
+        TEAM_STATS_CACHE[league_key] = {"data": stats, "timestamp": time.time()}
+    return stats
+
+
+def _compute_best_stats(league_key):
+    """Calcola le migliori statistiche per il campionato."""
+    cached = TEAM_STATS_CACHE.get(league_key)
+    if not cached:
+        return None
+    stats = cached.get("data", {})
+    if not stats or len(stats) < 3:
+        return None
+    try:
+        best_attack = max(stats.items(), key=lambda x: x[1].get("gf", 0))
+        best_defense = min(stats.items(), key=lambda x: x[1].get("gs", 999))
+        most_cs = max(stats.items(), key=lambda x: x[1].get("clean_sheet", 0))
+
+        def form_score(form_str):
+            score = 0
+            for c in (form_str or "")[-5:]:
+                if c == "W": score += 3
+                elif c == "D": score += 1
+            return score
+
+        best_form = max(stats.items(), key=lambda x: form_score(x[1].get("form", "")))
+        best_wins = max(stats.items(), key=lambda x: x[1].get("vinte", 0))
+
+        return {
+            "miglior_attacco": {
+                "squadra": best_attack[0],
+                "gf": best_attack[1]["gf"],
+                "media": round(best_attack[1]["gf"] / max(best_attack[1].get("giocate", 1), 1), 2)
+            },
+            "miglior_difesa": {
+                "squadra": best_defense[0],
+                "gs": best_defense[1]["gs"],
+                "clean_sheet": best_defense[1].get("clean_sheet", 0)
+            },
+            "piu_clean_sheet": {
+                "squadra": most_cs[0],
+                "clean_sheet": most_cs[1].get("clean_sheet", 0)
+            },
+            "miglior_forma": {
+                "squadra": best_form[0],
+                "form": (best_form[1].get("form", "") or "")[-5:],
+                "punti_forma": form_score(best_form[1].get("form", ""))
+            },
+            "miglior_casa": {
+                "squadra": best_wins[0],
+                "vittorie": best_wins[1].get("vinte", 0)
+            }
+        }
+    except Exception as e:
+        print(f"Compute best stats {league_key}: {e}")
+        return None
+
 
 # ─────────────────────────────
 # MONDIALI 2026
