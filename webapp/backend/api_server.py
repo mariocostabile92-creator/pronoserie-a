@@ -4752,55 +4752,63 @@ def _fetch_team_stats_league(league_key):
 
 
 def _compute_best_stats(league_key):
-    """Calcola le migliori statistiche per il campionato."""
+    """Calcola le migliori statistiche per il campionato. Fallback su classifica."""
+    # 1. Prova cache API dettagliata
     cached = TEAM_STATS_CACHE.get(league_key)
-    if not cached:
-        return None
-    stats = cached.get("data", {})
-    if not stats or len(stats) < 3:
+    if cached and cached.get("data") and len(cached["data"]) >= 3:
+        stats = cached["data"]
+        try:
+            best_attack = max(stats.items(), key=lambda x: x[1].get("gf", 0))
+            best_defense = min(stats.items(), key=lambda x: x[1].get("gs", 999))
+            most_cs = max(stats.items(), key=lambda x: x[1].get("clean_sheet", 0))
+            def form_score(form_str):
+                score = 0
+                for c in (form_str or "")[-5:]:
+                    if c == "W": score += 3
+                    elif c == "D": score += 1
+                return score
+            best_form = max(stats.items(), key=lambda x: form_score(x[1].get("form", "")))
+            best_wins = max(stats.items(), key=lambda x: x[1].get("vinte", 0))
+            return {
+                "miglior_attacco": {"squadra": best_attack[0], "gf": best_attack[1]["gf"], "media": round(best_attack[1]["gf"] / max(best_attack[1].get("giocate", 1), 1), 2)},
+                "miglior_difesa": {"squadra": best_defense[0], "gs": best_defense[1]["gs"], "clean_sheet": best_defense[1].get("clean_sheet", 0)},
+                "piu_clean_sheet": {"squadra": most_cs[0], "clean_sheet": most_cs[1].get("clean_sheet", 0)},
+                "miglior_forma": {"squadra": best_form[0], "form": (best_form[1].get("form", "") or "")[-5:], "punti_forma": form_score(best_form[1].get("form", ""))},
+                "miglior_casa": {"squadra": best_wins[0], "vittorie": best_wins[1].get("vinte", 0)}
+            }
+        except Exception:
+            pass
+
+    # 2. Fallback: calcola dalla classifica (sempre disponibile)
+    cl = CLASSIFICA_CACHE.get(league_key)
+    if not cl or len(cl) < 3:
         return None
     try:
-        best_attack = max(stats.items(), key=lambda x: x[1].get("gf", 0))
-        best_defense = min(stats.items(), key=lambda x: x[1].get("gs", 999))
-        most_cs = max(stats.items(), key=lambda x: x[1].get("clean_sheet", 0))
+        def _gf(s): return s.get("GF", 0) or 0
+        def _gs(s): return s.get("GS", 999) or 999
+        def _v(s): return s.get("V", 0) or 0
+        def _g(s): return max(s.get("G", 1) or 1, 1)
+        def _sq(s): return s.get("Squadra", "?")
 
-        def form_score(form_str):
-            score = 0
-            for c in (form_str or "")[-5:]:
-                if c == "W": score += 3
-                elif c == "D": score += 1
-            return score
-
-        best_form = max(stats.items(), key=lambda x: form_score(x[1].get("form", "")))
-        best_wins = max(stats.items(), key=lambda x: x[1].get("vinte", 0))
+        att = max(cl, key=_gf)
+        dif = min(cl, key=_gs)
+        # Miglior rapporto GS/partite = stima clean sheet
+        best_ratio = min(cl, key=lambda s: (_gs(s) if _gs(s) < 999 else 0) / _g(s))
+        wins = max(cl, key=_v)
+        # Forma: squadra con piu punti nelle ultime partite (V*3+N)
+        def _pts_ratio(s):
+            return (_v(s) * 3 + (s.get("N", 0) or 0)) / _g(s)
+        forma = max(cl, key=_pts_ratio)
 
         return {
-            "miglior_attacco": {
-                "squadra": best_attack[0],
-                "gf": best_attack[1]["gf"],
-                "media": round(best_attack[1]["gf"] / max(best_attack[1].get("giocate", 1), 1), 2)
-            },
-            "miglior_difesa": {
-                "squadra": best_defense[0],
-                "gs": best_defense[1]["gs"],
-                "clean_sheet": best_defense[1].get("clean_sheet", 0)
-            },
-            "piu_clean_sheet": {
-                "squadra": most_cs[0],
-                "clean_sheet": most_cs[1].get("clean_sheet", 0)
-            },
-            "miglior_forma": {
-                "squadra": best_form[0],
-                "form": (best_form[1].get("form", "") or "")[-5:],
-                "punti_forma": form_score(best_form[1].get("form", ""))
-            },
-            "miglior_casa": {
-                "squadra": best_wins[0],
-                "vittorie": best_wins[1].get("vinte", 0)
-            }
+            "miglior_attacco": {"squadra": _sq(att), "gf": _gf(att), "media": round(_gf(att) / _g(att), 2)},
+            "miglior_difesa": {"squadra": _sq(dif), "gs": _gs(dif) if _gs(dif) < 999 else 0, "clean_sheet": 0},
+            "piu_clean_sheet": {"squadra": _sq(best_ratio), "clean_sheet": 0},
+            "miglior_forma": {"squadra": _sq(forma), "form": "", "punti_forma": round(_pts_ratio(forma), 2)},
+            "miglior_casa": {"squadra": _sq(wins), "vittorie": _v(wins)}
         }
     except Exception as e:
-        print(f"Compute best stats {league_key}: {e}")
+        print(f"Compute best stats fallback {league_key}: {e}")
         return None
 
 
