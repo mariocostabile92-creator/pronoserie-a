@@ -1,21 +1,55 @@
-"""
+﻿"""
 database.py - PostgreSQL (Neon.tech)
-Database persistente che non si cancella mai.
+Database persistente con connection pooling.
 """
 
 import os
 import psycopg2
 import psycopg2.extras
+import psycopg2.pool
 from datetime import datetime, timezone
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL non configurata nelle variabili d'ambiente!")
 
+# Connection pool: min 1, max 10 connessioni
+_pool = None
+
+def _init_pool():
+    global _pool
+    if _pool is None:
+        try:
+            _pool = psycopg2.pool.SimpleConnectionPool(1, 10, DATABASE_URL)
+        except Exception as e:
+            print(f"Errore pool DB: {e}")
+            _pool = None
 
 def _get_conn():
+    global _pool
+    if _pool is None:
+        _init_pool()
+    if _pool:
+        try:
+            conn = _pool.getconn()
+            conn.autocommit = False
+            return conn
+        except Exception:
+            _pool = None
+    # Fallback senza pool
     conn = psycopg2.connect(DATABASE_URL)
     return conn
+
+def _put_conn(conn):
+    global _pool
+    if _pool and conn:
+        try:
+            _pool.putconn(conn)
+        except Exception:
+            try:
+                _put_conn(conn)
+            except Exception:
+                pass
 
 
 def init_db():
@@ -107,7 +141,7 @@ def init_db():
     """)
     conn.commit()
     cur.close()
-    conn.close()
+    _put_conn(conn)
     print("DB PostgreSQL OK")
 
 
@@ -127,7 +161,7 @@ def create_user(email, password_hash):
         return None
     finally:
         cur.close()
-        conn.close()
+        _put_conn(conn)
 
 
 def get_user_by_email(email):
@@ -136,7 +170,7 @@ def get_user_by_email(email):
     cur.execute("SELECT * FROM users WHERE email = %s", (email.lower().strip(),))
     row = cur.fetchone()
     cur.close()
-    conn.close()
+    _put_conn(conn)
     return dict(row) if row else None
 
 
@@ -146,7 +180,7 @@ def get_user_by_id(user_id):
     cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
     row = cur.fetchone()
     cur.close()
-    conn.close()
+    _put_conn(conn)
     return dict(row) if row else None
 
 
@@ -157,7 +191,7 @@ def update_plan(user_id, plan):
     conn.commit()
     ok = cur.rowcount > 0
     cur.close()
-    conn.close()
+    _put_conn(conn)
     return ok
 
 
@@ -167,7 +201,7 @@ def update_stripe_customer(user_id, stripe_customer_id):
     cur.execute("UPDATE users SET stripe_customer_id = %s WHERE id = %s", (stripe_customer_id, user_id))
     conn.commit()
     cur.close()
-    conn.close()
+    _put_conn(conn)
 
 
 def log_api_call(user_id, endpoint):
@@ -179,7 +213,7 @@ def log_api_call(user_id, endpoint):
     )
     conn.commit()
     cur.close()
-    conn.close()
+    _put_conn(conn)
 
 
 def count_daily_calls(user_id):
@@ -192,11 +226,11 @@ def count_daily_calls(user_id):
     )
     row = cur.fetchone()
     cur.close()
-    conn.close()
+    _put_conn(conn)
     return row[0] if row else 0
 
 
-# ── TRACKING PREDIZIONI ──
+# â”€â”€ TRACKING PREDIZIONI â”€â”€
 
 def save_prediction(home, away, data_partita, pred, bk_live=False):
     """Salva un pronostico nel DB per verifica futura."""
@@ -221,7 +255,7 @@ def save_prediction(home, away, data_partita, pred, bk_live=False):
         ))
         conn.commit()
         cur.close()
-        conn.close()
+        _put_conn(conn)
     except Exception:
         pass
 
@@ -270,11 +304,11 @@ def verify_predictions(risultati_live):
 
         conn.commit()
         cur.close()
-        conn.close()
+        _put_conn(conn)
         if verificate > 0:
-            print(f"✅ TRACKING: {verificate} predizioni verificate")
+            print(f"âœ… TRACKING: {verificate} predizioni verificate")
     except Exception as e:
-        print(f"⚠️ Errore tracking: {e}")
+        print(f"âš ï¸ Errore tracking: {e}")
 
 
 def get_tracking_stats():
@@ -294,7 +328,7 @@ def get_tracking_stats():
         """)
         row = cur.fetchone()
         cur.close()
-        conn.close()
+        _put_conn(conn)
         if row and row["totale"] > 0:
             return {
                 "totale": row["totale"],
