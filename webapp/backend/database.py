@@ -8,10 +8,9 @@ import psycopg2
 import psycopg2.extras
 from datetime import datetime, timezone
 
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL",
-    "postgresql://neondb_owner:npg_MH8IvDSTg3mq@ep-soft-voice-aga6gbd9-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require"
-)
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL non configurata nelle variabili d'ambiente!")
 
 
 def _get_conn():

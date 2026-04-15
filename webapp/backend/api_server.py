@@ -294,7 +294,7 @@ def _scrape_live_data():
 # ─────────────────────────────
 # NOTIFICHE GOL TELEGRAM (per utenti Pro)
 # ─────────────────────────────
-TELEGRAM_BOT_TOKEN = "8664256029:AAH2dTkgm5Ca8WnwnNurYWW1LfWhoYVna5Q"
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 _NOTIFIED_GOALS = set()  # Set di gol gia' notificati: "fixture_id_minuto_giocatore"
 _BOT_DB_PATH = os.path.join(_ROOT, "bot_utenti.db")
 
@@ -709,7 +709,7 @@ def check_limit(user):
 # ─────────────────────────────
 # QUOTE BOOKMAKER LIVE (the-odds-api.com)
 # ─────────────────────────────
-ODDS_API_KEY = "6003dadbc1da344808124a37f63f316a"
+ODDS_API_KEY = os.environ.get("ODDS_API_KEY", "")
 ODDS_CACHE = {}  # {"Inter_vs_Roma": {"prob_1": 55, "prob_x": 25, "prob_2": 20}, ...}
 ODDS_LAST_UPDATE = ""
 
@@ -1286,7 +1286,7 @@ def genera_pronostico(home, away):
 # ─────────────────────────────
 # EMAIL (Resend)
 # ─────────────────────────────
-RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "re_ShqALKcH_HAnRE4SUyU9asxwpcAXC16AL")
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 
 def send_welcome_email(to_email):
     """Invia email di benvenuto dopo la registrazione."""
@@ -3919,7 +3919,7 @@ RISULTATI_GIORNATE = {
     ]},
 }
 
-FOOTBALL_API_KEY = "3f8ed68a9b1cb532479096f33bfbc568"
+FOOTBALL_API_KEY = os.environ.get("FOOTBALL_API_KEY", "")
 FOOTBALL_API_HOST = "v3.football.api-sports.io"
 LIVE_RESULTS_CACHE = None
 LIVE_RESULTS_TIME = ""

@@ -8,7 +8,9 @@ from jose import JWTError, jwt
 from database import get_user_by_id
 
 # Configurazione JWT
-SECRET_KEY = os.environ.get("JWT_SECRET", "chiave-segreta-32-caratteri-base")[:32]
+SECRET_KEY = os.environ.get("JWT_SECRET", "")[:32]
+if not SECRET_KEY:
+    SECRET_KEY = "default-dev-key-change-in-prod!"[:32]
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 
