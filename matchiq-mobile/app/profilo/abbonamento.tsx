@@ -72,10 +72,15 @@ export default function AbbonamentoScreen() {
       return;
     }
 
+    if (!user?.email) {
+      Alert.alert('Errore', 'Email utente non disponibile. Rieffettua il login.');
+      return;
+    }
+
     setCheckout(true);
     try {
-      // Crea sessione checkout Stripe (richiede JWT)
-      const res = await createCheckout();
+      // Avvia checkout Stripe con GET /payments/checkout-direct?email=... (come la webapp)
+      const res = await createCheckout(user.email);
       const checkoutUrl = res.data.checkout_url;
 
       if (!checkoutUrl) {

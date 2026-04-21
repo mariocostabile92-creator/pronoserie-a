@@ -50,40 +50,43 @@ export const login = (email: string, password: string) =>
 export const register = (email: string, password: string) =>
   api.post('/auth/register', { email, password });
 
-// ===== PRONOSTICI =====
-export const getPrediction = (home: string, away: string, league: string = 'serie_a') =>
-  api.get(`/pronostico/${home}/${away}`);
+/**
+ * Reset password: invia email con link di reset.
+ * Endpoint: POST /auth/reset-password  body { email }
+ */
+export const resetPassword = (email: string) =>
+  api.post('/auth/reset-password', { email });
 
-export const getDailyTips = (league: string = 'serie_a') => {
+/**
+ * Cambia password dell'utente autenticato.
+ * Endpoint: POST /auth/change-password  body { old_password, new_password }
+ */
+export const changePassword = (oldPw: string, newPw: string) =>
+  api.post('/auth/change-password', { old_password: oldPw, new_password: newPw });
+
+// ===== PRONOSTICI =====
+
+/**
+ * Pronostico IA per una partita.
+ * Serie A usa /pronostico/{home}/{away} (senza prefisso lega).
+ * Le altre leghe usano /{league}/pronostico/{home}/{away} (come la webapp).
+ */
+export const getPrediction = (home: string, away: string, league: string = 'serie-a') =>
+  league === 'serie-a'
+    ? api.get(`/pronostico/${encodeURIComponent(home)}/${encodeURIComponent(away)}`)
+    : api.get(`/${league}/pronostico/${encodeURIComponent(home)}/${encodeURIComponent(away)}`);
+
+export const getDailyTips = (league: string = 'serie-a') => {
   // Mappa lega → endpoint schedina
   const endpoints: Record<string, string> = {
-    serie_a: '/schedina',
-    premier: '/schedina-pl',
-    la_liga: '/schedina-ll',
-    bundesliga: '/schedina-bl',
-    ligue_1: '/schedina-l1',
+    'serie-a':        '/schedina',
+    'premier-league': '/schedina-pl',
+    'la-liga':        '/schedina-ll',
+    'bundesliga':     '/schedina-bl',
+    'ligue-1':        '/schedina-l1',
   };
   return api.get(endpoints[league] || '/schedina');
 };
-
-// ===== CALENDARIO =====
-export const getCalendar = (league: string = 'serie_a', day?: number) =>
-  api.get(`/${league}/calendario`, { params: { day } });
-
-// ===== CLASSIFICA =====
-export const getStandings = (league: string = 'serie_a') =>
-  api.get(`/${league}/classifica`);
-
-// ===== RISULTATI LIVE =====
-export const getLiveResults = (league?: string) =>
-  api.get('/risultati', { params: { league } });
-
-export const getMatchDetails = (matchId: string) =>
-  api.get(`/fixture/${matchId}`);
-
-// ===== SQUADRE =====
-export const getTeamRoster = (team: string, league: string = 'serie_a') =>
-  api.get(`/squadra/${team}`);
 
 // ===== CLASSIFICA LEGA =====
 // league: 'serie-a' | 'premier-league' | 'la-liga' | 'bundesliga' | 'ligue-1'
@@ -95,16 +98,30 @@ export const getClassifica = (league: string) =>
     : api.get(`/${league}/classifica`);
 
 // ===== CALENDARIO LEGA =====
-// Restituisce giornate con partite programmate e risultati
-// La Serie A usa /calendario (senza prefisso), le altre leghe usano /{league}/calendario
+// Restituisce giornate con partite programmate e risultati.
+// La Serie A usa /calendario (senza prefisso), le altre leghe usano /{league}/calendario.
 export const getCalendario = (league: string) =>
   league === 'serie-a'
     ? api.get('/calendario')
     : api.get(`/${league}/calendario`);
 
+// ===== RISULTATI LIVE =====
+/**
+ * Risultati live della giornata corrente.
+ * Serie A usa /risultati (senza prefisso).
+ * Le altre leghe usano /{league}/risultati (path, non query param).
+ */
+export const getLiveResults = (league: string = 'serie-a') =>
+  league === 'serie-a'
+    ? api.get('/risultati')
+    : api.get(`/${league}/risultati`);
+
+export const getMatchDetails = (matchId: string) =>
+  api.get(`/fixture/${matchId}`);
+
 // ===== SCHEDINA / SIMULA GIORNATA =====
-// Restituisce i pronostici IA per la giornata corrente della lega selezionata
-// Usato dal bottone "Simula Giornata" nel calendario, identico alla webapp
+// Restituisce i pronostici IA per la giornata corrente della lega selezionata.
+// Usato dal bottone "Simula Giornata" nel calendario, identico alla webapp.
 const SCHEDINA_ENDPOINTS: Record<string, string> = {
   'serie-a':        '/schedina',
   'premier-league': '/schedina-pl',
@@ -116,14 +133,34 @@ export const getSchedina = (league: string) =>
   api.get(SCHEDINA_ENDPOINTS[league] || '/schedina');
 
 // ===== DETTAGLIO FIXTURE =====
-// Restituisce eventi, score e info della partita
+// Restituisce eventi, score e info della partita.
 export const getFixtureDetail = (id: number | string) =>
   api.get(`/fixture/${id}`);
 
 // ===== DETTAGLIO SQUADRA =====
-// Restituisce rosa, formazione, infortunati e allenatore di una squadra
+// Restituisce rosa, formazione, infortunati e allenatore di una squadra.
 export const getSquadra = (nome: string) =>
   api.get(`/squadra/${encodeURIComponent(nome)}`);
+
+// Alias per compatibilità
+export const getTeamRoster = (team: string) =>
+  api.get(`/squadra/${encodeURIComponent(team)}`);
+
+// ===== SQUADRE ATTIVE PER LEGA =====
+/**
+ * Elenco squadre attive nella lega.
+ * Endpoint: GET /{league}/squadre-attive
+ */
+export const getSquadreAttive = (league: string) =>
+  api.get(`/${league}/squadre-attive`);
+
+// ===== MARCATORI =====
+/**
+ * Classifica marcatori della lega.
+ * Endpoint: GET /{league}/marcatori
+ */
+export const getMarcatori = (league: string) =>
+  api.get(`/${league}/marcatori`);
 
 // ===== NOTIZIE CALCISTICHE =====
 // Risposta: { notizie: [{ titolo, fonte, url }], aggiornamento }
@@ -192,8 +229,12 @@ export const applyReferral = (code: string, email: string) =>
 
 // ===== FANTACALCIO =====
 
-/** Consigli IA per la giornata di fantacalcio (Serie A) */
-export const getFantacalcioConsigli = (giornata: number) =>
+/**
+ * Consigli IA per la giornata di fantacalcio.
+ * Serie A usa /fantacalcio/consigli/{giornata} (senza prefisso lega).
+ * Le altre leghe usano /{league}/fantacalcio/consigli/{giornata}.
+ */
+export const getFantacalcioConsigli = (giornata: number, league: string = 'serie-a') =>
   api.get<{
     giornata: number;
     data: string;
@@ -213,7 +254,11 @@ export const getFantacalcioConsigli = (giornata: number) =>
       capitano: { nome: string; squadra: string } | null;
     };
     error?: string;
-  }>(`/fantacalcio/consigli/${giornata}`);
+  }>(
+    league === 'serie-a'
+      ? `/fantacalcio/consigli/${giornata}`
+      : `/${league}/fantacalcio/consigli/${giornata}`
+  );
 
 // ===== MONDIALI 2026 =====
 
@@ -251,18 +296,28 @@ export const getMondialiPronostico = (home: string, away: string) =>
 export const checkPlan = () =>
   api.get<{ piano: string; email: string }>('/payments/check-plan');
 
-/** Crea sessione checkout Stripe per upgrade Pro (richiede autenticazione) */
-export const createCheckout = () =>
-  api.post<{ checkout_url: string }>('/payments/checkout');
+/**
+ * Avvia il checkout Stripe per upgrade Pro.
+ * Usa GET /payments/checkout-direct?email=... (come la webapp).
+ * Richiede l'email dell'utente come query parameter.
+ */
+export const createCheckout = (email: string) =>
+  api.get<{ checkout_url: string }>('/payments/checkout-direct', { params: { email } });
 
 // ===== PUSH NOTIFICATIONS =====
 
 /**
  * Registra il push token Expo nel backend.
- * Endpoint da implementare lato backend: POST /api/push/register
- * Per ora l'infrastruttura è pronta ma il backend non ha ancora l'endpoint.
+ * Endpoint: POST /push/register
  */
 export const registerPushToken = (token: string) =>
   api.post('/push/register', { token });
+
+/**
+ * Recupera le notifiche push programmate per l'utente.
+ * Endpoint: GET /push/scheduled-notifications
+ */
+export const getScheduledNotifications = () =>
+  api.get('/push/scheduled-notifications');
 
 export default api;

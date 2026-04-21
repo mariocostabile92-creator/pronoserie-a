@@ -59,7 +59,8 @@ export default function ProfiloScreen() {
 
   const handleAbbonati = async () => {
     try {
-      const res = await createCheckout();
+      // Usa GET /payments/checkout-direct?email=... (come la webapp)
+      const res = await createCheckout(user?.email || '');
       if (res.data?.checkout_url) Linking.openURL(res.data.checkout_url);
     } catch (_) {
       router.push('/(tabs)/pricing');

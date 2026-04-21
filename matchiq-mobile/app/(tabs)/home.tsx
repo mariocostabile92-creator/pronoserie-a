@@ -39,7 +39,7 @@ export default function HomeScreen() {
 
   const loadSchedina = async () => {
     try {
-      const res = await getDailyTips('serie_a');
+      const res = await getDailyTips('serie-a');
       setSchedina(res.data);
     } catch (_) {}
     setLoadingSchedina(false);
@@ -58,7 +58,8 @@ export default function HomeScreen() {
       return;
     }
     try {
-      const res = await createCheckout();
+      // Usa GET /payments/checkout-direct?email=... (come la webapp)
+      const res = await createCheckout(user?.email || '');
       if (res.data.checkout_url) {
         Linking.openURL(res.data.checkout_url);
       }

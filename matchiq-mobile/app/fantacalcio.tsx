@@ -19,6 +19,15 @@ import { Colors, Spacing, BorderRadius } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { getFantacalcioConsigli } from '../services/api';
 
+// Leghe disponibili per i consigli fantacalcio
+const LEGHE_FANTACALCIO = [
+  { key: 'serie-a',        label: 'ITA',  colore: Colors.success },
+  { key: 'premier-league', label: 'ENG',  colore: Colors.info },
+  { key: 'la-liga',        label: 'ESP',  colore: '#facc15' },
+  { key: 'bundesliga',     label: 'GER',  colore: '#ef4444' },
+  { key: 'ligue-1',        label: 'FRA',  colore: '#003189' },
+];
+
 // Struttura di un singolo giocatore consigliato
 interface GiocatoreConsigliato {
   giocatore: string;
@@ -71,8 +80,12 @@ export default function FantacalcioScreen() {
   const [caricamento, setCaricamento] = useState(false);
   const [dati, setDati] = useState<RispostaFantacalcio | null>(null);
   const [errore, setErrore] = useState<string | null>(null);
+  // Lega selezionata (default Serie A)
+  const [legaIdx, setLegaIdx] = useState(0);
 
-  // Carica i consigli per la giornata selezionata
+  const lega = LEGHE_FANTACALCIO[legaIdx];
+
+  // Carica i consigli per la giornata e la lega selezionate
   const caricaConsigli = useCallback(async () => {
     const g = parseInt(giornataInput, 10);
     if (!g || g < 1 || g > 38) {
@@ -85,7 +98,9 @@ export default function FantacalcioScreen() {
     setDati(null);
 
     try {
-      const res = await getFantacalcioConsigli(g);
+      // Passa la lega corrente: Serie A usa /fantacalcio/consigli/{g},
+      // le altre leghe usano /{league}/fantacalcio/consigli/{g}
+      const res = await getFantacalcioConsigli(g, lega.key);
       if (res.data.error) {
         setErrore(res.data.error);
       } else {
@@ -97,7 +112,7 @@ export default function FantacalcioScreen() {
     } finally {
       setCaricamento(false);
     }
-  }, [giornataInput]);
+  }, [giornataInput, lega.key]);
 
   return (
     <View style={styles.container}>
@@ -115,6 +130,29 @@ export default function FantacalcioScreen() {
           Consigli intelligenti per la tua giornata
         </ThemedText>
       </ThemedView>
+
+      {/* Selettore lega */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.legheScroll}>
+        <View style={styles.legheRiga}>
+          {LEGHE_FANTACALCIO.map((l, i) => (
+            <TouchableOpacity
+              key={l.key}
+              onPress={() => { setLegaIdx(i); setDati(null); setErrore(null); }}
+              style={[
+                styles.legaChip,
+                legaIdx === i && { backgroundColor: l.colore },
+              ]}
+            >
+              <ThemedText
+                type="small"
+                style={[styles.legaChipTesto, legaIdx === i && { color: '#000', fontWeight: '700' }]}
+              >
+                {l.label}
+              </ThemedText>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
 
       {/* Selezione giornata */}
       <ThemedView style={styles.selezioneBox}>
@@ -302,6 +340,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: Spacing.xs,
+  },
+  // Selettore lega
+  legheScroll: {
+    marginHorizontal: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  legheRiga: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+    paddingVertical: 4,
+  },
+  legaChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  legaChipTesto: {
+    color: Colors.textMuted,
   },
   // Selezione giornata
   selezioneBox: {
