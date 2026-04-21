@@ -8,7 +8,16 @@ import numpy as np
 import pandas as pd
 from scipy.stats import poisson
 from stats_engine import get_h2h_stats
-from season_2526 import get_xg, get_xg_media_campionato, CLASSIFICA_REALE_30G, get_team_ou_tendency, get_season_avg_goals, get_xg_pl, get_xg_media_pl, get_xg_laliga, get_xg_media_laliga, get_xg_bl, get_xg_media_bl, get_xg_l1, get_xg_media_l1
+from season_2526 import (
+    get_xg, get_xg_media_campionato, CLASSIFICA_REALE_30G,
+    get_team_ou_tendency, get_season_avg_goals,
+    get_xg_pl, get_xg_media_pl,
+    get_xg_laliga, get_xg_media_laliga,
+    get_xg_bl, get_xg_media_bl,
+    get_xg_l1, get_xg_media_l1,
+    # Nuove funzioni multi-lega per classifica reale e forma recente
+    get_pts_per_squadra, get_forma_recente,
+)
 from live_data import get_impatto_infortunati, get_n_indisponibili
 
 # Import statistiche API Football (opzionale, non blocca se non disponibili)
@@ -111,21 +120,49 @@ BOOKMAKER_COLS = [
     ("SBH", "SBD", "SBA"),
 ]
 
-# Mappa classifica reale -> punti (per correzione forza)
-_CLASSIFICA_PTS = {}
-for _r in CLASSIFICA_REALE_30G:
-    _CLASSIFICA_PTS[_r["Squadra"]] = _r["Punti"]
-_MEDIA_PTS = sum(_CLASSIFICA_PTS.values()) / len(_CLASSIFICA_PTS) if _CLASSIFICA_PTS else 40
+# ─────────────────────────────────────────────────────────────────────────────
+# CLASSIFICA MULTI-LEGA: dizionario {lega -> {squadra -> punti}}
+# Carica i punti per tutte le 5 leghe all'avvio del modulo.
+# Priorita': dati aggiornati da classifiche_reali.json > hardcoded in season_2526.py
+# La Serie A usa CLASSIFICA_REALE_30G come fonte primaria (invariata).
+# ─────────────────────────────────────────────────────────────────────────────
+_LEGHE_SUPPORTATE = ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]
+
+# Costruisce la mappa {lega -> {squadra -> punti}} per tutte le leghe
+_ALL_CLASSIFICHE = {}
+for _lega in _LEGHE_SUPPORTATE:
+    _ALL_CLASSIFICHE[_lega] = get_pts_per_squadra(_lega)
+
+# Media punti per lega (usata come fallback se la squadra non e' trovata)
+_MEDIA_PTS_PER_LEGA = {
+    _lega: (
+        sum(_ALL_CLASSIFICHE[_lega].values()) / len(_ALL_CLASSIFICHE[_lega])
+        if _ALL_CLASSIFICHE[_lega] else 40
+    )
+    for _lega in _LEGHE_SUPPORTATE
+}
+
+# Compatibilita' backward: mantieni _CLASSIFICA_PTS e _MEDIA_PTS per Serie A
+_CLASSIFICA_PTS = _ALL_CLASSIFICHE["serie-a"]
+_MEDIA_PTS = _MEDIA_PTS_PER_LEGA["serie-a"]
 
 
-def _get_classifica_factor(home: str, away: str) -> float:
+def _get_classifica_factor(home: str, away: str, league: str = "serie-a") -> float:
     """
     Ritorna un fattore di correzione basato sulla differenza in classifica.
     Positivo = casa piu' forte, negativo = ospite piu' forte.
     Range circa [-0.15, +0.15].
+
+    Supporta tutte le 5 leghe top europee:
+    - Cerca prima nel dizionario della lega corrente (dati reali)
+    - Usa la media punti della stessa lega come fallback
     """
-    pts_h = _CLASSIFICA_PTS.get(home, _MEDIA_PTS)
-    pts_a = _CLASSIFICA_PTS.get(away, _MEDIA_PTS)
+    # Seleziona classifica e media punti per la lega corrente
+    classifica_lega = _ALL_CLASSIFICHE.get(league, _CLASSIFICA_PTS)
+    media_lega = _MEDIA_PTS_PER_LEGA.get(league, _MEDIA_PTS)
+
+    pts_h = classifica_lega.get(home, media_lega)
+    pts_a = classifica_lega.get(away, media_lega)
     diff = (pts_h - pts_a) / 100.0  # Normalizzato [-0.5, +0.5]
     return diff
 
@@ -528,10 +565,24 @@ def get_prediction(home_stats: dict, away_stats: dict,
     lambda_home *= forma_factor
     lambda_away *= (2.0 - forma_factor)  # Inverso
 
-    # ── MIGLIORIA 3: CORREZIONE CLASSIFICA REALE ──
-    class_diff = _get_classifica_factor(home_name, away_name)
+    # ── MIGLIORIA 3: CORREZIONE CLASSIFICA REALE (multi-lega) ──
+    # Usa la classifica della lega corrente (non piu' solo Serie A)
+    class_diff = _get_classifica_factor(home_name, away_name, league=league)
     lambda_home *= (1.0 + ALPHA_CLASSIFICA * class_diff * 5)
     lambda_away *= (1.0 - ALPHA_CLASSIFICA * class_diff * 5)
+
+    # ── CORREZIONE FORMA CORRENTE (ultime 5 partite stagione con decay) ──
+    # Feature aggiuntiva rispetto alla forma storica (forma_casa/trasf_pesata).
+    # Peso basso (0.06) per non sovra-pesare rispetto ai dati storici pluriennali.
+    # Valore neutro 0.5 se dati non disponibili (no impatto).
+    ALPHA_FORMA_CORRENTE = 0.06
+    forma_curr_home = get_forma_recente(home_name, league)
+    forma_curr_away = get_forma_recente(away_name, league)
+    forma_curr_diff = forma_curr_home - forma_curr_away  # Range [-1, +1]
+    if forma_curr_home != 0.5 or forma_curr_away != 0.5:
+        # Applica solo se almeno un valore non e' il default neutro
+        lambda_home *= (1.0 + ALPHA_FORMA_CORRENTE * forma_curr_diff)
+        lambda_away *= (1.0 - ALPHA_FORMA_CORRENTE * forma_curr_diff)
 
     # ── FASE 4: FATTORE CAMPO AVANZATO ──
     # Applicato solo in produzione con dati API Football reali (win_home_pct live)

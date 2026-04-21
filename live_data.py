@@ -130,6 +130,166 @@ INFORTUNATI_BASELINE = {
         {"nome": "Denoon", "tipo": "infortunio", "dettaglio": "Lungodegente"},
         {"nome": "Scuffet", "tipo": "infortunio", "dettaglio": "Rientro inizio aprile"},
     ],
+
+    # ──────────────────────────────────────────────
+    # PREMIER LEAGUE (aprile 2026)
+    # Fonte baseline: notizie pubbliche aggiornate
+    # ──────────────────────────────────────────────
+    "Arsenal": [
+        {"nome": "Tomiyasu", "tipo": "infortunio", "dettaglio": "Problema al ginocchio, rientro incerto"},
+        {"nome": "Tierney", "tipo": "infortunio", "dettaglio": "Lesione muscolare"},
+    ],
+    "Liverpool": [
+        {"nome": "Diogo Jota", "tipo": "infortunio", "dettaglio": "Lesione al tendine, rientro aprile/maggio"},
+    ],
+    "Chelsea": [],
+    "Manchester City": [
+        {"nome": "Rodri", "tipo": "infortunio", "dettaglio": "Recupero da infortunio al ginocchio"},
+        {"nome": "Ederson", "tipo": "infortunio", "dettaglio": "Problema muscolare, da valutare"},
+    ],
+    "Newcastle United": [
+        {"nome": "Sven Botman", "tipo": "infortunio", "dettaglio": "Infortunio al ginocchio, out a lungo"},
+    ],
+    "Brentford": [
+        {"nome": "Kristoffer Ajer", "tipo": "infortunio", "dettaglio": "Infortunio al ginocchio"},
+    ],
+    "Brighton": [],
+    "Bournemouth": [],
+    "Fulham": [],
+    "Manchester United": [
+        {"nome": "Luke Shaw", "tipo": "infortunio", "dettaglio": "Problema muscolare, rientro aprile"},
+        {"nome": "Lisandro Martinez", "tipo": "infortunio", "dettaglio": "Problema al ginocchio"},
+    ],
+    "Crystal Palace": [],
+    "Aston Villa": [
+        {"nome": "Emiliano Buendia", "tipo": "infortunio", "dettaglio": "Recupero lungo stop"},
+    ],
+    "Leeds": [],
+    "Everton": [
+        {"nome": "Seamus Coleman", "tipo": "infortunio", "dettaglio": "Da valutare"},
+    ],
+    "Nottingham Forest": [],
+    "West Ham": [],
+    "Tottenham": [
+        {"nome": "Micky van de Ven", "tipo": "infortunio", "dettaglio": "Problema muscolare"},
+    ],
+    "Wolverhampton Wanderers": [
+        {"nome": "Pedro Neto", "tipo": "infortunio", "dettaglio": "Problema muscolare, da valutare"},
+    ],
+    "Burnley": [],
+    "Sunderland": [],
+    # Alias nomi corti
+    "Man City":     [{"nome": "Rodri", "tipo": "infortunio", "dettaglio": "Recupero da infortunio al ginocchio"},
+                     {"nome": "Ederson", "tipo": "infortunio", "dettaglio": "Problema muscolare"}],
+    "Man United":   [{"nome": "Luke Shaw", "tipo": "infortunio", "dettaglio": "Problema muscolare"},
+                     {"nome": "Lisandro Martinez", "tipo": "infortunio", "dettaglio": "Ginocchio"}],
+    "Newcastle":    [{"nome": "Sven Botman", "tipo": "infortunio", "dettaglio": "Ginocchio, out a lungo"}],
+    "Nott. Forest": [],
+    "Wolves":       [{"nome": "Pedro Neto", "tipo": "infortunio", "dettaglio": "Muscolare"}],
+
+    # ──────────────────────────────────────────────
+    # LA LIGA (aprile 2026)
+    # ──────────────────────────────────────────────
+    "Barcelona": [
+        {"nome": "Gavi", "tipo": "infortunio", "dettaglio": "Rientro progressivo dopo lungo stop"},
+        {"nome": "Frenkie de Jong", "tipo": "infortunio", "dettaglio": "Problema alla caviglia, da valutare"},
+    ],
+    "Real Madrid": [
+        {"nome": "Thibaut Courtois", "tipo": "infortunio", "dettaglio": "Recupero graduale"},
+        {"nome": "Eder Militao", "tipo": "infortunio", "dettaglio": "Recupero da infortunio al ginocchio"},
+    ],
+    "Atletico Madrid": [],
+    "Athletic Club": [],
+    "Real Betis": [
+        {"nome": "Nabil Fekir", "tipo": "infortunio", "dettaglio": "Problema muscolare"},
+    ],
+    "Villarreal": [],
+    "Real Sociedad": [],
+    "Rayo Vallecano": [],
+    "Getafe": [],
+    "Osasuna": [],
+    "Celta Vigo": [],
+    "Alaves": [],
+    "Valencia": [],
+    "Girona": [],
+    "Real Oviedo": [],
+    "Espanyol": [],
+    "Mallorca": [],
+    "Levante": [],
+    "Sevilla": [
+        {"nome": "Erik Lamela", "tipo": "dubbio", "dettaglio": "Da valutare"},
+    ],
+    "Elche": [],
+    # Alias
+    "Atletico": [],
+    "Oviedo":   [],
+
+    # ──────────────────────────────────────────────
+    # BUNDESLIGA (aprile 2026)
+    # ──────────────────────────────────────────────
+    "Bayern Munich": [
+        {"nome": "Manuel Neuer", "tipo": "dubbio", "dettaglio": "Da valutare per la prossima gara"},
+    ],
+    "Bayer Leverkusen": [],
+    "RasenBallsport Leipzig": [
+        {"nome": "Dani Olmo", "tipo": "dubbio", "dettaglio": "Piccolo problema muscolare"},
+    ],
+    "Borussia Dortmund": [
+        {"nome": "Sebastien Haller", "tipo": "infortunio", "dettaglio": "Problema muscolare, rientro imminente"},
+    ],
+    "VfB Stuttgart": [],
+    "Eintracht Frankfurt": [],
+    "Hoffenheim": [],
+    "Mainz 05": [],
+    "Freiburg": [],
+    "FC Cologne": [],
+    "Union Berlin": [],
+    "Werder Bremen": [],
+    "Borussia M.Gladbach": [],
+    "Wolfsburg": [],
+    "Augsburg": [],
+    "Hamburger SV": [],
+    "St. Pauli": [],
+    "FC Heidenheim": [],
+    # Alias Bundesliga
+    "RB Leipzig":        [{"nome": "Dani Olmo", "tipo": "dubbio", "dettaglio": "Muscolare"}],
+    "Mainz":             [],
+    "Stuttgart":         [],
+    "Monchengladbach":   [],
+    "1. FC Koln":        [],
+    "1. FC Heidenheim":  [],
+    "St Pauli":          [],
+
+    # ──────────────────────────────────────────────
+    # LIGUE 1 (aprile 2026)
+    # ──────────────────────────────────────────────
+    "Paris Saint Germain": [
+        {"nome": "Lucas Hernandez", "tipo": "infortunio", "dettaglio": "Recupero da infortunio al ginocchio"},
+    ],
+    "Lens": [],
+    "Monaco": [
+        {"nome": "Aleksandr Golovin", "tipo": "infortunio", "dettaglio": "Problema muscolare"},
+    ],
+    "Marseille": [],
+    "Lille": [],
+    "Strasbourg": [],
+    "Lyon": [
+        {"nome": "Maxence Caqueret", "tipo": "dubbio", "dettaglio": "Da valutare"},
+    ],
+    "Rennes": [],
+    "Lorient": [],
+    "Auxerre": [],
+    "Toulouse": [],
+    "Brest": [],
+    "Nice": [],
+    "Paris FC": [],
+    "Nantes": [],
+    "Le Havre": [],
+    "Metz": [],
+    "Angers": [],
+    # Alias Ligue 1
+    "PSG":               [{"nome": "Lucas Hernandez", "tipo": "infortunio", "dettaglio": "Ginocchio"}],
+    "Stade Brestois 29": [],
 }
 
 # Probabili formazioni baseline (giornata 31)

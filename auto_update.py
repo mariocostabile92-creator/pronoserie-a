@@ -148,6 +148,44 @@ def aggiorna_xg_understat() -> bool:
         return False
 
 
+def aggiorna_classifiche_multiliga() -> bool:
+    """
+    Aggiorna le classifiche reali per tutte le 5 leghe top europee
+    scaricando i CSV aggiornati da football-data.co.uk.
+
+    Delega a update_classifiche.py che salva i risultati in classifiche_reali.json.
+    Questo file viene poi letto da predictor.py per la correzione classifica.
+
+    Ritorna True se almeno una lega e' stata aggiornata.
+    """
+    print("\n  [Classifiche] Avvio aggiornamento classifiche multi-lega...")
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    update_module = os.path.join(script_dir, "update_classifiche.py")
+
+    if not os.path.exists(update_module):
+        print(f"  [Classifiche] ATTENZIONE: {update_module} non trovato!")
+        return False
+
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("update_classifiche", update_module)
+        update_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(update_mod)
+
+        ok = update_mod.aggiorna_classifiche()
+        if ok:
+            print("  [Classifiche] Aggiornamento completato per tutte le leghe!")
+        else:
+            print("  [Classifiche] Aggiornamento parziale (alcune leghe con errori)")
+        return ok
+
+    except Exception as e:
+        print(f"  [Classifiche] ERRORE durante l'aggiornamento: {e}")
+        return False
+
+
+
 def controlla_retrain(forza=False, dry_run=False) -> bool:
     """
     Controlla se e' necessario eseguire il re-training settimanale del modello.
@@ -210,15 +248,17 @@ def controlla_retrain(forza=False, dry_run=False) -> bool:
         return False
 
 
-def esegui_aggiornamento(include_retrain=True) -> bool:
+def esegui_aggiornamento(include_retrain=True, include_classifiche=True) -> bool:
     """
     Esegue l'aggiornamento completo:
     1. Scarica CSV risultati (football-data.co.uk)
-    2. Aggiorna classifica e marcatori
-    3. (Settimanale) Re-training automatico del modello predittivo
+    2. Aggiorna classifica e marcatori Serie A
+    3. (Settimanale) Aggiorna classifiche multi-lega (tutte e 5 le leghe)
+    4. (Settimanale) Re-training automatico del modello predittivo
 
     Parametri:
-        include_retrain: se True, controlla e avvia il re-training settimanale
+        include_retrain:      se True, controlla e avvia il re-training settimanale
+        include_classifiche:  se True, aggiorna classifiche multi-lega (settimanale)
     """
     print("=" * 50)
     print(f"AGGIORNAMENTO DATI SERIE A")
@@ -238,12 +278,21 @@ def esegui_aggiornamento(include_retrain=True) -> bool:
     aggiorna_classifica()
     aggiorna_marcatori()
 
-    # 3. Re-training settimanale del modello (se attivo)
+    # 3. Aggiornamento classifiche multi-lega (settimanale, stesso ciclo del re-training)
+    if include_classifiche:
+        print("\n  Aggiornamento classifiche multi-lega...")
+        ok_cl = aggiorna_classifiche_multiliga()
+        if ok_cl:
+            print("  [OK] Classifiche multi-lega aggiornate!")
+        else:
+            print("  [!] Classifiche multi-lega non aggiornate (uso dati hardcoded)")
+
+    # 4. Re-training settimanale del modello (se attivo)
     if include_retrain:
         print("\n  Controllo re-training automatico...")
         controlla_retrain()
 
-    # 4. Salva timestamp
+    # 5. Salva timestamp
     try:
         with open(LOG_FILE, "w") as f:
             f.write(datetime.now().strftime("%d/%m/%Y %H:%M"))
@@ -285,17 +334,28 @@ if __name__ == "__main__":
         print("\n" + ("OK - xG aggiornati con dati reali Understat" if ok else "ERRORE - aggiornamento parziale"))
         sys.exit(0 if ok else 1)
 
-    elif "--all" in args:
-        # Modalita': aggiornamento completo (CSV + xG + re-training)
+    elif "--classifiche" in args:
+        # Modalita': aggiorna solo le classifiche multi-lega da football-data.co.uk
         print("=" * 60)
-        print("AGGIORNAMENTO COMPLETO (CSV + xG Understat + Re-training)")
+        print("AGGIORNAMENTO CLASSIFICHE MULTI-LEGA (5 leghe top)")
         print(f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
         print("=" * 60)
-        ok_csv = esegui_aggiornamento(include_retrain=True)
+        ok = aggiorna_classifiche_multiliga()
+        print("\n" + ("OK - Classifiche aggiornate per tutte le leghe" if ok else "ERRORE - aggiornamento parziale"))
+        sys.exit(0 if ok else 1)
+
+    elif "--all" in args:
+        # Modalita': aggiornamento completo (CSV + xG + classifiche + re-training)
+        print("=" * 60)
+        print("AGGIORNAMENTO COMPLETO (CSV + xG Understat + Classifiche + Re-training)")
+        print(f"Data: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+        print("=" * 60)
+        ok_csv = esegui_aggiornamento(include_retrain=True, include_classifiche=True)
         ok_xg = aggiorna_xg_understat()
         print("\n" + "=" * 60)
-        print(f"CSV risultati: {'OK' if ok_csv else 'SKIP'}")
-        print(f"xG Understat:  {'OK' if ok_xg else 'ERRORE'}")
+        print(f"CSV risultati:      {'OK' if ok_csv else 'SKIP'}")
+        print(f"xG Understat:       {'OK' if ok_xg else 'ERRORE'}")
+        print("Classifiche multi:  (incluso in CSV)")
         print("=" * 60)
         sys.exit(0 if ok_xg else 1)
 
@@ -312,6 +372,6 @@ if __name__ == "__main__":
         sys.exit(0 if ok else 1)
 
     else:
-        # Modalita' default: aggiornamento CSV Serie A + controllo re-training settimanale
-        esegui_aggiornamento(include_retrain=True)
+        # Modalita' default: aggiornamento CSV Serie A + classifiche + re-training settimanale
+        esegui_aggiornamento(include_retrain=True, include_classifiche=True)
         input("\nPremi INVIO per chiudere...")

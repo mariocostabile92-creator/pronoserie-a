@@ -484,3 +484,195 @@ def get_season_avg_goals() -> float:
     if tot_partite == 0:
         return 2.6
     return round(tot_gol / tot_partite, 2)
+
+
+# ──────────────────────────────────────────────
+# CLASSIFICHE REALI ALTRE LEGHE (aggiornate ad aprile 2026)
+# Usate come fallback se classifiche_reali.json non e' disponibile.
+# Aggiornare con: python update_classifiche.py
+# Formato: {"Squadra": ..., "Punti": ..., "G": ..., "GF": ..., "GS": ...}
+# ──────────────────────────────────────────────
+
+# Premier League - Giornata ~33 (aprile 2026)
+CLASSIFICA_PL = [
+    {"Squadra": "Arsenal",                 "Punti": 77, "G": 33, "GF": 72, "GS": 30, "DR": 42},
+    {"Squadra": "Liverpool",               "Punti": 73, "G": 33, "GF": 65, "GS": 46, "DR": 19},
+    {"Squadra": "Chelsea",                 "Punti": 67, "G": 33, "GF": 71, "GS": 50, "DR": 21},
+    {"Squadra": "Manchester City",         "Punti": 65, "G": 33, "GF": 69, "GS": 41, "DR": 28},
+    {"Squadra": "Newcastle United",        "Punti": 60, "G": 33, "GF": 56, "GS": 52, "DR":  4},
+    {"Squadra": "Brentford",               "Punti": 56, "G": 33, "GF": 60, "GS": 49, "DR": 11},
+    {"Squadra": "Brighton",                "Punti": 54, "G": 33, "GF": 52, "GS": 49, "DR":  3},
+    {"Squadra": "Bournemouth",             "Punti": 52, "G": 33, "GF": 60, "GS": 53, "DR":  7},
+    {"Squadra": "Fulham",                  "Punti": 50, "G": 33, "GF": 46, "GS": 55, "DR": -9},
+    {"Squadra": "Manchester United",       "Punti": 49, "G": 33, "GF": 63, "GS": 46, "DR": 17},
+    {"Squadra": "Crystal Palace",          "Punti": 47, "G": 33, "GF": 58, "GS": 51, "DR":  7},
+    {"Squadra": "Aston Villa",             "Punti": 44, "G": 33, "GF": 50, "GS": 52, "DR": -2},
+    {"Squadra": "Leeds",                   "Punti": 40, "G": 33, "GF": 55, "GS": 50, "DR":  5},
+    {"Squadra": "Everton",                 "Punti": 35, "G": 33, "GF": 46, "GS": 53, "DR": -7},
+    {"Squadra": "Nottingham Forest",       "Punti": 33, "G": 33, "GF": 41, "GS": 57, "DR":-16},
+    {"Squadra": "West Ham",                "Punti": 28, "G": 33, "GF": 44, "GS": 62, "DR":-18},
+    {"Squadra": "Tottenham",               "Punti": 26, "G": 33, "GF": 41, "GS": 54, "DR":-13},
+    {"Squadra": "Wolverhampton Wanderers", "Punti": 23, "G": 33, "GF": 33, "GS": 65, "DR":-32},
+    {"Squadra": "Burnley",                 "Punti": 18, "G": 33, "GF": 34, "GS": 74, "DR":-40},
+    {"Squadra": "Sunderland",              "Punti": 16, "G": 33, "GF": 39, "GS": 57, "DR":-18},
+    # Alias nomi corti usati da football-data.co.uk
+    {"Squadra": "Man City",      "Punti": 65, "G": 33, "GF": 69, "GS": 41, "DR": 28},
+    {"Squadra": "Man United",    "Punti": 49, "G": 33, "GF": 63, "GS": 46, "DR": 17},
+    {"Squadra": "Newcastle",     "Punti": 60, "G": 33, "GF": 56, "GS": 52, "DR":  4},
+    {"Squadra": "Nott. Forest",  "Punti": 33, "G": 33, "GF": 41, "GS": 57, "DR":-16},
+    {"Squadra": "Wolves",        "Punti": 23, "G": 33, "GF": 33, "GS": 65, "DR":-32},
+]
+
+# La Liga - Giornata ~31 (aprile 2026)
+CLASSIFICA_LALIGA = [
+    {"Squadra": "Barcelona",       "Punti": 82, "G": 31, "GF": 93, "GS": 44, "DR": 49},
+    {"Squadra": "Real Madrid",     "Punti": 71, "G": 31, "GF": 74, "GS": 38, "DR": 36},
+    {"Squadra": "Atletico Madrid", "Punti": 64, "G": 31, "GF": 55, "GS": 41, "DR": 14},
+    {"Squadra": "Athletic Club",   "Punti": 58, "G": 31, "GF": 49, "GS": 39, "DR": 10},
+    {"Squadra": "Real Betis",      "Punti": 54, "G": 31, "GF": 53, "GS": 41, "DR": 12},
+    {"Squadra": "Villarreal",      "Punti": 52, "G": 31, "GF": 57, "GS": 44, "DR": 13},
+    {"Squadra": "Real Sociedad",   "Punti": 47, "G": 31, "GF": 51, "GS": 49, "DR":  2},
+    {"Squadra": "Rayo Vallecano",  "Punti": 43, "G": 31, "GF": 48, "GS": 47, "DR":  1},
+    {"Squadra": "Getafe",          "Punti": 37, "G": 31, "GF": 29, "GS": 41, "DR":-12},
+    {"Squadra": "Osasuna",         "Punti": 36, "G": 31, "GF": 42, "GS": 43, "DR": -1},
+    {"Squadra": "Celta Vigo",      "Punti": 35, "G": 31, "GF": 44, "GS": 43, "DR":  1},
+    {"Squadra": "Alaves",          "Punti": 33, "G": 31, "GF": 45, "GS": 46, "DR": -1},
+    {"Squadra": "Valencia",        "Punti": 30, "G": 31, "GF": 45, "GS": 46, "DR": -1},
+    {"Squadra": "Girona",          "Punti": 28, "G": 31, "GF": 43, "GS": 57, "DR":-14},
+    {"Squadra": "Real Oviedo",     "Punti": 26, "G": 31, "GF": 35, "GS": 55, "DR":-20},
+    {"Squadra": "Espanyol",        "Punti": 25, "G": 31, "GF": 46, "GS": 54, "DR": -8},
+    {"Squadra": "Mallorca",        "Punti": 22, "G": 31, "GF": 39, "GS": 57, "DR":-18},
+    {"Squadra": "Levante",         "Punti": 20, "G": 31, "GF": 48, "GS": 59, "DR":-11},
+    {"Squadra": "Sevilla",         "Punti": 19, "G": 31, "GF": 35, "GS": 55, "DR":-20},
+    {"Squadra": "Elche",           "Punti": 16, "G": 31, "GF": 40, "GS": 62, "DR":-22},
+    # Alias nomi corti
+    {"Squadra": "Atletico",        "Punti": 64, "G": 31, "GF": 55, "GS": 41, "DR": 14},
+    {"Squadra": "Oviedo",          "Punti": 26, "G": 31, "GF": 35, "GS": 55, "DR":-20},
+]
+
+# Bundesliga - Giornata ~30 (aprile 2026)
+CLASSIFICA_BL = [
+    {"Squadra": "Bayern Munich",        "Punti": 75, "G": 30, "GF": 99, "GS": 36, "DR": 63},
+    {"Squadra": "Bayer Leverkusen",     "Punti": 63, "G": 30, "GF": 66, "GS": 42, "DR": 24},
+    {"Squadra": "RasenBallsport Leipzig","Punti": 57, "G": 30, "GF": 67, "GS": 45, "DR": 22},
+    {"Squadra": "Borussia Dortmund",    "Punti": 53, "G": 30, "GF": 59, "GS": 39, "DR": 20},
+    {"Squadra": "VfB Stuttgart",        "Punti": 50, "G": 30, "GF": 61, "GS": 47, "DR": 14},
+    {"Squadra": "Eintracht Frankfurt",  "Punti": 45, "G": 30, "GF": 47, "GS": 49, "DR": -2},
+    {"Squadra": "Hoffenheim",           "Punti": 42, "G": 30, "GF": 57, "GS": 50, "DR":  7},
+    {"Squadra": "Mainz 05",             "Punti": 41, "G": 30, "GF": 53, "GS": 54, "DR": -1},
+    {"Squadra": "Freiburg",             "Punti": 40, "G": 30, "GF": 47, "GS": 47, "DR":  0},
+    {"Squadra": "FC Cologne",           "Punti": 36, "G": 30, "GF": 48, "GS": 56, "DR": -8},
+    {"Squadra": "Union Berlin",         "Punti": 33, "G": 30, "GF": 43, "GS": 49, "DR": -6},
+    {"Squadra": "Werder Bremen",        "Punti": 31, "G": 30, "GF": 40, "GS": 53, "DR":-13},
+    {"Squadra": "Borussia M.Gladbach",  "Punti": 29, "G": 30, "GF": 43, "GS": 51, "DR": -8},
+    {"Squadra": "Wolfsburg",            "Punti": 27, "G": 30, "GF": 44, "GS": 62, "DR":-18},
+    {"Squadra": "Augsburg",             "Punti": 26, "G": 30, "GF": 44, "GS": 63, "DR":-19},
+    {"Squadra": "Hamburger SV",         "Punti": 22, "G": 30, "GF": 39, "GS": 61, "DR":-22},
+    {"Squadra": "St. Pauli",            "Punti": 19, "G": 30, "GF": 30, "GS": 57, "DR":-27},
+    {"Squadra": "FC Heidenheim",        "Punti": 16, "G": 30, "GF": 41, "GS": 65, "DR":-24},
+    # Alias nomi corti (football-data.co.uk)
+    {"Squadra": "RB Leipzig",           "Punti": 57, "G": 30, "GF": 67, "GS": 45, "DR": 22},
+    {"Squadra": "Mainz",                "Punti": 41, "G": 30, "GF": 53, "GS": 54, "DR": -1},
+    {"Squadra": "Stuttgart",            "Punti": 50, "G": 30, "GF": 61, "GS": 47, "DR": 14},
+    {"Squadra": "Monchengladbach",      "Punti": 29, "G": 30, "GF": 43, "GS": 51, "DR": -8},
+    {"Squadra": "1. FC Koln",           "Punti": 36, "G": 30, "GF": 48, "GS": 56, "DR": -8},
+    {"Squadra": "1. FC Heidenheim",     "Punti": 16, "G": 30, "GF": 41, "GS": 65, "DR":-24},
+    {"Squadra": "St Pauli",             "Punti": 19, "G": 30, "GF": 30, "GS": 57, "DR":-27},
+]
+
+# Ligue 1 - Giornata ~30 (aprile 2026)
+CLASSIFICA_L1 = [
+    {"Squadra": "Paris Saint Germain", "Punti": 76, "G": 30, "GF": 70, "GS": 28, "DR": 42},
+    {"Squadra": "Lens",                "Punti": 63, "G": 30, "GF": 66, "GS": 40, "DR": 26},
+    {"Squadra": "Monaco",              "Punti": 59, "G": 30, "GF": 58, "GS": 47, "DR": 11},
+    {"Squadra": "Marseille",           "Punti": 57, "G": 30, "GF": 62, "GS": 43, "DR": 19},
+    {"Squadra": "Lille",               "Punti": 55, "G": 30, "GF": 53, "GS": 37, "DR": 16},
+    {"Squadra": "Strasbourg",          "Punti": 50, "G": 30, "GF": 50, "GS": 40, "DR": 10},
+    {"Squadra": "Lyon",                "Punti": 46, "G": 30, "GF": 49, "GS": 43, "DR":  6},
+    {"Squadra": "Rennes",              "Punti": 43, "G": 30, "GF": 50, "GS": 51, "DR": -1},
+    {"Squadra": "Lorient",             "Punti": 41, "G": 30, "GF": 44, "GS": 47, "DR": -3},
+    {"Squadra": "Auxerre",             "Punti": 39, "G": 30, "GF": 37, "GS": 44, "DR": -7},
+    {"Squadra": "Toulouse",            "Punti": 36, "G": 30, "GF": 42, "GS": 42, "DR":  0},
+    {"Squadra": "Brest",               "Punti": 33, "G": 30, "GF": 41, "GS": 48, "DR": -7},
+    {"Squadra": "Nice",                "Punti": 31, "G": 30, "GF": 42, "GS": 56, "DR":-14},
+    {"Squadra": "Paris FC",            "Punti": 28, "G": 30, "GF": 43, "GS": 53, "DR":-10},
+    {"Squadra": "Nantes",              "Punti": 26, "G": 30, "GF": 32, "GS": 49, "DR":-17},
+    {"Squadra": "Le Havre",            "Punti": 24, "G": 30, "GF": 34, "GS": 51, "DR":-17},
+    {"Squadra": "Metz",                "Punti": 20, "G": 30, "GF": 30, "GS": 59, "DR":-29},
+    {"Squadra": "Angers",              "Punti": 17, "G": 30, "GF": 29, "GS": 52, "DR":-23},
+    # Alias nomi alternativi
+    {"Squadra": "PSG",                 "Punti": 76, "G": 30, "GF": 70, "GS": 28, "DR": 42},
+    {"Squadra": "Stade Brestois 29",   "Punti": 33, "G": 30, "GF": 41, "GS": 48, "DR": -7},
+]
+
+# Mappa lega -> lista classifica hardcoded
+_CLASSIFICA_PER_LEGA = {
+    "serie-a":        CLASSIFICA_REALE_30G,
+    "premier-league": CLASSIFICA_PL,
+    "la-liga":        CLASSIFICA_LALIGA,
+    "bundesliga":     CLASSIFICA_BL,
+    "ligue-1":        CLASSIFICA_L1,
+}
+
+
+def get_classifica_lega(lega: str) -> list:
+    """
+    Ritorna la classifica della lega specificata.
+    Prima prova a caricare da classifiche_reali.json (aggiornato da update_classifiche.py),
+    poi usa i dati hardcoded come fallback.
+    """
+    # Prova a caricare dati aggiornati da JSON (se update_classifiche.py e' stato eseguito)
+    try:
+        from update_classifiche import carica_classifiche
+        dati = carica_classifiche()
+        lega_dati = dati.get("leghe", {}).get(lega, {})
+        classifica_json = lega_dati.get("classifica", {})
+        if classifica_json:
+            # Converti formato JSON -> lista (come CLASSIFICA_REALE_30G)
+            lista = []
+            for nome, d in classifica_json.items():
+                lista.append({
+                    "Squadra": nome,
+                    "Punti": d.get("punti", 0),
+                    "G": d.get("giocate", 0),
+                    "GF": d.get("gf", 0),
+                    "GS": d.get("gs", 0),
+                    "DR": d.get("dr", 0),
+                })
+            return sorted(lista, key=lambda x: (-x["Punti"], -x["DR"], -x["GF"]))
+    except Exception:
+        pass
+
+    # Fallback: dati hardcoded
+    return _CLASSIFICA_PER_LEGA.get(lega, CLASSIFICA_REALE_30G)
+
+
+def get_pts_per_squadra(lega: str) -> dict:
+    """
+    Ritorna un dizionario {nome_squadra: punti} per la lega specificata.
+    Include dati sia da JSON aggiornato che da fallback hardcoded.
+    """
+    classifica = get_classifica_lega(lega)
+    return {r["Squadra"]: r["Punti"] for r in classifica}
+
+
+def get_forma_recente(squadra: str, lega: str) -> float:
+    """
+    Ritorna la forma recente della squadra (ultime 5 partite con decay factor).
+    Valore in [0.0, 1.0]:
+        0.0 = 5 sconfitte di fila (pessima forma)
+        0.5 = forma neutrale (2 vittorie, 1 pareggio, 2 sconfitte circa)
+        1.0 = 5 vittorie di fila (forma perfetta)
+
+    Carica da classifiche_reali.json se disponibile, altrimenti ritorna 0.5 (neutro).
+    """
+    try:
+        from update_classifiche import carica_classifiche
+        dati = carica_classifiche()
+        lega_dati = dati.get("leghe", {}).get(lega, {})
+        forma_dati = lega_dati.get("forma", {})
+        if squadra in forma_dati:
+            return forma_dati[squadra].get("forma_5", 0.5)
+    except Exception:
+        pass
+    return 0.5  # Valore neutro se dati non disponibili
