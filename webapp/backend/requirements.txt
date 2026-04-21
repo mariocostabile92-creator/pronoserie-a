@@ -9,3 +9,4 @@ numpy
 scipy
 psycopg2-binary
 pywebpush
+slowapi

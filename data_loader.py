@@ -12,7 +12,7 @@ import pandas as pd
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
-CARTELLA_CSV = r"C:\Users\Mario\Desktop\Mariocalcio"
+CARTELLA_CSV = os.environ.get("CARTELLA_CSV", os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_seriea"))
 CARTELLA_PL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_pl")
 CARTELLA_LL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_laliga")
 CARTELLA_UCL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_ucl")

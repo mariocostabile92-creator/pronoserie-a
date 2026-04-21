@@ -9,3 +9,9 @@ pandas
 numpy
 scipy
 psycopg2-binary
+slowapi
+customtkinter
+scikit-learn
+python-telegram-bot
+Pillow
+python-pptx

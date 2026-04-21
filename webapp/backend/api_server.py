@@ -39,9 +39,23 @@ from api_auth import get_optional_user, hash_password, verify_password, create_t
 from api_payments import router as payments_router
 
 # ─────────────────────────────
+# RATE LIMITING (slowapi)
+# ─────────────────────────────
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi import Request
+
+limiter = Limiter(key_func=get_remote_address)
+
+# ─────────────────────────────
 # APP
 # ─────────────────────────────
 app = FastAPI(title="MatchIQ API", version="2.0")
+
+# Registra il limiter e l'exception handler per il rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -246,16 +260,17 @@ LIVE_INFORTUNATI = {}
 LIVE_LAST_UPDATE = ""
 
 def _utc_to_rome(utc_str):
-    """Converte orario UTC dall'API in ora italiana (CET/CEST)."""
+    """Converte orario UTC dall'API in ora italiana (CET/CEST) usando zoneinfo."""
     try:
         if not utc_str or len(utc_str) < 16:
             return ""
-        h = int(utc_str[11:13])
-        m = utc_str[14:16]
-        # Italia = UTC+2 (CEST, estate) o UTC+1 (CET, inverno)
-        # Da fine marzo a fine ottobre = +2
-        h_it = (h + 2) % 24
-        return f"{h_it:02d}:{m}"
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        # Parse l'orario UTC
+        orario_utc = datetime.fromisoformat(utc_str.replace('Z', '+00:00'))
+        # Converti a timezone Europe/Rome (gestisce automaticamente CET/CEST)
+        ora_locale = orario_utc.astimezone(ZoneInfo("Europe/Rome"))
+        return ora_locale.strftime("%H:%M")
     except Exception:
         return utc_str[11:16] if len(utc_str) > 15 else ""
 
@@ -662,6 +677,27 @@ async def startup():
             print(f"⚠️ Bot Telegram non avviato: {e}")
 
     threading.Thread(target=_start_telegram_bot, daemon=True).start()
+
+# ─────────────────────────────
+# IMPORT E REGISTRAZIONE ROUTER MODULARI
+# ─────────────────────────────
+from routes.auth import router as auth_router
+from routes.pronostici import router as pronostici_router
+from routes.live import router as live_router
+from routes.leghe import router as leghe_router
+from routes.schedina import router as schedina_router
+from routes.referral import router as referral_router
+from routes.tracking import router as tracking_router
+from routes.fantacalcio import router as fantacalcio_router
+
+app.include_router(auth_router)
+app.include_router(pronostici_router)
+app.include_router(live_router)
+app.include_router(leghe_router)
+app.include_router(schedina_router)
+app.include_router(referral_router)
+app.include_router(tracking_router)
+app.include_router(fantacalcio_router)
 
 # ─────────────────────────────
 # FRONTEND
@@ -1385,98 +1421,9 @@ def _notify_admin_new_user(email, piano):
 # ─────────────────────────────
 # AUTH
 # ─────────────────────────────
-@app.post("/api/auth/register")
-async def register(data: dict):
-    email = data["email"].lower().strip()
 
-    if get_user_by_email(email):
-        raise HTTPException(409, "Email gia' registrata")
 
-    user = create_user(email, hash_password(data["password"]))
-    token = create_token({"sub": str(user["id"])})
 
-    # Invia email di benvenuto (in background, non blocca la risposta)
-    threading.Thread(target=send_welcome_email, args=(email,), daemon=True).start()
-
-    # Notifica admin (in background)
-    try:
-        threading.Thread(target=_notify_admin_new_user, args=(email, user.get("piano", "free")), daemon=True).start()
-    except Exception as e:
-        print(f"⚠️ Errore avvio notifica admin: {e}")
-
-    return {"access_token": token, "piano": user["piano"]}
-
-@app.post("/api/auth/login")
-async def login(data: dict):
-    user = get_user_by_email(data["email"].lower().strip())
-
-    if not user or not verify_password(data["password"].strip(), user["password_hash"]):
-        raise HTTPException(401, "Credenziali errate")
-
-    token = create_token({"sub": str(user["id"])})
-
-    return {"access_token": token, "piano": user["piano"]}
-
-@app.post("/api/auth/reset-password")
-async def reset_password(data: dict):
-    import random, string
-    email = data.get("email", "").lower().strip()
-    if not email:
-        raise HTTPException(400, "Email richiesta")
-    user = get_user_by_email(email)
-    if not user:
-        raise HTTPException(404, "Email non trovata")
-    # Genera nuova password casuale
-    new_pass = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-    # Aggiorna nel DB
-    from database import _get_conn
-    conn = _get_conn()
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET password_hash = %s WHERE id = %s", (hash_password(new_pass), user["id"]))
-    conn.commit()
-    cur.close()
-    conn.close()
-    # Invia via email
-    try:
-        import urllib.request as ur
-        body = json.dumps({
-            "from": "MatchIQ <noreply@matchiq.it.com>",
-            "to": [email],
-            "subject": "MatchIQ - La tua nuova password",
-            "html": f'<div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px"><h2 style="color:#2ecc71">Recupero Password</h2><p>La tua nuova password provvisoria e\':</p><div style="background:#162447;padding:16px;border-radius:8px;text-align:center;margin:16px 0"><code style="font-size:1.5rem;font-weight:800;color:#2ecc71;font-family:Courier New,monospace;user-select:all">{new_pass}</code></div><p style="font-size:.85rem;color:#8892b0">Copia la password qui sopra (toccala per selezionarla) e usala per accedere.</p><p>Poi cambiala dalle impostazioni del tuo account.</p><hr style="border:1px solid #1f3460"><p style="color:#8892b0;font-size:.85rem">MatchIQ - Pronostici Calcistici con IA</p></div>'
-        }).encode()
-        req = ur.Request("https://api.resend.com/emails", data=body, headers={
-            "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json",
-            "User-Agent": "MatchIQ/1.0"
-        })
-        ur.urlopen(req, timeout=10)
-        print(f"📧 Password reset inviata a {email}")
-    except Exception as e:
-        print(f"❌ Errore invio reset password: {e}")
-    return {"sent": True}
-
-@app.post("/api/auth/change-password")
-async def change_password(data: dict, user: Optional[dict] = Depends(get_optional_user)):
-    if not user:
-        raise HTTPException(401, "Devi essere loggato")
-    old_pass = data.get("old_password", "")
-    new_pass = data.get("new_password", "")
-    if not old_pass or not new_pass:
-        raise HTTPException(400, "Compila tutti i campi")
-    if len(new_pass) < 6:
-        raise HTTPException(400, "La nuova password deve avere almeno 6 caratteri")
-    db_user = get_user_by_email(user.get("email", ""))
-    if not db_user or not verify_password(old_pass, db_user["password_hash"]):
-        raise HTTPException(401, "Password attuale errata")
-    from database import _get_conn
-    conn = _get_conn()
-    cur = conn.cursor()
-    cur.execute("UPDATE users SET password_hash = %s WHERE id = %s", (hash_password(new_pass), db_user["id"]))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return {"status": "ok"}
 
 # ─────────────────────────────
 # PRONOSTICO - Helper unificato
@@ -1721,10 +1668,6 @@ def _compute_pronostico(league: str, home: str, away: str) -> dict:
         "bookmaker_live_data": bk_live if bk_used_live else None,
     }
 
-@app.get("/api/pronostico/{home}/{away}")
-async def pronostico(home: str, away: str, user: Optional[dict] = Depends(get_optional_user)):
-    check_limit(user)
-    return _compute_pronostico("serie-a", home, away)
 
 # ─────────────────────────────
 # CALENDARIO (FIX DEFINITIVO)
@@ -2331,28 +2274,10 @@ def _fetch_infortunati_live():
     except Exception as e:
         print(f"❌ Errore fetch infortunati: {e}")
 
-@app.get("/api/classifica")
-async def classifica():
-    cl = CLASSIFICA_CACHE.get("serie-a") or CLASS_FALLBACK
-    mc = MARCATORI_CACHE.get("serie-a") or MARC_FALLBACK
-    return {
-        "classifica": cl,
-        "marcatori": mc,
-        "aggiornamento": CLASSIFICA_LAST_UPDATE.get("serie-a", "") or "Dati base",
-        "live": CLASSIFICA_CACHE.get("serie-a") is not None,
-        "stats_squadre": _compute_best_stats("serie-a"),
-    }
 
 # ─────────────────────────────
 # MARCATORI
 # ─────────────────────────────
-@app.get("/api/marcatori")
-async def marcatori():
-    try:
-        return get_marcatori()
-    except Exception as e:
-        print("❌ ERRORE MARCATORI:", e)
-        return []
 
 # ─────────────────────────────
 # SQUADRE (rose, formazioni, infortunati)
@@ -2593,346 +2518,15 @@ def _get_injuries_ondemand(team_name):
         pass
     return []
 
-@app.get("/api/squadra/{nome}")
-async def squadra(nome: str):
-    n = nome.strip().title()
-    # Formazione: live > hardcoded > on-demand
-    form = LIVE_FORMAZIONI.get(n) or FORMAZIONI.get(n)
-    if not form:
-        form = _get_last_lineup(n)
-    # Infortunati: live cache > hardcoded > on-demand
-    inj = INFORTUNATI_LIVE.get(n) if INFORTUNATI_LIVE.get(n) else (LIVE_INFORTUNATI.get(n) if LIVE_INFORTUNATI.get(n) is not None else INFORTUNATI.get(n, []))
-    if not inj and (n in PL_TEAM_IDS or not INFORTUNATI.get(n)):
-        inj = _get_injuries_ondemand(n)
-    # Allenatore: live > hardcoded > on-demand API
-    allenatore = ALLENATORI_LIVE.get(n) or ALLENATORI.get(n)
-    if not allenatore or allenatore == "N/D":
-        allenatore = _get_coach_ondemand(n) or "N/D"
-    # Rosa: live cache > hardcoded > on-demand
-    if ROSE_LIVE.get(n):
-        rosa = ROSE_LIVE[n]
-    elif ROSE.get(n):
-        rosa = [{"nome":g[0],"ruolo":g[1],"numero":g[2]} for g in ROSE[n]]
-    else:
-        rosa = _get_squad_ondemand(n)
-    return {
-        "nome": n,
-        "allenatore": allenatore,
-        "formazione": form,
-        "infortunati": inj,
-        "rosa": rosa,
-        "ultimo_aggiornamento": ROSE_LAST_UPDATE or LIVE_LAST_UPDATE or "Dati base",
-    }
 
 # ─────────────────────────────
 # SCHEDINA DEL GIORNO (IA)
 # ─────────────────────────────
-@app.get("/api/schedina")
-async def schedina_del_giorno():
-    """L'IA seleziona le 3-5 giocate piu' sicure della PROSSIMA giornata Serie A."""
-    # Trova la prossima giornata da giocare automaticamente
-    prossima_g = None
-    for g_num in range(31, 39):
-        cal = CAL_HARDCODED.get(g_num)
-        if not cal:
-            continue
-        # Controlla se la giornata e' gia' stata giocata (tutte le partite nei risultati live)
-        tutte_giocate = True
-        if LIVE_RESULTS_CACHE:
-            for h, a in cal["partite"]:
-                trovata = False
-                for p in LIVE_RESULTS_CACHE:
-                    if (p["home"] == h and p["away"] == a) or (p["home"] == a and p["away"] == h):
-                        if p.get("status") in ("FT", "AET", "PEN"):
-                            trovata = True
-                            break
-                if not trovata:
-                    tutte_giocate = False
-                    break
-        else:
-            tutte_giocate = False
-        if not tutte_giocate:
-            prossima_g = g_num
-            break
-    if prossima_g is None:
-        prossima_g = 38
 
-    giocate = []
-    cal = CAL_HARDCODED.get(prossima_g, {})
-    partite = cal.get("partite", [])
 
-    for home, away in partite:
-        try:
-            raw = genera_pronostico(home, away)
-            if raw.get("sicura"):
-                giocate.append({
-                    "home": home, "away": away,
-                    "tip": raw["suggerimento"],
-                    "tip_label": raw["sugg_label"],
-                    "prob": max(raw["prob_1"], raw["prob_x"], raw["prob_2"]),
-                    "quota": raw.get(f"quota_{raw['suggerimento'].lower().replace('x','x')}", 0),
-                    "confidence": raw["confidence"],
-                    "over_under": ("Over 2.5 " + str(raw.get("over_25",50)) + "%") if raw.get("over_25",0) > 50 else ("Under 2.5 " + str(raw.get("under_25",50)) + "%"),
-                    "goal": ("Goal Si " + str(raw.get("goal_si",50)) + "%") if raw.get("goal_si",0) > 50 else ("Goal No " + str(raw.get("goal_no",50)) + "%"),
-                })
-        except Exception:
-            continue
 
-    giocate.sort(key=lambda x: -x["confidence"])
-    top = giocate[:5]
-    quota_tot = 1.0
-    for g in top:
-        q = g.get("quota", 1.5)
-        if q > 1: quota_tot *= q
 
-    return {
-        "giornata": prossima_g,
-        "data": cal.get("data", ""),
-        "giocate": top,
-        "n_giocate": len(top),
-        "quota_totale": round(quota_tot, 2),
-        "tipo": "Pronostici ad alta confidenza selezionati dall'IA",
-    }
 
-@app.get("/api/schedina-pl")
-async def schedina_pl():
-    """Schedina del giorno Premier League - prossima giornata."""
-    # Prendi il calendario PL per trovare la prossima giornata
-    try:
-        cal_data = LIVE_RESULTS_CACHE_ML.get("premier-league") or []
-        cl_pl = CLASSIFICA_CACHE.get("premier-league") or []
-        if not cl_pl:
-            _fetch_league_data("premier-league")
-            cl_pl = CLASSIFICA_CACHE.get("premier-league") or []
-
-        # Prendi fixtures future dalla cache
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=39&season=2025&next=10",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        if not data.get("response"):
-            return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": "Nessuna partita disponibile"}
-
-        nome_map = _get_nome_map("premier-league")
-        giornata_num = ""
-        giocate = []
-
-        for fix in data["response"][:10]:
-            teams = fix.get("teams", {})
-            lg = fix.get("league", {})
-            home = nome_map.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
-            away = nome_map.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
-            if not giornata_num:
-                giornata_num = lg.get("round", "").split(" - ")[-1] if " - " in lg.get("round", "") else "?"
-
-            try:
-                raw = genera_pronostico(home, away)
-                mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
-                conf = raw.get("confidence", 0)
-                if conf >= 0.30 or mp > 35:
-                    giocate.append({
-                        "home": home, "away": away,
-                        "tip": raw.get("suggerimento", "?"),
-                        "tip_label": raw.get("sugg_label", ""),
-                        "prob": mp,
-                        "quota": raw.get(f"quota_{raw.get('suggerimento','1').lower()}", 1.5),
-                        "confidence": conf,
-                        "over_under": ("Over 2.5 " + str(raw.get("over_25",50)) + "%") if raw.get("over_25",0) > 50 else ("Under 2.5 " + str(raw.get("under_25",50)) + "%"),
-                        "goal": ("Goal Si " + str(raw.get("goal_si",50)) + "%") if raw.get("goal_si",0) > 50 else ("Goal No " + str(raw.get("goal_no",50)) + "%"),
-                    })
-            except Exception:
-                continue
-
-        giocate.sort(key=lambda x: -x["confidence"])
-        top = giocate[:5]
-        quota_tot = 1.0
-        for g in top:
-            q = g.get("quota", 1.5)
-            if q > 1: quota_tot *= q
-
-        return {
-            "giornata": giornata_num,
-            "giocate": top,
-            "n_giocate": len(top),
-            "quota_totale": round(quota_tot, 2),
-            "tipo": "Pronostici ad alta confidenza selezionati dall'IA",
-        }
-    except Exception as e:
-        return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
-
-@app.get("/api/schedina-ll")
-async def schedina_ll():
-    """Schedina del giorno La Liga - prossima giornata."""
-    try:
-        cl_ll = CLASSIFICA_CACHE.get("la-liga") or []
-        if not cl_ll:
-            _fetch_league_data("la-liga")
-
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=140&season=2025&next=10",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        if not data.get("response"):
-            return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": "Nessuna partita"}
-
-        nome_map = _get_nome_map("la-liga")
-        giornata_num = ""
-        giocate = []
-
-        for fix in data["response"][:10]:
-            teams = fix.get("teams", {})
-            lg = fix.get("league", {})
-            home = nome_map.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
-            away = nome_map.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
-            if not giornata_num:
-                giornata_num = lg.get("round", "").split(" - ")[-1] if " - " in lg.get("round", "") else "?"
-
-            try:
-                raw = genera_pronostico(home, away)
-                mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
-                conf = raw.get("confidence", 0)
-                if conf >= 0.30 or mp > 35:
-                    giocate.append({
-                        "home": home, "away": away,
-                        "tip": raw.get("suggerimento", "?"),
-                        "prob": mp,
-                        "quota": raw.get(f"quota_{raw.get('suggerimento','1').lower()}", 1.5),
-                        "confidence": conf,
-                        "over_under": ("Over 2.5 " + str(raw.get("over_25",50)) + "%") if raw.get("over_25",0) > 50 else ("Under 2.5 " + str(raw.get("under_25",50)) + "%"),
-                        "goal": ("Goal Si " + str(raw.get("goal_si",50)) + "%") if raw.get("goal_si",0) > 50 else ("Goal No " + str(raw.get("goal_no",50)) + "%"),
-                    })
-            except Exception:
-                continue
-
-        giocate.sort(key=lambda x: -x["confidence"])
-        top = giocate[:5]
-        quota_tot = 1.0
-        for g in top:
-            q = g.get("quota", 1.5)
-            if q > 1: quota_tot *= q
-
-        return {
-            "giornata": giornata_num,
-            "giocate": top,
-            "n_giocate": len(top),
-            "quota_totale": round(quota_tot, 2),
-            "tipo": "Pronostici ad alta confidenza selezionati dall'IA",
-        }
-    except Exception as e:
-        return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
-
-@app.get("/api/schedina-bl")
-async def schedina_bl():
-    """Schedina del giorno Bundesliga."""
-    try:
-        if not CLASSIFICA_CACHE.get("bundesliga"):
-            _fetch_league_data("bundesliga")
-        req = urllib.request.Request(f"https://{FOOTBALL_API_HOST}/fixtures?league=78&season=2025&next=10", headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-        if not data.get("response"): return {"giornata":"?","giocate":[],"n_giocate":0,"quota_totale":0,"tipo":"Nessuna partita"}
-        nome_map = _get_nome_map("bundesliga"); giornata_num = ""; giocate = []
-        for fix in data["response"][:10]:
-            teams=fix.get("teams",{}); lg=fix.get("league",{})
-            home_api=teams.get("home",{}).get("name","?")
-            away_api=teams.get("away",{}).get("name","?")
-            home=nome_map.get(home_api, home_api)
-            away=nome_map.get(away_api, away_api)
-            if not giornata_num: giornata_num=lg.get("round","").split(" - ")[-1] if " - " in lg.get("round","") else "?"
-            try:
-                # Usa CSV Bundesliga - prova nome mappato, poi originale
-                if _df_bl is not None and len(_df_bl) > 100:
-                    try:
-                        hs = get_team_stats(_df_bl, home, opponent=away)
-                        aws = get_team_stats(_df_bl, away, opponent=home)
-                    except:
-                        hs = get_team_stats(_df_bl, home_api, opponent=away_api)
-                        aws = get_team_stats(_df_bl, away_api, opponent=home_api)
-                    raw = get_prediction(hs, aws, df=_df_bl)
-                else:
-                    raw = genera_pronostico(home, away)
-                mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
-                if conf>=0.30 or mp>35:
-                    giocate.append({"home":home,"away":away,"tip":raw.get("suggerimento","?"),"prob":mp,"quota":raw.get(f"quota_{raw.get('suggerimento','1').lower()}",1.5),"confidence":conf,"over_under":("Over 2.5 "+str(raw.get("over_25",50))+"%") if raw.get("over_25",0)>50 else ("Under 2.5 "+str(raw.get("under_25",50))+"%"),"goal":("Goal Si "+str(raw.get("goal_si",50))+"%") if raw.get("goal_si",0)>50 else ("Goal No "+str(raw.get("goal_no",50))+"%")})
-            except: continue
-        giocate.sort(key=lambda x:-x["confidence"]); top=giocate[:5]; qt=1.0
-        for g in top:
-            if g.get("quota",1.5)>1: qt*=g["quota"]
-        return {"giornata":giornata_num,"giocate":top,"n_giocate":len(top),"quota_totale":round(qt,2),"tipo":"Pronostici ad alta confidenza selezionati dall'IA"}
-    except Exception as e: return {"giornata":"?","giocate":[],"n_giocate":0,"quota_totale":0,"tipo":f"Errore: {e}"}
-
-@app.get("/api/schedina-l1")
-async def schedina_l1():
-    """Schedina del giorno Ligue 1."""
-    try:
-        if not CLASSIFICA_CACHE.get("ligue-1"):
-            _fetch_league_data("ligue-1")
-        req = urllib.request.Request(f"https://{FOOTBALL_API_HOST}/fixtures?league=61&season=2025&next=10", headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-        if not data.get("response"): return {"giornata":"?","giocate":[],"n_giocate":0,"quota_totale":0,"tipo":"Nessuna partita"}
-        nome_map = _get_nome_map("ligue-1"); giornata_num = ""; giocate = []
-        for fix in data["response"][:10]:
-            teams=fix.get("teams",{}); lg=fix.get("league",{})
-            home_api=teams.get("home",{}).get("name","?")
-            away_api=teams.get("away",{}).get("name","?")
-            home=nome_map.get(home_api, home_api)
-            away=nome_map.get(away_api, away_api)
-            if not giornata_num: giornata_num=lg.get("round","").split(" - ")[-1] if " - " in lg.get("round","") else "?"
-            try:
-                # Usa CSV Ligue 1 - prova nome mappato, poi originale
-                if _df_l1 is not None and len(_df_l1) > 100:
-                    try:
-                        hs = get_team_stats(_df_l1, home, opponent=away)
-                        aws = get_team_stats(_df_l1, away, opponent=home)
-                    except:
-                        hs = get_team_stats(_df_l1, home_api, opponent=away_api)
-                        aws = get_team_stats(_df_l1, away_api, opponent=home_api)
-                    raw = get_prediction(hs, aws, df=_df_l1)
-                else:
-                    raw = genera_pronostico(home, away)
-                mp=max(raw.get("prob_1",0),raw.get("prob_x",0),raw.get("prob_2",0)); conf=raw.get("confidence",0)
-                if conf>=0.30 or mp>35:
-                    giocate.append({"home":home,"away":away,"tip":raw.get("suggerimento","?"),"prob":mp,"quota":raw.get(f"quota_{raw.get('suggerimento','1').lower()}",1.5),"confidence":conf,"over_under":("Over 2.5 "+str(raw.get("over_25",50))+"%") if raw.get("over_25",0)>50 else ("Under 2.5 "+str(raw.get("under_25",50))+"%"),"goal":("Goal Si "+str(raw.get("goal_si",50))+"%") if raw.get("goal_si",0)>50 else ("Goal No "+str(raw.get("goal_no",50))+"%")})
-            except: continue
-        giocate.sort(key=lambda x:-x["confidence"]); top=giocate[:5]; qt=1.0
-        for g in top:
-            if g.get("quota",1.5)>1: qt*=g["quota"]
-        return {"giornata":giornata_num,"giocate":top,"n_giocate":len(top),"quota_totale":round(qt,2),"tipo":"Pronostici ad alta confidenza selezionati dall'IA"}
-    except Exception as e: return {"giornata":"?","giocate":[],"n_giocate":0,"quota_totale":0,"tipo":f"Errore: {e}"}
-
-@app.get("/api/{league}/squadre-attive")
-async def squadre_attive(league: str):
-    """Ritorna le squadre ancora attive in una competizione (da prossime fixtures)."""
-    if league not in LEAGUES:
-        raise HTTPException(404, "Competizione non trovata")
-    lg = LEAGUES[league]
-    nome_map = _get_nome_map(league)
-    try:
-        # Prendi le prossime 20 fixtures per trovare le squadre ancora in gioco
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league={lg['id']}&season={lg['season']}&next=20",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-        teams = set()
-        for fix in data.get("response", []):
-            h = fix.get("teams", {}).get("home", {}).get("name", "")
-            a = fix.get("teams", {}).get("away", {}).get("name", "")
-            h_mapped = nome_map.get(h, h)
-            a_mapped = nome_map.get(a, a)
-            if h_mapped: teams.add(h_mapped)
-            if a_mapped: teams.add(a_mapped)
-        return {"squadre": sorted(teams)}
-    except Exception:
-        return {"squadre": []}
 
 # ─────────────────────────────
 # WEB PUSH NOTIFICATIONS
@@ -3005,84 +2599,7 @@ def _generate_referral_code(user_id, email):
     raw = f"{user_id}_{email}_{os.urandom(4).hex()}"
     return hashlib.md5(raw.encode()).hexdigest()[:8].upper()
 
-@app.get("/api/referral/my-code")
-async def get_referral_code(user: Optional[dict] = Depends(get_optional_user)):
-    if not user:
-        raise HTTPException(401, "Devi essere loggato")
-    from database import _get_conn
-    conn = _get_conn()
-    cur = conn.cursor()
-    # Controlla se l'utente ha gia' un codice
-    cur.execute("SELECT referral_code FROM users WHERE id = %s", (user["id"],))
-    row = cur.fetchone()
-    code = row[0] if row and row[0] else None
-    if not code:
-        code = _generate_referral_code(user["id"], user["email"])
-        cur.execute("UPDATE users SET referral_code = %s WHERE id = %s", (code, user["id"]))
-        conn.commit()
-    # Conta referral completati
-    cur.execute("SELECT COUNT(*) FROM referrals WHERE referrer_id = %s AND status = 'completed'", (user["id"],))
-    completed = cur.fetchone()[0]
-    cur.execute("SELECT COUNT(*) FROM referrals WHERE referrer_id = %s AND status = 'pending'", (user["id"],))
-    pending = cur.fetchone()[0]
-    cur.close()
-    conn.close()
-    return {
-        "code": code,
-        "link": f"https://matchiq.it.com/app#registrati?ref={code}",
-        "completati": completed,
-        "in_attesa": pending,
-    }
 
-@app.post("/api/referral/apply")
-async def apply_referral(data: dict):
-    """Applica un codice referral quando un nuovo utente si registra."""
-    code = data.get("code", "").strip().upper()
-    new_user_email = data.get("email", "").strip().lower()
-    if not code or not new_user_email:
-        return {"status": "skip"}
-    from database import _get_conn
-    conn = _get_conn()
-    cur = conn.cursor()
-    # Trova chi ha il codice
-    cur.execute("SELECT id, email FROM users WHERE referral_code = %s", (code,))
-    referrer = cur.fetchone()
-    if not referrer:
-        cur.close(); conn.close()
-        return {"status": "code_not_found"}
-    referrer_id, referrer_email = referrer
-    # Non puoi invitare te stesso
-    if referrer_email == new_user_email:
-        cur.close(); conn.close()
-        return {"status": "self_referral"}
-    # Registra il referral
-    cur.execute("""
-        INSERT INTO referrals (referrer_id, referrer_email, referral_code, referred_email, status, created_at)
-        VALUES (%s, %s, %s, %s, 'completed', %s)
-    """, (referrer_id, referrer_email, code, new_user_email, datetime.now(timezone.utc).isoformat()))
-    # Premio: attiva Pro per 30 giorni all'invitante
-    cur.execute("UPDATE users SET piano = 'pro' WHERE id = %s", (referrer_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    # Notifica l'invitante via email
-    try:
-        import urllib.request as ur
-        body = json.dumps({
-            "from": "MatchIQ <noreply@matchiq.it.com>",
-            "to": [referrer_email],
-            "subject": "Un amico si e' iscritto con il tuo codice!",
-            "html": f'<div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px"><h2 style="color:#2ecc71">Referral completato!</h2><p><strong>{new_user_email}</strong> si e\' iscritto con il tuo codice referral.</p><p style="color:#2ecc71;font-size:1.2rem;font-weight:700">Hai ottenuto 1 mese Pro gratis!</p><hr style="border:1px solid #1f3460"><p style="color:#8892b0;font-size:.85rem">MatchIQ - Pronostici Calcistici con IA</p></div>'
-        }).encode()
-        req = ur.Request("https://api.resend.com/emails", data=body, headers={
-            "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json",
-            "User-Agent": "MatchIQ/1.0"
-        })
-        ur.urlopen(req, timeout=10)
-    except Exception:
-        pass
-    return {"status": "ok", "reward": "1 mese Pro gratis"}
 
 # ─────────────────────────────
 # FANTACALCIO - Helper
@@ -3454,290 +2971,17 @@ def _fantacalcio_impl(league, giornata):
         return {"giornata": giornata, "consigli": {}, "error": str(e)}
 
 
-@app.get("/api/fantacalcio/consigli/{giornata}")
-async def fantacalcio_consigli(giornata: int):
-    return _fantacalcio_impl("serie-a", giornata)
-
-
-@app.get("/api/{league}/fantacalcio/consigli/{giornata}")
-async def fantacalcio_consigli_league(league: str, giornata: int):
-    if league not in FANTACALCIO_LEAGUES:
-        raise HTTPException(404, "Campionato non supportato per il fantacalcio")
-    return _fantacalcio_impl(league, giornata)
 
 
 # ─────────────────────────────
 # STORICO PRONOSTICI UTENTE
 # ─────────────────────────────
-@app.post("/api/user/save-prediction")
-async def save_user_prediction(data: dict, user: Optional[dict] = Depends(get_optional_user)):
-    if not user:
-        raise HTTPException(401, "Devi essere loggato")
-    from database import _get_conn
-    conn = _get_conn()
-    cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO user_predictions (user_id, league, home, away, pronostico, prob, confidence, over_under, goal, created_at, match_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """, (
-        user["id"], data.get("league",""), data.get("home",""), data.get("away",""),
-        data.get("pronostico",""), data.get("prob",0), data.get("confidence",""),
-        data.get("over_under",""), data.get("goal",""),
-        datetime.now(timezone.utc).isoformat(), data.get("match_date","")
-    ))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return {"status": "ok"}
 
-@app.get("/api/user/my-predictions")
-async def get_user_predictions(user: Optional[dict] = Depends(get_optional_user)):
-    if not user:
-        raise HTTPException(401, "Devi essere loggato")
-    from database import _get_conn
-    import psycopg2.extras
-    conn = _get_conn()
-    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("""
-        SELECT * FROM user_predictions WHERE user_id = %s ORDER BY id DESC LIMIT 50
-    """, (user["id"],))
-    preds = cur.fetchall()
-    # Statistiche
-    cur.execute("""
-        SELECT
-            COUNT(*) as totale,
-            SUM(CASE WHEN corretto THEN 1 ELSE 0 END) as ok_1x2,
-            SUM(CASE WHEN ou_corretto THEN 1 ELSE 0 END) as ok_ou,
-            SUM(CASE WHEN goal_corretto THEN 1 ELSE 0 END) as ok_goal,
-            SUM(CASE WHEN verificato THEN 1 ELSE 0 END) as verificati
-        FROM user_predictions WHERE user_id = %s
-    """, (user["id"],))
-    stats = cur.fetchone()
-    cur.close()
-    conn.close()
-    v = stats["verificati"] or 0
-    return {
-        "predictions": [dict(p) for p in preds],
-        "stats": {
-            "totale": stats["totale"] or 0,
-            "verificati": v,
-            "ok_1x2": stats["ok_1x2"] or 0,
-            "ok_ou": stats["ok_ou"] or 0,
-            "ok_goal": stats["ok_goal"] or 0,
-            "acc_1x2": round((stats["ok_1x2"] or 0) / v * 100, 1) if v > 0 else 0,
-            "acc_ou": round((stats["ok_ou"] or 0) / v * 100, 1) if v > 0 else 0,
-            "acc_goal": round((stats["ok_goal"] or 0) / v * 100, 1) if v > 0 else 0,
-        }
-    }
 
-@app.post("/api/user/verify-predictions")
-async def verify_user_predictions(user: Optional[dict] = Depends(get_optional_user)):
-    """Verifica i pronostici dell'utente con i risultati reali."""
-    if not user:
-        raise HTTPException(401, "Devi essere loggato")
-    from database import _get_conn
-    import psycopg2.extras
-    conn = _get_conn()
-    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT * FROM user_predictions WHERE user_id = %s AND verificato = FALSE", (user["id"],))
-    preds = cur.fetchall()
-    verificati = 0
-    # Cerca risultati in tutte le cache
-    all_results = []
-    for lk in LEAGUES:
-        for p in (RISULTATI_STAGIONE_CACHE_ML.get(lk) or []):
-            all_results.append(p)
-        for p in (LIVE_RESULTS_CACHE_ML.get(lk) or []):
-            if p.get("status") in ("FT","AET","PEN"):
-                all_results.append(p)
-    if LIVE_RESULTS_CACHE:
-        for p in LIVE_RESULTS_CACHE:
-            if p.get("status") in ("FT","AET","PEN"):
-                all_results.append(p)
-    for pred in preds:
-        for ris in all_results:
-            if ris.get("home") == pred["home"] and ris.get("away") == pred["away"] and ris.get("status") in ("FT","AET","PEN"):
-                gol_h = ris["gol_h"]
-                gol_a = ris["gol_a"]
-                if gol_h > gol_a: ris_1x2 = "1"
-                elif gol_h == gol_a: ris_1x2 = "X"
-                else: ris_1x2 = "2"
-                corretto = pred["pronostico"] == ris_1x2
-                gol_tot = gol_h + gol_a
-                ou_pred = "Over" in (pred.get("over_under") or "")
-                ou_ok = (gol_tot > 2.5) == ou_pred
-                goal_pred = "Si" in (pred.get("goal") or "")
-                is_goal = gol_h >= 1 and gol_a >= 1
-                goal_ok = is_goal == goal_pred
-                cur.execute("""
-                    UPDATE user_predictions SET gol_h_reale=%s, gol_a_reale=%s, risultato_reale=%s,
-                    corretto=%s, ou_corretto=%s, goal_corretto=%s, verificato=TRUE WHERE id=%s
-                """, (gol_h, gol_a, ris_1x2, corretto, ou_ok, goal_ok, pred["id"]))
-                verificati += 1
-                break
-    conn.commit()
-    cur.close()
-    conn.close()
-    return {"verificati": verificati}
 
 # ─────────────────────────────
 # DASHBOARD ACCURATEZZA
 # ─────────────────────────────
-@app.get("/api/accuratezza")
-async def accuratezza():
-    """Calcola accuratezza pronostici vs risultati reali per ogni giornata."""
-    risultati = []
-
-    for league_key in ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]:
-        league = LEAGUES.get(league_key)
-        if not league:
-            continue
-        lid = league["id"]
-        season = league["season"]
-        nome_map = _get_nome_map(league_key)
-
-        # Prendi CSV giusto per i pronostici
-        if league_key == "serie-a":
-            csv_df = _df
-        elif league_key == "premier-league":
-            csv_df = _df_pl
-        elif league_key == "la-liga":
-            csv_df = _df_ll
-        elif league_key == "bundesliga":
-            csv_df = _df_bl
-        elif league_key == "ligue-1":
-            csv_df = _df_l1
-        elif league_key == "champions-league":
-            csv_df = _df_ucl
-        elif league_key == "europa-league":
-            csv_df = _df_uel
-        elif league_key == "conference-league":
-            csv_df = _df_uecl
-        else:
-            csv_df = None
-
-        # Prendi risultati finiti dalla cache
-        storico = RISULTATI_STAGIONE_CACHE_ML.get(league_key) or []
-        if not storico:
-            continue
-
-        # Raggruppa per round
-        from collections import defaultdict
-        per_round = defaultdict(list)
-        for p in storico:
-            per_round[p.get("round", "")].append(p)
-
-        # Ultime 5 giornate completate
-        rounds_sorted = sorted(per_round.keys(), key=lambda r: int(r.split(" - ")[-1]) if " - " in r and r.split(" - ")[-1].isdigit() else 0, reverse=True)
-
-        for rd in rounds_sorted[:5]:
-            partite = per_round[rd]
-            if len(partite) < 5:
-                continue
-            g_num = rd.split(" - ")[-1] if " - " in rd else rd
-            ok_1x2 = 0
-            ok_ou = 0
-            ok_goal = 0
-            tot = 0
-            ok_alta = 0
-            tot_alta = 0
-            dettagli = []
-
-            for p in partite:
-                h, a = p["home"], p["away"]
-                gol_h, gol_a = p["gol_h"], p["gol_a"]
-                if gol_h is None:
-                    continue
-
-                # Calcola pronostico
-                try:
-                    if csv_df is not None and len(csv_df) > 100:
-                        hs = get_team_stats(csv_df, h, opponent=a)
-                        aws = get_team_stats(csv_df, a, opponent=h)
-                        pred = get_prediction(hs, aws, df=csv_df)
-                    else:
-                        pred = genera_pronostico(h, a)
-                except Exception:
-                    continue
-
-                # Risultato reale
-                if gol_h > gol_a:
-                    ris = "1"
-                elif gol_h == gol_a:
-                    ris = "X"
-                else:
-                    ris = "2"
-
-                sugg = pred.get("suggerimento", "")
-                corretto = sugg == ris
-                if corretto:
-                    ok_1x2 += 1
-
-                gol_tot = gol_h + gol_a
-                pred_over = pred.get("over_25", 50) > 50
-                ou_ok = (gol_tot > 2.5) == pred_over
-                if ou_ok:
-                    ok_ou += 1
-
-                is_goal = gol_h >= 1 and gol_a >= 1
-                pred_goal = pred.get("goal_si", 50) > 50
-                goal_ok = is_goal == pred_goal
-                if goal_ok:
-                    ok_goal += 1
-
-                conf = pred.get("confidence_label", "")
-                if conf == "Alta":
-                    tot_alta += 1
-                    if corretto:
-                        ok_alta += 1
-
-                tot += 1
-                dettagli.append({
-                    "home": h, "away": a,
-                    "gol_h": gol_h, "gol_a": gol_a,
-                    "pronostico": sugg,
-                    "risultato": ris,
-                    "corretto": corretto,
-                    "confidenza": conf,
-                })
-
-            if tot >= 5:
-                risultati.append({
-                    "campionato": league["name"],
-                    "league_key": league_key,
-                    "giornata": g_num,
-                    "totale": tot,
-                    "ok_1x2": ok_1x2,
-                    "acc_1x2": round(ok_1x2 / tot * 100, 0),
-                    "ok_ou": ok_ou,
-                    "acc_ou": round(ok_ou / tot * 100, 0),
-                    "ok_goal": ok_goal,
-                    "acc_goal": round(ok_goal / tot * 100, 0),
-                    "ok_alta": ok_alta,
-                    "tot_alta": tot_alta,
-                    "acc_alta": round(ok_alta / tot_alta * 100, 0) if tot_alta > 0 else 0,
-                    "dettagli": dettagli,
-                })
-
-    # Calcola totali
-    tot_all = sum(r["totale"] for r in risultati)
-    ok_all = sum(r["ok_1x2"] for r in risultati)
-    ok_ou_all = sum(r["ok_ou"] for r in risultati)
-    ok_g_all = sum(r["ok_goal"] for r in risultati)
-    ok_alta_all = sum(r["ok_alta"] for r in risultati)
-    tot_alta_all = sum(r["tot_alta"] for r in risultati)
-
-    return {
-        "giornate": risultati,
-        "totale": {
-            "partite": tot_all,
-            "acc_1x2": round(ok_all / tot_all * 100, 1) if tot_all > 0 else 0,
-            "acc_ou": round(ok_ou_all / tot_all * 100, 1) if tot_all > 0 else 0,
-            "acc_goal": round(ok_g_all / tot_all * 100, 1) if tot_all > 0 else 0,
-            "acc_alta": round(ok_alta_all / tot_alta_all * 100, 1) if tot_alta_all > 0 else 0,
-            "tot_alta": tot_alta_all,
-        }
-    }
 
 # ─────────────────────────────
 # NOTIZIE LIVE SERIE A
@@ -3782,25 +3026,6 @@ def _scrape_notizie():
         NOTIZIE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
         print(f"📰 Notizie: {len(NOTIZIE_CACHE)} articoli live da Google News")
 
-@app.get("/api/notizie")
-async def notizie():
-    """Ritorna le ultime notizie Serie A."""
-    if not NOTIZIE_CACHE or len(NOTIZIE_CACHE) < 4:
-        return {"notizie":[
-            {"titolo":"Probabili formazioni Serie A Giornata 31: le scelte dei tecnici","fonte":"Fantacalcio.it","url":"https://www.fantacalcio.it/probabili-formazioni-serie-a"},
-            {"titolo":"Calciomercato Serie A: tutti i trasferimenti di gennaio 2026","fonte":"Sky Sport","url":"https://sport.sky.it/calciomercato/serie-a"},
-            {"titolo":"Serie A Giornata 31: Inter-Roma, Napoli-Milan - pronostici e analisi","fonte":"Sky Sport","url":"https://sport.sky.it/calcio/serie-a/calendario-risultati"},
-            {"titolo":"Classifica marcatori Serie A: Lautaro 14 gol, Douvikas secondo","fonte":"Tuttosport","url":"https://www.tuttosport.com/live/classifica-marcatori-serie-a"},
-            {"titolo":"Infortunati Serie A: tutti gli indisponibili per la giornata 31","fonte":"Fantacalciopedia","url":"https://www.fantacalciopedia.com/articoli-fcp/consigli-fantacalcio/75-lista-infortunati-serie-a-aggiornata.html"},
-            {"titolo":"Champions League: calendario e risultati delle italiane","fonte":"UEFA","url":"https://www.uefa.com/uefachampionsleague/"},
-            {"titolo":"Premier League 2025-2026: classifica e risultati aggiornati","fonte":"Premier League","url":"https://www.premierleague.com/tables"},
-            {"titolo":"La Liga 2025-2026: classifica e calendario aggiornato","fonte":"La Liga","url":"https://www.laliga.com/en-GB/laliga-easports/standing"},
-            {"titolo":"Bundesliga 2025-2026: risultati e classifica","fonte":"Bundesliga","url":"https://www.bundesliga.com/en/bundesliga/table"},
-            {"titolo":"Ligue 1 2025-2026: classifica e top scorer","fonte":"Ligue 1","url":"https://www.ligue1.com/ranking"},
-            {"titolo":"Europa League: il cammino delle squadre italiane","fonte":"UEFA","url":"https://www.uefa.com/uefaeuropaleague/"},
-            {"titolo":"Serie A, la lotta salvezza: Verona e Pisa a 18 punti, chi retrocede?","fonte":"Gazzetta","url":"https://www.gazzetta.it/calcio/serie-a/"},
-        ],"aggiornamento":"Aggiornamento automatico ogni 30 min"}
-    return {"notizie":NOTIZIE_CACHE,"aggiornamento":NOTIZIE_LAST_UPDATE}
 
 # ─────────────────────────────
 # RISULTATI LIVE + STORICO COMPLETO
@@ -4168,236 +3393,10 @@ def _fetch_live_results():
     except Exception as e:
         print(f"❌ Errore API Football: {e}")
 
-@app.get("/api/risultati")
-async def risultati():
-    """Ritorna risultati: live + storico completo da API Football."""
-    giornate = []
-
-    # 1. Partite LIVE (in corso adesso)
-    live_partite = []
-    if LIVE_RESULTS_CACHE:
-        for p in LIVE_RESULTS_CACHE:
-            if p.get("live"):
-                live_partite.append({
-                    "home": p["home"], "away": p["away"],
-                    "gol_h": p["gol_h"], "gol_a": p["gol_a"],
-                    "marcatori": p["marcatori"],
-                    "marcatori_home": p.get("marcatori_home", []),
-                    "marcatori_away": p.get("marcatori_away", []),
-                    "status": p["status"],
-                    "status_it": p.get("status_it", p["status"]),
-                    "minuto": p["minuto"], "live": True,
-                    "data": p["data"], "ora": p.get("ora", ""),
-                    "rossi_home": p.get("rossi_home", []),
-                    "rossi_away": p.get("rossi_away", []),
-                    "fixture_id": p.get("fixture_id"),
-                })
-    if live_partite:
-        giornate.append({
-            "giornata": "Live",
-            "data": live_partite[0]["data"],
-            "partite": live_partite,
-            "live": True,
-        })
-
-    # 2. Storico completo da API Football (raggruppato per round/giornata)
-    if RISULTATI_STAGIONE_CACHE:
-        from collections import defaultdict
-        per_round = defaultdict(list)
-        for p in RISULTATI_STAGIONE_CACHE:
-            # Raggruppa per round (es. "Regular Season - 30")
-            rd = p.get("round", "")
-            per_round[rd].append(p)
-
-        # Ordina i round dal piu' recente
-        rounds_sorted = sorted(per_round.keys(), key=lambda r: int(r.split(" - ")[-1]) if " - " in r and r.split(" - ")[-1].isdigit() else 0, reverse=True)
-
-        for rd in rounds_sorted:
-            partite = per_round[rd]
-            # Estrai numero giornata dal round
-            g_num = rd.split(" - ")[-1] if " - " in rd else rd
-            # Data = data della prima partita
-            data_str = partite[0]["data"] if partite else ""
-            giornate.append({
-                "giornata": g_num,
-                "data": data_str,
-                "partite": partite,
-                "live": False,
-            })
-    elif LIVE_RESULTS_CACHE:
-        # Fallback: usa le ultime 30 partite raggruppate per data
-        from collections import defaultdict
-        per_data = defaultdict(list)
-        for p in LIVE_RESULTS_CACHE:
-            if not p.get("live"):
-                per_data[p["data"]].append({
-                    "home": p["home"], "away": p["away"],
-                    "gol_h": p["gol_h"], "gol_a": p["gol_a"],
-                    "marcatori": p.get("marcatori", []),
-                    "marcatori_home": p.get("marcatori_home", []),
-                    "marcatori_away": p.get("marcatori_away", []),
-                    "status": "FT", "status_it": "Terminata",
-                    "live": False, "data": p["data"],
-                    "ora": p.get("ora", ""),
-                    "fixture_id": p.get("fixture_id"),
-                })
-        for data_str in sorted(per_data.keys(), reverse=True):
-            giornate.append({
-                "giornata": data_str,
-                "data": data_str,
-                "partite": per_data[data_str],
-                "live": False,
-            })
-
-    return {
-        "giornate": giornate,
-        "live": any(g.get("live") for g in giornate),
-        "aggiornamento": RISULTATI_STAGIONE_TIME or LIVE_RESULTS_TIME or "In caricamento...",
-    }
 
 # ─────────────────────────────
 # DETTAGLIO PARTITA LIVE (API Football completo)
 # ─────────────────────────────
-@app.get("/api/fixture/{fixture_id}")
-async def fixture_detail(fixture_id: int):
-    """Scarica dettagli completi di una partita: eventi, statistiche, formazioni."""
-    result = {"fixture_id": fixture_id}
-
-    # 1. Fixture base + eventi
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?id={fixture_id}",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        if data.get("response") and len(data["response"]) > 0:
-            fix = data["response"][0]
-            teams = fix.get("teams", {})
-            goals = fix.get("goals", {})
-            fixture = fix.get("fixture", {})
-            status = fixture.get("status", {})
-            events = fix.get("events", [])
-            score = fix.get("score", {})
-
-            home_name = FOOTBALL_NOME_MAP.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
-            away_name = FOOTBALL_NOME_MAP.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
-            home_id = teams.get("home", {}).get("id")
-
-            status_map = {"FT":"Terminata","1H":"1T","2H":"2T","HT":"Intervallo","NS":"Non iniziata","ET":"Supplementari","P":"Rigori"}
-
-            result["home"] = home_name
-            result["away"] = away_name
-            result["gol_h"] = goals.get("home", 0) or 0
-            result["gol_a"] = goals.get("away", 0) or 0
-            result["status"] = status.get("short", "")
-            result["status_it"] = status_map.get(status.get("short", ""), status.get("short", ""))
-            result["minuto"] = status.get("elapsed")
-            result["live"] = status.get("short", "") in ("1H", "2H", "HT", "ET", "P")
-            result["data"] = fixture.get("date", "")[:10]
-            result["ora"] = _utc_to_rome(fixture.get("date", ""))
-            result["arbitro"] = fixture.get("referee", "")
-            result["stadio"] = fixture.get("venue", {}).get("name", "")
-            result["citta"] = fixture.get("venue", {}).get("city", "")
-
-            # Parziali
-            ht = score.get("halftime", {})
-            result["primo_tempo"] = f"{ht.get('home', '-')}-{ht.get('away', '-')}" if ht else ""
-
-            # Eventi dettagliati
-            eventi = []
-            for ev in events:
-                nome = ev.get("player", {}).get("name", "?")
-                assist = ev.get("assist", {}).get("name", "")
-                minuto = ev.get("time", {}).get("elapsed", "?")
-                extra = ev.get("time", {}).get("extra")
-                min_str = f"{minuto}'+{extra}" if extra else f"{minuto}'"
-                tipo = ev.get("type", "")
-                detail = ev.get("detail", "")
-                team_id = ev.get("team", {}).get("id")
-                is_home = team_id == home_id
-
-                evento = {
-                    "minuto": min_str,
-                    "tipo": tipo,
-                    "dettaglio": detail,
-                    "giocatore": nome,
-                    "assist": assist,
-                    "squadra": "home" if is_home else "away",
-                }
-                eventi.append(evento)
-            result["eventi"] = eventi
-    except Exception as e:
-        result["errore_fixture"] = str(e)
-
-    # 2. Statistiche partita
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures/statistics?fixture={fixture_id}",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        stats = {}
-        if data.get("response") and len(data["response"]) >= 2:
-            for side, idx in [("home", 0), ("away", 1)]:
-                for s in data["response"][idx].get("statistics", []):
-                    tipo = s.get("type", "")
-                    val = s.get("value")
-                    key_map = {
-                        "Ball Possession": "possesso",
-                        "Total Shots": "tiri",
-                        "Shots on Goal": "tiri_porta",
-                        "Shots off Goal": "tiri_fuori",
-                        "Blocked Shots": "tiri_bloccati",
-                        "Corner Kicks": "corner",
-                        "Fouls": "falli",
-                        "Offsides": "fuorigioco",
-                        "Yellow Cards": "gialli",
-                        "Red Cards": "rossi",
-                        "Goalkeeper Saves": "parate",
-                        "Total passes": "passaggi",
-                        "Passes accurate": "passaggi_riusciti",
-                        "Passes %": "passaggi_pct",
-                        "expected_goals": "xg",
-                    }
-                    for api_name, our_name in key_map.items():
-                        if tipo == api_name:
-                            stats[f"{our_name}_{side}"] = val
-        result["stats"] = stats
-    except Exception as e:
-        result["stats"] = {}
-
-    # 3. Formazioni
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures/lineups?fixture={fixture_id}",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        lineups = {}
-        if data.get("response") and len(data["response"]) >= 2:
-            for idx, side in enumerate(["home", "away"]):
-                team_data = data["response"][idx]
-                formazione = team_data.get("formation", "")
-                coach = team_data.get("coach", {}).get("name", "")
-                titolari = [p.get("player", {}).get("name", "?") for p in team_data.get("startXI", [])]
-                panchina = [p.get("player", {}).get("name", "?") for p in team_data.get("substitutes", [])]
-                lineups[side] = {
-                    "modulo": formazione,
-                    "allenatore": coach,
-                    "titolari": titolari,
-                    "panchina": panchina[:7],
-                }
-        result["formazioni"] = lineups
-    except Exception as e:
-        result["formazioni"] = {}
-
-    return result
 
 # ─────────────────────────────
 # ENDPOINT MULTI-LEAGUE (Premier League + futuri campionati)
@@ -4542,170 +3541,8 @@ def _fetch_league_data(league_key):
 
     print(f"✅ {league['name']}: dati aggiornati")
 
-@app.get("/api/{league}/classifica")
-async def classifica_league(league: str):
-    if league not in LEAGUES:
-        raise HTTPException(404, "Campionato non trovato")
-    cl = CLASSIFICA_CACHE.get(league)
-    mc = MARCATORI_CACHE.get(league)
-    # Statistiche squadre (solo campionati domestici)
-    stats_squadre = None
-    if league in ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]:
-        stats_squadre = _compute_best_stats(league)
-        if not stats_squadre:
-            # Avvia fetch in background
-            import threading
-            threading.Thread(target=_fetch_team_stats_league, args=(league,), daemon=True).start()
-    return {"classifica": cl or [], "marcatori": mc or [], "aggiornamento": CLASSIFICA_LAST_UPDATE.get(league, ""), "live": cl is not None, "stats_squadre": stats_squadre}
 
-@app.get("/api/{league}/calendario")
-async def calendario_league(league: str):
-    """Calendario per qualsiasi campionato - prossime giornate + risultati da API Football."""
-    if league not in LEAGUES:
-        raise HTTPException(404, "Campionato non trovato")
-    lg = LEAGUES[league]
-    lid = lg["id"]
-    season = lg["season"]
-    nome_map = _get_nome_map(league)
 
-    giornate = []
-    giornata_corrente = None
-
-    try:
-        # Prendi TUTTE le fixtures della stagione (giocate + da giocare)
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league={lid}&season={season}",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=20) as r:
-            data = json.loads(r.read().decode())
-
-        if data.get("response"):
-            from collections import defaultdict
-            per_round = defaultdict(list)
-
-            for fix in data["response"]:
-                teams = fix.get("teams", {})
-                goals = fix.get("goals", {})
-                fixture = fix.get("fixture", {})
-                status = fixture.get("status", {})
-                lg_data = fix.get("league", {})
-                events = fix.get("events", [])
-
-                home_name = nome_map.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
-                away_name = nome_map.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
-
-                ss = status.get("short", "NS")
-                is_live = ss in ("1H", "2H", "HT", "ET", "P")
-                has_result = ss in ("FT", "AET", "PEN", "1H", "2H", "HT")
-
-                marcatori = []
-                for ev in events:
-                    if ev.get("type") == "Goal":
-                        nome = ev.get("player", {}).get("name", "?")
-                        minuto = ev.get("time", {}).get("elapsed", "?")
-                        detail = ev.get("detail", "")
-                        marcatori.append(f"{nome} {minuto}'" + (" (R)" if detail == "Penalty" else " (aut.)" if detail == "Own Goal" else ""))
-
-                match_data = {
-                    "home": home_name, "away": away_name,
-                    "gol_h": goals.get("home") if has_result else None,
-                    "gol_a": goals.get("away") if has_result else None,
-                    "status": ss,
-                    "status_it": {"FT": "Terminata", "NS": "Da giocare", "1H": "1T", "2H": "2T", "HT": "Intervallo"}.get(ss, ss),
-                    "minuto": status.get("elapsed"),
-                    "live": is_live,
-                    "fixture_id": fixture.get("id"),
-                    "ora": _utc_to_rome(fixture.get("date", "")),
-                    "data": fixture.get("date", "")[:10],
-                    "marcatori": marcatori,
-                }
-
-                rd = lg_data.get("round", "")
-                per_round[rd].append(match_data)
-
-            # Ordina i round per numero
-            def round_num(r):
-                try:
-                    return int(r.split(" - ")[-1])
-                except:
-                    return 0
-
-            for rd in sorted(per_round.keys(), key=round_num):
-                partite = per_round[rd]
-                g_num = rd.split(" - ")[-1] if " - " in rd else rd
-
-                total = len(partite)
-                ft_count = sum(1 for p in partite if p["status"] in ("FT", "AET", "PEN"))
-                ns_count = sum(1 for p in partite if p["status"] in ("NS", "TBD"))
-                ha_live = any(p["live"] for p in partite)
-                
-                # Se almeno 70% delle partite sono finite, considera la giornata completata
-                # Questo gestisce il caso di partite rinviate o in corso
-                tutte_finite = ft_count >= total * 0.7
-                ha_da_giocare = ns_count > 0
-
-                if tutte_finite:
-                    stato = "completata"
-                elif ha_live:
-                    stato = "live"
-                    giornata_corrente = g_num
-                else:
-                    stato = "prossima"
-                    if giornata_corrente is None and ha_da_giocare:
-                        giornata_corrente = g_num
-
-                giornate.append({
-                    "giornata": g_num,
-                    "data": partite[0]["data"] if partite else "",
-                    "partite": partite,
-                    "stato": stato,
-                    "live": ha_live,
-                })
-
-    except Exception as e:
-        print(f"⚠️ Calendario {league}: {e}")
-
-    if giornata_corrente is None and giornate:
-        for g in giornate:
-            if g["stato"] != "completata":
-                giornata_corrente = g["giornata"]
-                break
-
-    return {
-        "giornate": giornate,
-        "giornata_corrente": giornata_corrente or (giornate[-1]["giornata"] if giornate else "1"),
-        "live": any(g.get("live") for g in giornate),
-    }
-
-@app.get("/api/{league}/risultati")
-async def risultati_league(league: str):
-    if league not in LEAGUES:
-        raise HTTPException(404, "Campionato non trovato")
-    giornate = []
-    # Live
-    live_p = LIVE_RESULTS_CACHE_ML.get(league) or []
-    live_now = [p for p in live_p if p.get("live")]
-    if live_now:
-        giornate.append({"giornata":"Live","data":live_now[0]["data"],"partite":live_now,"live":True})
-    # Storico
-    storico = RISULTATI_STAGIONE_CACHE_ML.get(league) or []
-    if storico:
-        from collections import defaultdict
-        per_round = defaultdict(list)
-        for p in storico:
-            per_round[p.get("round","")].append(p)
-        for rd in sorted(per_round.keys(), key=lambda r: int(r.split(" - ")[-1]) if " - " in r and r.split(" - ")[-1].isdigit() else 0, reverse=True):
-            g_num = rd.split(" - ")[-1] if " - " in rd else rd
-            giornate.append({"giornata":g_num,"data":per_round[rd][0]["data"],"partite":per_round[rd],"live":False})
-    return {"giornate":giornate,"live":LIVE_IN_CORSO_ML.get(league,False),"aggiornamento":CLASSIFICA_LAST_UPDATE.get(league,"")}
-
-@app.get("/api/{league}/pronostico/{home}/{away}")
-async def pronostico_league(league: str, home: str, away: str, user: Optional[dict] = Depends(get_optional_user)):
-    if league not in LEAGUES:
-        raise HTTPException(404, "Campionato non trovato")
-    check_limit(user)
-    return _compute_pronostico(league, home, away)
 
 # ─────────────────────────────
 # STATISTICHE SQUADRE PER CLASSIFICA
@@ -4815,51 +3652,6 @@ def _compute_best_stats(league_key):
 # ─────────────────────────────
 # MONDIALI 2026
 # ─────────────────────────────
-@app.get("/api/mondiali-2026/gironi")
-async def worldcup_gironi():
-    """Restituisce gironi e partite del Mondiale 2026."""
-    if not WC_GIRONI_CACHE:
-        _fetch_worldcup_data()
-
-    # Raggruppa fixtures per girone
-    fixtures_per_girone = {}
-    for f in WC_FIXTURES_CACHE:
-        rd = f.get("round", "")
-        if "Group" in rd:
-            # Trova il girone di questa partita
-            for g_letter, squadre in WC_GIRONI_CACHE.items():
-                nomi_girone = [s["squadra"] for s in squadre]
-                if f["home"] in nomi_girone or f["away"] in nomi_girone:
-                    if g_letter not in fixtures_per_girone:
-                        fixtures_per_girone[g_letter] = []
-                    fixtures_per_girone[g_letter].append(f)
-                    break
-
-    # Fixtures fase finale
-    fasi = {}
-    for f in WC_FIXTURES_CACHE:
-        rd = f.get("round", "")
-        if "Group" not in rd and rd:
-            fase = rd
-            if fase not in fasi:
-                fasi[fase] = []
-            fasi[fase].append(f)
-
-    return {
-        "gironi": WC_GIRONI_CACHE,
-        "partite_gironi": fixtures_per_girone,
-        "fasi_finale": fasi,
-        "totale_partite": len(WC_FIXTURES_CACHE),
-    }
-
-
-@app.get("/api/mondiali-2026/standings/{girone}")
-async def worldcup_standings(girone: str):
-    if not WC_GIRONI_CACHE:
-        _fetch_worldcup_data()
-    g = girone.upper()
-    standings = WC_GIRONI_CACHE.get(g, [])
-    return {"girone": g, "classifica": standings}
 
 
 # ─────────────────────────────

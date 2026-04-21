@@ -1,0 +1,22 @@
+# File esclusi dalla build EAS
+# node_modules è gestito direttamente da EAS
+node_modules/
+
+# Cache Expo locale
+.expo/
+
+# File Markdown (documentazione, non necessari nella build)
+*.md
+
+# File di ambiente locali
+.env.local
+.env.*.local
+
+# Log
+*.log
+npm-debug.log*
+
+# Chiavi e certificati locali (usare EAS Secrets)
+*.keystore
+*.jks
+google-service-account.json

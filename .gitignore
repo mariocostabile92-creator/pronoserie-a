@@ -9,5 +9,10 @@ simulazioni.db
 bot_utenti.db
 webapp_users.db
 .env
+webapp/backend/.env
+webapp/backend/.env.txt
+bool
+dict
+str
 *.zip
 node_modules/

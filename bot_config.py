@@ -3,11 +3,13 @@ bot_config.py
 Configurazione del Bot Telegram per pronostici Serie A.
 """
 
+import os
+
 # ──────────────────────────────────────────────
 # CONFIGURAZIONE BOT TELEGRAM
 # Ottieni il token da @BotFather su Telegram
 # ──────────────────────────────────────────────
-TELEGRAM_BOT_TOKEN = "8614203898:AAE5Tp64-V-XPXfvq-52ASrQDt-p7noJ-IQ"
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 # ──────────────────────────────────────────────
 # CONFIGURAZIONE STRIPE (per pagamenti Pro)

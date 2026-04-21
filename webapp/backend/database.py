@@ -4,6 +4,11 @@ Database persistente con connection pooling.
 """
 
 import os
+from dotenv import load_dotenv
+
+# Carica variabili da file .env (se esiste)
+load_dotenv()
+
 import psycopg2
 import psycopg2.extras
 import psycopg2.pool
@@ -45,11 +50,9 @@ def _put_conn(conn):
     if _pool and conn:
         try:
             _pool.putconn(conn)
-        except Exception:
-            try:
-                _put_conn(conn)
-            except Exception:
-                pass
+        except Exception as e:
+            # Rimosso il bug di ricorsione
+            print(f"Errore _put_conn: {e}")
 
 
 def init_db():
