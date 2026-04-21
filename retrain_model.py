@@ -450,6 +450,24 @@ def esegui_retrain(leghe=None, dry_run=False):
     aggiornati = sum(1 for r in risultati if r.get("applicato"))
     print(f"\n  Leghe aggiornate: {aggiornati}/{len(risultati)}")
 
+    # ── RE-TRAINING ML ENSEMBLE ──
+    # Dopo l'ottimizzazione dei parametri Dixon-Coles, ri-allena anche i modelli
+    # ML ensemble specifici per ogni lega. Frequenza: settimanale (stessa del retrain).
+    if not dry_run:
+        print(f"\n{'=' * 60}")
+        print("  RE-TRAINING ML ENSEMBLE (modelli per lega)")
+        print("=" * 60)
+        ml_risultati = retrain_ml_models(leghe=leghe)
+        for lg, sc in ml_risultati.items():
+            if sc is not None and sc > 0:
+                print(f"  [ML OK]    {lg:<20}  CV score: {sc:.1f}%")
+            elif sc == 0:
+                print(f"  [ML FALL]  {lg:<20}  fallback Serie A (dati insufficienti)")
+            else:
+                print(f"  [ML ERR]   {lg:<20}  errore durante training")
+    else:
+        print("\n  [DRY-RUN] Re-training ML ensemble simulato (non eseguito).")
+
     # Salva timestamp ultimo re-training
     if not dry_run:
         try:
@@ -461,6 +479,38 @@ def esegui_retrain(leghe=None, dry_run=False):
 
     print("=" * 60)
     return risultati
+
+
+def retrain_ml_models(leghe=None):
+    """
+    Ri-allena i modelli ML ensemble per tutte le leghe (o quelle specificate).
+    Viene chiamata da esegui_retrain() dopo il re-training Dixon-Coles.
+
+    Usa ml_ensemble.train_model() per ogni lega:
+      - Serie A sempre allenata per prima (usata come fallback)
+      - Le altre leghe ricevono fallback serie-a se hanno < 50 partite
+
+    Ritorna: dict {league_id: cv_score} (cv_score=0 se fallback, None se errore)
+    """
+    if leghe is None:
+        leghe = list(FOOTBALL_DATA_URLS.keys())
+
+    # Assicura che Serie A sia allenata per prima (e' il fallback per le altre)
+    leghe_ordinate = ["serie-a"] + [lg for lg in leghe if lg != "serie-a"]
+
+    risultati_ml = {}
+
+    for league_id in leghe_ordinate:
+        try:
+            from ml_ensemble import train_model as train_ml
+            print(f"\n  ML training: {league_id}...")
+            _, score_cv = train_ml(league_id)
+            risultati_ml[league_id] = score_cv
+        except Exception as e:
+            print(f"  [ML ERRORE] {league_id}: {e}")
+            risultati_ml[league_id] = None
+
+    return risultati_ml
 
 
 def controlla_e_ritrain(forza=False, dry_run=False):

@@ -60,6 +60,7 @@ LEAGUE_PARAMS = {
         'alpha_xg': 0.45,            # xG stagionale (dati Understat verificati)
         'dixon_coles_rho': -0.10,    # Correzione low-score standard
         'alpha_bk_blend': 0.35,      # Blend bookmaker moderato
+        'alpha_ml': 0.20,            # Peso ML ensemble (Serie A: modello piu' affidabile)
     },
     # Premier League: piu' competitiva, meno pareggi (~26%), molto imprevedibile
     # Alta scoring, meno vantaggio casalingo, forma recente pesa piu'
@@ -71,6 +72,7 @@ LEAGUE_PARAMS = {
         'alpha_xg': 0.45,            # xG PL da Understat reali (getLeagueData/EPL/2025)
         'dixon_coles_rho': -0.06,    # Meno correzione low-score (piu' gol in PL)
         'alpha_bk_blend': 0.40,      # Bookmaker molto precisi su PL: peso maggiore
+        'alpha_ml': 0.15,            # Peso ML ridotto: PL molto volatile, bookmaker dominano
     },
     # La Liga: dominata da Barça/Real, grande gap top-bottom
     # Pareggi intermedi, pochi dati H2H affidabili
@@ -82,6 +84,7 @@ LEAGUE_PARAMS = {
         'alpha_xg': 0.50,            # xG La Liga da Understat disponibili (alta qualita')
         'dixon_coles_rho': -0.08,    # Correzione media
         'alpha_bk_blend': 0.38,      # Bookmaker affidabili su LaLiga
+        'alpha_ml': 0.15,            # Peso ML moderato (dati piu' scarsi)
     },
     # Bundesliga: pochi pareggi (~24%), molti gol, Bayern domina
     # Alta scoring, risultati a basso punteggio rari
@@ -93,6 +96,7 @@ LEAGUE_PARAMS = {
         'alpha_xg': 0.45,            # xG Bundesliga affidabili
         'dixon_coles_rho': -0.05,    # Meno correzione low-score (molta scoring)
         'alpha_bk_blend': 0.35,      # Blend standard
+        'alpha_ml': 0.15,            # Peso ML moderato
     },
     # Ligue 1: PSG domina, molti pareggi tra le altre squadre (~29%)
     # xG ora da Understat reali (getLeagueData/Ligue_1/2025)
@@ -104,6 +108,7 @@ LEAGUE_PARAMS = {
         'alpha_xg': 0.45,            # xG Ligue 1 da Understat reali (getLeagueData/Ligue_1/2025)
         'dixon_coles_rho': -0.08,    # Correzione media
         'alpha_bk_blend': 0.35,      # Blend standard
+        'alpha_ml': 0.15,            # Peso ML moderato
     },
 }
 
@@ -752,5 +757,92 @@ def get_prediction(home_stats: dict, away_stats: dict,
         result["delta_bk_x"] = None
         result["delta_bk_2"] = None
         result["n_bookmakers"] = 0
+
+    # ── BLEND ML ENSEMBLE ──
+    # Integra le predizioni del ML ensemble specifico per lega come terza componente
+    # insieme a Dixon-Coles (gia' applicato) e quote bookmaker (gia' applicate).
+    # L'import e' locale per evitare import circolare (ml_ensemble importa predictor).
+    # Il blend ML viene applicato DOPO il blend bookmaker per coerenza col training
+    # (ml_ensemble e' stato allenato usando l'output completo di get_prediction).
+    _alpha_ml = p.get("alpha_ml", 0.0)
+    if _alpha_ml > 0:
+        try:
+            from ml_ensemble import predict_ml
+            ml_pred = predict_ml(
+                home_name, away_name,
+                result, home_stats, away_stats,
+                df, league, bk=bk,
+            )
+            if ml_pred is not None:
+                # Blend: (1 - alpha_ml) * Dixon-Coles+BK + alpha_ml * ML
+                p1_ml  = ml_pred["ml_prob_1"] / 100.0
+                px_ml  = ml_pred["ml_prob_x"] / 100.0
+                p2_ml  = ml_pred["ml_prob_2"] / 100.0
+                p1_cur = result["prob_1"] / 100.0
+                px_cur = result["prob_x"] / 100.0
+                p2_cur = result["prob_2"] / 100.0
+
+                p1_fin = (1.0 - _alpha_ml) * p1_cur + _alpha_ml * p1_ml
+                px_fin = (1.0 - _alpha_ml) * px_cur + _alpha_ml * px_ml
+                p2_fin = (1.0 - _alpha_ml) * p2_cur + _alpha_ml * p2_ml
+
+                # Rinormalizza dopo blend
+                tot_ml = p1_fin + px_fin + p2_fin
+                if tot_ml > 0:
+                    p1_fin /= tot_ml
+                    px_fin /= tot_ml
+                    p2_fin /= tot_ml
+
+                result["prob_1"] = round(p1_fin * 100, 1)
+                result["prob_x"] = round(px_fin * 100, 1)
+                result["prob_2"] = round(p2_fin * 100, 1)
+
+                # Ricalcola quote finali dopo blend ML
+                def _quota_ml(p):
+                    return round(MARGINE_BK / p, 2) if p > 0 else 99.0
+
+                result["quota_1"] = _quota_ml(p1_fin)
+                result["quota_x"] = _quota_ml(px_fin)
+                result["quota_2"] = _quota_ml(p2_fin)
+
+                # Ricalcola suggerimento dopo blend ML
+                mx = max(result["prob_1"], result["prob_x"], result["prob_2"])
+                if mx == result["prob_1"]:
+                    result["suggerimento"] = "1"
+                    result["sugg_label"]   = "Vittoria Casa"
+                elif mx == result["prob_x"]:
+                    result["suggerimento"] = "X"
+                    result["sugg_label"]   = "Pareggio"
+                else:
+                    result["suggerimento"] = "2"
+                    result["sugg_label"]   = "Vittoria Ospite"
+
+                # Blend O/U e Goal con ML (peso ridotto: mercati extra meno affidabili)
+                alpha_ml_extra = _alpha_ml * 0.5
+                result["over_25"] = round(
+                    (1 - alpha_ml_extra) * result["over_25"] +
+                    alpha_ml_extra * ml_pred["ml_over_25"], 1
+                )
+                result["under_25"] = round(100 - result["over_25"], 1)
+                result["goal_si"] = round(
+                    (1 - alpha_ml_extra) * result["goal_si"] +
+                    alpha_ml_extra * ml_pred["ml_goal_si"], 1
+                )
+                result["goal_no"] = round(100 - result["goal_si"], 1)
+
+                # Aggiungi metadati ML al risultato (utile per debug e frontend)
+                result["ml_prob_1"]    = ml_pred["ml_prob_1"]
+                result["ml_prob_x"]    = ml_pred["ml_prob_x"]
+                result["ml_prob_2"]    = ml_pred["ml_prob_2"]
+                result["ml_league"]    = ml_pred["ml_league"]
+                result["ml_cv_score"]  = ml_pred["ml_cv_score"]
+                result["ml_applied"]   = True
+        except ImportError:
+            # ml_ensemble non disponibile: predizione solo Dixon-Coles + BK
+            result["ml_applied"] = False
+        except Exception:
+            result["ml_applied"] = False
+    else:
+        result["ml_applied"] = False
 
     return result
