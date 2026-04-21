@@ -205,13 +205,18 @@ async def calendario_league(league: str, request: Request):
                 }
                 per_round[lg_data.get("round", "")].append(match_data)
 
-            def round_num(r):
-                try:
-                    return int(r.split(" - ")[-1])
-                except Exception:
-                    return 0
+            # Ordina le giornate per DATA della prima partita (non per numero round).
+            # In La Liga e altri campionati, i round possono essere giocati fuori ordine
+            # cronologico (es. Giornata 33 si gioca prima della 32).
+            def round_min_date(r):
+                """Restituisce la data minima tra le partite del round."""
+                dates = [p["data"] for p in per_round[r] if p["data"]]
+                return min(dates) if dates else "9999-12-31"
 
-            for rd in sorted(per_round.keys(), key=round_num):
+            from datetime import date as date_cls
+            oggi = date_cls.today().isoformat()
+
+            for rd in sorted(per_round.keys(), key=round_min_date):
                 partite = per_round[rd]
                 g_num = rd.split(" - ")[-1] if " - " in rd else rd
 
@@ -219,10 +224,6 @@ async def calendario_league(league: str, request: Request):
                 ft_count = sum(1 for p in partite if p["status"] in ("FT", "AET", "PEN"))
                 ns_count = sum(1 for p in partite if p["status"] in ("NS", "TBD"))
                 ha_live = any(p["live"] for p in partite)
-                # Una giornata è "completata" SOLO se non ci sono partite da giocare (NS/TBD)
-                # e nessuna partita è live. La soglia 70% era troppo aggressiva e causava
-                # giornate con 3 partite ancora NS di essere marchiate come completate,
-                # spostando erroneamente la giornata_corrente alla successiva.
                 tutte_finite = ns_count == 0 and not ha_live and ft_count > 0
                 ha_da_giocare = ns_count > 0
 
