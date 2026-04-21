@@ -224,10 +224,18 @@ async def calendario_league(league: str, request: Request):
                 ft_count = sum(1 for p in partite if p["status"] in ("FT", "AET", "PEN"))
                 ns_count = sum(1 for p in partite if p["status"] in ("NS", "TBD"))
                 ha_live = any(p["live"] for p in partite)
+
+                # Una giornata è "completata" se la maggior parte delle partite è finita
+                # E le eventuali partite NS rimanenti sono recuperi posticipati
+                # (la data della giornata è nel passato rispetto a oggi).
+                # Questo gestisce il caso PL G.31 con 1 recupero posticipato da febbraio.
+                data_giornata = round_min_date(rd)
+                giornata_nel_passato = data_giornata < oggi
                 tutte_finite = ns_count == 0 and not ha_live and ft_count > 0
+                quasi_finite = ft_count > 0 and ns_count <= 2 and giornata_nel_passato and not ha_live
                 ha_da_giocare = ns_count > 0
 
-                if tutte_finite:
+                if tutte_finite or quasi_finite:
                     stato = "completata"
                 elif ha_live:
                     stato = "live"
