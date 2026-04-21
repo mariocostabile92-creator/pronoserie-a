@@ -70,154 +70,212 @@ XG_2526 = {
 }
 
 # ──────────────────────────────────────────────
-# Expected Goals (xG) Premier League 2025-2026
-# Fonte: API Football (gol medi casa/trasferta pesati)
+# Expected Goals (xG) - Fonte: Understat, stagione 2025/2026
+# (EPL) - Aggiornato: 21/04/2026
 # ──────────────────────────────────────────────
 XG_PL = {
-    "Arsenal": {"xG_pg": 1.98, "xGA_pg": 0.69},
-    "Aston Villa": {"xG_pg": 1.35, "xGA_pg": 1.17},
-    "Bournemouth": {"xG_pg": 1.45, "xGA_pg": 1.55},
-    "Brentford": {"xG_pg": 1.52, "xGA_pg": 1.33},
-    "Brighton": {"xG_pg": 1.32, "xGA_pg": 1.19},
-    "Burnley": {"xG_pg": 1.05, "xGA_pg": 1.91},
-    "Chelsea": {"xG_pg": 1.68, "xGA_pg": 1.19},
-    "Crystal Palace": {"xG_pg": 1.08, "xGA_pg": 1.16},
-    "Everton": {"xG_pg": 1.21, "xGA_pg": 1.16},
-    "Fulham": {"xG_pg": 1.43, "xGA_pg": 1.43},
-    "Leeds": {"xG_pg": 1.22, "xGA_pg": 1.57},
-    "Liverpool": {"xG_pg": 1.62, "xGA_pg": 1.33},
-    "Man City": {"xG_pg": 2.04, "xGA_pg": 0.88},
-    "Man United": {"xG_pg": 1.82, "xGA_pg": 1.33},
-    "Newcastle": {"xG_pg": 1.44, "xGA_pg": 1.47},
-    "Nott. Forest": {"xG_pg": 0.99, "xGA_pg": 1.39},
-    "Sunderland": {"xG_pg": 1.10, "xGA_pg": 1.12},
-    "Tottenham": {"xG_pg": 1.28, "xGA_pg": 1.67},
-    "West Ham": {"xG_pg": 1.16, "xGA_pg": 1.85},
-    "Wolves": {"xG_pg": 0.83, "xGA_pg": 1.72},
+    "Arsenal": {"xG_pg": 2.006, "xGA_pg": 0.881},  # 33P
+    "Aston Villa": {"xG_pg": 1.454, "xGA_pg": 1.505},  # 33P
+    "Bournemouth": {"xG_pg": 1.775, "xGA_pg": 1.524},  # 33P
+    "Brentford": {"xG_pg": 1.788, "xGA_pg": 1.434},  # 33P
+    "Brighton": {"xG_pg": 1.481, "xGA_pg": 1.416},  # 33P
+    "Burnley": {"xG_pg": 0.98, "xGA_pg": 2.159},  # 33P
+    "Chelsea": {"xG_pg": 2.034, "xGA_pg": 1.46},  # 33P
+    "Crystal Palace": {"xG_pg": 1.657, "xGA_pg": 1.462},  # 32P
+    "Everton": {"xG_pg": 1.314, "xGA_pg": 1.538},  # 33P
+    "Fulham": {"xG_pg": 1.309, "xGA_pg": 1.609},  # 33P
+    "Leeds": {"xG_pg": 1.572, "xGA_pg": 1.44},  # 33P
+    "Liverpool": {"xG_pg": 1.806, "xGA_pg": 1.35},  # 33P
+    "Manchester City": {"xG_pg": 2.049, "xGA_pg": 1.205},  # 32P
+    "Manchester United": {"xG_pg": 1.837, "xGA_pg": 1.339},  # 33P
+    "Newcastle United": {"xG_pg": 1.594, "xGA_pg": 1.535},  # 33P
+    "Nottingham Forest": {"xG_pg": 1.204, "xGA_pg": 1.657},  # 33P
+    "Sunderland": {"xG_pg": 1.114, "xGA_pg": 1.638},  # 33P
+    "Tottenham": {"xG_pg": 1.199, "xGA_pg": 1.545},  # 33P
+    "West Ham": {"xG_pg": 1.274, "xGA_pg": 1.794},  # 33P
+    "Wolverhampton Wanderers": {"xG_pg": 0.935, "xGA_pg": 1.858},  # 33P
+    # Alias nomi corti (football-data.co.uk)
+    "Man City":     {"xG_pg": 2.049, "xGA_pg": 1.205},
+    "Man United":   {"xG_pg": 1.837, "xGA_pg": 1.339},
+    "Newcastle":    {"xG_pg": 1.594, "xGA_pg": 1.535},
+    "Nott. Forest": {"xG_pg": 1.204, "xGA_pg": 1.657},
+    "Wolves":       {"xG_pg": 0.935, "xGA_pg": 1.858},
 }
 
 def get_xg_pl(team_name: str) -> dict:
-    """Ritorna xG per partita di una squadra PL."""
+    """Ritorna xG per partita di una squadra PL. Supporta nomi Understat e nomi corti."""
     return XG_PL.get(team_name)
 
 def get_xg_media_pl() -> dict:
-    """Media xG del campionato PL."""
-    n = len(XG_PL)
+    """Media xG del campionato PL (esclude alias duplicati usando valori unici)."""
+    # Evita di contare doppioni degli alias: usa solo valori distinti
+    seen = set()
+    valori_unici = []
+    for v in XG_PL.values():
+        chiave = (v["xG_pg"], v["xGA_pg"])
+        if chiave not in seen:
+            seen.add(chiave)
+            valori_unici.append(v)
+    n = len(valori_unici)
     if n == 0:
         return {"xG_pg_medio": 1.35, "xGA_pg_medio": 1.35}
     return {
-        "xG_pg_medio": round(sum(v["xG_pg"] for v in XG_PL.values()) / n, 2),
-        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in XG_PL.values()) / n, 2),
+        "xG_pg_medio": round(sum(v["xG_pg"] for v in valori_unici) / n, 2),
+        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in valori_unici) / n, 2),
     }
 
 # ──────────────────────────────────────────────
-# Expected Goals (xG) La Liga 2025-2026
+# Expected Goals (xG) - Fonte: Understat, stagione 2025/2026
+# (La_liga) - Aggiornato: 21/04/2026
 # ──────────────────────────────────────────────
 XG_LALIGA = {
-    "Alaves": {"xG_pg": 1.12, "xGA_pg": 1.43},
-    "Athletic Club": {"xG_pg": 1.12, "xGA_pg": 1.37},
-    "Atletico Madrid": {"xG_pg": 1.71, "xGA_pg": 0.99},
-    "Barcelona": {"xG_pg": 2.70, "xGA_pg": 0.91},
-    "Celta Vigo": {"xG_pg": 1.46, "xGA_pg": 1.27},
-    "Elche": {"xG_pg": 1.29, "xGA_pg": 1.55},
-    "Espanyol": {"xG_pg": 1.20, "xGA_pg": 1.45},
-    "Getafe": {"xG_pg": 0.90, "xGA_pg": 0.97},
-    "Girona": {"xG_pg": 1.06, "xGA_pg": 1.45},
-    "Levante": {"xG_pg": 1.16, "xGA_pg": 1.66},
-    "Mallorca": {"xG_pg": 1.23, "xGA_pg": 1.57},
-    "Osasuna": {"xG_pg": 1.31, "xGA_pg": 1.19},
-    "Oviedo": {"xG_pg": 0.68, "xGA_pg": 1.53},
-    "Rayo Vallecano": {"xG_pg": 0.97, "xGA_pg": 1.10},
-    "Real Betis": {"xG_pg": 1.48, "xGA_pg": 1.24},
-    "Real Madrid": {"xG_pg": 2.17, "xGA_pg": 0.94},
-    "Real Sociedad": {"xG_pg": 1.54, "xGA_pg": 1.49},
-    "Sevilla": {"xG_pg": 1.26, "xGA_pg": 1.68},
-    "Valencia": {"xG_pg": 1.18, "xGA_pg": 1.47},
-    "Villarreal": {"xG_pg": 1.85, "xGA_pg": 1.17},
+    "Alaves": {"xG_pg": 1.404, "xGA_pg": 1.472},  # 31P
+    "Athletic Club": {"xG_pg": 1.52, "xGA_pg": 1.227},  # 31P
+    "Atletico Madrid": {"xG_pg": 1.744, "xGA_pg": 1.298},  # 31P
+    "Barcelona": {"xG_pg": 2.888, "xGA_pg": 1.4},  # 31P
+    "Celta Vigo": {"xG_pg": 1.396, "xGA_pg": 1.38},  # 31P
+    "Elche": {"xG_pg": 1.246, "xGA_pg": 1.957},  # 31P
+    "Espanyol": {"xG_pg": 1.433, "xGA_pg": 1.689},  # 31P
+    "Getafe": {"xG_pg": 0.91, "xGA_pg": 1.321},  # 31P
+    "Girona": {"xG_pg": 1.314, "xGA_pg": 1.787},  # 31P
+    "Levante": {"xG_pg": 1.495, "xGA_pg": 1.876},  # 31P
+    "Mallorca": {"xG_pg": 1.221, "xGA_pg": 1.799},  # 31P
+    "Osasuna": {"xG_pg": 1.326, "xGA_pg": 1.37},  # 31P
+    "Rayo Vallecano": {"xG_pg": 1.512, "xGA_pg": 1.499},  # 31P
+    "Real Betis": {"xG_pg": 1.63, "xGA_pg": 1.27},  # 31P
+    "Real Madrid": {"xG_pg": 2.311, "xGA_pg": 1.168},  # 31P
+    "Real Oviedo": {"xG_pg": 1.11, "xGA_pg": 1.744},  # 31P
+    "Real Sociedad": {"xG_pg": 1.596, "xGA_pg": 1.523},  # 31P
+    "Sevilla": {"xG_pg": 1.083, "xGA_pg": 1.721},  # 31P
+    "Valencia": {"xG_pg": 1.394, "xGA_pg": 1.453},  # 31P
+    "Villarreal": {"xG_pg": 1.784, "xGA_pg": 1.365},  # 31P
+    # Alias nomi corti
+    "Oviedo":           {"xG_pg": 1.11,  "xGA_pg": 1.744},
+    "Atletico":         {"xG_pg": 1.744, "xGA_pg": 1.298},
 }
 
 def get_xg_laliga(team_name: str) -> dict:
+    """Ritorna xG per partita di una squadra La Liga. Supporta nomi Understat e alias."""
     return XG_LALIGA.get(team_name)
 
 def get_xg_media_laliga() -> dict:
-    n = len(XG_LALIGA)
+    """Media xG del campionato La Liga (esclude alias duplicati)."""
+    seen = set()
+    valori_unici = []
+    for v in XG_LALIGA.values():
+        chiave = (v["xG_pg"], v["xGA_pg"])
+        if chiave not in seen:
+            seen.add(chiave)
+            valori_unici.append(v)
+    n = len(valori_unici)
     if n == 0:
         return {"xG_pg_medio": 1.35, "xGA_pg_medio": 1.35}
     return {
-        "xG_pg_medio": round(sum(v["xG_pg"] for v in XG_LALIGA.values()) / n, 2),
-        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in XG_LALIGA.values()) / n, 2),
+        "xG_pg_medio": round(sum(v["xG_pg"] for v in valori_unici) / n, 2),
+        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in valori_unici) / n, 2),
     }
 
 # ──────────────────────────────────────────────
-# Expected Goals (xG) Bundesliga 2025-2026
+# Expected Goals (xG) - Fonte: Understat, stagione 2025/2026
+# (Bundesliga) - Aggiornato: 21/04/2026
 # ──────────────────────────────────────────────
 XG_BL = {
-    "1. FC Heidenheim": {"xG_pg": 1.08, "xGA_pg": 2.27},
-    "1. FC Koln": {"xG_pg": 1.49, "xGA_pg": 1.75},
-    "Hoffenheim": {"xG_pg": 2.01, "xGA_pg": 1.43},
-    "Bayer Leverkusen": {"xG_pg": 2.12, "xGA_pg": 1.37},
-    "Bayern Munich": {"xG_pg": 3.6, "xGA_pg": 0.95},
-    "Borussia Dortmund": {"xG_pg": 2.17, "xGA_pg": 0.99},
-    "Monchengladbach": {"xG_pg": 1.26, "xGA_pg": 1.69},
-    "Eintracht Frankfurt": {"xG_pg": 1.85, "xGA_pg": 1.85},
-    "Augsburg": {"xG_pg": 1.27, "xGA_pg": 1.79},
-    "St Pauli": {"xG_pg": 0.92, "xGA_pg": 1.59},
-    "Mainz": {"xG_pg": 1.25, "xGA_pg": 1.52},
-    "Hamburger SV": {"xG_pg": 1.13, "xGA_pg": 1.47},
-    "RB Leipzig": {"xG_pg": 2.0, "xGA_pg": 1.3},
-    "Freiburg": {"xG_pg": 1.54, "xGA_pg": 1.67},
-    "Union Berlin": {"xG_pg": 1.18, "xGA_pg": 1.69},
-    "Stuttgart": {"xG_pg": 1.96, "xGA_pg": 1.31},
-    "Wolfsburg": {"xG_pg": 1.35, "xGA_pg": 2.24},
-    "Werder Bremen": {"xG_pg": 1.1, "xGA_pg": 1.76},
+    "Augsburg": {"xG_pg": 1.419, "xGA_pg": 2.012},  # 30P
+    "Bayer Leverkusen": {"xG_pg": 2.142, "xGA_pg": 1.363},  # 30P
+    "Bayern Munich": {"xG_pg": 3.195, "xGA_pg": 1.159},  # 30P
+    "Borussia Dortmund": {"xG_pg": 1.932, "xGA_pg": 1.271},  # 30P
+    "Borussia M.Gladbach": {"xG_pg": 1.388, "xGA_pg": 1.666},  # 30P
+    "Eintracht Frankfurt": {"xG_pg": 1.508, "xGA_pg": 1.601},  # 30P
+    "FC Cologne": {"xG_pg": 1.541, "xGA_pg": 1.808},  # 30P
+    "FC Heidenheim": {"xG_pg": 1.341, "xGA_pg": 2.103},  # 30P
+    "Freiburg": {"xG_pg": 1.518, "xGA_pg": 1.528},  # 30P
+    "Hamburger SV": {"xG_pg": 1.269, "xGA_pg": 1.966},  # 30P
+    "Hoffenheim": {"xG_pg": 1.834, "xGA_pg": 1.618},  # 30P
+    "Mainz 05": {"xG_pg": 1.708, "xGA_pg": 1.748},  # 30P
+    "RasenBallsport Leipzig": {"xG_pg": 2.177, "xGA_pg": 1.474},  # 30P
+    "St. Pauli": {"xG_pg": 0.961, "xGA_pg": 1.848},  # 30P
+    "Union Berlin": {"xG_pg": 1.392, "xGA_pg": 1.574},  # 30P
+    "VfB Stuttgart": {"xG_pg": 1.978, "xGA_pg": 1.541},  # 30P
+    "Werder Bremen": {"xG_pg": 1.286, "xGA_pg": 1.732},  # 30P
+    "Wolfsburg": {"xG_pg": 1.418, "xGA_pg": 1.994},  # 30P
+    # Alias nomi corti (football-data.co.uk)
+    "1. FC Heidenheim":   {"xG_pg": 1.341, "xGA_pg": 2.103},
+    "1. FC Koln":         {"xG_pg": 1.541, "xGA_pg": 1.808},
+    "Monchengladbach":    {"xG_pg": 1.388, "xGA_pg": 1.666},
+    "St Pauli":           {"xG_pg": 0.961, "xGA_pg": 1.848},
+    "Mainz":              {"xG_pg": 1.708, "xGA_pg": 1.748},
+    "RB Leipzig":         {"xG_pg": 2.177, "xGA_pg": 1.474},
+    "Stuttgart":          {"xG_pg": 1.978, "xGA_pg": 1.541},
 }
 
 def get_xg_bl(team_name: str) -> dict:
+    """Ritorna xG per partita di una squadra Bundesliga. Supporta nomi Understat e alias."""
     return XG_BL.get(team_name)
 
 def get_xg_media_bl() -> dict:
-    n = len(XG_BL)
+    """Media xG del campionato Bundesliga (esclude alias duplicati)."""
+    seen = set()
+    valori_unici = []
+    for v in XG_BL.values():
+        chiave = (v["xG_pg"], v["xGA_pg"])
+        if chiave not in seen:
+            seen.add(chiave)
+            valori_unici.append(v)
+    n = len(valori_unici)
     if n == 0:
         return {"xG_pg_medio": 1.5, "xGA_pg_medio": 1.5}
     return {
-        "xG_pg_medio": round(sum(v["xG_pg"] for v in XG_BL.values()) / n, 2),
-        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in XG_BL.values()) / n, 2),
+        "xG_pg_medio": round(sum(v["xG_pg"] for v in valori_unici) / n, 2),
+        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in valori_unici) / n, 2),
     }
 
 # ──────────────────────────────────────────────
-# Expected Goals (xG) Ligue 1 2025-2026
+# Expected Goals (xG) - Fonte: Understat, stagione 2025/2026
+# (Ligue_1) - Aggiornato: 21/04/2026
 # ──────────────────────────────────────────────
 XG_L1 = {
-    "Angers": {"xG_pg": 0.88, "xGA_pg": 1.33},
-    "Auxerre": {"xG_pg": 0.81, "xGA_pg": 1.27},
-    "Le Havre": {"xG_pg": 0.88, "xGA_pg": 1.26},
-    "Lens": {"xG_pg": 1.93, "xGA_pg": 0.92},
-    "Lille": {"xG_pg": 1.65, "xGA_pg": 1.14},
-    "Lorient": {"xG_pg": 1.36, "xGA_pg": 1.49},
-    "Lyon": {"xG_pg": 1.47, "xGA_pg": 0.97},
-    "Marseille": {"xG_pg": 2.05, "xGA_pg": 1.29},
-    "Metz": {"xG_pg": 0.9, "xGA_pg": 2.1},
-    "Monaco": {"xG_pg": 1.79, "xGA_pg": 1.44},
-    "Nantes": {"xG_pg": 0.86, "xGA_pg": 1.67},
-    "Nice": {"xG_pg": 1.16, "xGA_pg": 1.88},
-    "Paris FC": {"xG_pg": 1.33, "xGA_pg": 1.58},
-    "Paris Saint Germain": {"xG_pg": 2.29, "xGA_pg": 0.83},
-    "Rennes": {"xG_pg": 1.66, "xGA_pg": 1.41},
-    "Stade Brestois 29": {"xG_pg": 1.33, "xGA_pg": 1.52},
-    "Strasbourg": {"xG_pg": 1.66, "xGA_pg": 1.15},
-    "Toulouse": {"xG_pg": 1.35, "xGA_pg": 1.35},
+    "Angers": {"xG_pg": 0.948, "xGA_pg": 1.683},  # 30P
+    "Auxerre": {"xG_pg": 1.181, "xGA_pg": 1.414},  # 30P
+    "Brest": {"xG_pg": 1.386, "xGA_pg": 1.578},  # 29P
+    "Le Havre": {"xG_pg": 1.106, "xGA_pg": 1.654},  # 30P
+    "Lens": {"xG_pg": 2.199, "xGA_pg": 1.317},  # 29P
+    "Lille": {"xG_pg": 1.73, "xGA_pg": 1.208},  # 30P
+    "Lorient": {"xG_pg": 1.407, "xGA_pg": 1.529},  # 30P
+    "Lyon": {"xG_pg": 1.588, "xGA_pg": 1.405},  # 30P
+    "Marseille": {"xG_pg": 2.004, "xGA_pg": 1.392},  # 30P
+    "Metz": {"xG_pg": 0.966, "xGA_pg": 1.927},  # 30P
+    "Monaco": {"xG_pg": 1.89, "xGA_pg": 1.513},  # 30P
+    "Nantes": {"xG_pg": 1.052, "xGA_pg": 1.609},  # 29P
+    "Nice": {"xG_pg": 1.359, "xGA_pg": 1.822},  # 30P
+    "Paris FC": {"xG_pg": 1.394, "xGA_pg": 1.723},  # 30P
+    "Paris Saint Germain": {"xG_pg": 2.285, "xGA_pg": 0.899},  # 28P
+    "Rennes": {"xG_pg": 1.604, "xGA_pg": 1.651},  # 30P
+    "Strasbourg": {"xG_pg": 1.681, "xGA_pg": 1.331},  # 29P
+    "Toulouse": {"xG_pg": 1.353, "xGA_pg": 1.366},  # 30P
+    # Alias nomi alternativi
+    "Stade Brestois 29":  {"xG_pg": 1.386, "xGA_pg": 1.578},
+    "PSG":                {"xG_pg": 2.285, "xGA_pg": 0.899},
 }
 
 def get_xg_l1(team_name: str) -> dict:
+    """Ritorna xG per partita di una squadra Ligue 1. Supporta nomi Understat e alias."""
     return XG_L1.get(team_name)
 
 def get_xg_media_l1() -> dict:
-    n = len(XG_L1)
+    """Media xG del campionato Ligue 1 (esclude alias duplicati)."""
+    seen = set()
+    valori_unici = []
+    for v in XG_L1.values():
+        chiave = (v["xG_pg"], v["xGA_pg"])
+        if chiave not in seen:
+            seen.add(chiave)
+            valori_unici.append(v)
+    n = len(valori_unici)
     if n == 0:
         return {"xG_pg_medio": 1.35, "xGA_pg_medio": 1.35}
     return {
-        "xG_pg_medio": round(sum(v["xG_pg"] for v in XG_L1.values()) / n, 2),
-        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in XG_L1.values()) / n, 2),
+        "xG_pg_medio": round(sum(v["xG_pg"] for v in valori_unici) / n, 2),
+        "xGA_pg_medio": round(sum(v["xGA_pg"] for v in valori_unici) / n, 2),
     }
 
 # ──────────────────────────────────────────────

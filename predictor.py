@@ -59,7 +59,7 @@ LEAGUE_PARAMS = {
         'confidence_threshold': 0.78, # Soglia abbassata (lega piu' volatile)
         'alpha_h2h': 0.08,           # H2H meno stabile in PL (alta imprevedibilita')
         'alpha_forma': 0.22,         # Forma recente pesa di piu' in PL
-        'alpha_xg': 0.40,            # xG PL meno precisi (stima, non Understat)
+        'alpha_xg': 0.45,            # xG PL da Understat reali (getLeagueData/EPL/2025)
         'dixon_coles_rho': -0.06,    # Meno correzione low-score (piu' gol in PL)
         'alpha_bk_blend': 0.40,      # Bookmaker molto precisi su PL: peso maggiore
     },
@@ -86,13 +86,13 @@ LEAGUE_PARAMS = {
         'alpha_bk_blend': 0.35,      # Blend standard
     },
     # Ligue 1: PSG domina, molti pareggi tra le altre squadre (~29%)
-    # Dati storici meno abbondanti, xG meno precisi
+    # xG ora da Understat reali (getLeagueData/Ligue_1/2025)
     'ligue-1': {
         'draw_boost': 1.10,          # Ligue 1: molti pareggi (secondo solo a Serie A)
         'confidence_threshold': 0.78, # Soglia standard
         'alpha_h2h': 0.10,           # H2H moderato
         'alpha_forma': 0.20,         # Forma con peso medio
-        'alpha_xg': 0.42,            # xG Ligue 1 (meno precisi di SA/PL)
+        'alpha_xg': 0.45,            # xG Ligue 1 da Understat reali (getLeagueData/Ligue_1/2025)
         'dixon_coles_rho': -0.08,    # Correzione media
         'alpha_bk_blend': 0.35,      # Blend standard
     },
