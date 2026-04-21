@@ -1439,28 +1439,28 @@ def _compute_pronostico(league: str, home: str, away: str) -> dict:
         try:
             hs = get_team_stats(_df_pl, home, opponent=away)
             aw = get_team_stats(_df_pl, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_pl)
+            raw = get_prediction(hs, aw, df=_df_pl, league="premier-league")
         except Exception:
             raw = None
     elif league == "la-liga" and _df_ll is not None and len(_df_ll) > 100:
         try:
             hs = get_team_stats(_df_ll, home, opponent=away)
             aw = get_team_stats(_df_ll, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_ll)
+            raw = get_prediction(hs, aw, df=_df_ll, league="la-liga")
         except Exception:
             raw = None
     elif league == "bundesliga" and _df_bl is not None and len(_df_bl) > 100:
         try:
             hs = get_team_stats(_df_bl, home, opponent=away)
             aw = get_team_stats(_df_bl, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_bl)
+            raw = get_prediction(hs, aw, df=_df_bl, league="bundesliga")
         except Exception:
             raw = None
     elif league == "ligue-1" and _df_l1 is not None and len(_df_l1) > 100:
         try:
             hs = get_team_stats(_df_l1, home, opponent=away)
             aw = get_team_stats(_df_l1, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_l1)
+            raw = get_prediction(hs, aw, df=_df_l1, league="ligue-1")
         except Exception:
             raw = None
     elif league in ("champions-league", "europa-league", "conference-league"):

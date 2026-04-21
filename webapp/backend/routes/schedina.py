@@ -257,7 +257,7 @@ async def schedina_bl(request: Request):
                     except Exception:
                         hs = get_team_stats(_df_bl, home_api, opponent=away_api)
                         aws = get_team_stats(_df_bl, away_api, opponent=home_api)
-                    raw = get_prediction(hs, aws, df=_df_bl)
+                    raw = get_prediction(hs, aws, df=_df_bl, league="bundesliga")
                 else:
                     raw = genera_pronostico(home, away)
                 mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
@@ -327,7 +327,7 @@ async def schedina_l1(request: Request):
                     except Exception:
                         hs = get_team_stats(_df_l1, home_api, opponent=away_api)
                         aws = get_team_stats(_df_l1, away_api, opponent=home_api)
-                    raw = get_prediction(hs, aws, df=_df_l1)
+                    raw = get_prediction(hs, aws, df=_df_l1, league="ligue-1")
                 else:
                     raw = genera_pronostico(home, away)
                 mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))

@@ -20,16 +20,87 @@ except ImportError:
     def get_team_real_stats(name):
         return None
 
-# Costanti del modello (ottimizzate da backtesting su 299 partite)
+# Costanti del modello (ottimizzate da backtesting su 299 partite - Serie A)
 MAX_GOL = 10
 ALPHA_H2H = 0.12         # H2H contributo moderato
 ALPHA_FORMA = 0.18        # Forma recente pesata (ottimizzato)
 ALPHA_XG = 0.45           # xG stagione attuale - peso alto (ottimizzato)
 ALPHA_CLASSIFICA = 0.08   # Classifica reale
 DIXON_COLES_RHO = -0.10   # Correzione Dixon-Coles (ottimizzato)
-DRAW_BOOST = 1.12         # Boost pareggio
+DRAW_BOOST = 1.12         # Boost pareggio (ottimizzato per Serie A)
 MARGINE_BK = 1.05
 ALPHA_BK_BLEND = 0.35     # Blend con quote bookmaker
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PARAMETRI DIFFERENZIATI PER LEGA
+# Ogni campionato ha caratteristiche statistiche diverse:
+# - Frequenza pareggi (draw_boost)
+# - Volatilita' dei risultati (alpha_forma, alpha_h2h)
+# - Qualita' dati disponibili (alpha_xg, confidence_threshold)
+# - Correzione Dixon-Coles per risultati a basso punteggio (dixon_coles_rho)
+# - Peso blend quote bookmaker (alpha_bk_blend)
+# ─────────────────────────────────────────────────────────────────────────────
+LEAGUE_PARAMS = {
+    # Serie A: piu' tattica, molti pareggi, forte vantaggio casalingo
+    # Parametri ottimizzati su backtesting 299 partite
+    'serie-a': {
+        'draw_boost': 1.12,          # Serie A ha ~28-30% pareggi (alto)
+        'confidence_threshold': 0.82, # Soglia alta (dati storici abbondanti)
+        'alpha_h2h': 0.12,           # H2H moderato
+        'alpha_forma': 0.18,         # Forma recente pesata
+        'alpha_xg': 0.45,            # xG stagionale (dati Understat verificati)
+        'dixon_coles_rho': -0.10,    # Correzione low-score standard
+        'alpha_bk_blend': 0.35,      # Blend bookmaker moderato
+    },
+    # Premier League: piu' competitiva, meno pareggi (~26%), molto imprevedibile
+    # Alta scoring, meno vantaggio casalingo, forma recente pesa piu'
+    'premier-league': {
+        'draw_boost': 1.00,          # PL ha meno pareggi: nessun boost
+        'confidence_threshold': 0.78, # Soglia abbassata (lega piu' volatile)
+        'alpha_h2h': 0.08,           # H2H meno stabile in PL (alta imprevedibilita')
+        'alpha_forma': 0.22,         # Forma recente pesa di piu' in PL
+        'alpha_xg': 0.40,            # xG PL meno precisi (stima, non Understat)
+        'dixon_coles_rho': -0.06,    # Meno correzione low-score (piu' gol in PL)
+        'alpha_bk_blend': 0.40,      # Bookmaker molto precisi su PL: peso maggiore
+    },
+    # La Liga: dominata da Barça/Real, grande gap top-bottom
+    # Pareggi intermedi, pochi dati H2H affidabili
+    'la-liga': {
+        'draw_boost': 1.08,          # La Liga: ~27% pareggi (medio)
+        'confidence_threshold': 0.75, # Soglia piu' bassa (H2H scarsi, alta conf problematica)
+        'alpha_h2h': 0.10,           # H2H meno peso (meno dati storici)
+        'alpha_forma': 0.20,         # Forma con peso medio
+        'alpha_xg': 0.50,            # xG La Liga da Understat disponibili (alta qualita')
+        'dixon_coles_rho': -0.08,    # Correzione media
+        'alpha_bk_blend': 0.38,      # Bookmaker affidabili su LaLiga
+    },
+    # Bundesliga: pochi pareggi (~24%), molti gol, Bayern domina
+    # Alta scoring, risultati a basso punteggio rari
+    'bundesliga': {
+        'draw_boost': 0.98,          # Bundesliga: meno pareggi della media europea
+        'confidence_threshold': 0.78, # Soglia standard
+        'alpha_h2h': 0.10,           # H2H moderato
+        'alpha_forma': 0.20,         # Forma con peso medio
+        'alpha_xg': 0.45,            # xG Bundesliga affidabili
+        'dixon_coles_rho': -0.05,    # Meno correzione low-score (molta scoring)
+        'alpha_bk_blend': 0.35,      # Blend standard
+    },
+    # Ligue 1: PSG domina, molti pareggi tra le altre squadre (~29%)
+    # Dati storici meno abbondanti, xG meno precisi
+    'ligue-1': {
+        'draw_boost': 1.10,          # Ligue 1: molti pareggi (secondo solo a Serie A)
+        'confidence_threshold': 0.78, # Soglia standard
+        'alpha_h2h': 0.10,           # H2H moderato
+        'alpha_forma': 0.20,         # Forma con peso medio
+        'alpha_xg': 0.42,            # xG Ligue 1 (meno precisi di SA/PL)
+        'dixon_coles_rho': -0.08,    # Correzione media
+        'alpha_bk_blend': 0.35,      # Blend standard
+    },
+}
+
+# Fallback per leghe non presenti (UCL, UEL, UECL, Mondiali, ecc.)
+# Usa i parametri Serie A come base conservativa
+DEFAULT_LEAGUE_PARAMS = LEAGUE_PARAMS['serie-a']
 
 # Coppie bookmaker (Home, Draw, Away)
 BOOKMAKER_COLS = [
@@ -92,9 +163,11 @@ def _dixon_coles_tau(i: int, j: int, lh: float, la: float, rho: float) -> float:
 
 
 def calcola_probabilita(lambda_home: float, lambda_away: float,
-                         rho: float = DIXON_COLES_RHO) -> dict:
+                         rho: float = DIXON_COLES_RHO,
+                         draw_boost: float = DRAW_BOOST) -> dict:
     """
     Calcola P(1), P(X), P(2) con correzione Dixon-Coles.
+    draw_boost: fattore moltiplicativo per i pareggi (dipende dalla lega).
     """
     prob_1 = 0.0
     prob_x = 0.0
@@ -113,8 +186,8 @@ def calcola_probabilita(lambda_home: float, lambda_away: float,
             else:
                 prob_2 += p
 
-    # Normalizza con boost pareggio (Serie A ha piu' pareggi del modello Poisson)
-    prob_x *= DRAW_BOOST
+    # Normalizza con boost pareggio (calibrato per lega: SA=1.12, PL=1.00, BL=0.98)
+    prob_x *= draw_boost
     totale = prob_1 + prob_x + prob_2
     if totale > 0:
         prob_1 /= totale
@@ -288,10 +361,12 @@ def _get_bookmaker_reference(df: pd.DataFrame, home: str, away: str) -> dict | N
 
 
 def _calcola_confidence(probs: dict, n_home: int, n_away: int,
-                         h2h: dict | None, bk: dict | None) -> dict:
+                         h2h: dict | None, bk: dict | None,
+                         confidence_threshold: float = 0.82) -> dict:
     """
     Calcola indice di affidabilita' composito [0, 1].
     4 componenti pesate: separazione, volume dati, H2H, convergenza.
+    confidence_threshold: soglia per label 'Alta' (varia per lega).
     """
     # 1. Separazione probabilita' (40%)
     vals = sorted([probs["prob_1"], probs["prob_x"], probs["prob_2"]], reverse=True)
@@ -322,10 +397,13 @@ def _calcola_confidence(probs: dict, n_home: int, n_away: int,
     confidence = 0.40 * sep_score + 0.25 * data_score + 0.20 * h2h_score + 0.15 * conv_score
     confidence = round(min(max(confidence, 0), 1.0), 3)
 
-    if confidence >= 0.82:
+    # Soglia 'Media' = threshold_alta - 0.32 (mantiene la stessa distanza per tutte le leghe)
+    threshold_media = round(confidence_threshold - 0.32, 2)
+
+    if confidence >= confidence_threshold:
         label = "Alta"
         color = "#2ecc71"
-    elif confidence >= 0.50:
+    elif confidence >= threshold_media:
         label = "Media"
         color = "#f39c12"
     else:
@@ -339,7 +417,9 @@ def _calcola_confidence(probs: dict, n_home: int, n_away: int,
     }
 
 
-def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) -> dict:
+def get_prediction(home_stats: dict, away_stats: dict,
+                   df: pd.DataFrame = None,
+                   league: str = 'serie-a') -> dict:
     """
     Genera il pronostico 1X2 SUPER INTEGRATO:
     - Lambda base da storico CSV (26 anni)
@@ -349,9 +429,20 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     - Dixon-Coles per risultati bassi
     - Confronto quote bookmaker (5 bookmaker)
     - Indice di confidence multi-fattore
+    - Parametri differenziati per lega (LEAGUE_PARAMS)
     """
     home_name = home_stats.get("nome", "")
     away_name = away_stats.get("nome", "")
+
+    # Carica parametri specifici per questa lega (fallback su Serie A)
+    p = LEAGUE_PARAMS.get(league, DEFAULT_LEAGUE_PARAMS)
+    _draw_boost        = p['draw_boost']
+    _confidence_thr    = p['confidence_threshold']
+    _alpha_h2h         = p['alpha_h2h']
+    _alpha_forma       = p['alpha_forma']
+    _alpha_xg          = p['alpha_xg']
+    _dixon_coles_rho   = p['dixon_coles_rho']
+    _alpha_bk_blend    = p['alpha_bk_blend']
 
     # ── LAMBDA BASE (storico CSV con peso recenza) ──
     lambda_home_hist = (
@@ -395,9 +486,9 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
         xg_home_val = round(xg_home["xG_pg"], 2)
         xg_away_val = round(xg_away["xG_pg"], 2)
 
-        # Blending: 70% storico + 30% xG stagione attuale
-        lambda_home = (1 - ALPHA_XG) * lambda_home_hist + ALPHA_XG * lambda_home_xg
-        lambda_away = (1 - ALPHA_XG) * lambda_away_hist + ALPHA_XG * lambda_away_xg
+        # Blending: (1-alpha_xg) storico + alpha_xg xG stagione attuale (calibrato per lega)
+        lambda_home = (1 - _alpha_xg) * lambda_home_hist + _alpha_xg * lambda_home_xg
+        lambda_away = (1 - _alpha_xg) * lambda_away_hist + _alpha_xg * lambda_away_xg
     else:
         lambda_home = lambda_home_hist
         lambda_away = lambda_away_hist
@@ -426,14 +517,14 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
         h2h_applied = True
         h2h_n = h2h["n_partite"]
         adv = h2h["h2h_advantage"]
-        lambda_home *= (1.0 + ALPHA_H2H * adv)
-        lambda_away *= (1.0 - ALPHA_H2H * adv)
+        lambda_home *= (1.0 + _alpha_h2h * adv)
+        lambda_away *= (1.0 - _alpha_h2h * adv)
 
     # Correzione forma pesata
     forma_home = home_stats.get("forma_casa_pesata", 1.5)
     forma_away = away_stats.get("forma_trasf_pesata", 1.5)
     forma_diff = forma_home - forma_away
-    forma_factor = 1.0 + ALPHA_FORMA * forma_diff
+    forma_factor = 1.0 + _alpha_forma * forma_diff
     lambda_home *= forma_factor
     lambda_away *= (2.0 - forma_factor)  # Inverso
 
@@ -458,8 +549,10 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     lambda_home = max(0.3, min(lambda_home, 5.0))
     lambda_away = max(0.3, min(lambda_away, 5.0))
 
-    # Probabilita' con Dixon-Coles + boost pareggio
-    probs = calcola_probabilita(lambda_home, lambda_away)
+    # Probabilita' con Dixon-Coles + boost pareggio (parametri specifici per lega)
+    probs = calcola_probabilita(lambda_home, lambda_away,
+                                 rho=_dixon_coles_rho,
+                                 draw_boost=_draw_boost)
 
     # Extra boost X: se le squadre sono equilibrate (lambda simili), il pareggio e' piu' probabile
     ratio = min(lambda_home, lambda_away) / max(lambda_home, lambda_away) if max(lambda_home, lambda_away) > 0 else 0
@@ -498,10 +591,10 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
         bk_p1 = bk["book_prob_1"] / 100.0
         bk_px = bk["book_prob_x"] / 100.0
         bk_p2 = bk["book_prob_2"] / 100.0
-        # Blend: (1-alpha) modello + alpha bookmaker
-        probs["prob_1"] = (1 - ALPHA_BK_BLEND) * probs["prob_1"] + ALPHA_BK_BLEND * bk_p1
-        probs["prob_x"] = (1 - ALPHA_BK_BLEND) * probs["prob_x"] + ALPHA_BK_BLEND * bk_px
-        probs["prob_2"] = (1 - ALPHA_BK_BLEND) * probs["prob_2"] + ALPHA_BK_BLEND * bk_p2
+        # Blend: (1-alpha) modello + alpha bookmaker (peso bookmaker varia per lega)
+        probs["prob_1"] = (1 - _alpha_bk_blend) * probs["prob_1"] + _alpha_bk_blend * bk_p1
+        probs["prob_x"] = (1 - _alpha_bk_blend) * probs["prob_x"] + _alpha_bk_blend * bk_px
+        probs["prob_2"] = (1 - _alpha_bk_blend) * probs["prob_2"] + _alpha_bk_blend * bk_p2
         # Rinormalizza
         tot_bk = probs["prob_1"] + probs["prob_x"] + probs["prob_2"]
         if tot_bk > 0:
@@ -523,13 +616,14 @@ def get_prediction(home_stats: dict, away_stats: dict, df: pd.DataFrame = None) 
     qx = quota(probs["prob_x"])
     q2 = quota(probs["prob_2"])
 
-    # Confidence
+    # Confidence (soglia 'Alta' differenziata per lega)
     conf = _calcola_confidence(
         probs,
         home_stats.get("n_partite", 0),
         away_stats.get("n_partite", 0),
         h2h,
-        bk
+        bk,
+        confidence_threshold=_confidence_thr
     )
 
     result = {
