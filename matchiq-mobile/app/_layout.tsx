@@ -1,15 +1,53 @@
+import * as Updates from 'expo-updates';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { Alert } from 'react-native';
 import { Colors } from '../constants/theme';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { registerForPushNotifications } from '../services/notifications';
+
+// Controlla se sono disponibili aggiornamenti OTA e li scarica in background
+async function controllaAggiornamenti() {
+  // In modalità sviluppo gli aggiornamenti OTA non sono disponibili
+  if (__DEV__) return;
+
+  try {
+    const risultato = await Updates.checkForUpdateAsync();
+
+    if (risultato.isAvailable) {
+      // Scarica l'aggiornamento in background senza bloccare l'utente
+      await Updates.fetchUpdateAsync();
+
+      // Avvisa l'utente in modo discreto che l'aggiornamento è pronto
+      Alert.alert(
+        'Aggiornamento disponibile',
+        'Una nuova versione è stata scaricata. Riavvia l\'app per applicarla.',
+        [
+          { text: 'Più tardi', style: 'cancel' },
+          {
+            text: 'Riavvia ora',
+            onPress: () => Updates.reloadAsync(),
+          },
+        ]
+      );
+    }
+  } catch (errore) {
+    // Errore non critico: l'app continua a funzionare normalmente
+    console.warn('[OTA] Errore nel controllo aggiornamenti:', errore);
+  }
+}
 
 // Componente interno che gestisce il redirect in base allo stato di autenticazione
 function RootLayoutNav() {
   const { token, loading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
+
+  // Controlla aggiornamenti OTA all'avvio dell'app
+  useEffect(() => {
+    controllaAggiornamenti();
+  }, []);
 
   useEffect(() => {
     if (loading) return;

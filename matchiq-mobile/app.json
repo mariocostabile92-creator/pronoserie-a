@@ -12,6 +12,15 @@
       "resizeMode": "contain",
       "backgroundColor": "#0D1117"
     },
+    "updates": {
+      "url": "https://u.expo.dev/d415eb75-b604-4d9d-9708-ce77382bf06d",
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "ON_LOAD"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.matchiq.app"
@@ -38,7 +47,8 @@
       "expo-router",
       "expo-secure-store",
       "expo-notifications",
-      "expo-font"
+      "expo-font",
+      "expo-updates"
     ],
     "experiments": {
       "typedRoutes": true
