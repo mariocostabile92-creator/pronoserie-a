@@ -1,9 +1,10 @@
-﻿"""
+"""
 database.py - PostgreSQL (Neon.tech)
 Database persistente con connection pooling.
 """
 
 import os
+import logging
 from dotenv import load_dotenv
 
 # Carica variabili da file .env (se esiste)
@@ -14,6 +15,8 @@ import psycopg2.extras
 import psycopg2.pool
 from datetime import datetime, timezone
 
+logger = logging.getLogger(__name__)
+
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL non configurata nelle variabili d'ambiente!")
@@ -21,14 +24,19 @@ if not DATABASE_URL:
 # Connection pool: min 1, max 10 connessioni
 _pool = None
 
+# Traccia le connessioni prese dal pool per distinguerle dalle standalone
+_pool_connections = set()
+
+
 def _init_pool():
     global _pool
     if _pool is None:
         try:
             _pool = psycopg2.pool.SimpleConnectionPool(1, 10, DATABASE_URL)
         except Exception as e:
-            print(f"Errore pool DB: {e}")
+            logger.error(f"Errore inizializzazione pool DB: {e}")
             _pool = None
+
 
 def _get_conn():
     global _pool
@@ -38,21 +46,34 @@ def _get_conn():
         try:
             conn = _pool.getconn()
             conn.autocommit = False
+            _pool_connections.add(id(conn))
             return conn
-        except Exception:
+        except Exception as e:
+            logger.error(f"Errore _get_conn dal pool: {e}")
             _pool = None
-    # Fallback senza pool
+    # Fallback senza pool: connessione standalone (NON va in putconn)
+    logger.warning("Pool non disponibile, uso connessione standalone")
     conn = psycopg2.connect(DATABASE_URL)
     return conn
 
+
 def _put_conn(conn):
     global _pool
-    if _pool and conn:
+    if conn is None:
+        return
+    conn_id = id(conn)
+    if _pool and conn_id in _pool_connections:
         try:
+            _pool_connections.discard(conn_id)
             _pool.putconn(conn)
         except Exception as e:
-            # Rimosso il bug di ricorsione
-            print(f"Errore _put_conn: {e}")
+            logger.error(f"Errore _put_conn (pool): {e}")
+    else:
+        # Connessione standalone: la chiudiamo direttamente
+        try:
+            conn.close()
+        except Exception as e:
+            logger.error(f"Errore chiusura connessione standalone: {e}")
 
 
 def init_db():
@@ -117,8 +138,10 @@ def init_db():
     try:
         cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code TEXT")
         cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by INTEGER")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"ALTER TABLE users (colonne referral): {e}")
+        conn.rollback()
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS user_predictions (
             id SERIAL PRIMARY KEY,
@@ -142,6 +165,13 @@ def init_db():
             match_date TEXT
         )
     """)
+
+    # Indici sulle query più usate
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_api_usage_user_time ON api_usage(user_id, timestamp)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_predictions_verificato ON predictions_tracking(verificato)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_user_predictions_user_id ON user_predictions(user_id)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)")
+
     conn.commit()
     cur.close()
     _put_conn(conn)
@@ -233,7 +263,7 @@ def count_daily_calls(user_id):
     return row[0] if row else 0
 
 
-# â”€â”€ TRACKING PREDIZIONI â”€â”€
+# ── TRACKING PREDIZIONI ──
 
 def save_prediction(home, away, data_partita, pred, bk_live=False):
     """Salva un pronostico nel DB per verifica futura."""
@@ -259,8 +289,8 @@ def save_prediction(home, away, data_partita, pred, bk_live=False):
         conn.commit()
         cur.close()
         _put_conn(conn)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"Errore save_prediction ({home} vs {away}): {e}")
 
 
 def verify_predictions(risultati_live):
@@ -309,9 +339,9 @@ def verify_predictions(risultati_live):
         cur.close()
         _put_conn(conn)
         if verificate > 0:
-            print(f"âœ… TRACKING: {verificate} predizioni verificate")
+            print(f"✅ TRACKING: {verificate} predizioni verificate")
     except Exception as e:
-        print(f"âš ï¸ Errore tracking: {e}")
+        logger.error(f"Errore verify_predictions: {e}")
 
 
 def get_tracking_stats():
@@ -341,6 +371,6 @@ def get_tracking_stats():
                 "acc_alta": round(row["ok_alta"] / row["tot_alta"] * 100, 1) if row["tot_alta"] > 0 else 0,
                 "tot_alta": row["tot_alta"],
             }
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"Errore get_tracking_stats: {e}")
     return None
