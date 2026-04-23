@@ -7,6 +7,8 @@ Fix calendario + fallback + debug + Railway ready
 import sys
 import os
 import json
+import logging
+_logger = logging.getLogger(__name__)
 
 # PATH ROOT
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -59,13 +61,23 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://matchiq.it.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(payments_router)
+
+from league_mappings import (
+    PL_NOME_MAP, PL_TEAM_IDS,
+    LL_NOME_MAP, LL_TEAM_IDS,
+    BL_NOME_MAP, BL_TEAM_IDS,
+    L1_NOME_MAP, L1_TEAM_IDS,
+    WC_NOME_MAP, WC_TEAM_IDS,
+    FOOTBALL_NOME_MAP,
+    _TEAM_IDS, _RUOLO_MAP, _ALL_EURO_IDS,
+)
 
 # ─────────────────────────────
 # GLOBAL + MULTI-LEAGUE CONFIG
@@ -94,127 +106,7 @@ LEAGUES = {
 }
 
 # Mapping nomi API Football -> nomi nostri (per ogni league)
-PL_NOME_MAP = {
-    "Manchester United": "Man United", "Manchester City": "Man City",
-    "Newcastle United": "Newcastle", "Newcastle": "Newcastle",
-    "AFC Bournemouth": "Bournemouth", "Bournemouth": "Bournemouth",
-    "Wolverhampton Wanderers": "Wolves", "Wolves": "Wolves",
-    "Nottingham Forest": "Nott. Forest",
-    "Tottenham Hotspur": "Tottenham", "Tottenham": "Tottenham",
-    "West Ham United": "West Ham", "West Ham": "West Ham",
-    "Brighton and Hove Albion": "Brighton", "Brighton": "Brighton",
-    "Crystal Palace": "Crystal Palace",
-    "Arsenal": "Arsenal", "Liverpool": "Liverpool", "Chelsea": "Chelsea",
-    "Aston Villa": "Aston Villa", "Fulham": "Fulham", "Everton": "Everton",
-    "Brentford": "Brentford", "Burnley": "Burnley",
-    "Leeds United": "Leeds", "Leeds": "Leeds",
-    "Sunderland": "Sunderland",
-}
-
-PL_TEAM_IDS = {
-    "Arsenal":42,"Aston Villa":66,"Bournemouth":35,"Brentford":55,"Brighton":51,
-    "Burnley":44,"Chelsea":49,"Crystal Palace":52,"Everton":45,"Fulham":36,
-    "Leeds":63,"Liverpool":40,"Man City":50,"Man United":33,"Newcastle":34,
-    "Nott. Forest":65,"Sunderland":746,"Tottenham":47,"West Ham":48,"Wolves":39,
-}
-
-LL_NOME_MAP = {
-    "FC Barcelona": "Barcelona", "Barcelona": "Barcelona",
-    "Atletico Madrid": "Atletico Madrid", "Club Atletico de Madrid": "Atletico Madrid",
-    "Athletic Club": "Athletic Club", "Athletic Bilbao": "Athletic Club",
-    "Real Madrid": "Real Madrid",
-    "Real Sociedad": "Real Sociedad",
-    "Real Betis": "Real Betis",
-    "Villarreal CF": "Villarreal", "Villarreal": "Villarreal",
-    "Sevilla FC": "Sevilla", "Sevilla": "Sevilla",
-    "Valencia CF": "Valencia", "Valencia": "Valencia",
-    "RC Celta de Vigo": "Celta Vigo", "Celta Vigo": "Celta Vigo",
-    "RCD Espanyol": "Espanyol", "Espanyol": "Espanyol",
-    "Deportivo Alaves": "Alaves", "Alaves": "Alaves",
-    "CA Osasuna": "Osasuna", "Osasuna": "Osasuna",
-    "Getafe CF": "Getafe", "Getafe": "Getafe",
-    "Girona FC": "Girona", "Girona": "Girona",
-    "Rayo Vallecano": "Rayo Vallecano",
-    "RCD Mallorca": "Mallorca", "Mallorca": "Mallorca",
-    "Levante UD": "Levante", "Levante": "Levante",
-    "Real Oviedo": "Oviedo", "Oviedo": "Oviedo",
-    "Elche CF": "Elche", "Elche": "Elche",
-}
-
-LL_TEAM_IDS = {
-    "Alaves":542,"Athletic Club":531,"Atletico Madrid":530,"Barcelona":529,
-    "Celta Vigo":538,"Elche":797,"Espanyol":540,"Getafe":546,"Girona":547,
-    "Levante":539,"Mallorca":798,"Osasuna":727,"Oviedo":718,
-    "Rayo Vallecano":728,"Real Betis":543,"Real Madrid":541,
-    "Real Sociedad":548,"Sevilla":536,"Valencia":532,"Villarreal":533,
-}
-
-BL_NOME_MAP = {
-    "1. FC Heidenheim 1846": "Heidenheim", "1. FC Heidenheim": "Heidenheim",
-    "1. FC Köln": "1. FC Koln", "FC Köln": "1. FC Koln",
-    "1899 Hoffenheim": "Hoffenheim", "TSG Hoffenheim": "Hoffenheim",
-    "Bayern München": "Bayern Munich", "FC Bayern München": "Bayern Munich",
-    "Borussia Mönchengladbach": "Monchengladbach",
-    "FC Augsburg": "Augsburg", "FC St. Pauli": "St Pauli",
-    "FSV Mainz 05": "Mainz", "1. FSV Mainz 05": "Mainz",
-    "SC Freiburg": "Freiburg", "VfB Stuttgart": "Stuttgart",
-    "VfL Wolfsburg": "Wolfsburg",
-    "Bayer Leverkusen": "Bayer Leverkusen", "Borussia Dortmund": "Borussia Dortmund",
-    "Eintracht Frankfurt": "Eintracht Frankfurt", "RB Leipzig": "RB Leipzig",
-    "Union Berlin": "Union Berlin", "Werder Bremen": "Werder Bremen",
-    "Hamburger SV": "Hamburger SV",
-}
-
-BL_TEAM_IDS = {
-    "Heidenheim":180,"1. FC Koln":192,"Hoffenheim":167,
-    "Bayer Leverkusen":168,"Bayern Munich":157,"Borussia Dortmund":165,
-    "Monchengladbach":163,"Eintracht Frankfurt":169,"Augsburg":170,
-    "St Pauli":186,"Mainz":164,"Hamburger SV":175,"RB Leipzig":173,
-    "Freiburg":160,"Union Berlin":182,"Stuttgart":172,"Wolfsburg":161,
-    "Werder Bremen":162,
-}
-
-L1_NOME_MAP = {
-    "Paris Saint-Germain": "Paris Saint Germain", "PSG": "Paris Saint Germain",
-    "Olympique de Marseille": "Marseille", "Marseille": "Marseille",
-    "Olympique Lyonnais": "Lyon", "Lyon": "Lyon",
-    "AS Monaco": "Monaco", "Monaco": "Monaco",
-    "LOSC Lille": "Lille", "Lille": "Lille",
-    "Stade Rennais FC": "Rennes", "Rennes": "Rennes",
-    "RC Lens": "Lens", "Lens": "Lens",
-    "OGC Nice": "Nice", "Nice": "Nice",
-    "FC Nantes": "Nantes", "Nantes": "Nantes",
-    "Stade Brestois 29": "Stade Brestois 29", "Brest": "Stade Brestois 29",
-    "RC Strasbourg": "Strasbourg", "Strasbourg": "Strasbourg",
-    "Toulouse FC": "Toulouse", "Toulouse": "Toulouse",
-    "Le Havre AC": "Le Havre", "Le Havre": "Le Havre",
-    "AJ Auxerre": "Auxerre", "Auxerre": "Auxerre",
-    "SCO Angers": "Angers", "Angers": "Angers",
-    "FC Lorient": "Lorient", "Lorient": "Lorient",
-    "FC Metz": "Metz", "Metz": "Metz",
-    "Paris FC": "Paris FC",
-}
-
-L1_TEAM_IDS = {
-    "Paris Saint Germain": 85,
-    "Marseille": 81,
-    "Lyon": 80,
-    "Monaco": 91,
-    "Lille": 79,
-    "Rennes": 94,
-    "Lens": 116,
-    "Nice": 84,
-    "Nantes": 83,
-    "Stade Brestois 29": 130,
-    "Strasbourg": 95,
-    "Toulouse": 96,
-    "Le Havre": 1074,
-    "Auxerre": 110,
-    "Angers": 76,
-    "Lorient": 82,
-    "Metz": 112,
-    "Paris FC": 111,
-}
+# (Definiti in league_mappings.py e importati sopra)
 
 def _get_nome_map(league_key):
     if league_key == "premier-league":
@@ -460,12 +352,12 @@ def _live_updater():
                         _fetch_player_stats(flk)
                         time.sleep(1)
                     except Exception:
-                        pass
+                        _logger.warning("Eccezione silenziata", exc_info=True)
                 # Mondiali 2026
                 try:
                     _fetch_worldcup_data()
                 except Exception:
-                    pass
+                    _logger.warning("Eccezione silenziata", exc_info=True)
             # Competizioni europee: aggiorna ogni ciclo se partite in corso, altrimenti ogni 3 cicli
             if _updater_count % 3 == 0 or any(LIVE_IN_CORSO_ML.get(k) for k in ["champions-league","europa-league","conference-league","bundesliga","ligue-1"]):
                 _fetch_league_data("premier-league")
@@ -476,7 +368,7 @@ def _live_updater():
                 _fetch_league_data("bundesliga")
                 _fetch_league_data("ligue-1")
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         if LIVE_IN_CORSO:
             time.sleep(120)
         else:
@@ -564,70 +456,70 @@ async def startup():
         try:
             _fetch_live_results()
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_classifica_live()
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_marcatori_live()
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_infortunati_live()
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         print("✅ PRIMO FETCH COMPLETATO")
         # Rose, storico stagione caricati dopo
         try:
             _fetch_risultati_stagione()
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_rose_live()
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_rose_live(PL_TEAM_IDS)
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_rose_live(BL_TEAM_IDS)
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_rose_live(L1_TEAM_IDS)
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         # Premier League + La Liga
         try:
             _fetch_league_data("premier-league")
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_league_data("la-liga")
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_league_data("champions-league")
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_league_data("europa-league")
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_league_data("conference-league")
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_league_data("bundesliga")
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
         try:
             _fetch_league_data("ligue-1")
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
     t = threading.Thread(target=_live_updater, daemon=True)
     t.start()
     threading.Thread(target=_delayed_start, daemon=True).start()
@@ -967,7 +859,7 @@ def genera_pronostico(home, away):
                     _fetch_league_data(league_key)
                     cl = CLASSIFICA_CACHE.get(league_key) or []
                 except Exception:
-                    pass
+                    _logger.warning("Eccezione silenziata", exc_info=True)
             data_h = next((r for r in cl if r["Squadra"] == h), None)
             data_a = next((r for r in cl if r["Squadra"] == a), None)
             if data_h and data_a:
@@ -1416,7 +1308,7 @@ def _notify_admin_new_user(email, piano):
                 msg = f"🆕 <b>Nuovo iscritto MatchIQ!</b>\n\n📧 {email}\n📋 Piano: {piano}\n⏰ {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')}"
                 _send_telegram_message(chat_id, msg)
     except Exception:
-        pass
+        _logger.warning("Eccezione silenziata", exc_info=True)
 
 # ─────────────────────────────
 # AUTH
@@ -1923,54 +1815,7 @@ WC_GIRONI_CACHE = {}   # {girone_letter: [{squadra, punti, gf, gs, diff, team_id
 WC_FIXTURES_CACHE = [] # Lista di tutte le partite WC
 WC_LAST_UPDATE = 0
 
-WC_NOME_MAP = {
-    "United States": "USA", "USA": "USA",
-    "England": "Inghilterra", "France": "Francia",
-    "Germany": "Germania", "Spain": "Spagna",
-    "Brazil": "Brasile", "Argentina": "Argentina",
-    "Netherlands": "Olanda", "Belgium": "Belgio",
-    "Portugal": "Portogallo", "Croatia": "Croazia",
-    "Switzerland": "Svizzera", "Sweden": "Svezia",
-    "South Korea": "Corea del Sud", "Japan": "Giappone",
-    "Mexico": "Messico", "Canada": "Canada",
-    "Australia": "Australia", "Morocco": "Marocco",
-    "Senegal": "Senegal", "Tunisia": "Tunisia",
-    "Ivory Coast": "Costa d'Avorio", "Ghana": "Ghana",
-    "Egypt": "Egitto", "Algeria": "Algeria",
-    "South Africa": "Sudafrica", "Cape Verde Islands": "Capo Verde",
-    "Congo DR": "Congo DR", "Cameroon": "Camerun",
-    "Saudi Arabia": "Arabia Saudita", "Qatar": "Qatar",
-    "Iran": "Iran", "Iraq": "Iraq",
-    "Jordan": "Giordania", "Uzbekistan": "Uzbekistan",
-    "New Zealand": "Nuova Zelanda", "Haiti": "Haiti",
-    "Panama": "Panama", "Paraguay": "Paraguay",
-    "Uruguay": "Uruguay", "Colombia": "Colombia",
-    "Ecuador": "Ecuador", "Bolivia": "Bolivia",
-    "Türkiye": "Turchia", "Austria": "Austria",
-    "Norway": "Norvegia", "Scotland": "Scozia",
-    "Czech Republic": "Rep. Ceca", "Curaçao": "Curacao",
-    "Bosnia & Herzegovina": "Bosnia",
-}
-
-WC_TEAM_IDS = {
-    "USA": 2384, "Messico": 16, "Canada": 1997,
-    "Brasile": 6, "Argentina": 26, "Uruguay": 27,
-    "Colombia": 1560, "Ecuador": 2285, "Paraguay": 28,
-    "Francia": 2, "Inghilterra": 10, "Germania": 25,
-    "Spagna": 9, "Portogallo": 27, "Olanda": 1118,
-    "Belgio": 1, "Croazia": 3, "Svizzera": 15,
-    "Svezia": 22, "Austria": 775, "Norvegia": 1090,
-    "Scozia": 1569, "Rep. Ceca": 770, "Turchia": 3589,
-    "Bosnia": 764, "Giappone": 2232, "Corea del Sud": 17,
-    "Australia": 20, "Arabia Saudita": 23, "Qatar": 1569,
-    "Iran": 22, "Iraq": 2378, "Giordania": 99,
-    "Uzbekistan": 2385, "Nuova Zelanda": 1530,
-    "Marocco": 31, "Senegal": 34, "Tunisia": 28,
-    "Costa d'Avorio": 2282, "Ghana": 867, "Egitto": 3568,
-    "Algeria": 1538, "Sudafrica": 1530, "Capo Verde": 1535,
-    "Congo DR": 2286, "Haiti": 2380, "Panama": 2381,
-    "Curacao": 2382,
-}
+# WC_NOME_MAP and WC_TEAM_IDS are defined in league_mappings.py and imported above.
 
 def _fetch_worldcup_data():
     """Fetch gironi e partite Mondiali 2026 da API Football."""
@@ -2120,41 +1965,8 @@ def _fetch_player_stats(league_key):
     print(f"\U0001f4ca Player stats {league_key}: {len(stats)} giocatori")
 
 
-# Team IDs per API Football
-_TEAM_IDS = {
-    "Inter":505,"Milan":489,"Napoli":492,"Como":895,"Juventus":496,
-    "Roma":497,"Atalanta":499,"Lazio":487,"Bologna":500,"Sassuolo":488,
-    "Udinese":494,"Parma":523,"Genoa":495,"Torino":503,"Cagliari":490,
-    "Fiorentina":502,"Cremonese":520,"Lecce":867,"Verona":504,"Pisa":801,
-}
-_RUOLO_MAP = {"Goalkeeper":"P","Defender":"D","Midfielder":"C","Attacker":"A"}
 
-# Tutti i team IDs delle squadre europee (UCL/UEL/UECL)
-_ALL_EURO_IDS = {
-    "Ajax":194,"Arsenal":42,"Atalanta":499,"Athletic Club":531,"Atletico Madrid":530,
-    "Barcelona":529,"Bayer Leverkusen":168,"Bayern Munchen":157,"Bayern München":157,
-    "Benfica":211,"Bodo/Glimt":327,"Borussia Dortmund":165,"Chelsea":49,
-    "Club Brugge KV":569,"Eintracht Frankfurt":169,"FC Copenhagen":400,"Galatasaray":645,
-    "Inter":505,"Juventus":496,"Liverpool":40,"Manchester City":50,"Marseille":81,
-    "Monaco":91,"Napoli":492,"Newcastle":34,"Olympiakos Piraeus":553,"PSV Eindhoven":197,
-    "Pafos":3403,"Paris Saint Germain":85,"Qarabag":556,"Real Madrid":541,
-    "Slavia Praha":560,"Sporting CP":228,"Tottenham":47,"Union St. Gilloise":1393,
-    "Villarreal":533,"AS Roma":497,"Aston Villa":66,"Bologna":500,"Brann":319,
-    "Celta Vigo":538,"Celtic":247,"Dinamo Zagreb":620,"FC Basel 1893":551,
-    "FC Midtjylland":397,"FC Porto":212,"FCSB":559,"FK Crvena Zvezda":598,
-    "Fenerbahce":611,"Fenerbahçe":611,"Ferencvarosi TC":651,"Feyenoord":209,
-    "GO Ahead Eagles":410,"Genk":742,"Lille":79,"Ludogorets":566,"Lyon":80,
-    "Maccabi Tel Aviv":604,"Malmo FF":375,"Nice":84,"Nottingham Forest":65,
-    "PAOK":619,"Panathinaikos":617,"Plzen":567,"Rangers":257,"Real Betis":543,
-    "Red Bull Salzburg":571,"SC Braga":217,"SC Freiburg":160,"Sturm Graz":637,
-    "Utrecht":207,"VfB Stuttgart":172,"BSC Young Boys":565,"Shakhtar Donetsk":550,
-    "AEK Athens FC":575,"AEK Larnaca":614,"AZ Alkmaar":201,"Aberdeen":252,
-    "BK Hacken":367,"Breidablik":276,"Celje":4360,"Crystal Palace":52,"Drita":14281,
-    "Dynamo Kyiv":572,"FC Noah":3684,"FSV Mainz 05":164,"Fiorentina":502,
-    "HNK Rijeka":561,"Jagiellonia":336,"KuPS":1165,"Lech Poznan":347,
-    "Legia Warszawa":339,"Omonia Nicosia":3402,"Rapid Vienna":781,"Rayo Vallecano":728,
-    "Shamrock Rovers":652,"Slovan Bratislava":656,"Sparta Praha":628,"Strasbourg":95,
-}
+# _TEAM_IDS, _RUOLO_MAP, _ALL_EURO_IDS are defined in league_mappings.py and imported above.
 
 def _fetch_rose_live(team_ids=None):
     """Scarica rose complete di tutte le squadre da API Football."""
@@ -2204,7 +2016,7 @@ def _fetch_rose_live(team_ids=None):
 
                 time.sleep(0.5)  # Rate limiting
             except Exception:
-                pass
+                _logger.warning("Eccezione silenziata", exc_info=True)
 
         if ROSE_LIVE:
             ROSE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
@@ -2421,7 +2233,7 @@ def _get_last_lineup(team_name):
                         _FORMAZIONE_CACHE[team_name] = result
                         return result
     except Exception:
-        pass
+        _logger.warning("Eccezione silenziata", exc_info=True)
     return None
 
 def _get_coach_ondemand(team_name):
@@ -2452,7 +2264,7 @@ def _get_coach_ondemand(team_name):
                 _COACH_CACHE[team_name] = name
                 return name
     except Exception:
-        pass
+        _logger.warning("Eccezione silenziata", exc_info=True)
     return None
 
 _ROSA_CACHE_OD = {}  # Cache rosa on-demand
@@ -2481,7 +2293,7 @@ def _get_squad_ondemand(team_name):
                 _ROSA_CACHE_OD[team_name] = rosa
                 return rosa
     except Exception:
-        pass
+        _logger.warning("Eccezione silenziata", exc_info=True)
     return []
 
 def _get_injuries_ondemand(team_name):
@@ -2515,7 +2327,7 @@ def _get_injuries_ondemand(team_name):
                 seen[name] = {"nome": name, "tipo": "squalifica" if "Suspended" in reason or "Red" in reason else "infortunio", "dettaglio": reason or ptype or "Indisponibile"}
             return [v for v in list(seen.values())[:6]]
     except Exception:
-        pass
+        _logger.warning("Eccezione silenziata", exc_info=True)
     return []
 
 
@@ -2559,7 +2371,7 @@ async def push_subscribe(data: dict, user: Optional[dict] = Depends(get_optional
         cur.close()
         conn.close()
     except Exception:
-        pass
+        _logger.warning("Eccezione silenziata", exc_info=True)
     return {"status": "ok"}
 
 def send_push_notification(title, body, url="/app#home"):
@@ -2584,7 +2396,7 @@ def send_push_notification(title, body, url="/app#home"):
                 webpush(sub, payload, vapid_private_key=priv_key, vapid_claims={"sub": VAPID_EMAIL})
                 sent += 1
             except Exception:
-                pass
+                _logger.warning("Eccezione silenziata", exc_info=True)
         print(f"📱 Push inviata a {sent}/{len(rows)} dispositivi")
     except Exception as e:
         print(f"⚠️ Push error: {e}")
@@ -3150,29 +2962,7 @@ LIVE_RESULTS_CACHE = None
 LIVE_RESULTS_TIME = ""
 LIVE_IN_CORSO = False  # True se ci sono partite in corso
 
-# Mapping nomi API Football -> nostri nomi
-FOOTBALL_NOME_MAP = {
-    "FC Internazionale Milano": "Inter", "Inter Milan": "Inter", "Inter": "Inter",
-    "AC Milan": "Milan", "Milan": "Milan",
-    "SSC Napoli": "Napoli", "Napoli": "Napoli",
-    "Como 1907": "Como", "Como": "Como",
-    "Juventus FC": "Juventus", "Juventus": "Juventus",
-    "AS Roma": "Roma", "Roma": "Roma",
-    "Atalanta BC": "Atalanta", "Atalanta": "Atalanta",
-    "SS Lazio": "Lazio", "Lazio": "Lazio",
-    "Bologna FC 1909": "Bologna", "Bologna": "Bologna",
-    "US Sassuolo Calcio": "Sassuolo", "Sassuolo": "Sassuolo",
-    "Udinese Calcio": "Udinese", "Udinese": "Udinese",
-    "Parma Calcio 1913": "Parma", "Parma": "Parma",
-    "Genoa CFC": "Genoa", "Genoa": "Genoa",
-    "Torino FC": "Torino", "Torino": "Torino",
-    "Cagliari Calcio": "Cagliari", "Cagliari": "Cagliari",
-    "ACF Fiorentina": "Fiorentina", "Fiorentina": "Fiorentina",
-    "US Cremonese": "Cremonese", "Cremonese": "Cremonese",
-    "US Lecce": "Lecce", "Lecce": "Lecce",
-    "Hellas Verona FC": "Verona", "Hellas Verona": "Verona", "Verona": "Verona",
-    "AC Pisa 1909": "Pisa", "Pisa": "Pisa",
-}
+# FOOTBALL_NOME_MAP is defined in league_mappings.py and imported above.
 
 def _fetch_live_results():
     """Scarica risultati live dalla API Football (ultimi 30 + oggi)."""
@@ -3614,7 +3404,7 @@ def _compute_best_stats(league_key):
                 "miglior_casa": {"squadra": best_wins[0], "vittorie": best_wins[1].get("vinte", 0)}
             }
         except Exception:
-            pass
+            _logger.warning("Eccezione silenziata", exc_info=True)
 
     # 2. Fallback: calcola dalla classifica (sempre disponibile)
     cl = CLASSIFICA_CACHE.get(league_key)
