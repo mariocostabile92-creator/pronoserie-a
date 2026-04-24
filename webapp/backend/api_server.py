@@ -131,6 +131,7 @@ from routes.schedina import router as schedina_router
 from routes.referral import router as referral_router
 from routes.tracking import router as tracking_router
 from routes.fantacalcio import router as fantacalcio_router
+from routes.config import router as config_router
 
 app.include_router(auth_router)
 app.include_router(pronostici_router)
@@ -140,6 +141,7 @@ app.include_router(schedina_router)
 app.include_router(referral_router)
 app.include_router(tracking_router)
 app.include_router(fantacalcio_router)
+app.include_router(config_router)
 
 # ─────────────────────────────
 # GLOBAL STATE (DataFrames CSV per ogni campionato)
