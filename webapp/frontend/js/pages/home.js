@@ -33,9 +33,9 @@ function pageHome(){
     </div>
     <h2 style="text-align:center;margin:24px 0 16px">I nostri numeri parlano chiaro</h2>
     <div class="grid3" style="margin-bottom:24px">
-      <div class="card" style="text-align:center;border-color:var(--green)"><div style="font-size:2.5rem;font-weight:800;color:var(--green)">36.659</div><p style="color:var(--muted)">Partite analizzate</p></div>
-      <div class="card" style="text-align:center;border-color:var(--accent)"><div style="font-size:2.5rem;font-weight:800;color:var(--accent)">9</div><p style="color:var(--muted)">Competizioni coperte</p><p style="color:var(--muted);font-size:.7rem;margin-top:4px">Serie A - Premier League - La Liga - Bundesliga - Ligue 1<br>Champions League - Europa League - Conference League<br>+ Mondiali 2026</p></div>
-      <div class="card" style="text-align:center;border-color:var(--yellow)"><div style="font-size:2.5rem;font-weight:800;color:var(--yellow)">8</div><p style="color:var(--muted)">Fonti dati combinate</p></div>
+      <div class="card" style="text-align:center;border-color:var(--green)"><div id="home-stat-partite" style="font-size:2.5rem;font-weight:800;color:var(--green)">36.659</div><p style="color:var(--muted)">Partite analizzate</p></div>
+      <div class="card" style="text-align:center;border-color:var(--accent)"><div id="home-stat-comp" style="font-size:2.5rem;font-weight:800;color:var(--accent)">9</div><p style="color:var(--muted)">Competizioni coperte</p><p style="color:var(--muted);font-size:.7rem;margin-top:4px">Serie A - Premier League - La Liga - Bundesliga - Ligue 1<br>Champions League - Europa League - Conference League<br>+ Mondiali 2026</p></div>
+      <div class="card" style="text-align:center;border-color:var(--yellow)"><div id="home-stat-fonti" style="font-size:2.5rem;font-weight:800;color:var(--yellow)">8</div><p style="color:var(--muted)">Fonti dati combinate</p></div>
     </div>
     <h2 style="text-align:center;margin:24px 0 12px">Le nostre 8 fonti dati</h2>
     <div class="grid3">
@@ -49,9 +49,9 @@ function pageHome(){
       <div class="card" style="text-align:center"><div style="font-size:2rem">&#128176;</div><strong>Quote Bookmaker Live</strong><p style="color:var(--muted);font-size:.8rem">Media di 10+ bookmaker europei in tempo reale</p></div>
     </div>
     <div class="grid3">
-      <div class="stat-box card"><div class="num">54.8%</div><div class="lbl">1X2 (299 partite)</div></div>
-      <div class="stat-box card"><div class="num">57.5%</div><div class="lbl">Goal/NoGoal</div></div>
-      <div class="stat-box card" style="border-color:var(--green)"><div class="num" style="color:var(--green)">67.3%</div><div class="lbl">Pronostici Confidenza ALTA</div></div>
+      <div class="stat-box card"><div id="home-stat-1x2" class="num">54.8%</div><div class="lbl">1X2 (299 partite)</div></div>
+      <div class="stat-box card"><div id="home-stat-gng" class="num">57.5%</div><div class="lbl">Goal/NoGoal</div></div>
+      <div class="stat-box card" style="border-color:var(--green)"><div id="home-stat-alta" class="num" style="color:var(--green)">67.3%</div><div class="lbl">Pronostici Confidenza ALTA</div></div>
     </div>
     <div class="card" style="margin-top:16px;padding:20px;text-align:center;background:#0d1b2a;border-color:var(--accent)">
       <p style="color:var(--text);font-size:1rem;line-height:1.6">Questi numeri non sono inventati: sono il risultato di un <strong>backtesting su 299 partite reali</strong> della stagione 2025-2026. Quando l'IA ha confidenza Alta, centra il risultato 1X2 <strong style="color:var(--green)">2 volte su 3</strong>.</p>
@@ -94,6 +94,26 @@ function pageHome(){
       <a href="#mondiali" class="btn btn-green" style="margin-top:12px;display:inline-block">Vedi Gironi e Calendario &#127942;</a>
     </div>
   </div>`;
+}
+
+// Aggiorna i numeri marketing della home con dati live dal backend (/api/stats/summary)
+async function _loadHomeStats(){
+  try {
+    const s = await fetchAPI("/api/stats/summary");
+    if(!s) return;
+    // Aggiorna stat cards se presenti nel DOM
+    const elPartite = document.getElementById("home-stat-partite");
+    const elComp    = document.getElementById("home-stat-comp");
+    const elFonti   = document.getElementById("home-stat-fonti");
+    const el1x2     = document.getElementById("home-stat-1x2");
+    const elGng     = document.getElementById("home-stat-gng");
+    const elAlta    = document.getElementById("home-stat-alta");
+    if(elPartite) elPartite.textContent = s.totale_partite ? s.totale_partite.toLocaleString("it-IT") : elPartite.textContent;
+    if(elComp)    elComp.textContent    = s.competizioni_coperte || elComp.textContent;
+    if(elFonti)   elFonti.textContent   = s.fonti_dati || elFonti.textContent;
+    if(el1x2)     el1x2.textContent     = s.accuratezza_1x2 ? s.accuratezza_1x2 + "%" : el1x2.textContent;
+    if(elAlta)    elAlta.textContent    = s.accuratezza_alta_confidenza ? s.accuratezza_alta_confidenza + "%" : elAlta.textContent;
+  } catch(e) { console.warn("_loadHomeStats:", e); }
 }
 
 // Carica partite di oggi nella home

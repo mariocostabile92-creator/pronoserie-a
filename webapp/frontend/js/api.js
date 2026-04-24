@@ -40,3 +40,22 @@ async function postAPI(ep, body) {
 }
 
 function $(id){return document.getElementById(id)}
+
+// Carica configurazione dinamica (team IDs, leghe) dal backend
+async function loadConfig(){
+  try {
+    const cfg = await fetchAPI("/api/config");
+    if(!cfg) return;
+    // Aggiorna le costanti globali con i dati del backend
+    if(cfg.serie_a_team_ids) Object.assign(TEAM_IDS, cfg.serie_a_team_ids);
+    if(cfg.leagues){
+      cfg.leagues.forEach(lg => {
+        if(lg.key === "premier-league" && lg.team_ids) Object.assign(TEAM_IDS_PL, lg.team_ids);
+        if(lg.key === "la-liga"        && lg.team_ids) Object.assign(TEAM_IDS_LL, lg.team_ids);
+        if(lg.key === "bundesliga"     && lg.team_ids) Object.assign(TEAM_IDS_BL, lg.team_ids);
+        if(lg.key === "ligue-1"        && lg.team_ids) Object.assign(TEAM_IDS_L1, lg.team_ids);
+        if(lg.key === "mondiali-2026"  && lg.team_ids) Object.assign(TEAM_IDS_WC, lg.team_ids);
+      });
+    }
+  } catch(e) { console.warn("loadConfig:", e); }
+}

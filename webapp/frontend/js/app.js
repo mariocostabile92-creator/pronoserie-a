@@ -127,6 +127,7 @@ async function navigate(){
     setTimeout(()=>loadSchedinaBL(),5000);
     setTimeout(()=>loadSchedinaL1(),6000);
     setTimeout(()=>{fetchAPI("/api/classifica")},5000);
+    setTimeout(()=>_loadHomeStats(),800);
   }
   updateNavAuth();
 }
@@ -209,6 +210,7 @@ if(_refParam) localStorage.setItem("ref_code", _refParam);
 
 navigate();
 checkPaidReturn();
+loadConfig();
 
 // PWA Service Worker + Push Notifications
 if('serviceWorker' in navigator){
