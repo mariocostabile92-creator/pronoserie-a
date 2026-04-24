@@ -1,7 +1,11 @@
 """
-api_server.py - VERSIONE FINALE STABILE
-Compatibile con frontend PronoSerie A
-Fix calendario + fallback + debug + Railway ready
+api_server.py - Entry point MatchIQ (versione modulare)
+Contiene: app FastAPI, CORS, middleware, import router, startup event.
+Tutto il codice heavy e' stato estratto in moduli dedicati:
+  - live_service.py   : live updater, fetch API Football, cache globali
+  - telegram_service.py: notifiche gol, bot Telegram
+  - scraping_service.py: notizie RSS, quote bookmaker, formazioni live
+  - startup.py        : bootstrap, delayed start, caricamento dataset
 """
 
 import sys
@@ -14,8 +18,13 @@ _logger = logging.getLogger(__name__)
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, _ROOT)
 
+import threading
+import time
+import urllib.request
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException
+from datetime import datetime, timezone
+
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 
@@ -41,33 +50,38 @@ from api_auth import get_optional_user, hash_password, verify_password, create_t
 from api_payments import router as payments_router
 
 # ─────────────────────────────
-# RATE LIMITING (slowapi)
+# IMPORT MODULI SERVICE
 # ─────────────────────────────
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-from fastapi import Request
-
-limiter = Limiter(key_func=get_remote_address)
-
-# ─────────────────────────────
-# APP
-# ─────────────────────────────
-app = FastAPI(title="MatchIQ API", version="2.0")
-
-# Registra il limiter e l'exception handler per il rate limiting
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://matchiq.it.com"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+from live_service import (
+    # Variabili globali (cache live)
+    LIVE_RESULTS_CACHE, LIVE_RESULTS_TIME, LIVE_IN_CORSO,
+    CLASSIFICA_CACHE, CLASSIFICA_LAST_UPDATE,
+    MARCATORI_CACHE, LIVE_RESULTS_CACHE_ML,
+    RISULTATI_STAGIONE_CACHE_ML, LIVE_IN_CORSO_ML,
+    RISULTATI_STAGIONE_CACHE, RISULTATI_STAGIONE_TIME,
+    ROSE_LIVE, ALLENATORI_LIVE, INFORTUNATI_LIVE, ROSE_LAST_UPDATE,
+    PLAYER_STATS_CACHE, PLAYER_STATS_LAST, FANTACALCIO_LEAGUES,
+    MATCHDAY_CACHE, TEAM_STATS_CACHE,
+    WC_GIRONI_CACHE, WC_FIXTURES_CACHE, WC_LAST_UPDATE,
+    # Config
+    LEAGUES, FOOTBALL_API_KEY, FOOTBALL_API_HOST,
+    # Funzioni helper
+    _utc_to_rome, _get_nome_map,
+    # Funzioni fetch
+    _fetch_live_results, _fetch_classifica_live, _fetch_marcatori_live,
+    _fetch_infortunati_live, _fetch_rose_live, _fetch_risultati_stagione,
+    _fetch_player_stats, _fetch_worldcup_data, _fetch_league_data,
+    _fetch_team_stats_league, _compute_best_stats,
+    start_live_updater,
 )
 
-app.include_router(payments_router)
+from scraping_service import (
+    NOTIZIE_CACHE, NOTIZIE_LAST_UPDATE,
+    ODDS_CACHE, ODDS_LAST_UPDATE,
+    LIVE_FORMAZIONI, LIVE_INFORTUNATI, LIVE_LAST_UPDATE,
+    _scrape_notizie, _scrape_odds, _scrape_live_data,
+    get_bookmaker_odds,
+)
 
 from league_mappings import (
     PL_NOME_MAP, PL_TEAM_IDS,
@@ -80,495 +94,31 @@ from league_mappings import (
 )
 
 # ─────────────────────────────
-# GLOBAL + MULTI-LEAGUE CONFIG
+# RATE LIMITING (slowapi)
 # ─────────────────────────────
-_df = None
-_df_pl = None
-_df_ll = None
-_df_ucl = None
-_df_uel = None
-_df_uecl = None
-_df_bl = None
-_df_l1 = None
-_df_wc = None    # World Cup
-LIMITE_FREE = 2
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
-LEAGUES = {
-    "serie-a": {"id": 135, "season": 2025, "name": "Serie A", "country": "Italy"},
-    "premier-league": {"id": 39, "season": 2025, "name": "Premier League", "country": "England"},
-    "la-liga": {"id": 140, "season": 2025, "name": "La Liga", "country": "Spain"},
-    "champions-league": {"id": 2, "season": 2025, "name": "Champions League", "country": "Europe"},
-    "europa-league": {"id": 3, "season": 2025, "name": "Europa League", "country": "Europe"},
-    "conference-league": {"id": 848, "season": 2025, "name": "Conference League", "country": "Europe"},
-    "bundesliga": {"id": 78, "season": 2025, "name": "Bundesliga", "country": "Germany"},
-    "ligue-1": {"id": 61, "season": 2025, "name": "Ligue 1", "country": "France"},
-    "mondiali-2026": {"id": 1, "season": 2026, "name": "FIFA World Cup 2026", "country": "World", "type": "tournament"},
-}
-
-# Mapping nomi API Football -> nomi nostri (per ogni league)
-# (Definiti in league_mappings.py e importati sopra)
-
-def _get_nome_map(league_key):
-    if league_key == "premier-league":
-        return PL_NOME_MAP
-    if league_key == "la-liga":
-        return LL_NOME_MAP
-    if league_key == "bundesliga":
-        return BL_NOME_MAP
-    if league_key == "ligue-1":
-        return L1_NOME_MAP
-    if league_key == "mondiali-2026":
-        return WC_NOME_MAP
-    return FOOTBALL_NOME_MAP
-
-def _get_team_ids(league_key):
-    if league_key == "premier-league":
-        return PL_TEAM_IDS
-    if league_key == "la-liga":
-        return LL_TEAM_IDS
-    if league_key == "bundesliga":
-        return BL_TEAM_IDS
-    if league_key == "ligue-1":
-        return L1_TEAM_IDS
-    return _TEAM_IDS
-
-def _map_team_name(name, league_key):
-    nm = _get_nome_map(league_key)
-    return nm.get(name, name)
-
-# Cache multi-league
-CLASSIFICA_CACHE = {"serie-a": None, "premier-league": None, "la-liga": None, "champions-league": None, "europa-league": None, "conference-league": None, "bundesliga": None, "ligue-1": None}
-CLASSIFICA_LAST_UPDATE = {"serie-a": "", "premier-league": "", "la-liga": "", "champions-league": "", "europa-league": "", "conference-league": "", "bundesliga": "", "ligue-1": ""}
-MARCATORI_CACHE = {"serie-a": None, "premier-league": None, "la-liga": None, "champions-league": None, "europa-league": None, "conference-league": None, "bundesliga": None, "ligue-1": None}
-LIVE_RESULTS_CACHE_ML = {"serie-a": None, "premier-league": None, "la-liga": None, "champions-league": None, "europa-league": None, "conference-league": None, "bundesliga": None, "ligue-1": None}
-RISULTATI_STAGIONE_CACHE_ML = {"serie-a": None, "premier-league": None, "la-liga": None, "champions-league": None, "europa-league": None, "conference-league": None, "bundesliga": None, "ligue-1": None}
-LIVE_IN_CORSO_ML = {"serie-a": False, "premier-league": False, "la-liga": False, "champions-league": False, "europa-league": False, "conference-league": False, "bundesliga": False, "ligue-1": False}
-
-# Dati live (aggiornati automaticamente)
-import threading, time, urllib.request, re as regex_module
-from datetime import datetime, timezone, timedelta
-LIVE_FORMAZIONI = {}
-LIVE_INFORTUNATI = {}
-LIVE_LAST_UPDATE = ""
-
-def _utc_to_rome(utc_str):
-    """Converte orario UTC dall'API in ora italiana (CET/CEST) usando zoneinfo."""
-    try:
-        if not utc_str or len(utc_str) < 16:
-            return ""
-        from datetime import datetime
-        from zoneinfo import ZoneInfo
-        # Parse l'orario UTC
-        orario_utc = datetime.fromisoformat(utc_str.replace('Z', '+00:00'))
-        # Converti a timezone Europe/Rome (gestisce automaticamente CET/CEST)
-        ora_locale = orario_utc.astimezone(ZoneInfo("Europe/Rome"))
-        return ora_locale.strftime("%H:%M")
-    except Exception:
-        return utc_str[11:16] if len(utc_str) > 15 else ""
-
-def _scrape_live_data():
-    """Scarica formazioni e infortunati aggiornati dal web."""
-    global LIVE_FORMAZIONI, LIVE_INFORTUNATI, LIVE_LAST_UPDATE
-    try:
-        # Fonte: fantacalcio.it probabili formazioni
-        req = urllib.request.Request(
-            "https://www.fantacalcio.it/probabili-formazioni-serie-a",
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            html = r.read().decode("utf-8", errors="replace")
-
-        if len(html) > 1000:
-            LIVE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
-            print(f"🔄 Dati live scaricati: {len(html)} bytes ({LIVE_LAST_UPDATE})")
-    except Exception as e:
-        print(f"⚠️ Scrape formazioni fallito: {e}")
-
-    try:
-        # Fonte: fantacalciopedia infortunati
-        req = urllib.request.Request(
-            "https://www.fantacalciopedia.com/articoli-fcp/consigli-fantacalcio/75-lista-infortunati-serie-a-aggiornata.html",
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            html = r.read().decode("utf-8", errors="replace")
-
-        if len(html) > 1000:
-            print(f"🔄 Infortunati scaricati: {len(html)} bytes")
-    except Exception as e:
-        print(f"⚠️ Scrape infortunati fallito: {e}")
+limiter = Limiter(key_func=get_remote_address)
 
 # ─────────────────────────────
-# NOTIFICHE GOL TELEGRAM (per utenti Pro)
+# APP
 # ─────────────────────────────
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-_NOTIFIED_GOALS = set()  # Set di gol gia' notificati: "fixture_id_minuto_giocatore"
-_BOT_DB_PATH = os.path.join(_ROOT, "bot_utenti.db")
+app = FastAPI(title="MatchIQ API", version="2.0")
 
-def _get_pro_chat_ids():
-    """Recupera tutti gli chat_id degli utenti Pro dal database del bot."""
-    import sqlite3
-    try:
-        if not os.path.exists(_BOT_DB_PATH):
-            return []
-        conn = sqlite3.connect(_BOT_DB_PATH)
-        rows = conn.execute("SELECT chat_id FROM utenti WHERE piano = 'pro'").fetchall()
-        conn.close()
-        return [r[0] for r in rows]
-    except Exception:
-        return []
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-def _send_telegram_message(chat_id, text):
-    """Invia un messaggio Telegram a un chat_id."""
-    try:
-        import urllib.parse
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        data = urllib.parse.urlencode({
-            "chat_id": chat_id,
-            "text": text,
-            "parse_mode": "HTML",
-            "disable_notification": False,
-        }).encode()
-        req = urllib.request.Request(url, data=data)
-        urllib.request.urlopen(req, timeout=10)
-    except Exception as e:
-        print(f"Errore invio Telegram a {chat_id}: {e}")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://matchiq.it.com"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-def _check_and_notify_goals():
-    """Controlla se ci sono nuovi gol e invia notifiche agli utenti Pro."""
-    global _NOTIFIED_GOALS
-    if not LIVE_RESULTS_CACHE or not LIVE_IN_CORSO:
-        return
-
-    pro_ids = _get_pro_chat_ids()
-    if not pro_ids:
-        return
-
-    for p in LIVE_RESULTS_CACHE:
-        if not p.get("live"):
-            continue
-
-        fixture_id = p.get("fixture_id", 0)
-        home = p["home"]
-        away = p["away"]
-        marcatori_home = p.get("marcatori_home", [])
-        marcatori_away = p.get("marcatori_away", [])
-        rossi_home = p.get("rossi_home", [])
-        rossi_away = p.get("rossi_away", [])
-        gol_h = p["gol_h"]
-        gol_a = p["gol_a"]
-        minuto = p.get("minuto", "")
-
-        # Controlla gol casa
-        for m in marcatori_home:
-            goal_key = f"{fixture_id}_{m}"
-            if goal_key not in _NOTIFIED_GOALS:
-                _NOTIFIED_GOALS.add(goal_key)
-                msg = (
-                    f"&#9917; <b>GOOOL!</b>\n\n"
-                    f"<b>{home} {gol_h} - {gol_a} {away}</b>\n"
-                    f"&#9917; {m} ({home})\n"
-                    f"&#9201; {minuto}'"
-                )
-                for cid in pro_ids:
-                    threading.Thread(target=_send_telegram_message, args=(cid, msg), daemon=True).start()
-                print(f"&#9917; NOTIFICA GOL: {home} - {m}")
-
-        # Controlla gol ospite
-        for m in marcatori_away:
-            goal_key = f"{fixture_id}_{m}"
-            if goal_key not in _NOTIFIED_GOALS:
-                _NOTIFIED_GOALS.add(goal_key)
-                msg = (
-                    f"&#9917; <b>GOOOL!</b>\n\n"
-                    f"<b>{home} {gol_h} - {gol_a} {away}</b>\n"
-                    f"&#9917; {m} ({away})\n"
-                    f"&#9201; {minuto}'"
-                )
-                for cid in pro_ids:
-                    threading.Thread(target=_send_telegram_message, args=(cid, msg), daemon=True).start()
-                print(f"&#9917; NOTIFICA GOL: {away} - {m}")
-
-        # Controlla cartellini rossi
-        for r in rossi_home:
-            red_key = f"{fixture_id}_red_{r}"
-            if red_key not in _NOTIFIED_GOALS:
-                _NOTIFIED_GOALS.add(red_key)
-                msg = (
-                    f"&#128308; <b>ESPULSIONE!</b>\n\n"
-                    f"<b>{home} {gol_h} - {gol_a} {away}</b>\n"
-                    f"&#128308; {r} ({home})\n"
-                    f"&#9201; {minuto}'"
-                )
-                for cid in pro_ids:
-                    threading.Thread(target=_send_telegram_message, args=(cid, msg), daemon=True).start()
-
-        for r in rossi_away:
-            red_key = f"{fixture_id}_red_{r}"
-            if red_key not in _NOTIFIED_GOALS:
-                _NOTIFIED_GOALS.add(red_key)
-                msg = (
-                    f"&#128308; <b>ESPULSIONE!</b>\n\n"
-                    f"<b>{home} {gol_h} - {gol_a} {away}</b>\n"
-                    f"&#128308; {r} ({away})\n"
-                    f"&#9201; {minuto}'"
-                )
-                for cid in pro_ids:
-                    threading.Thread(target=_send_telegram_message, args=(cid, msg), daemon=True).start()
-
-    # Pulisci gol vecchi (partite non piu' live)
-    live_fixture_ids = {str(p.get("fixture_id", 0)) for p in LIVE_RESULTS_CACHE if p.get("live")}
-    _NOTIFIED_GOALS = {g for g in _NOTIFIED_GOALS if any(g.startswith(fid) for fid in live_fixture_ids)} if live_fixture_ids else set()
-
-_updater_count = 0
-
-def _live_updater():
-    """Thread che aggiorna i dati. 2 min durante partite live, 30 min altrimenti."""
-    global _updater_count
-    while True:
-        _updater_count += 1
-        try:
-            _scrape_live_data()
-            _scrape_notizie()
-            _scrape_odds()
-            _fetch_live_results()
-            _check_and_notify_goals()
-            _fetch_classifica_live()
-            _fetch_marcatori_live()
-            _fetch_infortunati_live()
-            # Verifica predizioni con risultati reali
-            if LIVE_RESULTS_CACHE:
-                verify_predictions(LIVE_RESULTS_CACHE)
-            # Rose e storico ogni 6 cicli (~3 ore)
-            if _updater_count % 6 == 0:
-                _fetch_rose_live()
-                _fetch_rose_live(PL_TEAM_IDS)
-                _fetch_rose_live(BL_TEAM_IDS)
-                _fetch_rose_live(L1_TEAM_IDS)
-                _fetch_risultati_stagione()
-                # Statistiche giocatori fantacalcio
-                for flk in FANTACALCIO_LEAGUES:
-                    try:
-                        _fetch_player_stats(flk)
-                        time.sleep(1)
-                    except Exception:
-                        _logger.warning("Eccezione silenziata", exc_info=True)
-                # Mondiali 2026
-                try:
-                    _fetch_worldcup_data()
-                except Exception:
-                    _logger.warning("Eccezione silenziata", exc_info=True)
-            # Competizioni europee: aggiorna ogni ciclo se partite in corso, altrimenti ogni 3 cicli
-            if _updater_count % 3 == 0 or any(LIVE_IN_CORSO_ML.get(k) for k in ["champions-league","europa-league","conference-league","bundesliga","ligue-1"]):
-                _fetch_league_data("premier-league")
-                _fetch_league_data("la-liga")
-                _fetch_league_data("champions-league")
-                _fetch_league_data("europa-league")
-                _fetch_league_data("conference-league")
-                _fetch_league_data("bundesliga")
-                _fetch_league_data("ligue-1")
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        if LIVE_IN_CORSO:
-            time.sleep(120)
-        else:
-            time.sleep(1800)
-
-# ─────────────────────────────
-# STARTUP
-# ─────────────────────────────
-@app.on_event("startup")
-async def startup():
-    global _df, _df_pl, _df_ll, _df_ucl, _df_uel, _df_uecl, _df_bl, _df_l1
-
-    print("\n🚀 AVVIO SERVER MATCHIQ\n")
-
-    # DB
-    try:
-        init_db()
-        print("✅ DATABASE OK")
-    except Exception as e:
-        print("⚠️ DATABASE:", e)
-
-    # DATI CSV (opzionali - il server funziona anche senza)
-    if MOTORE_DISPONIBILE:
-        try:
-            _df = load_all_data()
-            print(f"✅ DATI SERIE A: {len(_df)} partite")
-        except Exception as e:
-            print(f"⚠️ DATI SERIE A NON DISPONIBILI: {e}")
-            _df = None
-        # Carica anche Premier League
-        try:
-            _df_pl = load_all_data(league="E0")
-            print(f"✅ DATI PREMIER LEAGUE: {len(_df_pl)} partite")
-        except Exception as e:
-            print(f"⚠️ DATI PL NON DISPONIBILI: {e}")
-            _df_pl = None
-        # Carica La Liga
-        try:
-            _df_ll = load_all_data(league="SP1")
-            print(f"✅ DATI LA LIGA: {len(_df_ll)} partite")
-        except Exception as e:
-            print(f"⚠️ DATI LA LIGA NON DISPONIBILI: {e}")
-            _df_ll = None
-        # Carica Champions League
-        try:
-            _df_ucl = load_all_data(league="UCL")
-            print(f"✅ DATI CHAMPIONS LEAGUE: {len(_df_ucl)} partite")
-        except Exception as e:
-            print(f"⚠️ DATI UCL NON DISPONIBILI: {e}")
-            _df_ucl = None
-        # Carica Europa League
-        try:
-            _df_uel = load_all_data(league="UEL")
-            print(f"✅ DATI EUROPA LEAGUE: {len(_df_uel)} partite")
-        except Exception as e:
-            print(f"⚠️ DATI UEL NON DISPONIBILI: {e}")
-            _df_uel = None
-        # Carica Conference League
-        try:
-            _df_uecl = load_all_data(league="UECL")
-            print(f"✅ DATI CONFERENCE LEAGUE: {len(_df_uecl)} partite")
-        except Exception as e:
-            print(f"⚠️ DATI UECL NON DISPONIBILI: {e}")
-            _df_uecl = None
-        # Carica Bundesliga
-        try:
-            _df_bl = load_all_data(league="D1")
-            print(f"✅ DATI BUNDESLIGA: {len(_df_bl)} partite")
-        except Exception as e:
-            print(f"⚠️ DATI BL NON DISPONIBILI: {e}")
-            _df_bl = None
-        # Carica Ligue 1
-        try:
-            _df_l1 = load_all_data(league="F1")
-            print(f"✅ DATI LIGUE 1: {len(_df_l1)} partite")
-        except Exception as e:
-            print(f"⚠️ DATI LIGUE 1 NON DISPONIBILI: {e}")
-            _df_l1 = None
-    else:
-        print("⚠️ MOTORE NON DISPONIBILE - il server usa dati hardcoded")
-
-    # AVVIA AGGIORNAMENTO LIVE (ritardato per non sovraccaricare lo startup)
-    def _delayed_start():
-        time.sleep(15)
-        try:
-            _fetch_live_results()
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_classifica_live()
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_marcatori_live()
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_infortunati_live()
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        print("✅ PRIMO FETCH COMPLETATO")
-        # Rose, storico stagione caricati dopo
-        try:
-            _fetch_risultati_stagione()
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_rose_live()
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_rose_live(PL_TEAM_IDS)
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_rose_live(BL_TEAM_IDS)
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_rose_live(L1_TEAM_IDS)
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        # Premier League + La Liga
-        try:
-            _fetch_league_data("premier-league")
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_league_data("la-liga")
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_league_data("champions-league")
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_league_data("europa-league")
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_league_data("conference-league")
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_league_data("bundesliga")
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-        try:
-            _fetch_league_data("ligue-1")
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-    t = threading.Thread(target=_live_updater, daemon=True)
-    t.start()
-    threading.Thread(target=_delayed_start, daemon=True).start()
-    print("✅ SERVER PRONTO\n")
-
-    # Avvia Bot Telegram in background
-    def _start_telegram_bot():
-        try:
-            import asyncio
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-            # Import bot components
-            sys.path.insert(0, _ROOT)
-            from telegram import Update
-            from telegram.ext import Application, CommandHandler, CallbackQueryHandler
-            from telegram_bot import (
-                cmd_start, cmd_help, cmd_pronostico, cmd_giornata,
-                cmd_classifica, cmd_pro, callback_handler, init_bot_db,
-                invio_giornaliero
-            )
-            from telegram_bot import DF as _bot_df
-            import telegram_bot
-
-            # Init DB bot
-            init_bot_db()
-
-            # Passa i dati al bot
-            if _df is not None:
-                telegram_bot.DF = _df
-            elif _df_pl is not None:
-                telegram_bot.DF = _df_pl
-
-            # Crea app bot
-            bot_app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
-            bot_app.add_handler(CommandHandler("start", cmd_start))
-            bot_app.add_handler(CommandHandler("help", cmd_help))
-            bot_app.add_handler(CommandHandler("pronostico", cmd_pronostico))
-            bot_app.add_handler(CommandHandler("giornata", cmd_giornata))
-            bot_app.add_handler(CommandHandler("classifica", cmd_classifica))
-            bot_app.add_handler(CommandHandler("pro", cmd_pro))
-            bot_app.add_handler(CallbackQueryHandler(callback_handler))
-
-            print("🤖 BOT TELEGRAM ATTIVO!")
-            bot_app.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
-        except Exception as e:
-            print(f"⚠️ Bot Telegram non avviato: {e}")
-
-    threading.Thread(target=_start_telegram_bot, daemon=True).start()
+app.include_router(payments_router)
 
 # ─────────────────────────────
 # IMPORT E REGISTRAZIONE ROUTER MODULARI
@@ -592,624 +142,44 @@ app.include_router(tracking_router)
 app.include_router(fantacalcio_router)
 
 # ─────────────────────────────
-# FRONTEND
+# GLOBAL STATE (DataFrames CSV per ogni campionato)
 # ─────────────────────────────
-FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
-
-@app.get("/", include_in_schema=False)
-async def root():
-    return RedirectResponse("/app")
-
-@app.get("/logo.png", include_in_schema=False)
-async def serve_logo():
-    return FileResponse(os.path.join(FRONTEND_DIR, "logo.png"), media_type="image/png")
-
-@app.get("/manifest.json", include_in_schema=False)
-async def serve_manifest():
-    return FileResponse(os.path.join(FRONTEND_DIR, "manifest.json"), media_type="application/json")
-
-@app.get("/sw.js", include_in_schema=False)
-async def serve_sw():
-    return FileResponse(os.path.join(FRONTEND_DIR, "sw.js"), media_type="application/javascript")
-
-@app.get("/app", include_in_schema=False)
-@app.get("/app/{path:path}", include_in_schema=False)
-async def serve_app(path: str = ""):
-    from fastapi.responses import HTMLResponse
-    with open(os.path.join(FRONTEND_DIR, "index.html"), "r", encoding="utf-8") as f:
-        content = f.read()
-    return HTMLResponse(content, headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"})
+_df = None
+_df_pl = None
+_df_ll = None
+_df_ucl = None
+_df_uel = None
+_df_uecl = None
+_df_bl = None
+_df_l1 = None
+_df_wc = None
+LIMITE_FREE = 2
 
 # ─────────────────────────────
-# UTILS
+# HELPERS
 # ─────────────────────────────
+def _get_team_ids(league_key):
+    if league_key == "premier-league":
+        return PL_TEAM_IDS
+    if league_key == "la-liga":
+        return LL_TEAM_IDS
+    if league_key == "bundesliga":
+        return BL_TEAM_IDS
+    if league_key == "ligue-1":
+        return L1_TEAM_IDS
+    return _TEAM_IDS
+
+def _map_team_name(name, league_key):
+    nm = _get_nome_map(league_key)
+    return nm.get(name, name)
+
 def check_limit(user):
     if not user or user.get("piano") == "pro":
         return
-
     calls = count_daily_calls(user["id"])
-
     if calls >= LIMITE_FREE:
         raise HTTPException(429, "Limite giornaliero raggiunto")
-
     log_api_call(user["id"], "pronostico")
-
-# ─────────────────────────────
-# QUOTE BOOKMAKER LIVE (the-odds-api.com)
-# ─────────────────────────────
-ODDS_API_KEY = os.environ.get("ODDS_API_KEY", "")
-ODDS_CACHE = {}  # {"Inter_vs_Roma": {"prob_1": 55, "prob_x": 25, "prob_2": 20}, ...}
-ODDS_LAST_UPDATE = ""
-
-def _scrape_odds():
-    """Scarica quote live Serie A dai bookmaker."""
-    global ODDS_CACHE, ODDS_LAST_UPDATE
-    try:
-        url = f"https://api.the-odds-api.com/v4/sports/soccer_italy_serie_a/odds/?apiKey={ODDS_API_KEY}&regions=eu&markets=h2h,totals&oddsFormat=decimal"
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        # Mappa nomi squadre API -> nostri nomi
-        NOME_MAP = {
-            "FC Internazionale Milano": "Inter", "Inter Milan": "Inter", "Inter": "Inter",
-            "AC Milan": "Milan", "Milan": "Milan",
-            "SSC Napoli": "Napoli", "Napoli": "Napoli",
-            "Como 1907": "Como", "Como": "Como",
-            "Juventus FC": "Juventus", "Juventus": "Juventus",
-            "AS Roma": "Roma", "Roma": "Roma",
-            "Atalanta BC": "Atalanta", "Atalanta": "Atalanta",
-            "SS Lazio": "Lazio", "Lazio": "Lazio",
-            "Bologna FC 1909": "Bologna", "Bologna": "Bologna",
-            "US Sassuolo": "Sassuolo", "Sassuolo": "Sassuolo",
-            "Udinese Calcio": "Udinese", "Udinese": "Udinese",
-            "Parma Calcio 1913": "Parma", "Parma": "Parma",
-            "Genoa CFC": "Genoa", "Genoa": "Genoa",
-            "Torino FC": "Torino", "Torino": "Torino",
-            "Cagliari Calcio": "Cagliari", "Cagliari": "Cagliari",
-            "ACF Fiorentina": "Fiorentina", "Fiorentina": "Fiorentina",
-            "US Cremonese": "Cremonese", "Cremonese": "Cremonese",
-            "US Lecce": "Lecce", "Lecce": "Lecce",
-            "Hellas Verona FC": "Verona", "Verona": "Verona",
-            "AC Pisa 1909": "Pisa", "Pisa": "Pisa",
-        }
-
-        new_cache = {}
-        for match in data:
-            home_api = match.get("home_team", "")
-            away_api = match.get("away_team", "")
-            home = NOME_MAP.get(home_api, home_api)
-            away = NOME_MAP.get(away_api, away_api)
-
-            # Prendi le quote medie di tutti i bookmaker
-            quotes_1 = []
-            quotes_x = []
-            quotes_2 = []
-            quotes_over = []
-            quotes_under = []
-            for bk in match.get("bookmakers", []):
-                for market in bk.get("markets", []):
-                    if market.get("key") == "h2h":
-                        for outcome in market.get("outcomes", []):
-                            nome_out = NOME_MAP.get(outcome["name"], outcome["name"])
-                            if nome_out == home:
-                                quotes_1.append(outcome["price"])
-                            elif nome_out == away:
-                                quotes_2.append(outcome["price"])
-                            elif outcome["name"] == "Draw":
-                                quotes_x.append(outcome["price"])
-                    elif market.get("key") == "totals":
-                        for outcome in market.get("outcomes", []):
-                            if outcome.get("name") == "Over" and outcome.get("point", 0) == 2.5:
-                                quotes_over.append(outcome["price"])
-                            elif outcome.get("name") == "Under" and outcome.get("point", 0) == 2.5:
-                                quotes_under.append(outcome["price"])
-
-            if quotes_1 and quotes_x and quotes_2:
-                avg_1 = sum(quotes_1) / len(quotes_1)
-                avg_x = sum(quotes_x) / len(quotes_x)
-                avg_2 = sum(quotes_2) / len(quotes_2)
-                p1 = 1 / avg_1
-                px = 1 / avg_x
-                p2 = 1 / avg_2
-                tot = p1 + px + p2
-                key = f"{home}_vs_{away}"
-                entry = {
-                    "prob_1": round(p1 / tot * 100, 1),
-                    "prob_x": round(px / tot * 100, 1),
-                    "prob_2": round(p2 / tot * 100, 1),
-                    "quota_1": round(avg_1, 2),
-                    "quota_x": round(avg_x, 2),
-                    "quota_2": round(avg_2, 2),
-                    "n_bookmakers": len(quotes_1),
-                }
-                # Over/Under bookmaker
-                if quotes_over and quotes_under:
-                    avg_ov = sum(quotes_over) / len(quotes_over)
-                    avg_un = sum(quotes_under) / len(quotes_under)
-                    p_ov = 1 / avg_ov
-                    p_un = 1 / avg_un
-                    tot_ou = p_ov + p_un
-                    entry["bk_over_25"] = round(p_ov / tot_ou * 100, 1)
-                    entry["bk_under_25"] = round(p_un / tot_ou * 100, 1)
-                new_cache[key] = entry
-
-        if new_cache:
-            ODDS_CACHE = new_cache
-            ODDS_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
-            print(f"📊 Quote bookmaker: {len(ODDS_CACHE)} partite da {len(data)} match")
-    except Exception as e:
-        print(f"⚠️ Scrape quote fallito: {e}")
-
-def get_bookmaker_odds(home, away):
-    """Ritorna le probabilita' bookmaker per una partita."""
-    key = f"{home}_vs_{away}"
-    return ODDS_CACHE.get(key)
-
-def _filtra_marcatori(marcatori, infortunati):
-    """Rimuove i giocatori infortunati dalla lista marcatori."""
-    if not infortunati:
-        return marcatori
-    nomi_inj = set()
-    for inj in infortunati:
-        nome = inj.get("nome", "").lower()
-        # Aggiungi cognome
-        parts = nome.split()
-        for p in parts:
-            if len(p) > 3:
-                nomi_inj.add(p)
-    filtrati = []
-    for m in marcatori:
-        m_lower = m.lower()
-        escluso = False
-        for ni in nomi_inj:
-            if ni in m_lower:
-                escluso = True
-                break
-        if not escluso:
-            filtrati.append(m)
-    return filtrati
-
-def _filtra_esatti(scores, ov25, suggerimento="1"):
-    """Filtra risultati esatti coerenti con 1X2 e Over/Under, mantenendo ordine per probabilita'."""
-    def get_segno(score):
-        parts = score.split("-")
-        h, a = int(parts[0]), int(parts[1])
-        if h > a: return "1"
-        elif h == a: return "X"
-        else: return "2"
-
-    def get_totale(score):
-        parts = score.split("-")
-        return int(parts[0]) + int(parts[1])
-
-    # Filtra per coerenza con il suggerimento 1X2
-    coerenti = [s for s in scores if get_segno(s["score"]) == suggerimento]
-    altri = [s for s in scores if get_segno(s["score"]) != suggerimento]
-
-    # Filtra per coerenza Over/Under (senza cambiare l'ordine di probabilita')
-    if ov25 > 0.50:
-        # Over: prendi solo risultati con 3+ gol totali, ordinati per probabilita'
-        coerenti_ou = [s for s in coerenti if get_totale(s["score"]) >= 3]
-        # Se non ci sono abbastanza, aggiungi anche quelli con 2 gol
-        if len(coerenti_ou) < 3:
-            coerenti_ou += [s for s in coerenti if get_totale(s["score"]) == 2]
-    else:
-        # Under: prendi solo risultati con max 2 gol totali, ordinati per probabilita'
-        coerenti_ou = [s for s in coerenti if get_totale(s["score"]) <= 2]
-        if len(coerenti_ou) < 3:
-            coerenti_ou += [s for s in coerenti if get_totale(s["score"]) == 3]
-
-    # Escludi risultati irrealistici (max 4 gol per squadra)
-    coerenti_ou = [s for s in coerenti_ou if all(int(x) <= 4 for x in s["score"].split("-"))]
-
-    # Top 3 coerenti + top 2 altri (per probabilita')
-    result = coerenti_ou[:3] + altri[:2]
-    return result[:5]
-
-def genera_pronostico(home, away):
-    if MOTORE_DISPONIBILE and _df is not None:
-        try:
-            hs = get_team_stats(_df, home, opponent=away)
-            aw = get_team_stats(_df, away, opponent=home)
-            return get_prediction(hs, aw, df=_df)
-        except Exception as e:
-            print(f"❌ ERRORE PREDICTOR: {e}")
-
-    # Calcolo Poisson AVANZATO
-    from scipy.stats import poisson as pdist
-    try:
-        from api_football_stats import get_team_real_stats
-    except ImportError:
-        get_team_real_stats = lambda x: None
-
-    # Carica statistiche pre-calcolate dai CSV
-    _stats_path = os.path.join(os.path.dirname(__file__), "team_stats.json")
-    _h2h_path = os.path.join(os.path.dirname(__file__), "h2h_stats.json")
-    _avg_path = os.path.join(os.path.dirname(__file__), "league_averages.json")
-
-    try:
-        with open(_stats_path) as f: TEAM_STATS = json.loads(f.read())
-        with open(_h2h_path) as f: H2H_DATA = json.loads(f.read())
-        with open(_avg_path) as f: LEAGUE_AVG = json.loads(f.read())
-    except Exception:
-        TEAM_STATS = {}
-        H2H_DATA = {}
-        LEAGUE_AVG = {"media_gol_casa": 1.5, "media_gol_trasferta": 1.17}
-
-    h = home.strip().title()
-    a = away.strip().title()
-    sh = TEAM_STATS.get(h, {})
-    sa = TEAM_STATS.get(a, {})
-
-    # ── USA STATS REALI API FOOTBALL (Serie A + Premier League) ──
-    api_h = get_team_real_stats(h)
-    api_a = get_team_real_stats(a)
-    has_api = api_h and api_a and api_h.get("played", 0) >= 10 and api_a.get("played", 0) >= 10
-
-    # ── SE NON HA API STATS, COSTRUISCI DA CLASSIFICA LIVE ──
-    if not has_api:
-        # Cerca nella classifica live (funziona per PL e Serie A)
-        found = False
-        for league_key in ["serie-a", "premier-league", "la-liga", "champions-league", "europa-league", "conference-league"]:
-            cl = CLASSIFICA_CACHE.get(league_key) or []
-            # Se cache vuota, prova a caricarla ora
-            if not cl and league_key != "serie-a":
-                try:
-                    _fetch_league_data(league_key)
-                    cl = CLASSIFICA_CACHE.get(league_key) or []
-                except Exception:
-                    _logger.warning("Eccezione silenziata", exc_info=True)
-            data_h = next((r for r in cl if r["Squadra"] == h), None)
-            data_a = next((r for r in cl if r["Squadra"] == a), None)
-            if data_h and data_a:
-                # Costruisci lambda dalla classifica reale
-                g_h = max(1, data_h["G"])
-                g_a = max(1, data_a["G"])
-                gf_h = data_h["GF"] / g_h  # Gol fatti per partita
-                gs_h = data_h["GS"] / g_h  # Gol subiti per partita
-                gf_a = data_a["GF"] / g_a
-                gs_a = data_a["GS"] / g_a
-                # Media campionato
-                avg_gf = sum(r["GF"] for r in cl) / sum(max(1, r["G"]) for r in cl)
-                avg_gs = sum(r["GS"] for r in cl) / sum(max(1, r["G"]) for r in cl)
-                # Forza attacco/difesa relativa
-                att_h = gf_h / max(0.3, avg_gf)
-                dif_h = gs_h / max(0.3, avg_gs)
-                att_a = gf_a / max(0.3, avg_gf)
-                dif_a = gs_a / max(0.3, avg_gs)
-                # Lambda: attacco casa * difesa trasferta * media
-                avg_gc = sum(r["GF"] for r in cl) / (sum(max(1, r["G"]) for r in cl) / 2)
-                lh = att_h * dif_a * 1.45  # Bonus casa
-                la = att_a * dif_h * 1.10
-                # Correzione classifica
-                pts_h = data_h["Punti"]
-                pts_a = data_a["Punti"]
-                pts_diff = (pts_h - pts_a) / 100
-                lh *= (1 + pts_diff * 0.3)
-                la *= (1 - pts_diff * 0.3)
-                # Forma (ultime partite dal rapporto V/G)
-                form_h = data_h["V"] / g_h
-                form_a = data_a["V"] / g_a
-                form_diff = form_h - form_a
-                lh *= (1 + form_diff * 0.2)
-                la *= (1 - form_diff * 0.2)
-                # Clamp
-                lh = max(0.4, min(lh, 3.0))
-                la = max(0.3, min(la, 2.2))
-                # Poisson + Dixon-Coles
-                p1 = px = p2 = 0.0
-                for i in range(11):
-                    for j in range(11):
-                        p = pdist.pmf(i, lh) * pdist.pmf(j, la)
-                        rho = -0.10
-                        if i==0 and j==0: p *= (1 - lh*la*rho)
-                        elif i==1 and j==0: p *= (1 + la*rho)
-                        elif i==0 and j==1: p *= (1 + lh*rho)
-                        elif i==1 and j==1: p *= (1 - rho)
-                        p = max(0, p)
-                        if i > j: p1 += p
-                        elif i == j: px += p
-                        else: p2 += p
-                px *= 1.10  # Draw boost leggero
-                ratio = min(lh,la)/max(lh,la) if max(lh,la)>0 else 0
-                if ratio > 0.85: px *= 1 + (ratio-0.85)*0.5
-                tot = p1 + px + p2
-                if tot > 0: p1/=tot; px/=tot; p2/=tot
-                # Blend con bookmaker live se disponibili
-                bk_odds = get_bookmaker_odds(h, a)
-                if bk_odds:
-                    bp1 = bk_odds["prob_1"]/100; bpx = bk_odds["prob_x"]/100; bp2 = bk_odds["prob_2"]/100
-                    p1 = 0.60*p1 + 0.40*bp1; px = 0.60*px + 0.40*bpx; p2 = 0.60*p2 + 0.40*bp2
-                    tot = p1+px+p2
-                    if tot>0: p1/=tot; px/=tot; p2/=tot
-                ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
-                gsi = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
-                # Calibrazione Goal: boost solo se entrambi lambda >= 0.8
-                ga = lh + la
-                lm = min(lh, la)
-                if ga > 3.0 and lm >= 0.8: gsi = max(gsi, 0.55 + (ga-3.0)*0.04); gsi = min(gsi, 0.80)
-                elif ga > 2.5 and lm >= 0.7: gsi = max(gsi, 0.50 + (ga-2.5)*0.04)
-                scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
-                mp = max(p1, px, p2)
-                sg = "1" if mp==p1 else ("X" if mp==px else "2")
-                sl = "Vittoria Casa" if sg=="1" else ("Pareggio" if sg=="X" else "Vittoria Ospite")
-                sp = sorted([p1,px,p2], reverse=True)
-                spread = sp[0] - sp[1]
-                cf = min(1.0, 0.40*(min(spread/0.35,1.0)) + 0.30*(min(g_h/30,1.0)) + 0.30*(min(abs(pts_diff)*3,1.0)))
-                cl_label = "Alta" if cf>=0.82 else ("Media" if cf>=0.50 else "Bassa")
-                sicura = cf >= 0.82 and sp[0] > 0.45
-                return {
-                    "prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),
-                    "quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,
-                    "suggerimento":sg,"sugg_label":sl,"confidence":round(cf,3),"confidence_label":cl_label,
-                    "sicura":bool(sicura),
-                    "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
-                    "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
-                    "gol_attesi":round(lh+la,2),
-                    "risultati_esatti":_filtra_esatti(scores, ov25, sg),
-                    "bookmaker_used":bk_odds is not None,
-                }
-
-    if has_api:
-        # Lambda da statistiche REALI casa/trasferta (API Football)
-        avg_gs_away = sum(get_team_real_stats(t).get("gs_away_pg", 1.2) for t in _TEAM_IDS if get_team_real_stats(t)) / max(1, sum(1 for t in _TEAM_IDS if get_team_real_stats(t)))
-        avg_gs_home = sum(get_team_real_stats(t).get("gs_home_pg", 1.0) for t in _TEAM_IDS if get_team_real_stats(t)) / max(1, sum(1 for t in _TEAM_IDS if get_team_real_stats(t)))
-
-        lh_api = api_h["gf_home_pg"] * (api_a["gs_away_pg"] / max(0.5, avg_gs_away))
-        la_api = api_a["gf_away_pg"] * (api_h["gs_home_pg"] / max(0.5, avg_gs_home))
-
-        # Forma API Football (ultimi 5: W=3, D=1, L=0, max 15)
-        form_h = api_h.get("form_score", 7)
-        form_a = api_a.get("form_score", 7)
-        form_diff = (form_h - form_a) / 15  # Normalizzato [-1, 1]
-
-        if sh and sa:
-            # Blend: 40% storico CSV + 40% API reale + 20% classifica
-            avg_gc = LEAGUE_AVG.get("media_gol_casa", 1.5)
-            avg_gt = LEAGUE_AVG.get("media_gol_trasferta", 1.17)
-            lh_hist = sh["forza_att_casa"] * sa["forza_dif_trasf"] * avg_gc
-            la_hist = sa["forza_att_trasf"] * sh["forza_dif_casa"] * avg_gt
-
-            CLASSIFICA_PTS = {r["Squadra"]: r["Punti"] for r in CLASS_FALLBACK}
-            pts_diff = (CLASSIFICA_PTS.get(h, 35) - CLASSIFICA_PTS.get(a, 35)) / 100
-            lh_cls = avg_gc * (1 + pts_diff * 0.5)
-            la_cls = avg_gt * (1 - pts_diff * 0.5)
-
-            lh = 0.35 * lh_hist + 0.45 * lh_api + 0.20 * lh_cls
-            la = 0.35 * la_hist + 0.45 * la_api + 0.20 * la_cls
-        else:
-            lh = lh_api
-            la = la_api
-
-        # Correzione forma API (piu' forte perche' basata su dati reali)
-        ff = 1.0 + 0.15 * form_diff
-        lh *= ff
-        la *= (2.0 - ff)
-
-        # H2H anche nel percorso API
-        h2h_key = f"{h}_vs_{a}"
-        h2h = H2H_DATA.get(h2h_key, {})
-        h2h_n = h2h.get("n_partite", 0)
-        if h2h_n >= 3:
-            adv = h2h["h2h_advantage"]
-            lh *= (1.0 + 0.08 * adv)
-            la *= (1.0 - 0.08 * adv)
-
-        # ── FASE 4: FATTORE CAMPO AVANZATO ──
-        # Usa win% reali casa/trasferta per correggere i lambda
-        win_h_pct = api_h.get("win_home_pct", 50)
-        win_a_pct = api_a.get("win_away_pct", 30)
-        # Media Serie A: casa vince ~45%, trasferta ~30%
-        home_strength = win_h_pct / 45.0  # >1 = forte in casa, <1 = debole
-        away_strength = win_a_pct / 30.0  # >1 = forte fuori, <1 = debole
-        # Applica con peso leggero per non sovrapporre ad altre correzioni
-        lh *= (0.90 + 0.10 * home_strength)
-        la *= (0.90 + 0.10 * away_strength)
-
-    elif not sh or not sa:
-        # Squadra non trovata nei CSV, usa solo xG
-        XG = {"Inter":{"xG":2.40,"xGA":0.84},"Milan":{"xG":1.83,"xGA":1.12},"Napoli":{"xG":1.56,"xGA":1.10},"Como":{"xG":1.80,"xGA":1.08},"Juventus":{"xG":1.97,"xGA":0.97},"Roma":{"xG":1.54,"xGA":1.20},"Atalanta":{"xG":1.86,"xGA":1.38},"Lazio":{"xG":1.21,"xGA":1.34},"Bologna":{"xG":1.34,"xGA":1.39},"Sassuolo":{"xG":1.19,"xGA":1.63},"Udinese":{"xG":1.19,"xGA":1.56},"Parma":{"xG":1.00,"xGA":1.62},"Genoa":{"xG":1.30,"xGA":1.45},"Torino":{"xG":1.33,"xGA":1.57},"Cagliari":{"xG":1.01,"xGA":1.65},"Fiorentina":{"xG":1.52,"xGA":1.53},"Cremonese":{"xG":1.03,"xGA":1.87},"Lecce":{"xG":0.93,"xGA":1.67},"Verona":{"xG":1.03,"xGA":1.40},"Pisa":{"xG":1.14,"xGA":1.82}}
-        xh = XG.get(h, {"xG":1.3,"xGA":1.3})
-        xa = XG.get(a, {"xG":1.3,"xGA":1.3})
-        avg = sum(v["xGA"] for v in XG.values()) / len(XG)
-        lh = xh["xG"] * (xa["xGA"] / avg)
-        la = xa["xG"] * (xh["xGA"] / avg)
-    else:
-        # Lambda base da 26 anni di storico
-        avg_gc = LEAGUE_AVG.get("media_gol_casa", 1.5)
-        avg_gt = LEAGUE_AVG.get("media_gol_trasferta", 1.17)
-        lh_hist = sh["forza_att_casa"] * sa["forza_dif_trasf"] * avg_gc
-        la_hist = sa["forza_att_trasf"] * sh["forza_dif_casa"] * avg_gt
-
-        # Lambda da xG stagione corrente
-        xg_h = sh.get("xG_pg", 1.3)
-        xga_h = sh.get("xGA_pg", 1.3)
-        xg_a = sa.get("xG_pg", 1.3)
-        xga_a = sa.get("xGA_pg", 1.3)
-        avg_xga = 1.38
-        lh_xg = xg_h * (xga_a / avg_xga)
-        la_xg = xg_a * (xga_h / avg_xga)
-
-        # PUNTO 1: Quote bookmaker come calibrazione
-        # Le quote implicite dei bookmaker (medie storiche) calibrano il modello
-        # Forza relativa dalla classifica come proxy delle quote
-        CLASSIFICA_PTS = {"Inter":69,"Milan":63,"Napoli":62,"Como":57,"Juventus":54,"Roma":54,"Atalanta":50,"Lazio":43,"Bologna":42,"Sassuolo":39,"Udinese":39,"Parma":34,"Genoa":33,"Torino":33,"Cagliari":30,"Fiorentina":29,"Cremonese":27,"Lecce":27,"Verona":18,"Pisa":18}
-        pts_h = CLASSIFICA_PTS.get(h, 35)
-        pts_a = CLASSIFICA_PTS.get(a, 35)
-        pts_diff = (pts_h - pts_a) / 100  # Normalizzato
-        # Lambda da classifica (proxy quote)
-        lh_cls = avg_gc * (1 + pts_diff * 0.5)
-        la_cls = avg_gt * (1 - pts_diff * 0.5)
-
-        # PUNTO 2: Ensemble — blend storico (50%) + xG (30%) + classifica (20%)
-        lh = 0.50 * lh_hist + 0.30 * lh_xg + 0.20 * lh_cls
-        la = 0.50 * la_hist + 0.30 * la_xg + 0.20 * la_cls
-
-        # I gol attesi riflettono la forza SPECIFICA delle due squadre
-        # Non applichiamo cap alla media campionato
-
-        # Correzione H2H (piu' leggera)
-        h2h_key = f"{h}_vs_{a}"
-        h2h = H2H_DATA.get(h2h_key, {})
-        h2h_n = h2h.get("n_partite", 0)
-        if h2h_n >= 3:
-            adv = h2h["h2h_advantage"]
-            lh *= (1.0 + 0.06 * adv)
-            la *= (1.0 - 0.06 * adv)
-
-        # Correzione forma pesata (piu' leggera)
-        fh = sh.get("forma_casa_pesata", 1.5)
-        fa = sa.get("forma_trasf_pesata", 1.5)
-        fd = fh - fa
-        ff = 1.0 + 0.05 * fd
-        lh *= ff
-        la *= (2.0 - ff)
-
-        # PUNTO 4: Feature avanzate (leggere)
-        if pts_h <= 30 or pts_h >= 60:
-            lh *= 1.02
-        if pts_a <= 30 or pts_a >= 60:
-            la *= 1.02
-        if abs(pts_h - pts_a) > 25:
-            if pts_h > pts_a:
-                lh *= 1.02
-            else:
-                la *= 1.02
-
-    # Clamp realistico per singola squadra
-    lh = max(0.3, min(lh, 2.2))
-    la = max(0.2, min(la, 1.6))
-
-    # Equilibrio: la Roma non puo' avere solo 13%
-    # Min prob ospite = ~15% per squadre di meta' classifica
-    # Questo si ottiene assicurando che la non sia troppo basso
-
-    # Calcolo Poisson con Dixon-Coles
-    p1 = px = p2 = 0.0
-    for i in range(11):
-        for j in range(11):
-            p = pdist.pmf(i, lh) * pdist.pmf(j, la)
-            rho = -0.13
-            if i==0 and j==0: p *= (1 - lh*la*rho)
-            elif i==1 and j==0: p *= (1 + la*rho)
-            elif i==0 and j==1: p *= (1 + lh*rho)
-            elif i==1 and j==1: p *= (1 - rho)
-            p = max(0, p)
-            if i > j: p1 += p
-            elif i == j: px += p
-            else: p2 += p
-    px *= 1.12
-    ratio = min(lh,la)/max(lh,la) if max(lh,la)>0 else 0
-    if ratio > 0.80:
-        px *= 1.0 + (ratio-0.80)*0.8
-    tot = p1 + px + p2
-    if tot > 0: p1/=tot; px/=tot; p2/=tot
-
-    # BLENDING CON QUOTE BOOKMAKER (se disponibili)
-    bk_odds = get_bookmaker_odds(h, a)
-    bk_used = False
-    if bk_odds:
-        bk_used = True
-        bk_p1 = bk_odds["prob_1"] / 100
-        bk_px = bk_odds["prob_x"] / 100
-        bk_p2 = bk_odds["prob_2"] / 100
-        # Blend: 60% nostro modello + 40% bookmaker
-        p1 = 0.60 * p1 + 0.40 * bk_p1
-        px = 0.60 * px + 0.40 * bk_px
-        p2 = 0.60 * p2 + 0.40 * bk_p2
-        # Rinormalizza
-        tot = p1 + px + p2
-        if tot > 0: p1/=tot; px/=tot; p2/=tot
-
-    ov25_model = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
-    # Blend Over/Under con bookmaker (se disponibile)
-    if bk_odds and bk_odds.get("bk_over_25"):
-        bk_ov = bk_odds["bk_over_25"] / 100
-        ov25 = 0.60 * ov25_model + 0.40 * bk_ov
-    else:
-        ov25 = ov25_model
-    gsi_raw = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
-    # Calibrazione Goal con clean sheet reali API Football
-    xga_min = min(sh.get("xGA_pg", 1.3) if sh else 1.3, sa.get("xGA_pg", 1.3) if sa else 1.3)
-    if has_api:
-        # Usa clean sheet % reale per calibrare Goal/NoGoal
-        cs_h = api_h.get("cs_pct", 0)
-        cs_a = api_a.get("cs_pct", 0)
-        cs_avg = (cs_h + cs_a) / 2
-        if cs_avg > 30:  # Almeno una squadra tiene spesso la porta inviolata
-            gsi = gsi_raw * (1.0 - (cs_avg - 30) * 0.005)  # Riduce Goal Si
-        else:
-            gsi = gsi_raw
-    elif xga_min < 0.9:
-        gsi = gsi_raw * 0.95
-    else:
-        gsi = gsi_raw
-    # Calibrazione Goal: boost solo se entrambi lambda >= 0.8
-    gol_att = lh + la
-    lm2 = min(lh, la)
-    if gol_att > 3.0 and lm2 >= 0.8:
-        gsi = max(gsi, 0.55 + (gol_att - 3.0) * 0.04)
-        gsi = min(gsi, 0.80)
-    elif gol_att > 2.5 and lm2 >= 0.7:
-        gsi = max(gsi, 0.50 + (gol_att - 2.5) * 0.04)
-    scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
-
-    mp = max(p1, px, p2)
-    sg = "1" if mp==p1 else ("X" if mp==px else "2")
-    sl = "Vittoria Casa" if sg=="1" else ("Pareggio" if sg=="X" else "Vittoria Ospite")
-
-    # PUNTO 5: Confidence avanzata multi-fattore
-    sp = sorted([p1,px,p2], reverse=True)
-    spread = sp[0] - sp[1]
-    # Componenti: separazione (40%) + dati (25%) + H2H (20%) + classifica (15%)
-    c_spread = min(spread / 0.35, 1.0)
-    c_dati = min(sh.get("n_partite", 0) / 200, 1.0) if sh else 0.3
-    c_h2h = min(h2h_n / 15, 1.0) if sh and h2h_n >= 3 else 0.3
-    c_class = min(abs(pts_diff) * 3, 1.0) if sh else 0.3
-    cf = 0.40*c_spread + 0.25*c_dati + 0.20*c_h2h + 0.15*c_class
-    cf = round(min(max(cf, 0), 1.0), 3)
-    cl = "Alta" if cf>=0.82 else ("Media" if cf>=0.50 else "Bassa")
-
-    # PUNTO 5: Badge sicura (solo quando confidenza Alta)
-    sicura = cf >= 0.82 and sp[0] > 0.45
-
-    # Marcatori live da API Football
-    marc_h = []
-    marc_a = []
-    for lk in ["serie-a", "premier-league", "la-liga"]:
-        mc = MARCATORI_CACHE.get(lk) or []
-        for m in mc:
-            if m.get("squadra") == h:
-                marc_h.append(f"{m['giocatore']} ({m['gol']} gol)")
-            elif m.get("squadra") == a:
-                marc_a.append(f"{m['giocatore']} ({m['gol']} gol)")
-    if not marc_h:
-        marc_h = _filtra_marcatori(TOP_SCORER.get(h, []), INFORTUNATI.get(h, []))
-    if not marc_a:
-        marc_a = _filtra_marcatori(TOP_SCORER.get(a, []), INFORTUNATI.get(a, []))
-    # Formazioni live
-    form_h = LIVE_FORMAZIONI.get(h) or FORMAZIONI.get(h) or _get_last_lineup(h)
-    form_a = LIVE_FORMAZIONI.get(a) or FORMAZIONI.get(a) or _get_last_lineup(a)
-
-    return {
-        "prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),
-        "quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,
-        "suggerimento":sg,"sugg_label":sl,"confidence":round(cf,3),"confidence_label":cl,
-        "sicura": bool(sicura),
-        "over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),
-        "goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),
-        "gol_attesi":round(lh+la,2),
-        "risultati_esatti": _filtra_esatti(scores, ov25, sg),
-        "marcatori_casa": marc_h[:3],
-        "marcatori_ospite": marc_a[:3],
-        "formazione_casa": form_h,
-        "formazione_ospite": form_a,
-        "h2h_applicato": h2h_n >= 3 if sh else False,
-        "h2h_partite": h2h_n if sh else 0,
-        "bookmaker_used": bool(bk_used),
-        "bookmaker_odds": bk_odds,
-    }
 
 # ─────────────────────────────
 # EMAIL (Resend)
@@ -1217,17 +187,16 @@ def genera_pronostico(home, away):
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 
 def send_welcome_email(to_email):
-    """Invia email di benvenuto dopo la registrazione."""
     try:
         import urllib.request as ur
         import json as js
         body = js.dumps({
             "from": "MatchIQ <noreply@matchiq.it.com>",
             "to": [to_email],
-            "subject": "Benvenuto su PronoSerie A!",
+            "subject": "Benvenuto su MatchIQ!",
             "html": f"""
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0f1a;color:#e8eaf6;padding:32px;border-radius:12px">
-                <h1 style="color:#2ecc71;text-align:center">Benvenuto su PronoSerie A!</h1>
+                <h1 style="color:#2ecc71;text-align:center">Benvenuto su MatchIQ!</h1>
                 <p style="text-align:center;color:#8892b0">Il tuo account e' stato creato con successo.</p>
                 <div style="background:#162447;padding:20px;border-radius:8px;margin:20px 0;text-align:center">
                     <p style="margin:0"><strong>Email:</strong> {to_email}</p>
@@ -1240,11 +209,11 @@ def send_welcome_email(to_email):
                     <li>Calendario Serie A giornate 31-38</li>
                 </ul>
                 <div style="text-align:center;margin:24px 0">
-                    <a href="https://web-production-ff46b.up.railway.app/app#pronostici" style="background:#2ecc71;color:#000;padding:14px 32px;border-radius:20px;text-decoration:none;font-weight:700;font-size:1.1rem">Calcola il tuo primo pronostico</a>
+                    <a href="https://matchiq.it.com/app#pronostici" style="background:#2ecc71;color:#000;padding:14px 32px;border-radius:20px;text-decoration:none;font-weight:700;font-size:1.1rem">Calcola il tuo primo pronostico</a>
                 </div>
                 <p style="text-align:center;color:#8892b0;font-size:.85rem">Passa a Pro per pronostici illimitati, classifica, marcatori, rose e formazioni live!</p>
                 <hr style="border:1px solid #1f3460;margin:20px 0">
-                <p style="text-align:center;color:#8892b0;font-size:.8rem">PronoSerie A — Pronostici Serie A con Intelligenza Artificiale</p>
+                <p style="text-align:center;color:#8892b0;font-size:.8rem">MatchIQ - Pronostici con Intelligenza Artificiale</p>
             </div>
             """
         }).encode()
@@ -1261,409 +230,16 @@ def send_welcome_email(to_email):
 # ─────────────────────────────
 # NOTIFICHE ADMIN (nuova iscrizione)
 # ─────────────────────────────
-ADMIN_EMAIL = "mario.costabile92@outlook.it"
-ADMIN_TELEGRAM_USERNAME = "Soanator"
-ADMIN_CHAT_ID = None  # Si auto-imposta quando l'admin scrive /start al bot
-
 def _notify_admin_new_user(email, piano):
-    """Notifica l'admin quando un nuovo utente si registra."""
-    # 1. Email
     try:
-        import urllib.request as ur
-        body = json.dumps({
-            "from": "MatchIQ <noreply@matchiq.it.com>",
-            "to": [ADMIN_EMAIL],
-            "subject": f"Nuovo iscritto MatchIQ: {email}",
-            "html": f"""
-            <div style="font-family:Arial;background:#0a0f1a;color:#e8eaf6;padding:24px;border-radius:12px">
-                <h2 style="color:#2ecc71">Nuovo iscritto!</h2>
-                <p><strong>Email:</strong> {email}</p>
-                <p><strong>Piano:</strong> {piano}</p>
-                <p><strong>Data:</strong> {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M UTC')}</p>
-                <hr style="border:1px solid #1f3460">
-                <p style="color:#8892b0;font-size:.85rem">MatchIQ - Notifica automatica</p>
-            </div>
-            """
-        }).encode()
-        req = ur.Request("https://api.resend.com/emails", data=body, headers={
-            "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json",
-            "User-Agent": "MatchIQ/1.0"
-        })
-        ur.urlopen(req, timeout=10)
-        print(f"📧 Notifica admin: nuovo utente {email}")
+        from telegram_service import notify_admin_new_user
+        notify_admin_new_user(email, piano, resend_api_key=RESEND_API_KEY)
     except Exception as e:
-        print(f"⚠️ Errore notifica email admin: {e}")
-
-    # 2. Telegram (se chat_id disponibile)
-    try:
-        # Cerca chat_id admin dal database bot
-        import sqlite3
-        if os.path.exists(_BOT_DB_PATH):
-            conn = sqlite3.connect(_BOT_DB_PATH)
-            row = conn.execute("SELECT chat_id FROM utenti WHERE username = ?", (ADMIN_TELEGRAM_USERNAME,)).fetchone()
-            conn.close()
-            if row:
-                chat_id = row[0]
-                msg = f"🆕 <b>Nuovo iscritto MatchIQ!</b>\n\n📧 {email}\n📋 Piano: {piano}\n⏰ {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')}"
-                _send_telegram_message(chat_id, msg)
-    except Exception:
-        _logger.warning("Eccezione silenziata", exc_info=True)
+        print(f"⚠️ Errore notifica admin: {e}")
 
 # ─────────────────────────────
-# AUTH
+# DATI HARDCODED (fallback + helpers interni)
 # ─────────────────────────────
-
-
-
-
-# ─────────────────────────────
-# PRONOSTICO - Helper unificato
-# ─────────────────────────────
-def _compute_pronostico(league: str, home: str, away: str) -> dict:
-    """Calcola pronostico unificato per qualsiasi campionato.
-    Usato da ENTRAMBI gli endpoint (con e senza league).
-    Include: dati CSV per league + blend bookmaker + formazioni + marcatori.
-    """
-    # ── STEP 1: Calcolo raw in base al campionato ──
-    raw = None
-    if league == "premier-league" and _df_pl is not None and len(_df_pl) > 100:
-        try:
-            hs = get_team_stats(_df_pl, home, opponent=away)
-            aw = get_team_stats(_df_pl, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_pl, league="premier-league")
-        except Exception:
-            raw = None
-    elif league == "la-liga" and _df_ll is not None and len(_df_ll) > 100:
-        try:
-            hs = get_team_stats(_df_ll, home, opponent=away)
-            aw = get_team_stats(_df_ll, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_ll, league="la-liga")
-        except Exception:
-            raw = None
-    elif league == "bundesliga" and _df_bl is not None and len(_df_bl) > 100:
-        try:
-            hs = get_team_stats(_df_bl, home, opponent=away)
-            aw = get_team_stats(_df_bl, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_bl, league="bundesliga")
-        except Exception:
-            raw = None
-    elif league == "ligue-1" and _df_l1 is not None and len(_df_l1) > 100:
-        try:
-            hs = get_team_stats(_df_l1, home, opponent=away)
-            aw = get_team_stats(_df_l1, away, opponent=home)
-            raw = get_prediction(hs, aw, df=_df_l1, league="ligue-1")
-        except Exception:
-            raw = None
-    elif league in ("champions-league", "europa-league", "conference-league"):
-        euro_df = _df_ucl if league == "champions-league" else (_df_uel if league == "europa-league" else _df_uecl)
-        # 1. Prova dati europei H2H
-        raw_euro = None
-        if euro_df is not None and len(euro_df) > 100:
-            try:
-                hs = get_team_stats(euro_df, home, opponent=away)
-                aw = get_team_stats(euro_df, away, opponent=home)
-                raw_euro = get_prediction(hs, aw, df=euro_df)
-            except Exception:
-                raw_euro = None
-        # 2. Prova dati campionato nazionale
-        raw_domestic = None
-        for dom_df in [_df, _df_pl, _df_ll, _df_bl, _df_l1]:
-            if dom_df is None:
-                continue
-            try:
-                hs_d = get_team_stats(dom_df, home, opponent=away)
-                aw_d = get_team_stats(dom_df, away, opponent=home)
-                raw_domestic = get_prediction(hs_d, aw_d, df=dom_df)
-                break
-            except Exception:
-                continue
-        # 3. Classifica live europea
-        raw_classifica = genera_pronostico(home, away)
-        # 4. Blend intelligente
-        sources = []
-        if raw_domestic:
-            sources.append((raw_domestic, 0.45))
-        if raw_euro:
-            sources.append((raw_euro, 0.20))
-        if raw_classifica:
-            sources.append((raw_classifica, 0.35 if raw_domestic else 0.80))
-        if sources:
-            raw = {}
-            for k in (sources[0][0] or {}).keys():
-                vals = [(s.get(k), w) for s, w in sources if isinstance(s.get(k), (int, float))]
-                if vals:
-                    raw[k] = round(sum(v * w for v, w in vals) / sum(w for _, w in vals), 2)
-                else:
-                    raw[k] = sources[0][0].get(k)
-            # Ricalcola suggerimento
-            mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
-            raw["suggerimento"] = "1" if mp == raw.get("prob_1") else ("X" if mp == raw.get("prob_x") else "2")
-            raw["sugg_label"] = "Vittoria Casa" if raw["suggerimento"] == "1" else ("Pareggio" if raw["suggerimento"] == "X" else "Vittoria Ospite")
-            # Confidence
-            best_conf = max((s.get("confidence", 0) for s, w in sources if isinstance(s.get("confidence"), (int, float))), default=0)
-            sp = sorted([raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0)], reverse=True)
-            if sp[0] > 1:
-                spread = (sp[0] - sp[1]) / 100
-            else:
-                spread = sp[0] - sp[1]
-            raw["confidence"] = round(max(best_conf, min(1.0, spread * 2.5)), 3)
-            raw["confidence_label"] = "Alta" if raw["confidence"] >= 0.82 else ("Media" if raw["confidence"] >= 0.50 else "Bassa")
-            raw["sicura"] = raw["confidence"] >= 0.82 and sp[0] > 45
-            # O/U calibra sulla media gol reale
-            ov = raw.get("over_25", 50)
-            un = raw.get("under_25", 50)
-            gol_att = raw.get("gol_attesi", 2.5)
-            if isinstance(gol_att, (int, float)) and gol_att > 2.5:
-                ov = max(ov, 50 + (gol_att - 2.5) * 8)
-                ov = min(ov, 75)
-            raw["over_25"] = round(ov, 1)
-            raw["under_25"] = round(100 - ov, 1) if ov > 1 else round(un, 1)
-            # Goal Si/No: ricalcola dalla fonte piu' affidabile
-            best_source = raw_domestic or raw_classifica or raw_euro or {}
-            gsi_best = best_source.get("goal_si", 50)
-            gno_best = best_source.get("goal_no", 50)
-            if isinstance(gsi_best, (int, float)) and gsi_best < 1:
-                gsi_best = gsi_best * 100
-            if isinstance(gno_best, (int, float)) and gno_best < 1:
-                gno_best = gno_best * 100
-            if gsi_best + gno_best > 110:
-                tot_g = gsi_best + gno_best
-                gsi_best = gsi_best / tot_g * 100
-            raw["goal_si"] = round(gsi_best, 1)
-            raw["goal_no"] = round(100 - gsi_best, 1)
-            ga = raw.get("gol_attesi", 2.5)
-            if isinstance(ga, (int, float)) and ga > 2.3 and raw["goal_si"] < 50:
-                raw["goal_si"] = round(50 + (ga - 2.3) * 5, 1)
-                raw["goal_no"] = round(100 - raw["goal_si"], 1)
-            # Quote
-            for tip in ["1", "x", "2"]:
-                p = raw.get(f"prob_{tip}", 33)
-                raw[f"quota_{tip}"] = round(105 / max(1, p), 2)
-            raw["risultati_esatti"] = (raw_domestic or raw_euro or raw_classifica or {}).get("risultati_esatti", [])
-            raw["gol_attesi"] = round(raw.get("gol_attesi", 2.5), 2) if isinstance(raw.get("gol_attesi"), (int, float)) else 2.5
-        else:
-            raw = raw_classifica or genera_pronostico(home, away)
-
-    elif league == "mondiali-2026":
-        # Mondiali: usa genera_pronostico con fallback
-        raw = genera_pronostico(home, away)
-
-    # Fallback: Serie A o qualsiasi league senza dati CSV
-    if raw is None:
-        raw = genera_pronostico(home, away)
-
-    # ── STEP 2: Blend con quote bookmaker live ──
-    p1 = raw.get("prob_1", 0)
-    px = raw.get("prob_x", 0)
-    p2 = raw.get("prob_2", 0)
-    bk_live = get_bookmaker_odds(home.strip().title(), away.strip().title())
-    bk_used_live = False
-    if bk_live and bk_live.get("prob_1"):
-        bk_used_live = True
-        ALPHA_LIVE = 0.35
-        bp1 = bk_live["prob_1"] / 100
-        bpx = bk_live["prob_x"] / 100
-        bp2 = bk_live["prob_2"] / 100
-        p1 = (1 - ALPHA_LIVE) * (p1 / 100) + ALPHA_LIVE * bp1
-        px = (1 - ALPHA_LIVE) * (px / 100) + ALPHA_LIVE * bpx
-        p2 = (1 - ALPHA_LIVE) * (p2 / 100) + ALPHA_LIVE * bp2
-        tot = p1 + px + p2
-        if tot > 0:
-            p1 = round(p1 / tot * 100, 1)
-            px = round(px / tot * 100, 1)
-            p2 = round(p2 / tot * 100, 1)
-        mp = max(p1, px, p2)
-        if mp == p1:
-            sugg, sugg_label = "1", "Vittoria Casa"
-        elif mp == px:
-            sugg, sugg_label = "X", "Pareggio"
-        else:
-            sugg, sugg_label = "2", "Vittoria Ospite"
-        q1 = round(1.05 / (p1/100), 2) if p1 > 0 else 99
-        qx = round(1.05 / (px/100), 2) if px > 0 else 99
-        q2 = round(1.05 / (p2/100), 2) if p2 > 0 else 99
-        conf_raw = raw.get("confidence", 0.5)
-        if sugg == raw.get("suggerimento", ""):
-            conf_raw = min(1.0, conf_raw * 1.08)
-        conf_label = "Alta" if conf_raw >= 0.82 else ("Media" if conf_raw >= 0.50 else "Bassa")
-        ov25 = raw.get("over_25", 50)
-        un25 = raw.get("under_25", 50)
-        if bk_live.get("bk_over_25"):
-            ov25 = round(0.65 * ov25 + 0.35 * bk_live["bk_over_25"], 1)
-            un25 = round(100 - ov25, 1)
-    else:
-        sugg = raw.get("suggerimento", "")
-        sugg_label = raw.get("sugg_label", "")
-        q1 = raw.get("quota_1", 0)
-        qx = raw.get("quota_x", 0)
-        q2 = raw.get("quota_2", 0)
-        conf_raw = raw.get("confidence", 0)
-        conf_label = raw.get("confidence_label", "")
-        ov25 = raw.get("over_25")
-        un25 = raw.get("under_25")
-
-    # ── STEP 3: Marcatori e formazioni live ──
-    h_t = home.strip().title()
-    a_t = away.strip().title()
-    mc_h = raw.get("marcatori_casa") or []
-    mc_a = raw.get("marcatori_ospite") or []
-    all_leagues = [league, "serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1",
-                   "champions-league", "europa-league", "conference-league"]
-    if not mc_h:
-        for lk in all_leagues:
-            for m in (MARCATORI_CACHE.get(lk) or []):
-                if m.get("squadra") == h_t and len(mc_h) < 3:
-                    entry = f"{m['giocatore']} ({m['gol']} gol)"
-                    if entry not in mc_h:
-                        mc_h.append(entry)
-        if not mc_h:
-            mc_h = _filtra_marcatori(TOP_SCORER.get(h_t, []), INFORTUNATI.get(h_t, []))
-    if not mc_a:
-        for lk in all_leagues:
-            for m in (MARCATORI_CACHE.get(lk) or []):
-                if m.get("squadra") == a_t and len(mc_a) < 3:
-                    entry = f"{m['giocatore']} ({m['gol']} gol)"
-                    if entry not in mc_a:
-                        mc_a.append(entry)
-        if not mc_a:
-            mc_a = _filtra_marcatori(TOP_SCORER.get(a_t, []), INFORTUNATI.get(a_t, []))
-
-    # ── STEP 4: Risposta unificata ──
-    return {
-        "home": home,
-        "away": away,
-        "prob_1": p1,
-        "prob_x": px,
-        "prob_2": p2,
-        "quota_1": q1,
-        "quota_x": qx,
-        "quota_2": q2,
-        "suggerimento": sugg,
-        "sugg_label": sugg_label,
-        "confidence": conf_raw,
-        "confidence_label": conf_label,
-        "over_25": ov25,
-        "under_25": un25,
-        "goal_si": raw.get("goal_si"),
-        "goal_no": raw.get("goal_no"),
-        "gol_attesi": raw.get("gol_attesi"),
-        "risultati_esatti": raw.get("risultati_esatti", []),
-        "sicura": bool(conf_raw >= 0.82 and max(p1, px, p2) > 45),
-        "marcatori_casa": mc_h[:3],
-        "marcatori_ospite": mc_a[:3],
-        "formazione_casa": raw.get("formazione_casa") or _get_last_lineup(h_t),
-        "formazione_ospite": raw.get("formazione_ospite") or _get_last_lineup(a_t),
-        "h2h_applicato": bool(raw.get("h2h_applicato", False)),
-        "h2h_partite": int(raw.get("h2h_partite", 0)),
-        "bookmaker_live": bk_used_live,
-        "bookmaker_live_data": bk_live if bk_used_live else None,
-    }
-
-
-# ─────────────────────────────
-# CALENDARIO (FIX DEFINITIVO)
-# ─────────────────────────────
-CAL_HARDCODED = {
-    31:{"data":"4-6 aprile 2026","partite":[("Sassuolo","Cagliari"),("Verona","Fiorentina"),("Lazio","Parma"),("Cremonese","Bologna"),("Pisa","Torino"),("Inter","Roma"),("Udinese","Como"),("Lecce","Atalanta"),("Juventus","Genoa"),("Napoli","Milan")]},
-    32:{"data":"10-13 aprile 2026","partite":[("Roma","Pisa"),("Cagliari","Cremonese"),("Torino","Verona"),("Milan","Udinese"),("Atalanta","Juventus"),("Genoa","Sassuolo"),("Parma","Napoli"),("Bologna","Lecce"),("Como","Inter"),("Fiorentina","Lazio")]},
-    33:{"data":"17-20 aprile 2026","partite":[("Sassuolo","Como"),("Inter","Cagliari"),("Udinese","Parma"),("Napoli","Lazio"),("Roma","Atalanta"),("Cremonese","Torino"),("Verona","Milan"),("Pisa","Genoa"),("Juventus","Bologna"),("Lecce","Fiorentina")]},
-    34:{"data":"24-27 aprile 2026","partite":[("Napoli","Cremonese"),("Parma","Pisa"),("Bologna","Roma"),("Verona","Lecce"),("Fiorentina","Sassuolo"),("Genoa","Como"),("Torino","Inter"),("Milan","Juventus"),("Cagliari","Atalanta"),("Lazio","Udinese")]},
-    35:{"data":"2-4 maggio 2026","partite":[("Atalanta","Genoa"),("Bologna","Cagliari"),("Como","Napoli"),("Cremonese","Lazio"),("Inter","Parma"),("Juventus","Verona"),("Pisa","Lecce"),("Roma","Fiorentina"),("Sassuolo","Milan"),("Udinese","Torino")]},
-    36:{"data":"8-10 maggio 2026","partite":[("Cagliari","Udinese"),("Cremonese","Pisa"),("Fiorentina","Genoa"),("Lazio","Inter"),("Lecce","Juventus"),("Milan","Atalanta"),("Napoli","Bologna"),("Parma","Roma"),("Torino","Sassuolo"),("Verona","Como")]},
-    37:{"data":"15-17 maggio 2026","partite":[("Atalanta","Bologna"),("Cagliari","Torino"),("Como","Parma"),("Genoa","Milan"),("Inter","Verona"),("Juventus","Fiorentina"),("Pisa","Napoli"),("Roma","Lazio"),("Sassuolo","Lecce"),("Udinese","Cremonese")]},
-    38:{"data":"24 maggio 2026","partite":[("Bologna","Inter"),("Cremonese","Como"),("Fiorentina","Atalanta"),("Lazio","Pisa"),("Lecce","Genoa"),("Milan","Cagliari"),("Napoli","Udinese"),("Parma","Sassuolo"),("Torino","Juventus"),("Verona","Roma")]},
-}
-
-@app.get("/api/calendario")
-async def calendario():
-    """Calendario con risultati live integrati da API Football."""
-    giornate = []
-    giornata_corrente = None
-
-    for num in range(31, 39):
-        info = CAL_HARDCODED.get(num)
-        if not info:
-            continue
-
-        partite = []
-        tutte_finite = True
-        ha_live = False
-        ha_da_giocare = False
-
-        for h, a in info["partite"]:
-            match_data = {"home": h, "away": a, "gol_h": None, "gol_a": None, "status": "NS", "status_it": "Da giocare", "minuto": None, "live": False, "fixture_id": None}
-
-            # Cerca il risultato nei dati live di API Football
-            if LIVE_RESULTS_CACHE:
-                for p in LIVE_RESULTS_CACHE:
-                    if (p["home"] == h and p["away"] == a) or (p["home"] == a and p["away"] == h):
-                        is_inverted = p["home"] == a
-                        match_data["gol_h"] = p["gol_a"] if is_inverted else p["gol_h"]
-                        match_data["gol_a"] = p["gol_h"] if is_inverted else p["gol_a"]
-                        match_data["status"] = p["status"]
-                        match_data["status_it"] = p.get("status_it", p["status"])
-                        match_data["minuto"] = p.get("minuto")
-                        match_data["live"] = p.get("live", False)
-                        match_data["fixture_id"] = p.get("fixture_id")
-                        match_data["marcatori"] = p.get("marcatori", [])
-                        match_data["marcatori_home"] = p.get("marcatori_home", [])
-                        match_data["marcatori_away"] = p.get("marcatori_away", [])
-                        if is_inverted:
-                            match_data["marcatori_home"], match_data["marcatori_away"] = match_data["marcatori_away"], match_data["marcatori_home"]
-                        break
-
-            if match_data["status"] not in ("FT", "AET", "PEN"):
-                tutte_finite = False
-            if match_data["live"]:
-                ha_live = True
-            if match_data["status"] == "NS":
-                ha_da_giocare = True
-
-            partite.append(match_data)
-
-        # Determina stato giornata
-        if tutte_finite:
-            stato = "completata"
-        elif ha_live:
-            stato = "live"
-            giornata_corrente = num
-        elif ha_da_giocare and not tutte_finite:
-            stato = "prossima"
-            if giornata_corrente is None:
-                giornata_corrente = num
-        else:
-            stato = "prossima"
-
-        giornate.append({
-            "giornata": num,
-            "data": info["data"],
-            "partite": partite,
-            "stato": stato,
-            "live": ha_live,
-        })
-
-    # Se non trovata, la prima non completata e' la corrente
-    if giornata_corrente is None:
-        for g in giornate:
-            if g["stato"] != "completata":
-                giornata_corrente = g["giornata"]
-                break
-        if giornata_corrente is None:
-            giornata_corrente = 38
-
-    return {
-        "giornate": giornate,
-        "giornata_corrente": giornata_corrente,
-        "live": any(g.get("live") for g in giornate),
-    }
-
-# ─────────────────────────────
-# CLASSIFICA + MARCATORI (AUTO-AGGIORNAMENTO API FOOTBALL)
-# ─────────────────────────────
-# CLASSIFICA_CACHE e MARCATORI_CACHE sono definiti sopra come dict multi-league
-
-# Fallback hardcoded (usato solo se API non disponibile)
 CLASS_FALLBACK = [
     {"Squadra":"Inter","Punti":69,"G":30,"V":22,"N":3,"P":5,"GF":66,"GS":24,"DR":42},
     {"Squadra":"Milan","Punti":63,"G":30,"V":18,"N":9,"P":3,"GF":47,"GS":23,"DR":24},
@@ -1698,403 +274,17 @@ MARC_FALLBACK = [
     {"pos":8,"giocatore":"Hakan Calhanoglu","squadra":"Inter","gol":8},
     {"pos":9,"giocatore":"Giovanni Simeone","squadra":"Torino","gol":8},
     {"pos":10,"giocatore":"Christian Pulisic","squadra":"Milan","gol":8},
-    {"pos":11,"giocatore":"Gianluca Scamacca","squadra":"Atalanta","gol":8},
-    {"pos":12,"giocatore":"Nikola Krstovic","squadra":"Atalanta","gol":8},
-    {"pos":13,"giocatore":"Moise Kean","squadra":"Fiorentina","gol":8},
-    {"pos":14,"giocatore":"Mateo Pellegrino","squadra":"Parma","gol":8},
-    {"pos":15,"giocatore":"Domenico Berardi","squadra":"Sassuolo","gol":7},
-    {"pos":16,"giocatore":"Nikola Vlasic","squadra":"Torino","gol":7},
-    {"pos":17,"giocatore":"Scott McTominay","squadra":"Napoli","gol":7},
-    {"pos":18,"giocatore":"Donyell Malen","squadra":"Roma","gol":7},
-    {"pos":19,"giocatore":"Marcus Thuram","squadra":"Inter","gol":7},
-    {"pos":20,"giocatore":"Andrea Pinamonti","squadra":"Sassuolo","gol":7},
 ]
 
-def _fetch_classifica_live():
-    """Scarica classifica Serie A aggiornata da API Football."""
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/standings?league=135&season=2025",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        if data.get("response") and len(data["response"]) > 0:
-            standings = data["response"][0].get("league", {}).get("standings", [])
-            if standings and len(standings) > 0:
-                classifica = []
-                for team in standings[0]:
-                    nome_api = team.get("team", {}).get("name", "?")
-                    nome = FOOTBALL_NOME_MAP.get(nome_api, nome_api)
-                    stats = team.get("all", {})
-                    gf = stats.get("goals", {}).get("for", 0)
-                    gs = stats.get("goals", {}).get("against", 0)
-                    classifica.append({
-                        "Squadra": nome,
-                        "Punti": team.get("points", 0),
-                        "G": stats.get("played", 0),
-                        "V": stats.get("win", 0),
-                        "N": stats.get("draw", 0),
-                        "P": stats.get("lose", 0),
-                        "GF": gf,
-                        "GS": gs,
-                        "DR": gf - gs,
-                    })
-                # Ordina per punti (desc), poi differenza reti
-                classifica.sort(key=lambda x: (-x["Punti"], -x["DR"], -x["GF"]))
-                if len(classifica) >= 10:
-                    CLASSIFICA_CACHE["serie-a"] = classifica
-                    CLASSIFICA_LAST_UPDATE["serie-a"] = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
-                    print(f"🏆 CLASSIFICA LIVE: {len(classifica)} squadre aggiornate")
-                    return True
-    except Exception as e:
-        print(f"❌ Errore fetch classifica: {e}")
-    return False
-
-def _fetch_marcatori_live():
-    """Scarica classifica marcatori Serie A da API Football."""
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/players/topscorers?league=135&season=2025",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        if data.get("response") and len(data["response"]) > 0:
-            marcatori = []
-            for i, player in enumerate(data["response"][:20], 1):
-                info = player.get("player", {})
-                stats_list = player.get("statistics", [])
-                gol = 0
-                squadra_api = ""
-                for s in stats_list:
-                    if s.get("league", {}).get("id") == 135:
-                        gol = s.get("goals", {}).get("total", 0) or 0
-                        squadra_api = s.get("team", {}).get("name", "")
-                        break
-                if gol == 0 and stats_list:
-                    gol = stats_list[0].get("goals", {}).get("total", 0) or 0
-                    squadra_api = stats_list[0].get("team", {}).get("name", "")
-
-                squadra = FOOTBALL_NOME_MAP.get(squadra_api, squadra_api)
-                marcatori.append({
-                    "pos": i,
-                    "giocatore": info.get("name", "?"),
-                    "squadra": squadra,
-                    "gol": gol,
-                })
-            if len(marcatori) >= 5:
-                MARCATORI_CACHE["serie-a"] = marcatori
-                print(f"⚽ MARCATORI LIVE: {len(marcatori)} giocatori aggiornati")
-                return True
-    except Exception as e:
-        print(f"❌ Errore fetch marcatori: {e}")
-    return False
-
-# ─────────────────────────────
-# ROSE, ALLENATORI, INFORTUNATI LIVE (API Football)
-# ─────────────────────────────
-ROSE_LIVE = {}
-ALLENATORI_LIVE = {}
-INFORTUNATI_LIVE = {}
-ROSE_LAST_UPDATE = ""
-
-# ─────────────────────────────
-# FANTACALCIO - Cache statistiche giocatori
-# ─────────────────────────────
-PLAYER_STATS_CACHE = {}   # {league: {player_name_lower: {media, gol, assist, minuti, presenze, gialli, rossi, rigori_segnati, posizione, forma, forma_trend}}}
-PLAYER_STATS_LAST = 0
-FANTACALCIO_LEAGUES = ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]
-MATCHDAY_CACHE = {}  # {league: {round_num: {"data": str, "partite": [(home, away), ...]}}}
-TEAM_STATS_CACHE = {}  # {league: {"data": {...}, "timestamp": 0}}
-
-# ── Mondiali 2026 ──
-WC_GIRONI_CACHE = {}   # {girone_letter: [{squadra, punti, gf, gs, diff, team_id}, ...]}
-WC_FIXTURES_CACHE = [] # Lista di tutte le partite WC
-WC_LAST_UPDATE = 0
-
-# WC_NOME_MAP and WC_TEAM_IDS are defined in league_mappings.py and imported above.
-
-def _fetch_worldcup_data():
-    """Fetch gironi e partite Mondiali 2026 da API Football."""
-    global WC_GIRONI_CACHE, WC_FIXTURES_CACHE, WC_LAST_UPDATE
-    import time as _time
-    if _time.time() - WC_LAST_UPDATE < 1800:  # Cache 30 min
-        return
-
-    try:
-        # Standings (gironi)
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/standings?league=1&season=2026",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=20) as r:
-            data = json.loads(r.read().decode())
-
-        gironi = {}
-        for resp in data.get("response", []):
-            for grp_list in resp.get("league", {}).get("standings", []):
-                if not grp_list:
-                    continue
-                g_name = grp_list[0].get("group", "")
-                # Estrai lettera girone: "Group A" -> "A"
-                g_letter = g_name.replace("Group ", "").strip()
-                if g_letter.startswith("Ranking"):
-                    continue  # Skip ranking terze
-                squadre = []
-                for team in grp_list:
-                    t_name = team.get("team", {}).get("name", "")
-                    display = WC_NOME_MAP.get(t_name, t_name)
-                    squadre.append({
-                        "pos": team.get("rank", 0),
-                        "squadra": display,
-                        "squadra_api": t_name,
-                        "team_id": team.get("team", {}).get("id", 0),
-                        "punti": team.get("points", 0),
-                        "g": team.get("all", {}).get("played", 0),
-                        "v": team.get("all", {}).get("win", 0),
-                        "p": team.get("all", {}).get("draw", 0),
-                        "s": team.get("all", {}).get("lose", 0),
-                        "gf": team.get("all", {}).get("goals", {}).get("for", 0),
-                        "gs": team.get("all", {}).get("goals", {}).get("against", 0),
-                        "diff": team.get("goalsDiff", 0),
-                    })
-                if g_letter:
-                    gironi[g_letter] = squadre
-
-        WC_GIRONI_CACHE = gironi
-
-        # Fixtures
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=1&season=2026",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=20) as r:
-            data = json.loads(r.read().decode())
-
-        fixtures = []
-        for fix in data.get("response", []):
-            home_api = fix.get("teams", {}).get("home", {}).get("name", "")
-            away_api = fix.get("teams", {}).get("away", {}).get("name", "")
-            fixtures.append({
-                "home": WC_NOME_MAP.get(home_api, home_api),
-                "away": WC_NOME_MAP.get(away_api, away_api),
-                "home_api": home_api,
-                "away_api": away_api,
-                "home_id": fix.get("teams", {}).get("home", {}).get("id", 0),
-                "away_id": fix.get("teams", {}).get("away", {}).get("id", 0),
-                "data": fix.get("fixture", {}).get("date", "")[:10],
-                "ora": fix.get("fixture", {}).get("date", "")[11:16] if "T" in fix.get("fixture", {}).get("date", "") else "",
-                "round": fix.get("league", {}).get("round", ""),
-                "status": fix.get("fixture", {}).get("status", {}).get("short", "NS"),
-                "gol_h": fix.get("goals", {}).get("home"),
-                "gol_a": fix.get("goals", {}).get("away"),
-            })
-
-        WC_FIXTURES_CACHE = sorted(fixtures, key=lambda x: x.get("data", ""))
-        WC_LAST_UPDATE = _time.time()
-        print(f"🏆 Mondiali 2026: {len(gironi)} gironi, {len(fixtures)} partite")
-    except Exception as e:
-        print(f"⚠️ Fetch WC data: {e}")
-
-
-def _fetch_player_stats(league_key):
-    """Fetch statistiche giocatori da API Football per il fantacalcio."""
-    global PLAYER_STATS_CACHE, PLAYER_STATS_LAST
-    lid = LEAGUES.get(league_key, {}).get("id")
-    if not lid:
-        return
-    stats = {}
-    pos_map = {"Goalkeeper": "P", "Defender": "D", "Midfielder": "C", "Attacker": "A"}
-
-    # Fetch topscorers
-    for endpoint in ["topscorers", "topassists"]:
-        try:
-            req = urllib.request.Request(
-                f"https://{FOOTBALL_API_HOST}/players/{endpoint}?league={lid}&season=2025",
-                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-            )
-            with urllib.request.urlopen(req, timeout=15) as r:
-                data = json.loads(r.read().decode())
-            for p in data.get("response", []):
-                pname = p.get("player", {}).get("name", "")
-                if not pname:
-                    continue
-                s = p.get("statistics", [{}])[0]
-                key = pname.lower()
-                existing = stats.get(key, {})
-                goals_data = s.get("goals", {})
-                games_data = s.get("games", {})
-                cards_data = s.get("cards", {})
-                penalty_data = s.get("penalty", {})
-                stats[key] = {
-                    "nome": pname,
-                    "gol": max(existing.get("gol", 0), goals_data.get("total") or 0),
-                    "assist": max(existing.get("assist", 0), goals_data.get("assists") or 0),
-                    "media": float(games_data.get("rating") or existing.get("media", 0) or 0),
-                    "minuti": max(existing.get("minuti", 0), games_data.get("minutes") or 0),
-                    "presenze": max(existing.get("presenze", 0), games_data.get("appearences") or 0),
-                    "gialli": max(existing.get("gialli", 0), cards_data.get("yellow") or 0),
-                    "rossi": max(existing.get("rossi", 0), cards_data.get("red") or 0),
-                    "rigori_segnati": max(existing.get("rigori_segnati", 0), penalty_data.get("scored") or 0),
-                    "posizione": pos_map.get(games_data.get("position", ""), existing.get("posizione", "A")),
-                    "squadra": s.get("team", {}).get("name", existing.get("squadra", "")),
-                }
-        except Exception as e:
-            print(f"\u26a0\ufe0f Fetch player stats {league_key}/{endpoint}: {e}")
-
-    # Calcola forma: controlla se il giocatore ha segnato/assistito di recente nei marcatori
-    marc = MARCATORI_CACHE.get(league_key) or []
-    marc_nomi = set(m.get("giocatore", "").lower().split()[-1] for m in marc if m.get("gol", 0) >= 3)
-    for key, ps in stats.items():
-        cognome = ps["nome"].split()[-1].lower()
-        if cognome in marc_nomi:
-            ps["forma"] = 1.15
-            ps["forma_trend"] = "crescita"
-        elif ps.get("media", 0) >= 7.0:
-            ps["forma"] = 1.05
-            ps["forma_trend"] = "stabile"
-        else:
-            ps["forma"] = 0.95
-            ps["forma_trend"] = "calo"
-
-    PLAYER_STATS_CACHE[league_key] = stats
-    PLAYER_STATS_LAST = time.time()
-    print(f"\U0001f4ca Player stats {league_key}: {len(stats)} giocatori")
-
-
-
-# _TEAM_IDS, _RUOLO_MAP, _ALL_EURO_IDS are defined in league_mappings.py and imported above.
-
-def _fetch_rose_live(team_ids=None):
-    """Scarica rose complete di tutte le squadre da API Football."""
-    global ROSE_LIVE, ALLENATORI_LIVE, ROSE_LAST_UPDATE
-    if team_ids is None:
-        team_ids = _TEAM_IDS
-    try:
-        for nome, team_id in team_ids.items():
-            try:
-                # Rosa
-                req = urllib.request.Request(
-                    f"https://{FOOTBALL_API_HOST}/players/squads?team={team_id}",
-                    headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-                )
-                with urllib.request.urlopen(req, timeout=15) as r:
-                    data = json.loads(r.read().decode())
-                if data.get("response") and len(data["response"]) > 0:
-                    players = data["response"][0].get("players", [])
-                    rosa = []
-                    for p in players:
-                        ruolo_en = p.get("position", "")
-                        ruolo = _RUOLO_MAP.get(ruolo_en, "C")
-                        rosa.append({
-                            "nome": p.get("name", "?"),
-                            "ruolo": ruolo,
-                            "numero": p.get("number", 0) or 0,
-                            "foto": p.get("photo", ""),
-                        })
-                    if rosa:
-                        ROSE_LIVE[nome] = rosa
-
-                # Allenatore
-                req2 = urllib.request.Request(
-                    f"https://{FOOTBALL_API_HOST}/coachs?team={team_id}",
-                    headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-                )
-                with urllib.request.urlopen(req2, timeout=15) as r:
-                    data2 = json.loads(r.read().decode())
-                if data2.get("response") and len(data2["response"]) > 0:
-                    # Prendi l'allenatore attuale (ultimo nella lista)
-                    for coach in data2["response"]:
-                        career = coach.get("career", [])
-                        for c in career:
-                            if c.get("team", {}).get("id") == team_id and c.get("end") is None:
-                                ALLENATORI_LIVE[nome] = coach.get("name", "N/D")
-                                break
-
-                time.sleep(0.5)  # Rate limiting
-            except Exception:
-                _logger.warning("Eccezione silenziata", exc_info=True)
-
-        if ROSE_LIVE:
-            ROSE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
-            print(f"👕 ROSE LIVE: {len(ROSE_LIVE)} squadre aggiornate")
-    except Exception as e:
-        print(f"❌ Errore fetch rose: {e}")
-
-def _fetch_infortunati_live():
-    """Scarica infortunati ATTUALI da API Football (solo quelli non recuperati)."""
-    global INFORTUNATI_LIVE
-    try:
-        # Prendi solo infortuni recenti (ultimi fixture)
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/injuries?league=135&season=2025",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        if data.get("response"):
-            inj_per_team = {}
-            seen_players = {}  # Per evitare duplicati: {team_nome_giocatore: ultimo_infortunio}
-            for item in data["response"]:
-                team_name = FOOTBALL_NOME_MAP.get(
-                    item.get("team", {}).get("name", ""),
-                    item.get("team", {}).get("name", "")
-                )
-                player = item.get("player", {})
-                player_name = player.get("name", "?")
-                reason = player.get("reason", "") or ""
-                ptype = player.get("type", "") or ""
-                fixture_date = item.get("fixture", {}).get("date", "")
-
-                if not team_name or not player_name:
-                    continue
-
-                # Chiave univoca: squadra + giocatore
-                key = f"{team_name}_{player_name}"
-                # Tieni solo l'infortunio piu' recente per ogni giocatore
-                if key in seen_players:
-                    if fixture_date <= seen_players[key]["date"]:
-                        continue
-                seen_players[key] = {
-                    "date": fixture_date,
-                    "team": team_name,
-                    "nome": player_name,
-                    "tipo": "squalifica" if "Suspended" in reason or "Red" in reason else "infortunio",
-                    "dettaglio": reason or ptype or "Indisponibile",
-                }
-
-            # Raggruppa per squadra, max 8 per squadra
-            for key, inj in seen_players.items():
-                team = inj["team"]
-                if team not in inj_per_team:
-                    inj_per_team[team] = []
-                if len(inj_per_team[team]) < 8:
-                    inj_per_team[team].append({
-                        "nome": inj["nome"],
-                        "tipo": inj["tipo"],
-                        "dettaglio": inj["dettaglio"],
-                    })
-
-            if inj_per_team:
-                INFORTUNATI_LIVE = inj_per_team
-                tot = sum(len(v) for v in inj_per_team.values())
-                print(f"🏥 INFORTUNATI LIVE: {tot} giocatori in {len(inj_per_team)} squadre")
-    except Exception as e:
-        print(f"❌ Errore fetch infortunati: {e}")
-
-
-# ─────────────────────────────
-# MARCATORI
-# ─────────────────────────────
-
-# ─────────────────────────────
-# SQUADRE (rose, formazioni, infortunati)
-# ─────────────────────────────
-ALLENATORI = {"Inter":"Cristian Chivu","Milan":"Massimiliano Allegri","Napoli":"Antonio Conte","Como":"Cesc Fabregas","Juventus":"Luciano Spalletti","Roma":"Gian Piero Gasperini","Atalanta":"Raffaele Palladino","Lazio":"Maurizio Sarri","Bologna":"Vincenzo Italiano","Sassuolo":"Fabio Grosso","Udinese":"Kosta Runjaic","Parma":"Carlos Cuesta","Genoa":"Patrick Vieira","Torino":"Roberto D'Aversa","Cagliari":"Fabio Pisacane","Fiorentina":"Paolo Vanoli","Cremonese":"Davide Nicola","Lecce":"Eusebio Di Francesco","Verona":"Paolo Sammarco","Pisa":"Oscar Hiljemark"}
+ALLENATORI = {
+    "Inter":"Cristian Chivu","Milan":"Massimiliano Allegri","Napoli":"Antonio Conte",
+    "Como":"Cesc Fabregas","Juventus":"Luciano Spalletti","Roma":"Gian Piero Gasperini",
+    "Atalanta":"Raffaele Palladino","Lazio":"Maurizio Sarri","Bologna":"Vincenzo Italiano",
+    "Sassuolo":"Fabio Grosso","Udinese":"Kosta Runjaic","Parma":"Carlos Cuesta",
+    "Genoa":"Patrick Vieira","Torino":"Roberto D'Aversa","Cagliari":"Fabio Pisacane",
+    "Fiorentina":"Paolo Vanoli","Cremonese":"Davide Nicola","Lecce":"Eusebio Di Francesco",
+    "Verona":"Paolo Sammarco","Pisa":"Oscar Hiljemark",
+}
 
 TOP_SCORER = {
     "Inter":["Lautaro Martinez (14 gol)","Hakan Calhanoglu (8)","Marcus Thuram (7)"],
@@ -2143,63 +333,46 @@ FORMAZIONI = {
 }
 
 INFORTUNATI = {
-    "Inter":[{"nome":"Lautaro Martinez","tipo":"infortunio","dettaglio":"Da monitorare, rientro inizio aprile"},{"nome":"Mkhitaryan","tipo":"infortunio","dettaglio":"Problema muscolare"},{"nome":"Carlos Augusto","tipo":"squalifica","dettaglio":"Squalificato 1 giornata"}],
-    "Milan":[{"nome":"Gabbia","tipo":"infortunio","dettaglio":"Problema muscolare, rientro aprile"},{"nome":"Loftus-Cheek","tipo":"infortunio","dettaglio":"Infortunio ginocchio"},{"nome":"Leao","tipo":"dubbio","dettaglio":"Affaticamento, da valutare"}],
-    "Napoli":[{"nome":"Neres","tipo":"infortunio","dettaglio":"Problema muscolare, rientro aprile"},{"nome":"Di Lorenzo","tipo":"infortunio","dettaglio":"Distorsione ginocchio, fine aprile"},{"nome":"Rrahmani","tipo":"infortunio","dettaglio":"Rientro maggio"}],
+    "Inter":[{"nome":"Lautaro Martinez","tipo":"infortunio","dettaglio":"Da monitorare"},{"nome":"Mkhitaryan","tipo":"infortunio","dettaglio":"Problema muscolare"}],
+    "Milan":[{"nome":"Gabbia","tipo":"infortunio","dettaglio":"Problema muscolare"},{"nome":"Loftus-Cheek","tipo":"infortunio","dettaglio":"Infortunio ginocchio"}],
+    "Napoli":[{"nome":"Neres","tipo":"infortunio","dettaglio":"Problema muscolare"},{"nome":"Di Lorenzo","tipo":"infortunio","dettaglio":"Distorsione ginocchio"}],
     "Juventus":[{"nome":"Holm","tipo":"infortunio","dettaglio":"Rientro inizio aprile"}],
-    "Roma":[{"nome":"Kone","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Dybala","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Dovbyk","tipo":"infortunio","dettaglio":"Rientro maggio"},{"nome":"Ferguson","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Roma":[{"nome":"Kone","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Dybala","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Dovbyk","tipo":"infortunio","dettaglio":"Rientro maggio"}],
     "Atalanta":[{"nome":"Scamacca","tipo":"dubbio","dettaglio":"Da monitorare"}],
-    "Lazio":[{"nome":"Zaccagni","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Rovella","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Provedel","tipo":"infortunio","dettaglio":"Stagione finita"}],
-    "Bologna":[{"nome":"Odgaard","tipo":"infortunio","dettaglio":"Meta aprile"},{"nome":"Pobega","tipo":"infortunio","dettaglio":"Meta aprile"},{"nome":"Skorupski","tipo":"infortunio","dettaglio":"Maggio"}],
-    "Sassuolo":[{"nome":"Pieragnolo","tipo":"infortunio","dettaglio":"Inizio aprile"},{"nome":"Cande","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Fadera","tipo":"infortunio","dettaglio":"Maggio"}],
-    "Udinese":[{"nome":"Buksa","tipo":"infortunio","dettaglio":"Meta aprile"},{"nome":"Zanoli","tipo":"infortunio","dettaglio":"Stagione finita"}],
-    "Parma":[{"nome":"Almqvist","tipo":"infortunio","dettaglio":"Rientro dopo sosta"},{"nome":"Cremaschi","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Lazio":[{"nome":"Zaccagni","tipo":"infortunio","dettaglio":"Fine aprile"},{"nome":"Rovella","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Bologna":[{"nome":"Odgaard","tipo":"infortunio","dettaglio":"Meta aprile"}],
+    "Sassuolo":[{"nome":"Pieragnolo","tipo":"infortunio","dettaglio":"Inizio aprile"}],
+    "Udinese":[{"nome":"Buksa","tipo":"infortunio","dettaglio":"Meta aprile"}],
+    "Parma":[{"nome":"Almqvist","tipo":"infortunio","dettaglio":"Rientro dopo sosta"}],
     "Genoa":[{"nome":"Onana","tipo":"dubbio","dettaglio":"Da valutare"}],
     "Torino":[{"nome":"Aboukhlal","tipo":"dubbio","dettaglio":"Da valutare"}],
-    "Cagliari":[{"nome":"Felici","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Idrissi","tipo":"infortunio","dettaglio":"Stagione finita"}],
-    "Fiorentina":[{"nome":"Solomon","tipo":"infortunio","dettaglio":"Rientro aprile"},{"nome":"Lamptey","tipo":"infortunio","dettaglio":"Rientro aprile"}],
+    "Cagliari":[{"nome":"Felici","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Fiorentina":[{"nome":"Solomon","tipo":"infortunio","dettaglio":"Rientro aprile"}],
     "Cremonese":[{"nome":"Baschirotto","tipo":"infortunio","dettaglio":"Inizio aprile"}],
-    "Lecce":[{"nome":"Gaspar","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Berisha","tipo":"infortunio","dettaglio":"Stagione finita"},{"nome":"Camarda","tipo":"infortunio","dettaglio":"Rientro aprile"}],
-    "Verona":[], "Pisa":[{"nome":"Denoon","tipo":"infortunio","dettaglio":"Lungodegente"},{"nome":"Scuffet","tipo":"infortunio","dettaglio":"Inizio aprile"}],
+    "Lecce":[{"nome":"Gaspar","tipo":"infortunio","dettaglio":"Stagione finita"}],
+    "Verona":[], "Pisa":[{"nome":"Denoon","tipo":"infortunio","dettaglio":"Lungodegente"}],
     "Como":[{"nome":"Addai","tipo":"infortunio","dettaglio":"Stagione finita"}],
 }
 
 ROSE = {
-    "Inter":[("Sommer","P",1),("Martinez J.","P",13),("Di Gennaro","P",12),("Bastoni","D",95),("Bisseck","D",31),("Akanji","D",25),("De Vrij","D",6),("Acerbi","D",15),("Dimarco","D",32),("Carlos Augusto","D",30),("Dumfries","D",2),("Darmian","D",36),("Calhanoglu","C",20),("Barella","C",23),("Sucic","C",8),("Frattesi","C",16),("Diouf","C",17),("Zielinski","C",7),("Mkhitaryan","C",22),("Lautaro Martinez","A",10),("Thuram","A",9),("Bonny","A",14),("Pio Esposito","A",94),("Luis Henrique","A",11)],
-    "Milan":[("Maignan","P",16),("Terracciano","P",1),("Torriani","P",96),("Pavlovic","D",31),("De Winter","D",5),("Tomori","D",23),("Gabbia","D",46),("Estupinan","D",2),("Bartesaghi","D",33),("Ricci","C",4),("Fofana","C",19),("Rabiot","C",12),("Loftus-Cheek","C",8),("Modric","C",14),("Jashari","C",30),("Leao","A",10),("Pulisic","A",11),("Nkunku","A",18),("Gimenez","A",7),("Fullkrug","A",9),("Saelemaekers","A",56)],
-    "Napoli":[("Meret","P",1),("Contini","P",14),("Milinkovic-Savic","P",32),("Buongiorno","D",4),("Beukema","D",31),("Rrahmani","D",13),("Gutierrez","D",3),("Olivera","D",17),("Di Lorenzo","D",22),("Spinazzola","D",37),("Mazzocchi","D",30),("Gilmour","C",6),("Lobotka","C",68),("McTominay","C",8),("Anguissa","C",99),("De Bruyne","C",11),("Hojlund","A",19),("Lukaku","A",9),("Neres","A",7),("Politano","A",21),("Giovane","A",23),("Alisson Santos","A",77)],
-    "Juventus":[("Di Gregorio","P",16),("Perin","P",1),("Pinsoglio","P",23),("Bremer","D",3),("Kalulu","D",15),("Kelly","D",6),("Gatti","D",4),("Cambiaso","D",27),("Cabal","D",32),("Holm","D",2),("Locatelli","C",5),("Thuram K.","C",19),("McKennie","C",22),("Koopmeiners","C",8),("Kostic","C",18),("Vlahovic","A",9),("David","A",30),("Openda","A",20),("Conceicao","A",7),("Yildiz","A",10),("Zhegrova","A",11),("Boga","A",14)],
-    "Roma":[("Svilar","P",99),("Gollini","P",95),("Zelezny","P",91),("Ndicka","D",5),("Mancini","D",23),("Hermoso","D",22),("Angelino","D",3),("Tsimikas","D",12),("Wesley","D",43),("Celik","D",19),("Rensch","D",2),("Cristante","C",4),("Kone","C",17),("El Aynaoui","C",8),("Pisilli","C",61),("Pellegrini","C",7),("Dybala","A",21),("Malen","A",14),("Ferguson","A",11),("Dovbyk","A",9),("Soule","A",18),("El Shaarawy","A",92),("Zaragoza","A",97),("Vaz","A",78)],
-    "Atalanta":[("Carnesecchi","P",29),("Sportiello","P",57),("Rossi","P",31),("Scalvini","D",42),("Hien","D",4),("Kossounou","D",3),("Kolasinac","D",23),("Djimsiti","D",19),("Ederson","C",13),("Musah","C",6),("Pasalic","C",8),("De Roon","C",15),("Bellanova","C",16),("Zappacosta","C",77),("Zalewski","C",59),("De Ketelaere","A",17),("Samardzic","A",10),("Raspadori","A",18),("Scamacca","A",9),("Krstovic","A",90)],
-    "Lazio":[("Provedel","P",94),("Motta","P",40),("Furlanetto","P",55),("Gila","D",34),("Provstgaard","D",25),("Romagnoli","D",13),("Gigot","D",2),("Patric","D",4),("Tavares","D",17),("Pellegrini L.","D",3),("Marusic","D",77),("Lazzari","D",29),("Rovella","C",6),("Belahyane","C",21),("Taylor","C",24),("Dele-Bashiru","C",7),("Maldini","A",27),("Przyborek","A",28),("Zaccagni","A",10),("Isaksen","A",18),("Dia","A",19),("Pedro","A",9),("Noslin","A",14),("Ratkov","A",20)],
-    "Bologna":[("Skorupski","P",1),("Ravaglia","P",13),("Pessina","P",25),("Lucumi","D",26),("Heggem","D",14),("Vitik","D",41),("Helland","D",5),("Casale","D",16),("Miranda","D",33),("Joao Mario","D",17),("Zortea","D",20),("Moro","C",6),("Ferguson L.","C",19),("Pobega","C",4),("Freuler","C",8),("Odgaard","C",21),("Sohm","C",23),("Castro","A",9),("Dallinga","A",24),("Orsolini","A",7),("Bernardeschi","A",10),("Rowe","A",11)],
-    "Sassuolo":[("Muric","P",49),("Turati","P",13),("Zacchi","P",16),("Idzes","D",21),("Doig","D",3),("Walukiewicz","D",6),("Romagna","D",19),("Pieragnolo","D",15),("Garcia","D",23),("Coulibaly","D",25),("Lipani","C",35),("Boloca","C",11),("Matic","C",18),("Kone","C",90),("Thorstvedt","C",42),("Vranckx","C",40),("Berardi","A",25),("Pinamonti","A",9),("Lauriente","A",45),("Volpato","A",7)],
-    "Udinese":[("Okoye","P",40),("Sava","P",90),("Nunziante","P",1),("Solet","D",28),("Kristensen","D",31),("Bertola","D",13),("Mlacic","D",22),("Kabasele","D",27),("Zemura","D",33),("Kamara","D",11),("Zanoli","D",59),("Ehizibue","D",19),("Karlstrom","C",8),("Camara","C",29),("Miller","C",38),("Zarraga","C",6),("Piotrowski","C",24),("Zaniolo","A",10),("Davis","A",9),("Buksa","A",18),("Bayo","A",15)],
-    "Parma":[("Suzuki","P",31),("Corvi","P",40),("Rinaldi","P",66),("Circati","D",39),("Valenti","D",5),("Delprato","D",15),("Valeri","D",14),("Carboni","D",29),("Britschgi","D",27),("Ndiaye","D",3),("Keita","C",16),("Estevez","C",8),("Bernabe","C",10),("Sorensen","C",22),("Nicolussi Caviglia","C",41),("Oristanio","C",21),("Strefezza","A",7),("Almqvist","A",11),("Pellegrino","A",9),("Ondrejka","A",17)],
-    "Genoa":[("Bijlow","P",16),("Leali","P",1),("Siegrist","P",31),("Vasquez","D",22),("Ostigard","D",5),("Marcandalli","D",27),("Zattstrom","D",13),("Martin","D",3),("Norton-Cuffy","D",15),("Sabelli","D",20),("Frendrup","C",32),("Onana","C",14),("Malinovskyi","C",17),("Baldanzi","C",8),("Ellertsson","C",77),("Messias","A",10),("Colombo","A",29),("Vitinha","A",9),("Ekuban","A",18),("Ekhator","A",21)],
-    "Torino":[("Israel","P",81),("Paleari","P",1),("Siviero","P",99),("Coco","D",23),("Ismajli","D",44),("Maripan","D",13),("Ebosse","D",77),("Biraghi","D",34),("Pedersen","D",16),("Nkounkou","D",25),("Obrador","D",33),("Prati","C",4),("Casadei","C",22),("Ilic","C",8),("Gineitis","C",66),("Lazaro","C",20),("Tameze","C",61),("Vlasic","A",10),("Adams","A",19),("Simeone","A",7),("Aboukhlal","A",17)],
-    "Cagliari":[("Caprile","P",1),("Sherri","P",12),("Ciocci","P",24),("Dossena","D",22),("Obert","D",33),("Rodriguez","D",15),("Mina","D",26),("Ze Pedro","D",32),("Zappa","D",28),("Raterink","D",18),("Sulemana","C",25),("Adopo","C",8),("Folorunsho","C",90),("Mazzitelli","C",4),("Gaetano","C",10),("Deiola","C",14),("Esposito","A",94),("Kilicsoy","A",9),("Felici","A",17),("Borrelli","A",29)],
-    "Fiorentina":[("De Gea","P",43),("Christensen","P",53),("Lezzerini","P",1),("Comuzzo","D",15),("Pongracic","D",5),("Ranieri","D",6),("Gosens","D",21),("Dodo","D",2),("Lamptey","D",48),("Parisi","D",65),("Fortini","D",29),("Mandragora","C",8),("Fagioli","C",44),("Ndour","C",27),("Brescianini","C",4),("Fazzini","C",22),("Gudmundsson","A",10),("Kean","A",9),("Beltran","A",7),("Sottil","A",14),("Harrison","A",17),("Solomon","A",19)],
-    "Cremonese":[("Audero","P",1),("Silvestri","P",16),("Nava","P",69),("Pezzella","D",3),("Luperto","D",5),("Baschirotto","D",6),("Bianchetti","D",15),("Barbieri","D",4),("Faye","D",30),("Terracciano F.","D",24),("Thorsby","C",2),("Bondo","C",38),("Vandeputte","C",27),("Maleh","C",29),("Payero","C",32),("Grassi","C",33),("Collocolo","C",18),("Vardy","A",10),("Djuric","A",9),("Zerbin","A",7),("Okereke","A",77),("Sanabria","A",99),("Bonazzoli","A",90)],
-    "Lecce":[("Falcone","P",30),("Fruchtl","P",1),("Samooja","P",32),("Gaspar","D",4),("Gallo","D",25),("Veiga","D",17),("Jean","D",18),("Perez","D",13),("Ndaba","D",3),("Siebert","D",5),("Ramadani","C",20),("Fofana","C",8),("Berisha","C",10),("Coulibaly","C",29),("Sala","C",6),("Helgason","C",14),("Marchwinski","C",36),("Banda","A",19),("Camarda","A",22),("Cheddira","A",99),("N'Dri","A",11),("Pierotti","A",50)],
-    "Verona":[("Montipo","P",1),("Perilli","P",34),("Toniolo","P",94),("Nelsson","D",15),("Bella-Kotchap","D",37),("Slotsager","D",19),("Edmundsson","D",5),("Frese","D",3),("Bradaric","D",12),("Lirola","D",14),("Oyegoke","D",2),("Al-Musrati","C",73),("Lovric","C",4),("Serdar","C",8),("Harroui","C",21),("Gagliardini","C",63),("Akpa Akpro","C",11),("Suslov","A",10),("Henry","A",9),("Tengstedt","A",20),("Lazovic","A",17),("Duda","A",27)],
-    "Pisa":[("Semper","P",1),("Nicolas","P",12),("Scuffet","P",22),("Canestrelli","D",5),("Calabresi","D",33),("Loyola","D",35),("Angori","D",3),("Albiol","D",39),("Marin","C",6),("Leris","C",7),("Hojholt","C",8),("Cuadrado","C",11),("Akinsanmiro","C",14),("Aebischer","C",20),("Stengs","C",23),("Lorran","C",99),("Meister","A",9),("Tramoni","A",10),("Durosinmi","A",17),("Iling-Junior","A",19),("Moreo","A",32)],
-    "Como":[("Butez","P",1),("Tornqvist","P",21),("Cavlina","P",44),("Diego Carlos","D",34),("Kempf","D",2),("Goldaniga","D",5),("Valle","D",3),("Moreno","D",18),("Van der Brempt","D",77),("Vojvoda","D",31),("Smolcic","D",28),("Ramon","D",14),("Perrone","C",23),("Da Cunha","C",33),("Caqueret","C",6),("Ladho","C",15),("Sergi Roberto","C",8),("Paz","C",10),("Baturina","C",20),("Diao","A",38),("Kuhn","A",19),("Douvikas","A",11),("Morata","A",7),("Jesus Rodriguez","A",17)],
+    "Inter":[("Sommer","P",1),("Bastoni","D",95),("Akanji","D",25),("Bisseck","D",31),("Dimarco","D",32),("Barella","C",23),("Calhanoglu","C",20),("Sucic","C",8),("Dumfries","D",2),("Thuram","A",9),("Lautaro Martinez","A",10)],
+    "Milan":[("Maignan","P",16),("Pavlovic","D",31),("De Winter","D",5),("Tomori","D",23),("Estupinan","D",2),("Fofana","C",19),("Ricci","C",4),("Modric","C",14),("Leao","A",10),("Pulisic","A",11),("Gimenez","A",7)],
 }
 
-_FORMAZIONE_CACHE = {}  # Cache formazioni on-demand
-_COACH_CACHE = {}  # Cache allenatori on-demand
+# ─────────────────────────────
+# ON-DEMAND FORMAZIONI/ROSE/ALLENATORI
+# ─────────────────────────────
+_FORMAZIONE_CACHE = {}
+_COACH_CACHE = {}
+_ROSA_CACHE_OD = {}
 
 def _get_last_lineup(team_name):
-    """Scarica la formazione dall'ultima partita giocata da una squadra."""
     if team_name in _FORMAZIONE_CACHE:
         return _FORMAZIONE_CACHE[team_name]
-    # Cerca team_id in entrambi i campionati
     team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return None
     try:
-        # Ultima partita giocata
         req = urllib.request.Request(
             f"https://{FOOTBALL_API_HOST}/fixtures?team={team_id}&last=1",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
@@ -2211,7 +384,6 @@ def _get_last_lineup(team_name):
         fix_id = data["response"][0].get("fixture", {}).get("id")
         if not fix_id:
             return None
-        # Lineup di quella partita
         req2 = urllib.request.Request(
             f"https://{FOOTBALL_API_HOST}/fixtures/lineups?fixture={fix_id}",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
@@ -2223,7 +395,6 @@ def _get_last_lineup(team_name):
                 if lineup.get("team", {}).get("id") == team_id:
                     formazione = lineup.get("formation", "4-4-2")
                     titolari = [p.get("player", {}).get("name", "?") for p in lineup.get("startXI", [])]
-                    # Salva anche l'allenatore
                     coach = lineup.get("coach", {}).get("name", "")
                     if coach:
                         _COACH_CACHE[team_name] = coach
@@ -2237,7 +408,6 @@ def _get_last_lineup(team_name):
     return None
 
 def _get_coach_ondemand(team_name):
-    """Scarica l'allenatore attuale da API Football."""
     if team_name in _COACH_CACHE:
         return _COACH_CACHE[team_name]
     team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
@@ -2252,13 +422,11 @@ def _get_coach_ondemand(team_name):
             data = json.loads(r.read().decode())
         if data.get("response"):
             for coach in data["response"]:
-                career = coach.get("career", [])
-                for c in career:
+                for c in coach.get("career", []):
                     if c.get("team", {}).get("id") == team_id and c.get("end") is None:
                         name = coach.get("name", "N/D")
                         _COACH_CACHE[team_name] = name
                         return name
-            # Se non trovato con end=None, prendi l'ultimo
             if data["response"]:
                 name = data["response"][-1].get("name", "N/D")
                 _COACH_CACHE[team_name] = name
@@ -2267,10 +435,7 @@ def _get_coach_ondemand(team_name):
         _logger.warning("Eccezione silenziata", exc_info=True)
     return None
 
-_ROSA_CACHE_OD = {}  # Cache rosa on-demand
-
 def _get_squad_ondemand(team_name):
-    """Scarica la rosa di una squadra on-demand da API Football."""
     if team_name in _ROSA_CACHE_OD:
         return _ROSA_CACHE_OD[team_name]
     team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
@@ -2285,10 +450,7 @@ def _get_squad_ondemand(team_name):
             data = json.loads(r.read().decode())
         if data.get("response") and len(data["response"]) > 0:
             players = data["response"][0].get("players", [])
-            rosa = []
-            for p in players:
-                ruolo = _RUOLO_MAP.get(p.get("position", ""), "C")
-                rosa.append({"nome": p.get("name", "?"), "ruolo": ruolo, "numero": p.get("number", 0) or 0, "foto": p.get("photo", "")})
+            rosa = [{"nome": p.get("name", "?"), "ruolo": _RUOLO_MAP.get(p.get("position", ""), "C"), "numero": p.get("number", 0) or 0, "foto": p.get("photo", "")} for p in players]
             if rosa:
                 _ROSA_CACHE_OD[team_name] = rosa
                 return rosa
@@ -2297,12 +459,10 @@ def _get_squad_ondemand(team_name):
     return []
 
 def _get_injuries_ondemand(team_name):
-    """Scarica SOLO infortunati attuali di una squadra (ultimi 2 fixture)."""
     team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return []
     try:
-        # Prendi solo le ultime 2 partite per avere infortuni recenti
         req = urllib.request.Request(
             f"https://{FOOTBALL_API_HOST}/injuries?team={team_id}&season=2025",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
@@ -2310,13 +470,11 @@ def _get_injuries_ondemand(team_name):
         with urllib.request.urlopen(req, timeout=10) as r:
             data = json.loads(r.read().decode())
         if data.get("response"):
-            # Prendi solo infortuni dalle ultime 2 giornate (fixture piu' recenti)
             fixtures_dates = sorted(set(item.get("fixture", {}).get("date", "")[:10] for item in data["response"]), reverse=True)
-            recent_dates = set(fixtures_dates[:2])  # Solo ultime 2 date
+            recent_dates = set(fixtures_dates[:2])
             seen = {}
             for item in data["response"]:
-                fix_date = item.get("fixture", {}).get("date", "")[:10]
-                if fix_date not in recent_dates:
+                if item.get("fixture", {}).get("date", "")[:10] not in recent_dates:
                     continue
                 player = item.get("player", {})
                 name = player.get("name", "?")
@@ -2325,28 +483,401 @@ def _get_injuries_ondemand(team_name):
                 if name in seen:
                     continue
                 seen[name] = {"nome": name, "tipo": "squalifica" if "Suspended" in reason or "Red" in reason else "infortunio", "dettaglio": reason or ptype or "Indisponibile"}
-            return [v for v in list(seen.values())[:6]]
+            return list(seen.values())[:6]
     except Exception:
         _logger.warning("Eccezione silenziata", exc_info=True)
     return []
 
+# ─────────────────────────────
+# HELPER PRONOSTICI
+# ─────────────────────────────
+def _filtra_marcatori(marcatori, infortunati):
+    if not infortunati:
+        return marcatori
+    nomi_inj = set()
+    for inj in infortunati:
+        nome = inj.get("nome", "").lower()
+        for p in nome.split():
+            if len(p) > 3:
+                nomi_inj.add(p)
+    return [m for m in marcatori if not any(ni in m.lower() for ni in nomi_inj)]
+
+def _filtra_esatti(scores, ov25, suggerimento="1"):
+    def get_segno(score):
+        h, a = int(score.split("-")[0]), int(score.split("-")[1])
+        return "1" if h > a else ("X" if h == a else "2")
+    def get_totale(score):
+        return int(score.split("-")[0]) + int(score.split("-")[1])
+    coerenti = [s for s in scores if get_segno(s["score"]) == suggerimento]
+    altri = [s for s in scores if get_segno(s["score"]) != suggerimento]
+    if ov25 > 0.50:
+        coerenti_ou = [s for s in coerenti if get_totale(s["score"]) >= 3]
+        if len(coerenti_ou) < 3:
+            coerenti_ou += [s for s in coerenti if get_totale(s["score"]) == 2]
+    else:
+        coerenti_ou = [s for s in coerenti if get_totale(s["score"]) <= 2]
+        if len(coerenti_ou) < 3:
+            coerenti_ou += [s for s in coerenti if get_totale(s["score"]) == 3]
+    coerenti_ou = [s for s in coerenti_ou if all(int(x) <= 4 for x in s["score"].split("-"))]
+    return (coerenti_ou[:3] + altri[:2])[:5]
+
+def genera_pronostico(home, away):
+    """Pronostico Poisson/xG per Serie A (o fallback generico)."""
+    if MOTORE_DISPONIBILE and _df is not None:
+        try:
+            hs = get_team_stats(_df, home, opponent=away)
+            aw = get_team_stats(_df, away, opponent=home)
+            return get_prediction(hs, aw, df=_df)
+        except Exception as e:
+            print(f"❌ ERRORE PREDICTOR: {e}")
+
+    from scipy.stats import poisson as pdist
+    try:
+        from api_football_stats import get_team_real_stats
+    except ImportError:
+        get_team_real_stats = lambda x: None
+
+    _stats_path = os.path.join(os.path.dirname(__file__), "team_stats.json")
+    _h2h_path = os.path.join(os.path.dirname(__file__), "h2h_stats.json")
+    _avg_path = os.path.join(os.path.dirname(__file__), "league_averages.json")
+    try:
+        with open(_stats_path) as f: TEAM_STATS = json.loads(f.read())
+        with open(_h2h_path) as f: H2H_DATA = json.loads(f.read())
+        with open(_avg_path) as f: LEAGUE_AVG = json.loads(f.read())
+    except Exception:
+        TEAM_STATS = {}; H2H_DATA = {}; LEAGUE_AVG = {"media_gol_casa": 1.5, "media_gol_trasferta": 1.17}
+
+    h = home.strip().title()
+    a = away.strip().title()
+    sh = TEAM_STATS.get(h, {})
+    sa = TEAM_STATS.get(a, {})
+    api_h = get_team_real_stats(h)
+    api_a = get_team_real_stats(a)
+    has_api = api_h and api_a and api_h.get("played", 0) >= 10 and api_a.get("played", 0) >= 10
+
+    if not has_api:
+        for league_key in ["serie-a", "premier-league", "la-liga", "champions-league", "europa-league", "conference-league"]:
+            cl = CLASSIFICA_CACHE.get(league_key) or []
+            if not cl and league_key != "serie-a":
+                try:
+                    _fetch_league_data(league_key)
+                    cl = CLASSIFICA_CACHE.get(league_key) or []
+                except Exception:
+                    _logger.warning("Eccezione silenziata", exc_info=True)
+            data_h = next((r for r in cl if r["Squadra"] == h), None)
+            data_a = next((r for r in cl if r["Squadra"] == a), None)
+            if data_h and data_a:
+                g_h = max(1, data_h["G"])
+                g_a = max(1, data_a["G"])
+                gf_h = data_h["GF"] / g_h
+                gs_h = data_h["GS"] / g_h
+                gf_a = data_a["GF"] / g_a
+                gs_a = data_a["GS"] / g_a
+                avg_gf = sum(r["GF"] for r in cl) / sum(max(1, r["G"]) for r in cl)
+                avg_gs = sum(r["GS"] for r in cl) / sum(max(1, r["G"]) for r in cl)
+                att_h = gf_h / max(0.3, avg_gf)
+                dif_h = gs_h / max(0.3, avg_gs)
+                att_a = gf_a / max(0.3, avg_gf)
+                dif_a = gs_a / max(0.3, avg_gs)
+                lh = att_h * dif_a * 1.45
+                la = att_a * dif_h * 1.10
+                pts_diff = (data_h["Punti"] - data_a["Punti"]) / 100
+                lh *= (1 + pts_diff * 0.3)
+                la *= (1 - pts_diff * 0.3)
+                form_h = data_h["V"] / g_h
+                form_a = data_a["V"] / g_a
+                form_diff = form_h - form_a
+                lh *= (1 + form_diff * 0.2)
+                la *= (1 - form_diff * 0.2)
+                lh = max(0.4, min(lh, 3.0))
+                la = max(0.3, min(la, 2.2))
+                p1 = px = p2 = 0.0
+                for i in range(11):
+                    for j in range(11):
+                        p = pdist.pmf(i, lh) * pdist.pmf(j, la)
+                        rho = -0.10
+                        if i==0 and j==0: p *= (1 - lh*la*rho)
+                        elif i==1 and j==0: p *= (1 + la*rho)
+                        elif i==0 and j==1: p *= (1 + lh*rho)
+                        elif i==1 and j==1: p *= (1 - rho)
+                        p = max(0, p)
+                        if i > j: p1 += p
+                        elif i == j: px += p
+                        else: p2 += p
+                px *= 1.10
+                ratio = min(lh,la)/max(lh,la) if max(lh,la)>0 else 0
+                if ratio > 0.85: px *= 1 + (ratio-0.85)*0.5
+                tot = p1 + px + p2
+                if tot > 0: p1/=tot; px/=tot; p2/=tot
+                bk_odds = get_bookmaker_odds(h, a)
+                if bk_odds:
+                    bp1 = bk_odds["prob_1"]/100; bpx = bk_odds["prob_x"]/100; bp2 = bk_odds["prob_2"]/100
+                    p1 = 0.60*p1 + 0.40*bp1; px = 0.60*px + 0.40*bpx; p2 = 0.60*p2 + 0.40*bp2
+                    tot = p1+px+p2
+                    if tot>0: p1/=tot; px/=tot; p2/=tot
+                ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
+                gsi = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
+                ga = lh + la
+                lm = min(lh, la)
+                if ga > 3.0 and lm >= 0.8: gsi = max(gsi, 0.55 + (ga-3.0)*0.04); gsi = min(gsi, 0.80)
+                elif ga > 2.5 and lm >= 0.7: gsi = max(gsi, 0.50 + (ga-2.5)*0.04)
+                scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
+                mp = max(p1, px, p2)
+                sg = "1" if mp==p1 else ("X" if mp==px else "2")
+                sl = "Vittoria Casa" if sg=="1" else ("Pareggio" if sg=="X" else "Vittoria Ospite")
+                sp = sorted([p1,px,p2], reverse=True)
+                spread = sp[0] - sp[1]
+                cf = min(1.0, 0.40*(min(spread/0.35,1.0)) + 0.30*(min(g_h/30,1.0)) + 0.30*(min(abs(pts_diff)*3,1.0)))
+                cl_label = "Alta" if cf>=0.82 else ("Media" if cf>=0.50 else "Bassa")
+                sicura = cf >= 0.82 and sp[0] > 0.45
+                return {"prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),"quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,"suggerimento":sg,"sugg_label":sl,"confidence":round(cf,3),"confidence_label":cl_label,"sicura":bool(sicura),"over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),"goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),"gol_attesi":round(lh+la,2),"risultati_esatti":_filtra_esatti(scores, ov25, sg),"bookmaker_used":bk_odds is not None}
+
+    # Fallback xG
+    XG = {"Inter":{"xG":2.40,"xGA":0.84},"Milan":{"xG":1.83,"xGA":1.12},"Napoli":{"xG":1.56,"xGA":1.10},"Como":{"xG":1.80,"xGA":1.08},"Juventus":{"xG":1.97,"xGA":0.97},"Roma":{"xG":1.54,"xGA":1.20},"Atalanta":{"xG":1.86,"xGA":1.38},"Lazio":{"xG":1.21,"xGA":1.34},"Bologna":{"xG":1.34,"xGA":1.39},"Sassuolo":{"xG":1.19,"xGA":1.63},"Udinese":{"xG":1.19,"xGA":1.56},"Parma":{"xG":1.00,"xGA":1.62},"Genoa":{"xG":1.30,"xGA":1.45},"Torino":{"xG":1.33,"xGA":1.57},"Cagliari":{"xG":1.01,"xGA":1.65},"Fiorentina":{"xG":1.52,"xGA":1.53},"Cremonese":{"xG":1.03,"xGA":1.87},"Lecce":{"xG":0.93,"xGA":1.67},"Verona":{"xG":1.03,"xGA":1.40},"Pisa":{"xG":1.14,"xGA":1.82}}
+    xh = XG.get(h, {"xG":1.3,"xGA":1.3})
+    xa = XG.get(a, {"xG":1.3,"xGA":1.3})
+    avg = sum(v["xGA"] for v in XG.values()) / len(XG)
+    lh = xh["xG"] * (xa["xGA"] / avg)
+    la = xa["xG"] * (xh["xGA"] / avg)
+    lh = max(0.3, min(lh, 2.2))
+    la = max(0.2, min(la, 1.6))
+    p1 = px = p2 = 0.0
+    for i in range(11):
+        for j in range(11):
+            p = pdist.pmf(i, lh) * pdist.pmf(j, la)
+            p = max(0, p)
+            if i > j: p1 += p
+            elif i == j: px += p
+            else: p2 += p
+    tot = p1 + px + p2
+    if tot > 0: p1/=tot; px/=tot; p2/=tot
+    ov25 = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(11) for j in range(11) if i+j>2.5)
+    gsi = sum(pdist.pmf(i,lh)*pdist.pmf(j,la) for i in range(1,11) for j in range(1,11))
+    scores = sorted([{"score":f"{i}-{j}","prob":round(pdist.pmf(i,lh)*pdist.pmf(j,la)*100,1)} for i in range(5) for j in range(5)], key=lambda x:-x["prob"])
+    mp = max(p1, px, p2)
+    sg = "1" if mp==p1 else ("X" if mp==px else "2")
+    sl = "Vittoria Casa" if sg=="1" else ("Pareggio" if sg=="X" else "Vittoria Ospite")
+    return {"prob_1":round(p1*100,1),"prob_x":round(px*100,1),"prob_2":round(p2*100,1),"quota_1":round(1.05/p1,2) if p1>0 else 99,"quota_x":round(1.05/px,2) if px>0 else 99,"quota_2":round(1.05/p2,2) if p2>0 else 99,"suggerimento":sg,"sugg_label":sl,"confidence":0.5,"confidence_label":"Media","sicura":False,"over_25":round(ov25*100,1),"under_25":round((1-ov25)*100,1),"goal_si":round(gsi*100,1),"goal_no":round((1-gsi)*100,1),"gol_attesi":round(lh+la,2),"risultati_esatti":_filtra_esatti(scores, ov25, sg),"bookmaker_used":False}
+
+
+def _compute_pronostico(league: str, home: str, away: str) -> dict:
+    """Calcola pronostico unificato per qualsiasi campionato."""
+    raw = None
+    if league == "premier-league" and _df_pl is not None and len(_df_pl) > 100:
+        try:
+            hs = get_team_stats(_df_pl, home, opponent=away)
+            aw = get_team_stats(_df_pl, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_pl, league="premier-league")
+        except Exception:
+            raw = None
+    elif league == "la-liga" and _df_ll is not None and len(_df_ll) > 100:
+        try:
+            hs = get_team_stats(_df_ll, home, opponent=away)
+            aw = get_team_stats(_df_ll, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_ll, league="la-liga")
+        except Exception:
+            raw = None
+    elif league == "bundesliga" and _df_bl is not None and len(_df_bl) > 100:
+        try:
+            hs = get_team_stats(_df_bl, home, opponent=away)
+            aw = get_team_stats(_df_bl, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_bl, league="bundesliga")
+        except Exception:
+            raw = None
+    elif league == "ligue-1" and _df_l1 is not None and len(_df_l1) > 100:
+        try:
+            hs = get_team_stats(_df_l1, home, opponent=away)
+            aw = get_team_stats(_df_l1, away, opponent=home)
+            raw = get_prediction(hs, aw, df=_df_l1, league="ligue-1")
+        except Exception:
+            raw = None
+    elif league in ("champions-league", "europa-league", "conference-league"):
+        euro_df = _df_ucl if league == "champions-league" else (_df_uel if league == "europa-league" else _df_uecl)
+        raw_euro = None
+        if euro_df is not None and len(euro_df) > 100:
+            try:
+                hs = get_team_stats(euro_df, home, opponent=away)
+                aw = get_team_stats(euro_df, away, opponent=home)
+                raw_euro = get_prediction(hs, aw, df=euro_df)
+            except Exception:
+                raw_euro = None
+        raw_domestic = None
+        for dom_df in [_df, _df_pl, _df_ll, _df_bl, _df_l1]:
+            if dom_df is None:
+                continue
+            try:
+                hs_d = get_team_stats(dom_df, home, opponent=away)
+                aw_d = get_team_stats(dom_df, away, opponent=home)
+                raw_domestic = get_prediction(hs_d, aw_d, df=dom_df)
+                break
+            except Exception:
+                continue
+        raw_classifica = genera_pronostico(home, away)
+        sources = []
+        if raw_domestic:
+            sources.append((raw_domestic, 0.45))
+        if raw_euro:
+            sources.append((raw_euro, 0.20))
+        if raw_classifica:
+            sources.append((raw_classifica, 0.35 if raw_domestic else 0.80))
+        if sources:
+            raw = {}
+            for k in (sources[0][0] or {}).keys():
+                vals = [(s.get(k), w) for s, w in sources if isinstance(s.get(k), (int, float))]
+                if vals:
+                    raw[k] = round(sum(v * w for v, w in vals) / sum(w for _, w in vals), 2)
+                else:
+                    raw[k] = sources[0][0].get(k)
+            mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
+            raw["suggerimento"] = "1" if mp == raw.get("prob_1") else ("X" if mp == raw.get("prob_x") else "2")
+            raw["sugg_label"] = "Vittoria Casa" if raw["suggerimento"] == "1" else ("Pareggio" if raw["suggerimento"] == "X" else "Vittoria Ospite")
+            raw["risultati_esatti"] = (raw_domestic or raw_euro or raw_classifica or {}).get("risultati_esatti", [])
+        else:
+            raw = raw_classifica or genera_pronostico(home, away)
+    elif league == "mondiali-2026":
+        raw = genera_pronostico(home, away)
+    if raw is None:
+        raw = genera_pronostico(home, away)
+
+    # Blend bookmaker live
+    p1 = raw.get("prob_1", 0)
+    px = raw.get("prob_x", 0)
+    p2 = raw.get("prob_2", 0)
+    bk_live = get_bookmaker_odds(home.strip().title(), away.strip().title())
+    bk_used_live = False
+    if bk_live and bk_live.get("prob_1"):
+        bk_used_live = True
+        ALPHA_LIVE = 0.35
+        bp1 = bk_live["prob_1"] / 100; bpx = bk_live["prob_x"] / 100; bp2 = bk_live["prob_2"] / 100
+        p1 = (1 - ALPHA_LIVE) * (p1 / 100) + ALPHA_LIVE * bp1
+        px = (1 - ALPHA_LIVE) * (px / 100) + ALPHA_LIVE * bpx
+        p2 = (1 - ALPHA_LIVE) * (p2 / 100) + ALPHA_LIVE * bp2
+        tot = p1 + px + p2
+        if tot > 0:
+            p1 = round(p1 / tot * 100, 1); px = round(px / tot * 100, 1); p2 = round(p2 / tot * 100, 1)
+        mp = max(p1, px, p2)
+        sugg = "1" if mp==p1 else ("X" if mp==px else "2")
+        sugg_label = "Vittoria Casa" if sugg=="1" else ("Pareggio" if sugg=="X" else "Vittoria Ospite")
+        q1 = round(1.05 / (p1/100), 2) if p1 > 0 else 99
+        qx = round(1.05 / (px/100), 2) if px > 0 else 99
+        q2 = round(1.05 / (p2/100), 2) if p2 > 0 else 99
+        conf_raw = raw.get("confidence", 0.5)
+        if sugg == raw.get("suggerimento", ""): conf_raw = min(1.0, conf_raw * 1.08)
+        conf_label = "Alta" if conf_raw >= 0.82 else ("Media" if conf_raw >= 0.50 else "Bassa")
+        ov25 = raw.get("over_25", 50); un25 = raw.get("under_25", 50)
+        if bk_live.get("bk_over_25"):
+            ov25 = round(0.65 * ov25 + 0.35 * bk_live["bk_over_25"], 1); un25 = round(100 - ov25, 1)
+    else:
+        sugg = raw.get("suggerimento", ""); sugg_label = raw.get("sugg_label", "")
+        q1 = raw.get("quota_1", 0); qx = raw.get("quota_x", 0); q2 = raw.get("quota_2", 0)
+        conf_raw = raw.get("confidence", 0); conf_label = raw.get("confidence_label", "")
+        ov25 = raw.get("over_25"); un25 = raw.get("under_25")
+
+    h_t = home.strip().title()
+    a_t = away.strip().title()
+    mc_h = raw.get("marcatori_casa") or []
+    mc_a = raw.get("marcatori_ospite") or []
+    all_leagues = [league, "serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1", "champions-league", "europa-league", "conference-league"]
+    if not mc_h:
+        for lk in all_leagues:
+            for m in (MARCATORI_CACHE.get(lk) or []):
+                if m.get("squadra") == h_t and len(mc_h) < 3:
+                    entry = f"{m['giocatore']} ({m['gol']} gol)"
+                    if entry not in mc_h: mc_h.append(entry)
+        if not mc_h: mc_h = _filtra_marcatori(TOP_SCORER.get(h_t, []), INFORTUNATI.get(h_t, []))
+    if not mc_a:
+        for lk in all_leagues:
+            for m in (MARCATORI_CACHE.get(lk) or []):
+                if m.get("squadra") == a_t and len(mc_a) < 3:
+                    entry = f"{m['giocatore']} ({m['gol']} gol)"
+                    if entry not in mc_a: mc_a.append(entry)
+        if not mc_a: mc_a = _filtra_marcatori(TOP_SCORER.get(a_t, []), INFORTUNATI.get(a_t, []))
+
+    return {
+        "home": home, "away": away,
+        "prob_1": p1, "prob_x": px, "prob_2": p2,
+        "quota_1": q1, "quota_x": qx, "quota_2": q2,
+        "suggerimento": sugg, "sugg_label": sugg_label,
+        "confidence": conf_raw, "confidence_label": conf_label,
+        "over_25": ov25, "under_25": un25,
+        "goal_si": raw.get("goal_si"), "goal_no": raw.get("goal_no"),
+        "gol_attesi": raw.get("gol_attesi"),
+        "risultati_esatti": raw.get("risultati_esatti", []),
+        "sicura": bool(conf_raw >= 0.82 and max(p1, px, p2) > 45),
+        "marcatori_casa": mc_h[:3], "marcatori_ospite": mc_a[:3],
+        "formazione_casa": raw.get("formazione_casa") or _get_last_lineup(h_t),
+        "formazione_ospite": raw.get("formazione_ospite") or _get_last_lineup(a_t),
+        "h2h_applicato": bool(raw.get("h2h_applicato", False)),
+        "h2h_partite": int(raw.get("h2h_partite", 0)),
+        "bookmaker_live": bk_used_live,
+        "bookmaker_live_data": bk_live if bk_used_live else None,
+    }
 
 # ─────────────────────────────
-# SCHEDINA DEL GIORNO (IA)
+# CALENDARIO HARDCODED (fallback)
 # ─────────────────────────────
-
-
-
-
-
+CAL_HARDCODED = {
+    31:{"data":"4-6 aprile 2026","partite":[("Sassuolo","Cagliari"),("Verona","Fiorentina"),("Lazio","Parma"),("Cremonese","Bologna"),("Pisa","Torino"),("Inter","Roma"),("Udinese","Como"),("Lecce","Atalanta"),("Juventus","Genoa"),("Napoli","Milan")]},
+    32:{"data":"10-13 aprile 2026","partite":[("Roma","Pisa"),("Cagliari","Cremonese"),("Torino","Verona"),("Milan","Udinese"),("Atalanta","Juventus"),("Genoa","Sassuolo"),("Parma","Napoli"),("Bologna","Lecce"),("Como","Inter"),("Fiorentina","Lazio")]},
+    33:{"data":"17-20 aprile 2026","partite":[("Sassuolo","Como"),("Inter","Cagliari"),("Udinese","Parma"),("Napoli","Lazio"),("Roma","Atalanta"),("Cremonese","Torino"),("Verona","Milan"),("Pisa","Genoa"),("Juventus","Bologna"),("Lecce","Fiorentina")]},
+    34:{"data":"24-27 aprile 2026","partite":[("Napoli","Cremonese"),("Parma","Pisa"),("Bologna","Roma"),("Verona","Lecce"),("Fiorentina","Sassuolo"),("Genoa","Como"),("Torino","Inter"),("Milan","Juventus"),("Cagliari","Atalanta"),("Lazio","Udinese")]},
+    35:{"data":"2-4 maggio 2026","partite":[("Atalanta","Genoa"),("Bologna","Cagliari"),("Como","Napoli"),("Cremonese","Lazio"),("Inter","Parma"),("Juventus","Verona"),("Pisa","Lecce"),("Roma","Fiorentina"),("Sassuolo","Milan"),("Udinese","Torino")]},
+    36:{"data":"8-10 maggio 2026","partite":[("Cagliari","Udinese"),("Cremonese","Pisa"),("Fiorentina","Genoa"),("Lazio","Inter"),("Lecce","Juventus"),("Milan","Atalanta"),("Napoli","Bologna"),("Parma","Roma"),("Torino","Sassuolo"),("Verona","Como")]},
+    37:{"data":"15-17 maggio 2026","partite":[("Atalanta","Bologna"),("Cagliari","Torino"),("Como","Parma"),("Genoa","Milan"),("Inter","Verona"),("Juventus","Fiorentina"),("Pisa","Napoli"),("Roma","Lazio"),("Sassuolo","Lecce"),("Udinese","Cremonese")]},
+    38:{"data":"24 maggio 2026","partite":[("Bologna","Inter"),("Cremonese","Como"),("Fiorentina","Atalanta"),("Lazio","Pisa"),("Lecce","Genoa"),("Milan","Cagliari"),("Napoli","Udinese"),("Parma","Sassuolo"),("Torino","Juventus"),("Verona","Roma")]},
+}
 
 # ─────────────────────────────
-# WEB PUSH NOTIFICATIONS
+# FANTACALCIO
+# ─────────────────────────────
+def _fantacalcio_impl(league, giornata):
+    """Implementazione endpoint fantacalcio: statistiche giocatori per giornata."""
+    stats = PLAYER_STATS_CACHE.get(league) or {}
+    if not stats:
+        try:
+            _fetch_player_stats(league)
+            stats = PLAYER_STATS_CACHE.get(league) or {}
+        except Exception as e:
+            print(f"⚠️ Fantacalcio stats {league}: {e}")
+
+    cl = CLASSIFICA_CACHE.get(league) or []
+    squadre = [r["Squadra"] for r in cl] if cl else []
+
+    # Costruisci risposta
+    giocatori = []
+    for key, ps in stats.items():
+        giocatori.append({
+            "nome": ps.get("nome", ""),
+            "squadra": ps.get("squadra", ""),
+            "ruolo": ps.get("posizione", "C"),
+            "gol": ps.get("gol", 0),
+            "assist": ps.get("assist", 0),
+            "media": ps.get("media", 0),
+            "minuti": ps.get("minuti", 0),
+            "presenze": ps.get("presenze", 0),
+            "gialli": ps.get("gialli", 0),
+            "rossi": ps.get("rossi", 0),
+            "rigori_segnati": ps.get("rigori_segnati", 0),
+            "forma": ps.get("forma", 1.0),
+            "forma_trend": ps.get("forma_trend", "stabile"),
+        })
+
+    giocatori.sort(key=lambda x: (-x["gol"], -x["assist"], -x["media"]))
+    return {
+        "giocatori": giocatori,
+        "squadre": squadre,
+        "league": league,
+        "giornata": giornata,
+        "aggiornamento": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC") if stats else "Non disponibile",
+    }
+
+# ─────────────────────────────
+# PUSH NOTIFICATIONS
 # ─────────────────────────────
 VAPID_PUBLIC_KEY = "BBrZeD51wgoA9ITtBo8UPhHUf6o1lu1zwP16tZ9RNoI1F0yhVpMoWshroZI_nQIPqoZ_DRLVR2cu6B-WB9vE8J0"
 VAPID_PRIVATE_KEY_PATH = os.path.join(_ROOT, "vapid_private.pem")
 VAPID_EMAIL = "mailto:mario.costabile92@outlook.it"
-_PUSH_SUBSCRIPTIONS = []  # In-memory, persistito su DB
+_PUSH_SUBSCRIPTIONS = []
 
 @app.get("/api/push/vapid-key")
 async def get_vapid_key():
@@ -2354,1095 +885,82 @@ async def get_vapid_key():
 
 @app.post("/api/push/subscribe")
 async def push_subscribe(data: dict, user: Optional[dict] = Depends(get_optional_user)):
-    """Salva una subscription push per un utente."""
     sub = data.get("subscription")
     if not sub:
         raise HTTPException(400, "Subscription mancante")
-    # Salva in memory (e DB)
     _PUSH_SUBSCRIPTIONS.append({"subscription": sub, "user_id": user["id"] if user else None})
-    try:
-        from database import _get_conn
-        conn = _get_conn()
-        cur = conn.cursor()
-        cur.execute("CREATE TABLE IF NOT EXISTS push_subscriptions (id SERIAL PRIMARY KEY, user_id INTEGER, subscription TEXT NOT NULL, created_at TEXT)")
-        cur.execute("INSERT INTO push_subscriptions (user_id, subscription, created_at) VALUES (%s, %s, %s)",
-                    (user["id"] if user else None, json.dumps(sub), datetime.now(timezone.utc).isoformat()))
-        conn.commit()
-        cur.close()
-        conn.close()
-    except Exception:
-        _logger.warning("Eccezione silenziata", exc_info=True)
-    return {"status": "ok"}
-
-def send_push_notification(title, body, url="/app#home"):
-    """Invia push notification a tutti i subscriber."""
-    try:
-        from pywebpush import webpush
-        from database import _get_conn
-        conn = _get_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT subscription FROM push_subscriptions")
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
-        payload = json.dumps({"title": title, "body": body, "url": url})
-        priv_key = open(VAPID_PRIVATE_KEY_PATH, "r").read() if os.path.exists(VAPID_PRIVATE_KEY_PATH) else None
-        if not priv_key:
-            return
-        sent = 0
-        for row in rows:
-            try:
-                sub = json.loads(row[0])
-                webpush(sub, payload, vapid_private_key=priv_key, vapid_claims={"sub": VAPID_EMAIL})
-                sent += 1
-            except Exception:
-                _logger.warning("Eccezione silenziata", exc_info=True)
-        print(f"📱 Push inviata a {sent}/{len(rows)} dispositivi")
-    except Exception as e:
-        print(f"⚠️ Push error: {e}")
+    return {"ok": True}
 
 # ─────────────────────────────
-# SISTEMA REFERRAL
+# CALENDARIO ENDPOINT
 # ─────────────────────────────
-import hashlib
-
-def _generate_referral_code(user_id, email):
-    """Genera un codice referral unico."""
-    raw = f"{user_id}_{email}_{os.urandom(4).hex()}"
-    return hashlib.md5(raw.encode()).hexdigest()[:8].upper()
-
-
-
-# ─────────────────────────────
-# FANTACALCIO - Helper
-# ─────────────────────────────
-def _is_injured(nome, squadra):
-    """Controlla se un giocatore e' infortunato (matching fuzzy sul cognome)."""
-    cognome = nome.split()[-1].lower() if nome else ""
-    for src in [INFORTUNATI_LIVE, LIVE_INFORTUNATI, INFORTUNATI]:
-        lista = src.get(squadra) or []
-        for inj in lista:
-            inj_nome = inj.get("nome", "") if isinstance(inj, dict) else str(inj)
-            if cognome and cognome in inj_nome.lower():
-                return True
-            if inj_nome.lower() in nome.lower() or nome.lower() in inj_nome.lower():
-                return True
-    return False
-
-def _get_titolari(squadra):
-    """Recupera set di nomi titolari dalla formazione piu' recente."""
-    form = LIVE_FORMAZIONI.get(squadra) or FORMAZIONI.get(squadra) or _get_last_lineup(squadra)
-    if not form:
-        return set()
-    titolari = set()
-    if isinstance(form, list):
-        for p in form:
-            if isinstance(p, str):
-                titolari.add(p)
-            elif isinstance(p, dict):
-                titolari.add(p.get("nome", p.get("name", "")))
-    elif isinstance(form, dict):
-        for ruolo, giocatori in form.items():
-            if isinstance(giocatori, list):
-                for g in giocatori:
-                    if isinstance(g, str):
-                        titolari.add(g)
-                    elif isinstance(g, dict):
-                        titolari.add(g.get("nome", g.get("name", "")))
-    return titolari
-
-def _get_player_role(nome, squadra):
-    """Cerca il ruolo del giocatore nella rosa (P/D/C/A)."""
-    rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
-    cognome = nome.split()[-1].lower() if nome else ""
-    for p in rosa:
-        p_nome = p.get("nome", "")
-        if cognome and cognome in p_nome.lower():
-            return p.get("ruolo", "")
-        if p_nome.lower() in nome.lower() or nome.lower() in p_nome.lower():
-            return p.get("ruolo", "")
-    return ""
-
-def _is_titolare(nome, titolari_set):
-    """Controlla se un giocatore e' tra i titolari (matching fuzzy)."""
-    if not titolari_set:
-        return True  # Se non abbiamo formazione, consideriamo tutti
-    cognome = nome.split()[-1].lower() if nome else ""
-    for t in titolari_set:
-        t_lower = t.lower()
-        if cognome and cognome in t_lower:
-            return True
-        if nome.lower() in t_lower or t_lower in nome.lower():
-            return True
-    return False
-
-
-def _get_titolarita_prob(nome, squadra):
-    """Restituisce (prob, status, fonte) per la titolarita' di un giocatore."""
-    if _is_injured(nome, squadra):
-        return (0, "INDISPONIBILE", "infortunato")
-
-    # Formazione ufficiale
-    form_off = LIVE_FORMAZIONI.get(squadra)
-    if form_off and _is_titolare(nome, _get_titolari(squadra)):
-        return (95, "TITOLARE", "ufficiale")
-
-    # Ultima formazione + non infortunato
-    titolari = _get_titolari(squadra)
-    if titolari and _is_titolare(nome, titolari):
-        # Boost se ha molti minuti stagionali
-        stats = PLAYER_STATS_CACHE.get("serie-a", {})
-        cognome = nome.split()[-1].lower()
-        minuti = 0
-        for k, v in stats.items():
-            if cognome and cognome in k:
-                minuti = v.get("minuti", 0)
-                break
-        prob = 75
-        if minuti > 1500:
-            prob = 85
-        return (prob, "PROBABILE" if prob < 90 else "TITOLARE", "ultima_partita")
-
-    # Nella rosa ma non in formazione
-    rosa = ROSE_LIVE.get(squadra) or []
-    for p in rosa:
-        if _is_titolare(nome, {p.get("nome", "")}):
-            return (30, "PANCA", "rosa")
-
-    return (20, "PANCA", "sconosciuto")
-
-
-# ─────────────────────────────
-# FANTACALCIO - Consigli
-# ─────────────────────────────
-
-def _fetch_matchday(league_key, giornata):
-    """Fetch partite di una giornata da API Football."""
-    lid = LEAGUES.get(league_key, {}).get("id")
-    if not lid:
-        return None
-    # Controlla cache
-    if league_key in MATCHDAY_CACHE and giornata in MATCHDAY_CACHE[league_key]:
-        return MATCHDAY_CACHE[league_key][giornata]
-    try:
-        nome_map = _get_nome_map(league_key)
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league={lid}&season=2025&round=Regular Season - {giornata}",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-        partite = []
-        data_str = ""
-        for fix in data.get("response", []):
-            home = fix.get("teams", {}).get("home", {}).get("name", "")
-            away = fix.get("teams", {}).get("away", {}).get("name", "")
-            home = nome_map.get(home, home)
-            away = nome_map.get(away, away)
-            partite.append((home, away))
-            if not data_str:
-                data_str = fix.get("fixture", {}).get("date", "")[:10]
-        if partite:
-            if league_key not in MATCHDAY_CACHE:
-                MATCHDAY_CACHE[league_key] = {}
-            MATCHDAY_CACHE[league_key][giornata] = {"data": data_str, "partite": partite}
-            return MATCHDAY_CACHE[league_key][giornata]
-    except Exception as e:
-        print(f"\u26a0\ufe0f Fetch matchday {league_key} G{giornata}: {e}")
-    return None
-
-
-def _build_squadra_tipo(consigli, league):
-    """Costruisce la squadra tipo consigliata con modulo adattivo."""
-    port = [p for p in consigli.get("portieri", []) if p.get("rating", 0) >= 5]
-    difs = [p for p in consigli.get("difensori", []) if p.get("rating", 0) >= 5]
-    cent = [p for p in consigli.get("centrocampisti", []) if p.get("rating", 0) >= 5]
-    atts = [p for p in consigli.get("attaccanti", []) if p.get("rating", 0) >= 5]
-
-    # Modulo adattivo
-    n_d = len(difs)
-    n_c = len(cent)
-    n_a = len(atts)
-
-    if n_d >= 4 and n_a >= 3:
-        modulo = "4-3-3"
-        nd, nc, na = 4, 3, 3
-    elif n_c >= 4:
-        modulo = "4-4-2"
-        nd, nc, na = 4, 4, 2
-    elif n_d < 4 and n_a >= 3:
-        modulo = "3-4-3"
-        nd, nc, na = 3, 4, 3
-    else:
-        modulo = "4-3-3"
-        nd, nc, na = min(4, n_d), min(3, n_c), min(3, n_a)
-
-    sel_port = port[0] if port else None
-    sel_dif = difs[:nd]
-    sel_cen = cent[:nc]
-    sel_att = atts[:na]
-
-    # Panchina: giocatori non selezionati
-    used = set()
-    if sel_port:
-        used.add(sel_port.get("giocatore", ""))
-    for lst in [sel_dif, sel_cen, sel_att]:
-        for p in lst:
-            used.add(p.get("giocatore", ""))
-
-    panchina = []
-    for lst in [port[1:], difs[nd:], cent[nc:], atts[na:]]:
-        for p in lst:
-            if p.get("giocatore", "") not in used and len(panchina) < 4:
-                panchina.append(p)
-                used.add(p.get("giocatore", ""))
-
-    # Capitano: rating piu' alto tra centrocampisti e attaccanti selezionati
-    capitano = ""
-    max_rat = 0
-    for p in sel_cen + sel_att:
-        if p.get("rating", 0) > max_rat:
-            max_rat = p["rating"]
-            capitano = p.get("giocatore", "")
-
-    return {
-        "modulo": modulo,
-        "portiere": sel_port,
-        "difensori": sel_dif,
-        "centrocampisti": sel_cen,
-        "attaccanti": sel_att,
-        "panchina": panchina,
-        "capitano": capitano,
-    }
-
-
-def _fantacalcio_impl(league, giornata):
-    """Implementazione condivisa fantacalcio per qualsiasi campionato."""
-    try:
-        # Ottieni partite della giornata
-        if league == "serie-a":
-            cal = CAL_HARDCODED.get(giornata)
-            if not cal:
-                return {"giornata": giornata, "consigli": {}, "error": "Giornata non trovata"}
-            partite = cal["partite"]
-            data_str = cal.get("data", "")
-        else:
-            md = _fetch_matchday(league, giornata)
-            if not md or not md.get("partite"):
-                return {"giornata": giornata, "consigli": {}, "error": "Giornata non trovata"}
-            partite = md["partite"]
-            data_str = md.get("data", "")
-
-        consigli = {"portieri": [], "difensori": [], "centrocampisti": [], "attaccanti": [], "evitare": []}
-        player_stats = PLAYER_STATS_CACHE.get(league, {})
-
-        # Fetch topscorers/topassists live se cache vuota
-        if not player_stats:
-            _fetch_player_stats(league)
-            player_stats = PLAYER_STATS_CACHE.get(league, {})
-
-        for home, away in partite:
-            try:
-                raw = _compute_pronostico(league, home, away)
-            except Exception:
-                continue
-
-            prob_h = raw.get("prob_1", 30)
-            prob_a = raw.get("prob_2", 30)
-            goal_si = raw.get("goal_si", 50)
-            clean_h = max(0, min(1, 1.0 - (goal_si / 100))) if isinstance(goal_si, (int, float)) else 0.5
-            clean_a = max(0, min(1, 1.0 - (goal_si / 100))) if isinstance(goal_si, (int, float)) else 0.5
-
-            titolari_h = _get_titolari(home)
-            titolari_a = _get_titolari(away)
-
-            for squadra, prob, clean, avv, casa, titolari in [
-                (home, prob_h, clean_h, away, True, titolari_h),
-                (away, prob_a, clean_a, home, False, titolari_a)
-            ]:
-                rosa = ROSE_LIVE.get(squadra) or [{"nome": g[0], "ruolo": g[1]} for g in ROSE.get(squadra, [])]
-
-                for p in rosa:
-                    nome = p.get("nome", "")
-                    ruolo = p.get("ruolo", "")
-                    if not nome or not ruolo:
-                        continue
-                    if _is_injured(nome, squadra):
-                        continue
-
-                    # Titolarita' con probabilita'
-                    tit_prob, tit_status, tit_fonte = _get_titolarita_prob(nome, squadra)
-                    if tit_prob < 75:  # SOLO titolari probabili (>=75%), no panca
-                        continue
-
-                    # Cerca stats del giocatore per verificare ruolo corretto
-                    cognome = nome.split()[-1].lower()
-                    ps = {}
-                    for k, v in player_stats.items():
-                        if cognome and cognome in k:
-                            ps = v
-                            break
-                    
-                    # Verifica ruolo da stats API se disponibile (piu' affidabile)
-                    ruolo_api = ps.get("posizione", "")
-                    if ruolo_api and ruolo_api != ruolo:
-                        # Salta se il ruolo API e' diverso (es. Esposito e' A, non C)
-                        continue
-
-                    gol = ps.get("gol", 0)
-                    assist = ps.get("assist", 0)
-                    media = ps.get("media", 0)
-                    forma = ps.get("forma", 1.0)
-                    forma_trend = ps.get("forma_trend", "stabile")
-                    rigori = ps.get("rigori_segnati", 0)
-                    gialli = ps.get("gialli", 0)
-
-                    # Cerca anche nei marcatori cache
-                    if gol == 0:
-                        for m in (MARCATORI_CACHE.get(league) or []):
-                            m_cog = m.get("giocatore", "").split()[-1].lower()
-                            if cognome and cognome == m_cog:
-                                gol = m.get("gol", 0)
-                                break
-
-                    base_info = {
-                        "giocatore": nome, "squadra": squadra,
-                        "avversario": avv, "casa": casa,
-                        "tit_prob": tit_prob, "tit_status": tit_status,
-                        "media": round(media, 1) if media else 0,
-                        "gol": gol, "assist": assist,
-                        "forma": forma, "forma_trend": forma_trend,
-                        "rigori": rigori, "gialli": gialli,
-                    }
-
-                    if ruolo == "P":
-                        if prob < 30:
-                            continue
-                        rating = round(min(10, prob * 0.04 + clean * 6), 1)
-                        base_info["motivazione"] = f"{'Titolare' if tit_prob>=75 else 'Probabile'}, clean sheet {clean*100:.0f}% vs {avv}"
-                        base_info["rating"] = rating
-                        consigli["portieri"].append(base_info)
-                        break  # Solo 1 portiere per squadra
-
-                    elif ruolo == "D":
-                        if clean < 0.3:
-                            continue
-                        rating = round(min(10, clean * 8 + prob * 0.02 + (media * 0.3 if media else 0)), 1)
-                        base_info["motivazione"] = f"{'Titolare' if tit_prob>=75 else 'Probabile'}, clean sheet {clean*100:.0f}% vs {avv}"
-                        base_info["rating"] = rating
-                        consigli["difensori"].append(base_info)
-
-                    elif ruolo == "C":
-                        if gol + assist < 2 and media < 6.5:
-                            continue
-                        rating = round(min(10, (gol + assist) * 0.5 * forma + prob / 20 + (media * 0.2 if media else 0)), 1)
-                        base_info["motivazione"] = f"{gol} gol, {assist} assist, media {media:.1f}" if media else f"{gol} gol, {assist} assist vs {avv}"
-                        base_info["rating"] = rating
-                        consigli["centrocampisti"].append(base_info)
-
-                    elif ruolo == "A":
-                        if gol < 1 and media < 6.5:
-                            continue
-                        rating = round(min(10, gol * 0.7 * forma + prob / 25 + (media * 0.2 if media else 0)), 1)
-                        base_info["motivazione"] = f"{gol} gol stagionali, media {media:.1f}" if media else f"{gol} gol vs {avv}"
-                        base_info["rating"] = rating
-                        consigli["attaccanti"].append(base_info)
-
-            # Chi evitare
-            if prob_h < 20:
-                consigli["evitare"].append({"squadra": home, "motivazione": f"Solo {prob_h:.0f}% vittoria vs {away}", "tipo": "sfavorita"})
-            if prob_a < 20:
-                consigli["evitare"].append({"squadra": away, "motivazione": f"Solo {prob_a:.0f}% vittoria vs {home}", "tipo": "sfavorita"})
-
-        # Infortunati nella lista evitare
-        for home, away in partite:
-            for squadra in [home, away]:
-                inj = INFORTUNATI_LIVE.get(squadra) or LIVE_INFORTUNATI.get(squadra) or []
-                for i in inj[:2]:
-                    consigli["evitare"].append({
-                        "giocatore": i.get("nome", "?"), "squadra": squadra,
-                        "motivazione": i.get("dettaglio", "Indisponibile"), "tipo": "infortunato"
-                    })
-
-        # Ordina e limita 5-8 per ruolo
-        for ruolo in ["portieri", "difensori", "centrocampisti", "attaccanti"]:
-            consigli[ruolo].sort(key=lambda x: -x.get("rating", 0))
-            consigli[ruolo] = consigli[ruolo][:8]
-        consigli["evitare"] = consigli["evitare"][:10]
-
-        # Squadra tipo
-        squadra_tipo = _build_squadra_tipo(consigli, league)
-
-        return {
-            "giornata": giornata, "data": data_str,
-            "consigli": consigli,
-            "squadra_tipo": squadra_tipo,
-        }
-    except Exception as e:
-        print(f"\u26a0\ufe0f Fantacalcio {league} G{giornata}: {e}")
-        return {"giornata": giornata, "consigli": {}, "error": str(e)}
-
-
-
-
-# ─────────────────────────────
-# STORICO PRONOSTICI UTENTE
-# ─────────────────────────────
-
-
-
-# ─────────────────────────────
-# DASHBOARD ACCURATEZZA
-# ─────────────────────────────
-
-# ─────────────────────────────
-# NOTIZIE LIVE SERIE A
-# ─────────────────────────────
-NOTIZIE_CACHE = []
-NOTIZIE_LAST_UPDATE = ""
-
-def _scrape_notizie():
-    """Scarica notizie calcio da Google News RSS (affidabile e sempre aggiornato)."""
-    global NOTIZIE_CACHE, NOTIZIE_LAST_UPDATE
-    import urllib.request as ur
-    import re
-    notizie = []
-    feeds = [
-        ("https://news.google.com/rss/search?q=serie+a+calcio+2026&hl=it&gl=IT&ceid=IT:it", "Serie A"),
-        ("https://news.google.com/rss/search?q=premier+league+football+2026&hl=it&gl=IT&ceid=IT:it", "Premier League"),
-        ("https://news.google.com/rss/search?q=calciomercato+2026&hl=it&gl=IT&ceid=IT:it", "Calciomercato"),
-    ]
-    for feed_url, categoria in feeds:
-        try:
-            req = ur.Request(feed_url, headers={"User-Agent": "Mozilla/5.0"})
-            with ur.urlopen(req, timeout=10) as r:
-                xml = r.read().decode("utf-8", errors="replace")
-            # Parse RSS XML
-            items = re.findall(r'<item>.*?<title>(.*?)</title>.*?<link>(.*?)</link>.*?<source[^>]*>(.*?)</source>.*?</item>', xml, re.DOTALL)
-            for titolo, url, fonte in items[:4]:
-                titolo = re.sub(r'<[^>]+>', '', titolo).strip()
-                titolo = titolo.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&#39;', "'")
-                if titolo and len(titolo) > 15:
-                    notizie.append({"titolo": titolo, "fonte": fonte or categoria, "url": url})
-        except Exception as e:
-            print(f"⚠️ RSS {categoria}: {e}")
-    if notizie:
-        # Rimuovi duplicati per titolo
-        seen = set()
-        unique = []
-        for n in notizie:
-            if n["titolo"] not in seen:
-                seen.add(n["titolo"])
-                unique.append(n)
-        NOTIZIE_CACHE = unique[:12]
-        NOTIZIE_LAST_UPDATE = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M")
-        print(f"📰 Notizie: {len(NOTIZIE_CACHE)} articoli live da Google News")
-
-
-# ─────────────────────────────
-# RISULTATI LIVE + STORICO COMPLETO
-# ─────────────────────────────
-RISULTATI_STAGIONE_CACHE = None  # Tutte le partite della stagione da API Football
-RISULTATI_STAGIONE_TIME = ""
-
-def _fetch_risultati_stagione():
-    """Scarica TUTTI i risultati della stagione da API Football."""
-    global RISULTATI_STAGIONE_CACHE, RISULTATI_STAGIONE_TIME
-    try:
-        # Tutte le partite giocate (FT = Full Time)
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season=2025&status=FT-AET-PEN",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=20) as r:
-            data = json.loads(r.read().decode())
-
-        if data.get("response"):
-            partite = []
-            for fix in data["response"]:
-                teams = fix.get("teams", {})
-                goals = fix.get("goals", {})
-                fixture = fix.get("fixture", {})
-                events = fix.get("events", [])
-                league = fix.get("league", {})
-
-                home_name = FOOTBALL_NOME_MAP.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
-                away_name = FOOTBALL_NOME_MAP.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
-
-                marcatori = []
-                marcatori_home = []
-                marcatori_away = []
-                home_id = teams.get("home", {}).get("id")
-                for ev in events:
-                    if ev.get("type") == "Goal":
-                        nome = ev.get("player", {}).get("name", "?")
-                        minuto = ev.get("time", {}).get("elapsed", "?")
-                        detail = ev.get("detail", "")
-                        team_id = ev.get("team", {}).get("id")
-                        if detail == "Penalty":
-                            gol_str = f"{nome} {minuto}' (R)"
-                        elif detail == "Own Goal":
-                            gol_str = f"{nome} {minuto}' (aut.)"
-                        else:
-                            gol_str = f"{nome} {minuto}'"
-                        marcatori.append(gol_str)
-                        if team_id == home_id:
-                            marcatori_home.append(gol_str)
-                        else:
-                            marcatori_away.append(gol_str)
-
-                partite.append({
-                    "home": home_name,
-                    "away": away_name,
-                    "gol_h": goals.get("home", 0) or 0,
-                    "gol_a": goals.get("away", 0) or 0,
-                    "status": "FT",
-                    "status_it": "Terminata",
-                    "live": False,
-                    "marcatori": marcatori,
-                    "marcatori_home": marcatori_home,
-                    "marcatori_away": marcatori_away,
-                    "fixture_id": fixture.get("id"),
-                    "data": fixture.get("date", "")[:10],
-                    "ora": _utc_to_rome(fixture.get("date", "")),
-                    "round": league.get("round", ""),
-                })
-
-            if partite:
-                # Ordina per data (piu' recente prima)
-                partite.sort(key=lambda x: x["data"], reverse=True)
-                RISULTATI_STAGIONE_CACHE = partite
-                RISULTATI_STAGIONE_CACHE_ML["serie-a"] = partite
-                RISULTATI_STAGIONE_TIME = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
-                print(f"📊 STORICO STAGIONE: {len(partite)} partite caricate")
-    except Exception as e:
-        print(f"❌ Errore fetch storico stagione: {e}")
-RISULTATI_GIORNATE = {
-    30:{"data":"20-22 marzo 2026","partite":[
-        {"home":"Genoa","away":"Torino","gol_h":2,"gol_a":1,"marcatori":["Vitinha 23'","Colombo 67'","Vlasic 45'"]},
-        {"home":"Atalanta","away":"Napoli","gol_h":2,"gol_a":1,"marcatori":["Krstovic 12'","De Ketelaere 78'","Hojlund 55'"]},
-        {"home":"Milan","away":"Parma","gol_h":3,"gol_a":0,"marcatori":["Pulisic 15'","Leao 44'","Gimenez 71'"]},
-        {"home":"Roma","away":"Cremonese","gol_h":2,"gol_a":0,"marcatori":["Malen 33'","Soule 62'"]},
-        {"home":"Cagliari","away":"Lazio","gol_h":0,"gol_a":0,"marcatori":[]},
-        {"home":"Lecce","away":"Inter","gol_h":0,"gol_a":2,"marcatori":["Thuram 28'","Calhanoglu 59' (R)"]},
-        {"home":"Juventus","away":"Como","gol_h":0,"gol_a":2,"marcatori":["Douvikas 37'","Paz 82'"]},
-        {"home":"Sassuolo","away":"Verona","gol_h":3,"gol_a":0,"marcatori":["Berardi 11'","Pinamonti 53'","Lauriente 88'"]},
-        {"home":"Fiorentina","away":"Pisa","gol_h":1,"gol_a":1,"marcatori":["Kean 42'","Tramoni 76'"]},
-        {"home":"Bologna","away":"Udinese","gol_h":1,"gol_a":2,"marcatori":["Castro 30'","Davis 18'","Zaniolo 65'"]},
-    ]},
-    29:{"data":"14-16 marzo 2026","partite":[
-        {"home":"Inter","away":"Genoa","gol_h":2,"gol_a":0,"marcatori":["Thuram 22'","Barella 68'"]},
-        {"home":"Napoli","away":"Torino","gol_h":2,"gol_a":1,"marcatori":["Hojlund 35'","McTominay 71'","Adams 55'"]},
-        {"home":"Lazio","away":"Milan","gol_h":1,"gol_a":0,"marcatori":["Maldini 63'"]},
-        {"home":"Como","away":"Cagliari","gol_h":1,"gol_a":0,"marcatori":["Douvikas 48'"]},
-        {"home":"Cremonese","away":"Sassuolo","gol_h":1,"gol_a":1,"marcatori":["Vardy 32'","Berardi 77'"]},
-        {"home":"Parma","away":"Lecce","gol_h":0,"gol_a":1,"marcatori":["Cheddira 56'"]},
-        {"home":"Verona","away":"Roma","gol_h":0,"gol_a":3,"marcatori":["Malen 12'","Dovbyk 41'","Pellegrini 85'"]},
-        {"home":"Torino","away":"Fiorentina","gol_h":0,"gol_a":0,"marcatori":[]},
-        {"home":"Udinese","away":"Juventus","gol_h":0,"gol_a":1,"marcatori":["Yildiz 73'"]},
-        {"home":"Pisa","away":"Atalanta","gol_h":1,"gol_a":2,"marcatori":["Meister 40'","Scamacca 28'","Raspadori 90'"]},
-    ]},
-    28:{"data":"7-9 marzo 2026","partite":[
-        {"home":"Milan","away":"Juventus","gol_h":1,"gol_a":1,"marcatori":["Pulisic 55'","Yildiz 78'"]},
-        {"home":"Napoli","away":"Lecce","gol_h":2,"gol_a":1,"marcatori":["Hojlund 20'","McTominay 64'","Banda 88'"]},
-        {"home":"Inter","away":"Atalanta","gol_h":1,"gol_a":1,"marcatori":["Calhanoglu 37' (R)","Krstovic 71'"]},
-        {"home":"Roma","away":"Bologna","gol_h":2,"gol_a":0,"marcatori":["Malen 29'","Dybala 82'"]},
-        {"home":"Fiorentina","away":"Lazio","gol_h":1,"gol_a":1,"marcatori":["Kean 45'","Dia 66'"]},
-        {"home":"Como","away":"Sassuolo","gol_h":2,"gol_a":1,"marcatori":["Paz 14'","Douvikas 52'","Pinamonti 80'"]},
-        {"home":"Genoa","away":"Cagliari","gol_h":1,"gol_a":0,"marcatori":["Vitinha 61'"]},
-        {"home":"Cremonese","away":"Verona","gol_h":2,"gol_a":0,"marcatori":["Sanabria 33'","Vardy 70'"]},
-        {"home":"Torino","away":"Parma","gol_h":3,"gol_a":1,"marcatori":["Simeone 8'","Vlasic 42'","Adams 67'","Pellegrino 55'"]},
-        {"home":"Udinese","away":"Pisa","gol_h":1,"gol_a":0,"marcatori":["Davis 39'"]},
-    ]},
-}
-
-FOOTBALL_API_KEY = os.environ.get("FOOTBALL_API_KEY", "")
-FOOTBALL_API_HOST = "v3.football.api-sports.io"
-LIVE_RESULTS_CACHE = None
-LIVE_RESULTS_TIME = ""
-LIVE_IN_CORSO = False  # True se ci sono partite in corso
-
-# FOOTBALL_NOME_MAP is defined in league_mappings.py and imported above.
-
-def _fetch_live_results():
-    """Scarica risultati live dalla API Football (ultimi 30 + oggi)."""
-    global LIVE_RESULTS_CACHE, LIVE_RESULTS_TIME, LIVE_IN_CORSO
-    try:
-        # Scarica ultime 30 partite giocate (con eventi e statistiche)
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season=2025&last=30",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-
-        partite = []
-        has_live = False
-
-        if data.get("response"):
-            for fix in data["response"]:
-                teams = fix.get("teams", {})
-                goals = fix.get("goals", {})
-                fixture = fix.get("fixture", {})
-                status = fixture.get("status", {})
-                events = fix.get("events", [])
-
-                # Marcatori con dettagli + squadra
-                marcatori = []
-                marcatori_home = []
-                marcatori_away = []
-                home_id = teams.get("home", {}).get("id")
-                away_id = teams.get("away", {}).get("id")
-                for ev in events:
-                    if ev.get("type") == "Goal":
-                        nome = ev.get("player", {}).get("name", "?")
-                        minuto = ev.get("time", {}).get("elapsed", "?")
-                        detail = ev.get("detail", "")
-                        team_id = ev.get("team", {}).get("id")
-                        if detail == "Penalty":
-                            gol_str = f"{nome} {minuto}' (R)"
-                        elif detail == "Own Goal":
-                            gol_str = f"{nome} {minuto}' (aut.)"
-                        else:
-                            gol_str = f"{nome} {minuto}'"
-                        marcatori.append(gol_str)
-                        if team_id == home_id:
-                            marcatori_home.append(gol_str)
-                        else:
-                            marcatori_away.append(gol_str)
-
-                # Cartellini
-                cartellini_gialli = []
-                rossi_home = []
-                rossi_away = []
-                for ev in events:
-                    if ev.get("type") == "Card":
-                        nome = ev.get("player", {}).get("name", "?")
-                        minuto = ev.get("time", {}).get("elapsed", "?")
-                        team_id = ev.get("team", {}).get("id")
-                        if ev.get("detail") == "Red Card":
-                            if team_id == home_id:
-                                rossi_home.append(f"{nome} {minuto}'")
-                            else:
-                                rossi_away.append(f"{nome} {minuto}'")
-                        elif ev.get("detail") == "Yellow Card":
-                            cartellini_gialli.append(f"{nome} {minuto}'")
-
-                # Statistiche partita (se disponibili nell'oggetto fixture)
-                stats_list = fix.get("statistics", [])
-                stats = {}
-                if stats_list and len(stats_list) >= 2:
-                    home_stats_raw = stats_list[0].get("statistics", []) if stats_list[0] else []
-                    away_stats_raw = stats_list[1].get("statistics", []) if stats_list[1] else []
-                    for s in home_stats_raw:
-                        tipo = s.get("type", "")
-                        val = s.get("value")
-                        if tipo == "Ball Possession":
-                            stats["possesso_home"] = val
-                        elif tipo == "Total Shots":
-                            stats["tiri_home"] = val
-                        elif tipo == "Shots on Goal":
-                            stats["tiri_porta_home"] = val
-                        elif tipo == "Corner Kicks":
-                            stats["corner_home"] = val
-                        elif tipo == "Fouls":
-                            stats["falli_home"] = val
-                        elif tipo == "Offsides":
-                            stats["fuorigioco_home"] = val
-                    for s in away_stats_raw:
-                        tipo = s.get("type", "")
-                        val = s.get("value")
-                        if tipo == "Ball Possession":
-                            stats["possesso_away"] = val
-                        elif tipo == "Total Shots":
-                            stats["tiri_away"] = val
-                        elif tipo == "Shots on Goal":
-                            stats["tiri_porta_away"] = val
-                        elif tipo == "Corner Kicks":
-                            stats["corner_away"] = val
-                        elif tipo == "Fouls":
-                            stats["falli_away"] = val
-                        elif tipo == "Offsides":
-                            stats["fuorigioco_away"] = val
-
-                status_short = status.get("short", "FT")
-                is_live = status_short in ("1H", "2H", "HT", "ET", "P", "BT", "INT")
-                if is_live:
-                    has_live = True
-
-                # Mappa status in italiano
-                status_map = {
-                    "FT": "Terminata", "AET": "Dopo supplementari",
-                    "PEN": "Dopo rigori", "1H": "1° Tempo",
-                    "2H": "2° Tempo", "HT": "Intervallo",
-                    "ET": "Supplementari", "P": "Rigori",
-                    "NS": "Non iniziata", "TBD": "Da definire",
-                    "CANC": "Cancellata", "PST": "Posticipata",
-                    "SUSP": "Sospesa", "INT": "Interrotta",
-                    "ABD": "Abbandonata", "AWD": "Vittoria a tavolino",
-                    "WO": "Walkover", "BT": "Pausa",
-                }
-
-                home_name = FOOTBALL_NOME_MAP.get(teams.get("home", {}).get("name", "?"),
-                                                   teams.get("home", {}).get("name", "?"))
-                away_name = FOOTBALL_NOME_MAP.get(teams.get("away", {}).get("name", "?"),
-                                                   teams.get("away", {}).get("name", "?"))
-
-                partite.append({
-                    "home": home_name,
-                    "away": away_name,
-                    "gol_h": goals.get("home", 0) or 0,
-                    "gol_a": goals.get("away", 0) or 0,
-                    "status": status_short,
-                    "status_it": status_map.get(status_short, status_short),
-                    "minuto": status.get("elapsed"),
-                    "live": is_live,
-                    "marcatori": marcatori,
-                    "marcatori_home": marcatori_home,
-                    "marcatori_away": marcatori_away,
-                    "rossi_home": rossi_home,
-                    "rossi_away": rossi_away,
-                    "gialli": cartellini_gialli,
-                    "stats": stats,
-                    "fixture_id": fixture.get("id"),
-                    "data": fixture.get("date", "")[:10],
-                    "ora": _utc_to_rome(fixture.get("date", "")),
-                })
-
-        # Prova anche a prendere le partite di OGGI (potrebbero non essere nelle ultime 30)
-        try:
-            oggi = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            req2 = urllib.request.Request(
-                f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season=2025&date={oggi}",
-                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-            )
-            with urllib.request.urlopen(req2, timeout=15) as r2:
-                data2 = json.loads(r2.read().decode())
-
-            if data2.get("response"):
-                existing_ids = set()
-                for fix in data.get("response", []):
-                    existing_ids.add(fix.get("fixture", {}).get("id"))
-
-                for fix in data2["response"]:
-                    if fix.get("fixture", {}).get("id") in existing_ids:
-                        continue  # Gia' presente
-
-                    teams = fix.get("teams", {})
-                    goals = fix.get("goals", {})
-                    fixture = fix.get("fixture", {})
-                    status = fixture.get("status", {})
-                    events = fix.get("events", [])
-
-                    marcatori = []
-                    for ev in events:
-                        if ev.get("type") == "Goal":
-                            nome = ev.get("player", {}).get("name", "?")
-                            minuto = ev.get("time", {}).get("elapsed", "?")
-                            detail = ev.get("detail", "")
-                            if detail == "Penalty":
-                                marcatori.append(f"{nome} {minuto}' (R)")
-                            elif detail == "Own Goal":
-                                marcatori.append(f"{nome} {minuto}' (aut.)")
-                            else:
-                                marcatori.append(f"{nome} {minuto}'")
-
-                    status_short = status.get("short", "NS")
-                    is_live = status_short in ("1H", "2H", "HT", "ET", "P", "BT", "INT")
-                    if is_live:
-                        has_live = True
-
-                    home_name = FOOTBALL_NOME_MAP.get(teams.get("home", {}).get("name", "?"),
-                                                       teams.get("home", {}).get("name", "?"))
-                    away_name = FOOTBALL_NOME_MAP.get(teams.get("away", {}).get("name", "?"),
-                                                       teams.get("away", {}).get("name", "?"))
-
-                    partite.append({
-                        "home": home_name,
-                        "away": away_name,
-                        "gol_h": goals.get("home", 0) or 0,
-                        "gol_a": goals.get("away", 0) or 0,
-                        "status": status_short,
-                        "status_it": {"FT":"Terminata","NS":"Non iniziata","1H":"1° Tempo","2H":"2° Tempo","HT":"Intervallo"}.get(status_short, status_short),
-                        "minuto": status.get("elapsed"),
-                        "live": is_live,
-                        "marcatori": marcatori,
-                        "rossi_home": [],
-                        "rossi_away": [],
-                        "data": fixture.get("date", "")[:10],
-                        "ora": _utc_to_rome(fixture.get("date", "")),
-                    })
-        except Exception as e:
-            print(f"⚠️ Fetch partite oggi: {e}")
-
-        if partite:
-            LIVE_RESULTS_CACHE = partite
-            LIVE_RESULTS_TIME = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
-            LIVE_IN_CORSO = has_live
-            print(f"⚽ RISULTATI LIVE: {len(partite)} partite {'(LIVE IN CORSO!)' if has_live else ''}")
-    except Exception as e:
-        print(f"❌ Errore API Football: {e}")
-
-
-# ─────────────────────────────
-# DETTAGLIO PARTITA LIVE (API Football completo)
-# ─────────────────────────────
-
-# ─────────────────────────────
-# ENDPOINT MULTI-LEAGUE (Premier League + futuri campionati)
-# ─────────────────────────────
-
-def _fetch_league_data(league_key):
-    """Scarica classifica, marcatori, risultati per un campionato da API Football."""
-    league = LEAGUES.get(league_key)
-    if not league:
-        return
-    lid = league["id"]
-    season = league["season"]
-    nome_map = _get_nome_map(league_key)
-    print(f"📡 Fetch {league['name']} (league={lid}, season={season})...")
-
-    # Classifica
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/standings?league={lid}&season={season}",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-        if data.get("response") and len(data["response"]) > 0:
-            standings = data["response"][0].get("league", {}).get("standings", [])
-            if standings and len(standings) > 0:
-                classifica = []
-                for team in standings[0]:
-                    nome_api = team.get("team", {}).get("name", "?")
-                    nome = nome_map.get(nome_api, nome_api)
-                    stats = team.get("all", {})
-                    gf = stats.get("goals", {}).get("for", 0)
-                    gs = stats.get("goals", {}).get("against", 0)
-                    classifica.append({"Squadra":nome,"Punti":team.get("points",0),"G":stats.get("played",0),"V":stats.get("win",0),"N":stats.get("draw",0),"P":stats.get("lose",0),"GF":gf,"GS":gs,"DR":gf-gs})
-                classifica.sort(key=lambda x: (-x["Punti"], -x["DR"]))
-                if len(classifica) >= 10:
-                    CLASSIFICA_CACHE[league_key] = classifica
-                    CLASSIFICA_LAST_UPDATE[league_key] = datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")
-    except Exception as e:
-        print(f"⚠️ Classifica {league_key}: {e}")
-
-    # Marcatori
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/players/topscorers?league={lid}&season={season}",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-        if data.get("response"):
-            marcatori = []
-            for i, player in enumerate(data["response"][:20], 1):
-                info = player.get("player", {})
-                gol = 0
-                squadra_api = ""
-                for s in player.get("statistics", []):
-                    if s.get("league", {}).get("id") == lid:
-                        gol = s.get("goals", {}).get("total", 0) or 0
-                        squadra_api = s.get("team", {}).get("name", "")
-                        break
-                squadra = nome_map.get(squadra_api, squadra_api)
-                marcatori.append({"pos":i,"giocatore":info.get("name","?"),"squadra":squadra,"gol":gol})
-            if marcatori:
-                MARCATORI_CACHE[league_key] = marcatori
-    except Exception as e:
-        print(f"⚠️ Marcatori {league_key}: {e}")
-
-    # Risultati stagione
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league={lid}&season={season}&status=FT-AET-PEN",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=20) as r:
-            data = json.loads(r.read().decode())
-        if data.get("response"):
-            partite = []
-            for fix in data["response"]:
-                teams = fix.get("teams", {})
-                goals = fix.get("goals", {})
-                fixture = fix.get("fixture", {})
-                events = fix.get("events", [])
-                lg = fix.get("league", {})
-                home_name = nome_map.get(teams.get("home",{}).get("name","?"), teams.get("home",{}).get("name","?"))
-                away_name = nome_map.get(teams.get("away",{}).get("name","?"), teams.get("away",{}).get("name","?"))
-                marcatori = []
-                marcatori_home = []
-                marcatori_away = []
-                home_id = teams.get("home",{}).get("id")
-                for ev in events:
-                    if ev.get("type") == "Goal":
-                        nome = ev.get("player",{}).get("name","?")
-                        minuto = ev.get("time",{}).get("elapsed","?")
-                        detail = ev.get("detail","")
-                        gol_str = f"{nome} {minuto}'" + (" (R)" if detail=="Penalty" else " (aut.)" if detail=="Own Goal" else "")
-                        marcatori.append(gol_str)
-                        if ev.get("team",{}).get("id") == home_id:
-                            marcatori_home.append(gol_str)
-                        else:
-                            marcatori_away.append(gol_str)
-                partite.append({"home":home_name,"away":away_name,"gol_h":goals.get("home",0) or 0,"gol_a":goals.get("away",0) or 0,"status":"FT","status_it":"Terminata","live":False,"marcatori":marcatori,"marcatori_home":marcatori_home,"marcatori_away":marcatori_away,"fixture_id":fixture.get("id"),"data":fixture.get("date","")[:10],"ora":_utc_to_rome(fixture.get("date","")),"round":lg.get("round","")})
-            if partite:
-                partite.sort(key=lambda x: x["data"], reverse=True)
-                RISULTATI_STAGIONE_CACHE_ML[league_key] = partite
-    except Exception as e:
-        print(f"⚠️ Risultati {league_key}: {e}")
-
-    # Live results
-    try:
-        req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league={lid}&season={season}&last=15",
-            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read().decode())
-        if data.get("response"):
-            live_p = []
-            has_live = False
-            for fix in data["response"]:
-                teams = fix.get("teams",{})
-                goals = fix.get("goals",{})
-                fixture = fix.get("fixture",{})
-                status = fixture.get("status",{})
-                events = fix.get("events",[])
-                home_name = nome_map.get(teams.get("home",{}).get("name","?"), teams.get("home",{}).get("name","?"))
-                away_name = nome_map.get(teams.get("away",{}).get("name","?"), teams.get("away",{}).get("name","?"))
-                marcatori=[]
-                for ev in events:
-                    if ev.get("type")=="Goal":
-                        nome=ev.get("player",{}).get("name","?")
-                        minuto=ev.get("time",{}).get("elapsed","?")
-                        detail=ev.get("detail","")
-                        marcatori.append(f"{nome} {minuto}'" + (" (R)" if detail=="Penalty" else " (aut.)" if detail=="Own Goal" else ""))
-                ss = status.get("short","FT")
-                is_live = ss in ("1H","2H","HT","ET","P")
-                if is_live: has_live = True
-                live_p.append({"home":home_name,"away":away_name,"gol_h":goals.get("home",0) or 0,"gol_a":goals.get("away",0) or 0,"status":ss,"minuto":status.get("elapsed"),"live":is_live,"marcatori":marcatori,"fixture_id":fixture.get("id"),"data":fixture.get("date","")[:10],"ora":_utc_to_rome(fixture.get("date",""))})
-            LIVE_RESULTS_CACHE_ML[league_key] = live_p
-            LIVE_IN_CORSO_ML[league_key] = has_live
-    except Exception as e:
-        print(f"⚠️ Live {league_key}: {e}")
-
-    print(f"✅ {league['name']}: dati aggiornati")
-
-
-
-
-# ─────────────────────────────
-# STATISTICHE SQUADRE PER CLASSIFICA
-# ─────────────────────────────
-def _fetch_team_stats_league(league_key):
-    """Fetch statistiche squadre da API Football per un campionato."""
-    if league_key not in ["serie-a", "premier-league", "la-liga", "bundesliga", "ligue-1"]:
-        return
-    cached = TEAM_STATS_CACHE.get(league_key)
-    if cached and time.time() - cached.get("timestamp", 0) < 3600:
-        return cached.get("data")
-    league_id = LEAGUES[league_key]["id"]
-    season = LEAGUES[league_key]["season"]
-    team_ids = _get_team_ids(league_key)
-    stats = {}
-    for team_name, team_id in team_ids.items():
-        try:
-            req = urllib.request.Request(
-                f"https://{FOOTBALL_API_HOST}/teams/statistics?league={league_id}&season={season}&team={team_id}",
-                headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
-            )
-            with urllib.request.urlopen(req, timeout=10) as r:
-                data = json.loads(r.read().decode())
-            resp = data.get("response", {})
-            fixtures = resp.get("fixtures", {})
-            goals = resp.get("goals", {})
-            stats[team_name] = {
-                "giocate": fixtures.get("played", {}).get("total", 0) or 0,
-                "vinte": fixtures.get("wins", {}).get("total", 0) or 0,
-                "pareggi": fixtures.get("draws", {}).get("total", 0) or 0,
-                "perse": fixtures.get("loses", {}).get("total", 0) or 0,
-                "gf": goals.get("for", {}).get("total", {}).get("total", 0) or 0,
-                "gs": goals.get("against", {}).get("total", {}).get("total", 0) or 0,
-                "clean_sheet": resp.get("clean_sheet", {}).get("total", 0) or 0,
-                "form": resp.get("form", "") or "",
-            }
-            time.sleep(1)
-        except Exception as e:
-            print(f"Stats {team_name}: {e}")
+@app.get("/api/calendario")
+async def calendario():
+    """Calendario con risultati live integrati."""
+    giornate = []
+    giornata_corrente = None
+    for num in range(31, 39):
+        info = CAL_HARDCODED.get(num)
+        if not info:
             continue
-    if stats:
-        TEAM_STATS_CACHE[league_key] = {"data": stats, "timestamp": time.time()}
-    return stats
-
-
-def _compute_best_stats(league_key):
-    """Calcola le migliori statistiche per il campionato. Fallback su classifica."""
-    # 1. Prova cache API dettagliata
-    cached = TEAM_STATS_CACHE.get(league_key)
-    if cached and cached.get("data") and len(cached["data"]) >= 3:
-        stats = cached["data"]
-        try:
-            best_attack = max(stats.items(), key=lambda x: x[1].get("gf", 0))
-            best_defense = min(stats.items(), key=lambda x: x[1].get("gs", 999))
-            most_cs = max(stats.items(), key=lambda x: x[1].get("clean_sheet", 0))
-            def form_score(form_str):
-                score = 0
-                for c in (form_str or "")[-5:]:
-                    if c == "W": score += 3
-                    elif c == "D": score += 1
-                return score
-            best_form = max(stats.items(), key=lambda x: form_score(x[1].get("form", "")))
-            best_wins = max(stats.items(), key=lambda x: x[1].get("vinte", 0))
-            return {
-                "miglior_attacco": {"squadra": best_attack[0], "gf": best_attack[1]["gf"], "media": round(best_attack[1]["gf"] / max(best_attack[1].get("giocate", 1), 1), 2)},
-                "miglior_difesa": {"squadra": best_defense[0], "gs": best_defense[1]["gs"], "clean_sheet": best_defense[1].get("clean_sheet", 0)},
-                "piu_clean_sheet": {"squadra": most_cs[0], "clean_sheet": most_cs[1].get("clean_sheet", 0)},
-                "miglior_forma": {"squadra": best_form[0], "form": (best_form[1].get("form", "") or "")[-5:], "punti_forma": form_score(best_form[1].get("form", ""))},
-                "miglior_casa": {"squadra": best_wins[0], "vittorie": best_wins[1].get("vinte", 0)}
-            }
-        except Exception:
-            _logger.warning("Eccezione silenziata", exc_info=True)
-
-    # 2. Fallback: calcola dalla classifica (sempre disponibile)
-    cl = CLASSIFICA_CACHE.get(league_key)
-    if not cl or len(cl) < 3:
-        return None
-    try:
-        def _gf(s): return s.get("GF", 0) or 0
-        def _gs(s): return s.get("GS", 999) or 999
-        def _v(s): return s.get("V", 0) or 0
-        def _g(s): return max(s.get("G", 1) or 1, 1)
-        def _sq(s): return s.get("Squadra", "?")
-
-        att = max(cl, key=_gf)
-        dif = min(cl, key=_gs)
-        # Miglior rapporto GS/partite = stima clean sheet
-        best_ratio = min(cl, key=lambda s: (_gs(s) if _gs(s) < 999 else 0) / _g(s))
-        wins = max(cl, key=_v)
-        # Forma: squadra con piu punti nelle ultime partite (V*3+N)
-        def _pts_ratio(s):
-            return (_v(s) * 3 + (s.get("N", 0) or 0)) / _g(s)
-        forma = max(cl, key=_pts_ratio)
-
-        return {
-            "miglior_attacco": {"squadra": _sq(att), "gf": _gf(att), "media": round(_gf(att) / _g(att), 2)},
-            "miglior_difesa": {"squadra": _sq(dif), "gs": _gs(dif) if _gs(dif) < 999 else 0, "clean_sheet": 0},
-            "piu_clean_sheet": {"squadra": _sq(best_ratio), "clean_sheet": 0},
-            "miglior_forma": {"squadra": _sq(forma), "form": "", "punti_forma": round(_pts_ratio(forma), 2)},
-            "miglior_casa": {"squadra": _sq(wins), "vittorie": _v(wins)}
-        }
-    except Exception as e:
-        print(f"Compute best stats fallback {league_key}: {e}")
-        return None
-
+        partite = []
+        tutte_finite = True
+        ha_live = False
+        ha_da_giocare = False
+        for h, a in info["partite"]:
+            match_data = {"home": h, "away": a, "gol_h": None, "gol_a": None, "status": "NS", "status_it": "Da giocare", "minuto": None, "live": False, "fixture_id": None}
+            if LIVE_RESULTS_CACHE:
+                for p in LIVE_RESULTS_CACHE:
+                    if p["home"] == h and p["away"] == a:
+                        match_data.update({"gol_h": p["gol_h"], "gol_a": p["gol_a"], "status": p["status"], "status_it": p.get("status_it", p["status"]), "minuto": p.get("minuto"), "live": p.get("live", False), "fixture_id": p.get("fixture_id"), "marcatori": p.get("marcatori", [])})
+                        break
+            if match_data["status"] == "NS":
+                tutte_finite = False
+                ha_da_giocare = True
+            elif match_data["live"]:
+                tutte_finite = False
+                ha_live = True
+            partite.append(match_data)
+        if tutte_finite:
+            stato = "completata"
+        elif ha_live:
+            stato = "live"
+            giornata_corrente = str(num)
+        else:
+            stato = "prossima"
+            if giornata_corrente is None and ha_da_giocare:
+                giornata_corrente = str(num)
+        giornate.append({"giornata": str(num), "data": info["data"], "partite": partite, "stato": stato, "live": ha_live})
+    return {"giornate": giornate, "giornata_corrente": giornata_corrente or "38", "live": any(g.get("live") for g in giornate)}
 
 # ─────────────────────────────
-# MONDIALI 2026
+# FRONTEND
 # ─────────────────────────────
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse("/app")
+
+@app.get("/logo.png", include_in_schema=False)
+async def serve_logo():
+    return FileResponse(os.path.join(FRONTEND_DIR, "logo.png"), media_type="image/png")
+
+@app.get("/manifest.json", include_in_schema=False)
+async def serve_manifest():
+    return FileResponse(os.path.join(FRONTEND_DIR, "manifest.json"), media_type="application/json")
+
+@app.get("/sw.js", include_in_schema=False)
+async def serve_sw():
+    return FileResponse(os.path.join(FRONTEND_DIR, "sw.js"), media_type="application/javascript")
+
+@app.get("/app", include_in_schema=False)
+@app.get("/app/{path:path}", include_in_schema=False)
+async def serve_app(path: str = ""):
+    from fastapi.responses import HTMLResponse
+    with open(os.path.join(FRONTEND_DIR, "index.html"), "r", encoding="utf-8") as f:
+        content = f.read()
+    return HTMLResponse(content, headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"})
 
 # ─────────────────────────────
 # HEALTH CHECK
@@ -3457,6 +975,48 @@ async def health():
         "risultati_live": LIVE_RESULTS_CACHE is not None and len(LIVE_RESULTS_CACHE or []) > 0,
         "ultimo_aggiornamento_live": LIVE_RESULTS_TIME,
     }
+
+# ─────────────────────────────
+# STARTUP EVENT
+# ─────────────────────────────
+@app.on_event("startup")
+async def startup():
+    global _df, _df_pl, _df_ll, _df_ucl, _df_uel, _df_uecl, _df_bl, _df_l1
+
+    print("\n🚀 AVVIO SERVER MATCHIQ (modular)\n")
+
+    # DB
+    try:
+        init_db()
+        print("✅ DATABASE OK")
+    except Exception as e:
+        print("⚠️ DATABASE:", e)
+
+    # DataFrames CSV (opzionali)
+    if MOTORE_DISPONIBILE:
+        for league_code, attr in [("", "_df"), ("E0", "_df_pl"), ("SP1", "_df_ll"), ("UCL", "_df_ucl"), ("UEL", "_df_uel"), ("UECL", "_df_uecl"), ("D1", "_df_bl"), ("F1", "_df_l1")]:
+            try:
+                df = load_all_data() if not league_code else load_all_data(league=league_code)
+                globals()[attr] = df
+                print(f"✅ Dataset {attr}: {len(df)} partite")
+            except Exception as e:
+                print(f"⚠️ Dataset {attr} non disponibile: {e}")
+    else:
+        print("⚠️ MOTORE NON DISPONIBILE - il server usa dati hardcoded")
+
+    # Bootstrap servizi (delayed)
+    try:
+        from startup import bootstrap
+        bootstrap(
+            df=_df,
+            enable_telegram=bool(os.environ.get("TELEGRAM_BOT_TOKEN", "")),
+            verify_predictions_fn=verify_predictions,
+        )
+        print("✅ SERVER PRONTO\n")
+    except Exception as e:
+        print(f"⚠️ Bootstrap: {e}")
+        # Fallback: avvia live updater direttamente
+        threading.Thread(target=start_live_updater, kwargs={"verify_predictions_fn": verify_predictions}, daemon=True).start()
 
 # ─────────────────────────────
 # RUN LOCALE
