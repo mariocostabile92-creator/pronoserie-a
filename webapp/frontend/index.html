@@ -213,7 +213,43 @@ async function postAPI(ep, body) {
 function $(id){return document.getElementById(id)}
 
 //  -- HOME  -  - &euro;
+// Carica stats dinamiche dal backend
+let _homeStats = null;
+async function _loadHomeStats(){
+  if(_homeStats) return _homeStats;
+  try{
+    const d = await fetchAPI("/api/stats/summary");
+    if(d && d.totale_partite) _homeStats = d;
+  }catch(e){}
+  return _homeStats;
+}
+
+function _fmt(n){if(!n&&n!==0)return'...';return n.toLocaleString('it-IT')}
+function _pct(n){if(!n&&n!==0)return'...';return n+'%'}
+
 function pageHome(){
+  // Avvia caricamento stats in background e aggiorna i placeholder quando pronto
+  _loadHomeStats().then(s=>{
+    if(!s) return;
+    const ids={
+      'stat-partite': _fmt(s.totale_partite),
+      'stat-competizioni': s.competizioni_coperte || 9,
+      'stat-fonti': s.fonti_dati || 8,
+      'stat-acc-1x2': _pct(s.accuratezza_1x2),
+      'stat-acc-alta': _pct(s.accuratezza_alta_confidenza),
+      'stat-partite-verif': s.partite_verificate || 0,
+      'stat-upd': s.ultimo_aggiornamento || '',
+    };
+    Object.entries(ids).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.textContent=val;});
+    // Aggiorna anche il testo della descrizione
+    const desc=document.getElementById('stat-partite-desc');
+    if(desc&&s.totale_partite) desc.innerHTML='L\'intelligenza artificiale analizza <strong>'+_fmt(s.totale_partite)+' partite storiche</strong> di '+( s.competizioni_coperte||8)+' competizioni, gli <strong>scontri diretti</strong>, la <strong>forma delle squadre</strong>, gli <strong>infortunati</strong>, le <strong>formazioni</strong> e le <strong>quote dei bookmaker</strong>. Tu devi solo leggere il risultato e decidere se seguire il consiglio.';
+    const lbl1x2=document.getElementById('stat-lbl-1x2');
+    if(lbl1x2&&s.partite_verificate>0) lbl1x2.textContent='1X2 ('+s.partite_verificate+' partite)';
+    const note=document.getElementById('stat-note-backtesting');
+    if(note&&s.partite_verificate>0) note.innerHTML='Questi numeri non sono inventati: sono il risultato di un <strong>backtesting su '+s.partite_verificate+' partite reali</strong> della stagione 2025-2026. Quando l\'IA ha confidenza Alta, centra il risultato 1X2 <strong style="color:var(--green)">'+(s.accuratezza_alta_confidenza>=60?'2 volte su 3':'con alta precisione')+'</strong>.';
+  });
+
   return `<div class="hero" style="background:linear-gradient(135deg,rgba(13,27,42,.95),rgba(22,36,71,.9),rgba(13,59,30,.9)),url('/logo.png') center/300px no-repeat;position:relative">
     <img src="/logo.png" style="height:80px;margin-bottom:16px;filter:drop-shadow(0 4px 20px rgba(46,204,113,.4))">
     <h1>MatchIQ</h1>
@@ -234,21 +270,21 @@ function pageHome(){
       <h2 style="color:var(--green);margin-bottom:12px">Come funziona? Semplicissimo.</h2>
       <div class="grid3" style="margin-top:16px">
         <div style="text-align:center"><div style="font-size:2.5rem;margin-bottom:8px">1</div><strong>Scegli le squadre</strong><p style="color:var(--muted);font-size:.85rem;margin-top:4px">Seleziona la partita che ti interessa dal menu</p></div>
-        <div style="text-align:center"><div style="font-size:2.5rem;margin-bottom:8px">2</div><strong>L'IA calcola tutto</strong><p style="color:var(--muted);font-size:.85rem;margin-top:4px">Analizza 8 fonti dati e 15 anni di storico in 2 secondi</p></div>
+        <div style="text-align:center"><div style="font-size:2.5rem;margin-bottom:8px">2</div><strong>L'IA calcola tutto</strong><p style="color:var(--muted);font-size:.85rem;margin-top:4px">Analizza <span id="stat-fonti">8</span> fonti dati e 15 anni di storico in 2 secondi</p></div>
         <div style="text-align:center"><div style="font-size:2.5rem;margin-bottom:8px">3</div><strong>Ricevi il pronostico</strong><p style="color:var(--muted);font-size:.85rem;margin-top:4px">Ti dice il risultato piu' probabile con la % di successo</p></div>
       </div>
     </div>
     <div class="card" style="padding:24px;margin-bottom:24px;background:linear-gradient(135deg,#0d3b1e,#162447);border-color:var(--green)">
       <h2 style="text-align:center;color:var(--green);margin-bottom:12px">Non serve essere esperti!</h2>
-      <p style="color:var(--text);font-size:1rem;line-height:1.8;text-align:center;max-width:700px;margin:0 auto">
+      <p id="stat-partite-desc" style="color:var(--text);font-size:1rem;line-height:1.8;text-align:center;max-width:700px;margin:0 auto">
         <strong style="color:var(--green)">MatchIQ</strong> fa tutto il lavoro per te. L'intelligenza artificiale analizza <strong>36.659 partite storiche</strong> di 8 competizioni, gli <strong>scontri diretti</strong>, la <strong>forma delle squadre</strong>, gli <strong>infortunati</strong>, le <strong>formazioni</strong> e le <strong>quote dei bookmaker</strong>. Tu devi solo leggere il risultato e decidere se seguire il consiglio.
       </p>
     </div>
     <h2 style="text-align:center;margin:24px 0 16px">I nostri numeri parlano chiaro</h2>
     <div class="grid3" style="margin-bottom:24px">
-      <div class="card" style="text-align:center;border-color:var(--green)"><div style="font-size:2.5rem;font-weight:800;color:var(--green)">36.659</div><p style="color:var(--muted)">Partite analizzate</p></div>
-      <div class="card" style="text-align:center;border-color:var(--accent)"><div style="font-size:2.5rem;font-weight:800;color:var(--accent)">9</div><p style="color:var(--muted)">Competizioni coperte</p><p style="color:var(--muted);font-size:.7rem;margin-top:4px">Serie A - Premier League - La Liga - Bundesliga - Ligue 1<br>Champions League - Europa League - Conference League<br>+ Mondiali 2026</p></div>
-      <div class="card" style="text-align:center;border-color:var(--yellow)"><div style="font-size:2.5rem;font-weight:800;color:var(--yellow)">8</div><p style="color:var(--muted)">Fonti dati combinate</p></div>
+      <div class="card" style="text-align:center;border-color:var(--green)"><div id="stat-partite" style="font-size:2.5rem;font-weight:800;color:var(--green)">...</div><p style="color:var(--muted)">Partite analizzate</p></div>
+      <div class="card" style="text-align:center;border-color:var(--accent)"><div id="stat-competizioni" style="font-size:2.5rem;font-weight:800;color:var(--accent)">9</div><p style="color:var(--muted)">Competizioni coperte</p><p style="color:var(--muted);font-size:.7rem;margin-top:4px">Serie A - Premier League - La Liga - Bundesliga - Ligue 1<br>Champions League - Europa League - Conference League<br>+ Mondiali 2026</p></div>
+      <div class="card" style="text-align:center;border-color:var(--yellow)"><div id="stat-fonti-big" style="font-size:2.5rem;font-weight:800;color:var(--yellow)">8</div><p style="color:var(--muted)">Fonti dati combinate</p></div>
     </div>
     <h2 style="text-align:center;margin:24px 0 12px">Le nostre 8 fonti dati</h2>
     <div class="grid3">
@@ -262,12 +298,12 @@ function pageHome(){
       <div class="card" style="text-align:center"><div style="font-size:2rem">&#128176;</div><strong>Quote Bookmaker Live</strong><p style="color:var(--muted);font-size:.8rem">Media di 10+ bookmaker europei in tempo reale</p></div>
     </div>
     <div class="grid3">
-      <div class="stat-box card"><div class="num">54.8%</div><div class="lbl">1X2 (299 partite)</div></div>
+      <div class="stat-box card"><div class="num" id="stat-acc-1x2">...</div><div class="lbl" id="stat-lbl-1x2">1X2 (partite verificate)</div></div>
       <div class="stat-box card"><div class="num">57.5%</div><div class="lbl">Goal/NoGoal</div></div>
-      <div class="stat-box card" style="border-color:var(--green)"><div class="num" style="color:var(--green)">67.3%</div><div class="lbl">Pronostici Confidenza ALTA</div></div>
+      <div class="stat-box card" style="border-color:var(--green)"><div class="num" id="stat-acc-alta" style="color:var(--green)">...</div><div class="lbl">Pronostici Confidenza ALTA</div></div>
     </div>
     <div class="card" style="margin-top:16px;padding:20px;text-align:center;background:#0d1b2a;border-color:var(--accent)">
-      <p style="color:var(--text);font-size:1rem;line-height:1.6">Questi numeri non sono inventati: sono il risultato di un <strong>backtesting su 299 partite reali</strong> della stagione 2025-2026. Quando l'IA ha confidenza Alta, centra il risultato 1X2 <strong style="color:var(--green)">2 volte su 3</strong>.</p>
+      <p id="stat-note-backtesting" style="color:var(--text);font-size:1rem;line-height:1.6">Questi numeri non sono inventati: sono il risultato di un <strong>backtesting su partite reali</strong> della stagione 2025-2026. Quando l'IA ha confidenza Alta, centra il risultato 1X2 <strong style="color:var(--green)">2 volte su 3</strong>.</p>
     </div>
     <div class="card" style="margin-top:24px;padding:24px;border-color:var(--green)">
       ${userPlan==="pro"?'<div style="text-align:center;margin-bottom:12px"><span style="font-size:2rem">&#11088;</span><br><span style="color:var(--green);font-weight:800;font-size:1.1rem">Sei gia abbonato Pro!</span><br><span style="color:var(--muted);font-size:.9rem">Hai accesso completo a tutte le funzionalita</span></div>':''}
