@@ -5,12 +5,17 @@ Usato dal predictor per migliorare le predizioni con dati reali.
 """
 
 import json
+import logging
 import os
 import time
 import urllib.request
-from datetime import datetime
 
-API_KEY = "3f8ed68a9b1cb532479096f33bfbc568"
+logger = logging.getLogger(__name__)
+
+API_KEY = os.environ.get('API_FOOTBALL_KEY', '')
+if not API_KEY:
+    logger.warning('API_FOOTBALL_KEY non configurata')
+
 API_HOST = "v3.football.api-sports.io"
 LEAGUE_ID = 135  # Serie A
 SEASON = 2025
@@ -69,8 +74,8 @@ def _load_cache():
                 _STATS_CACHE = data
                 _CACHE_LOADED = True
                 return
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Errore caricamento cache API stats: %s", exc)
     _CACHE_LOADED = True
 
 
@@ -80,8 +85,8 @@ def _save_cache():
         _STATS_CACHE["_timestamp"] = time.time()
         with open(_CACHE_FILE, "w") as f:
             json.dump(_STATS_CACHE, f)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.error("Errore salvataggio cache API stats: %s", exc)
 
 
 def _api_request(endpoint):
@@ -94,8 +99,8 @@ def _api_request(endpoint):
         })
         with urllib.request.urlopen(req, timeout=15) as r:
             return json.loads(r.read().decode())
-    except Exception as e:
-        print(f"API Football error: {e}")
+    except Exception as exc:
+        logger.error("API Football error [%s]: %s", endpoint, exc)
         return None
 
 
@@ -124,7 +129,6 @@ def get_team_real_stats(team_name: str, fetch_if_missing: bool = False) -> dict:
     fixtures = resp.get("fixtures", {})
     goals = resp.get("goals", {})
     clean_sheet = resp.get("clean_sheet", {})
-    lineups = resp.get("lineups", [])
 
     # Gol fatti/subiti per partita casa e trasferta
     gf_home = goals.get("for", {}).get("average", {}).get("home", "0")
@@ -174,7 +178,7 @@ def fetch_all_team_stats():
     """Scarica le statistiche di tutte le squadre (da chiamare periodicamente)."""
     print("Scaricamento statistiche API Football...")
     for team in TEAM_IDS:
-        stats = get_team_real_stats(team)
+        stats = get_team_real_stats(team, fetch_if_missing=True)
         if stats:
             print(f"  {team}: GF casa={stats['gf_home_pg']}, GF trasf={stats['gf_away_pg']}, forma={stats['form']}")
         time.sleep(1)  # Rate limiting
