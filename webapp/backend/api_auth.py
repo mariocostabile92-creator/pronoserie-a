@@ -55,6 +55,9 @@ def verify_password(plain: str, hashed: str) -> bool:
 # --- FUNZIONI TOKEN JWT ---
 
 def create_token(data: dict) -> str:
+    """Crea un JWT firmato. `data` deve contenere la chiave 'sub' con l'ID utente (str)."""
+    if "sub" not in data:
+        raise ValueError("create_token: 'sub' claim obbligatorio mancante in data.")
     payload = data.copy()
     now = datetime.now(timezone.utc)
     expire = now + timedelta(days=TOKEN_EXPIRE_DAYS)
@@ -75,34 +78,45 @@ def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depen
         raise HTTPException(status_code=401, detail="Token mancante")
     try:
         payload = decode_token(credentials.credentials)
-        sub = payload.get("sub")
-        if sub is None:
-            logger.warning("get_current_user: claim 'sub' assente nel token.")
-            raise ValueError("Claim sub mancante")
-        user = get_user_by_id(int(sub))
-        if not user:
-            raise ValueError("Utente non trovato")
-        return user
-    except (ValueError, TypeError) as e:
-        logger.warning("get_current_user: %s", e)
-        raise HTTPException(status_code=401, detail="Sessione non valida")
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Token non valido")
     except Exception as e:
-        logger.error("get_current_user: errore inatteso: %s", e)
-        raise HTTPException(status_code=401, detail="Sessione non valida")
+        logger.error("get_current_user: errore decodifica token inatteso: %s", e)
+        raise HTTPException(status_code=401, detail="Token non valido")
+    sub = payload.get("sub")
+    if sub is None:
+        logger.warning("get_current_user: claim 'sub' assente nel token.")
+        raise HTTPException(status_code=401, detail="Token non valido")
+    try:
+        user = get_user_by_id(int(sub))
+    except (ValueError, TypeError) as e:
+        logger.warning("get_current_user: sub non convertibile in int: %s", e)
+        raise HTTPException(status_code=401, detail="Token non valido")
+    if not user:
+        logger.warning("get_current_user: utente con id=%s non trovato nel DB.", sub)
+        raise HTTPException(status_code=401, detail="Utente non trovato")
+    return user
 
 def get_optional_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme)) -> Optional[dict]:
     if not credentials:
         return None
     try:
         payload = decode_token(credentials.credentials)
-        sub = payload.get("sub")
-        if sub is None:
-            logger.warning("get_optional_user: claim 'sub' assente nel token.")
-            return None
-        return get_user_by_id(int(sub))
-    except (ValueError, TypeError) as e:
-        logger.warning("get_optional_user: %s", e)
+    except ValueError:
+        logger.warning("get_optional_user: token non valido, ritorna None.")
         return None
     except Exception as e:
-        logger.error("get_optional_user: errore inatteso: %s", e)
+        logger.error("get_optional_user: errore decodifica token inatteso: %s", e)
+        return None
+    sub = payload.get("sub")
+    if sub is None:
+        logger.warning("get_optional_user: claim 'sub' assente nel token.")
+        return None
+    try:
+        return get_user_by_id(int(sub))
+    except (ValueError, TypeError) as e:
+        logger.warning("get_optional_user: sub non convertibile in int: %s", e)
+        return None
+    except Exception as e:
+        logger.error("get_optional_user: errore inatteso lookup utente: %s", e)
         return None

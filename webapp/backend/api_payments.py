@@ -14,6 +14,12 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from api_auth import get_current_user
 from database import get_user_by_email, get_user_by_id, update_plan, update_stripe_customer
 
+# ── Idempotenza webhook: set in memoria degli event.id già processati ────────
+# In produzione ad alto volume si consiglia una tabella DB stripe_events
+# (event_id TEXT PRIMARY KEY, processed_at TIMESTAMPTZ). Il set in memoria
+# è sufficiente per traffic moderato e si azzera al riavvio del processo.
+_processed_event_ids: set = set()
+
 logger = logging.getLogger(__name__)
 
 # ── Configurazione Stripe (lazy: letta al momento dell'uso) ─────────────────
@@ -146,11 +152,10 @@ def handle_webhook(payload: bytes, sig_header: str) -> dict:
     Ritorna dict con l'esito dell'operazione.
     Lancia HTTPException se la firma non è valida.
 
-    NOTA IDEMPOTENZA: Stripe può recapitare lo stesso evento più di una volta.
-    Le funzioni _processa_pagamento e _revoca_piano chiamano update_plan che è
-    idempotente (SET piano = ?), quindi rielaborare lo stesso evento non causa
-    danni. Se in futuro si aggiunge logica non idempotente (es. invio email,
-    crediti), occorre deduplicare tramite event.id persistito nel DB.
+    IDEMPOTENZA: gli event.id già processati sono tracciati nel set
+    _processed_event_ids (in memoria). Stripe può recapitare lo stesso
+    evento più di una volta; i duplicati vengono ignorati prima di
+    eseguire qualsiasi aggiornamento DB.
     """
     stripe_secret_key = _get_stripe_secret_key()
     webhook_secret = _get_stripe_webhook_secret()
@@ -177,6 +182,12 @@ def handle_webhook(payload: bytes, sig_header: str) -> dict:
     event_type = event.get("type", "")
     event_id = event.get("id", "?")
     logger.info("Webhook Stripe ricevuto: event_type=%s event_id=%s", event_type, event_id)
+
+    # ── Idempotenza: skippa eventi già processati ────────────────────────────
+    if event_id in _processed_event_ids:
+        logger.info("Webhook Stripe duplicato ignorato: event_id=%s", event_id)
+        return {"status": "ok", "event": event_type, "skipped": True}
+    _processed_event_ids.add(event_id)
 
     if event_type == "checkout.session.completed":
         logger.info("Checkout completato (event_id=%s): aggiorno piano a 'pro'.", event_id)
@@ -276,8 +287,12 @@ async def crea_checkout(utente: dict = Depends(get_current_user)):
 
 
 @router.get("/checkout-direct")
-async def checkout_diretto(email: str = ""):
-    """Crea checkout Stripe. Se email fornita, la pre-compila."""
+async def checkout_diretto(email: str = "", utente: Optional[dict] = Depends(get_current_user)):
+    """
+    Crea checkout Stripe. Se email fornita, la pre-compila.
+    Se l'utente è autenticato, aggiunge metadata user_id per permettere
+    al webhook di aggiornare il piano correttamente.
+    """
     stripe_secret_key = _get_stripe_secret_key()
     stripe_price_id = _get_stripe_price_id()
     base_url = _get_base_url()
@@ -295,6 +310,11 @@ async def checkout_diretto(email: str = ""):
         }
         if email:
             params["customer_email"] = email
+        # Aggiunge metadata con user_id se l'utente è autenticato:
+        # il webhook usa questa info per aggiornare il piano senza
+        # dover fare lookup aggiuntivi su Stripe.
+        if utente and utente.get("id"):
+            params["metadata"] = {"user_id": str(utente["id"])}
         session = stripe.checkout.Session.create(**params)
         return {"checkout_url": session.url}
     except HTTPException:

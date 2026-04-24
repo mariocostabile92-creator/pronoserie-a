@@ -201,6 +201,7 @@ def init_db():
     _migrate_column_types()
     _add_fk_constraints()
     _add_unique_predictions_tracking()
+    _add_check_constraints()
 
 
 # ── Step 1: Migrazione TEXT → TIMESTAMPTZ / DATE ──
@@ -401,6 +402,52 @@ def _add_unique_predictions_tracking():
             pass
     finally:
         _put_conn(conn)
+
+
+# ── CHECK constraints su valori fissi ──
+
+def _add_check_constraints():
+    """
+    Aggiunge CHECK constraints per colonne con valori fissi.
+    Usa ADD CONSTRAINT IF NOT EXISTS (PostgreSQL 9.5+) in try/except separati
+    per garantire che un errore su un vincolo non blocchi gli altri.
+    """
+    constraints = [
+        # (constraint_name, table, expression)
+        (
+            "chk_users_piano",
+            "users",
+            "piano IN ('free', 'pro')",
+        ),
+        (
+            "chk_predictions_confidence_label",
+            "predictions_tracking",
+            "confidence_label IN ('Bassa', 'Media', 'Alta')",
+        ),
+        (
+            "chk_referrals_status",
+            "referrals",
+            "status IN ('pending', 'completed', 'expired')",
+        ),
+    ]
+    conn = _get_conn()
+    for name, table, expr in constraints:
+        try:
+            cur = conn.cursor()
+            cur.execute(
+                f"ALTER TABLE {table} "
+                f"ADD CONSTRAINT IF NOT EXISTS {name} CHECK ({expr})"
+            )
+            conn.commit()
+            cur.close()
+            logger.info(f"CHECK constraint applicato: {name}")
+        except Exception as e:
+            logger.warning(f"CHECK constraint {name} non applicato (già presente o errore): {e}")
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+    _put_conn(conn)
 
 
 # ── CRUD utenti ──

@@ -2,12 +2,14 @@
 routes/auth.py - Gestione autenticazione utenti
 Endpoint: registrazione, login, reset/change password
 """
+import logging
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional
 from datetime import datetime, timezone
 import threading
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+logger = logging.getLogger(__name__)
 
 # Import dipendenze dal modulo principale
 import sys
@@ -61,9 +63,9 @@ def send_welcome_email(to_email):
             "User-Agent": "MatchIQ/1.0"
         })
         ur.urlopen(req, timeout=10)
-        print(f"📧 Email inviata a {to_email}")
+        logger.info("send_welcome_email: email inviata a %s", to_email)
     except Exception as e:
-        print(f"⚠️ Errore invio email a {to_email}: {e}")
+        logger.warning("send_welcome_email: errore invio email a %s: %s", to_email, e)
 
 def _notify_admin_new_user(email, piano):
     """Notifica l'admin quando un nuovo utente si registra."""
@@ -92,9 +94,9 @@ def _notify_admin_new_user(email, piano):
             "User-Agent": "MatchIQ/1.0"
         })
         ur.urlopen(req, timeout=10)
-        print(f"📧 Notifica admin: nuovo utente {email}")
+        logger.info("_notify_admin_new_user: notifica email inviata per nuovo utente %s", email)
     except Exception as e:
-        print(f"⚠️ Errore notifica email admin: {e}")
+        logger.warning("_notify_admin_new_user: errore notifica email admin: %s", e)
 
 @router.post("/register")
 async def register(data: dict):
@@ -114,20 +116,25 @@ async def register(data: dict):
     try:
         threading.Thread(target=_notify_admin_new_user, args=(email, user.get("piano", "free")), daemon=True).start()
     except Exception as e:
-        print(f"⚠️ Errore avvio notifica admin: {e}")
+        logger.warning("register: errore avvio notifica admin per %s: %s", email, e)
 
     return {"access_token": token, "piano": user["piano"]}
 
 @router.post("/login")
 async def login(data: dict):
     """Login utente."""
-    user = get_user_by_email(data["email"].lower().strip())
+    email = data["email"].lower().strip()
+    user = get_user_by_email(email)
 
-    if not user or not verify_password(data["password"].strip(), user["password_hash"]):
+    if not user:
+        logger.warning("login: tentativo fallito - utente non trovato per email '%s'", email)
+        raise HTTPException(401, "Credenziali errate")
+
+    if not verify_password(data["password"].strip(), user["password_hash"]):
+        logger.warning("login: tentativo fallito - password errata per email '%s'", email)
         raise HTTPException(401, "Credenziali errate")
 
     token = create_token({"sub": str(user["id"])})
-
     return {"access_token": token, "piano": user["piano"]}
 
 @router.post("/reset-password")
@@ -164,9 +171,9 @@ async def reset_password(data: dict):
             "User-Agent": "MatchIQ/1.0"
         })
         ur.urlopen(req, timeout=10)
-        print(f"📧 Password reset inviata a {email}")
+        logger.info("reset_password: email con nuova password inviata a %s", email)
     except Exception as e:
-        print(f"❌ Errore invio reset password: {e}")
+        logger.error("reset_password: errore invio email a %s: %s", email, e)
     return {"sent": True}
 
 @router.post("/change-password")

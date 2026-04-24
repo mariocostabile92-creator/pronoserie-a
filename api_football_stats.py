@@ -17,37 +17,13 @@ if not API_KEY:
     logger.warning('API_FOOTBALL_KEY non configurata')
 
 API_HOST = "v3.football.api-sports.io"
-LEAGUE_ID = 135  # Serie A
-SEASON = 2025
+LEAGUE_ID = 135  # Serie A (ID fisso API-Football)
+SEASON = int(os.environ.get('API_FOOTBALL_SEASON', 2025))
 
 # Cache locale per non fare troppe chiamate API
 _STATS_CACHE = {}
 _CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "api_stats_cache.json")
 _CACHE_LOADED = False
-
-# Mapping nomi API -> nostri nomi
-NOME_MAP = {
-    "FC Internazionale Milano": "Inter", "Inter Milan": "Inter", "Inter": "Inter",
-    "AC Milan": "Milan", "Milan": "Milan",
-    "SSC Napoli": "Napoli", "Napoli": "Napoli",
-    "Como 1907": "Como", "Como": "Como",
-    "Juventus FC": "Juventus", "Juventus": "Juventus",
-    "AS Roma": "Roma", "Roma": "Roma",
-    "Atalanta BC": "Atalanta", "Atalanta": "Atalanta",
-    "SS Lazio": "Lazio", "Lazio": "Lazio",
-    "Bologna FC 1909": "Bologna", "Bologna": "Bologna",
-    "US Sassuolo Calcio": "Sassuolo", "Sassuolo": "Sassuolo",
-    "Udinese Calcio": "Udinese", "Udinese": "Udinese",
-    "Parma Calcio 1913": "Parma", "Parma": "Parma",
-    "Genoa CFC": "Genoa", "Genoa": "Genoa",
-    "Torino FC": "Torino", "Torino": "Torino",
-    "Cagliari Calcio": "Cagliari", "Cagliari": "Cagliari",
-    "ACF Fiorentina": "Fiorentina", "Fiorentina": "Fiorentina",
-    "US Cremonese": "Cremonese", "Cremonese": "Cremonese",
-    "US Lecce": "Lecce", "Lecce": "Lecce",
-    "Hellas Verona FC": "Verona", "Hellas Verona": "Verona", "Verona": "Verona",
-    "AC Pisa 1909": "Pisa", "Pisa": "Pisa",
-}
 
 # Mapping inverso nome -> team_id API Football
 TEAM_IDS = {
@@ -122,7 +98,16 @@ def get_team_real_stats(team_name: str, fetch_if_missing: bool = False) -> dict:
         return None
 
     data = _api_request(f"teams/statistics?league={LEAGUE_ID}&season={SEASON}&team={team_id}")
-    if not data or not data.get("response"):
+    # Validazione risposta: deve essere un dict con 'response' non vuota
+    if not data:
+        logger.warning("get_team_real_stats: risposta vuota/nulla per %s", team_name)
+        return None
+    response = data.get("response")
+    if not isinstance(response, (dict, list)) or (isinstance(response, list) and len(response) == 0):
+        logger.warning(
+            "get_team_real_stats: 'response' assente o lista vuota per %s (data=%s)",
+            team_name, str(data)[:200]
+        )
         return None
 
     resp = data["response"]
