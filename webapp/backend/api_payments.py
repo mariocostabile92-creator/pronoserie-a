@@ -16,33 +16,60 @@ from database import get_user_by_email, get_user_by_id, update_plan, update_stri
 
 logger = logging.getLogger(__name__)
 
-# ── Configurazione Stripe (da variabili d'ambiente) ─────────────────────────
-# Fix (2): RuntimeError se le variabili critiche mancano (come JWT_SECRET)
-_STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
-_STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "")
-_STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
-_BASE_URL = os.environ.get("FRONTEND_URL", "")
+# ── Configurazione Stripe (lazy: letta al momento dell'uso) ─────────────────
+# Non si lancia RuntimeError al boot: il server rimane attivo anche se Stripe
+# non è configurato. Le singole route ritorneranno HTTP 503 se mancano le vars.
 
-if not _STRIPE_SECRET_KEY:
-    raise RuntimeError("STRIPE_SECRET_KEY mancante nelle variabili d'ambiente.")
-if not _STRIPE_PRICE_ID:
-    raise RuntimeError("STRIPE_PRICE_ID mancante nelle variabili d'ambiente.")
-if not _STRIPE_WEBHOOK_SECRET:
-    raise RuntimeError("STRIPE_WEBHOOK_SECRET mancante nelle variabili d'ambiente.")
-if not _BASE_URL:
-    raise RuntimeError("FRONTEND_URL mancante nelle variabili d'ambiente.")
+_FRONTEND_URL_DEFAULT = "https://matchiq.it.com"
 
-STRIPE_SECRET_KEY = _STRIPE_SECRET_KEY
-STRIPE_PRICE_ID = _STRIPE_PRICE_ID
-STRIPE_WEBHOOK_SECRET = _STRIPE_WEBHOOK_SECRET
-BASE_URL = _BASE_URL
+# STRIPE_PRICE_ID: warning al boot se mancante, ma non crash.
+_STRIPE_PRICE_ID_BOOT = os.environ.get("STRIPE_PRICE_ID", "")
+if not _STRIPE_PRICE_ID_BOOT:
+    logger.warning(
+        "STRIPE_PRICE_ID non configurata: le route checkout non funzioneranno "
+        "finché la variabile non viene impostata."
+    )
 
-# URL di redirect dopo il pagamento
-SUCCESS_URL = BASE_URL + "/app?paid=1#home"
-CANCEL_URL = BASE_URL + "/app#pricing"
 
-# Configura la chiave Stripe
-stripe.api_key = STRIPE_SECRET_KEY
+def _get_stripe_secret_key() -> str:
+    """Legge STRIPE_SECRET_KEY al momento dell'uso. Lancia HTTPException 503 se mancante."""
+    key = os.environ.get("STRIPE_SECRET_KEY", "")
+    if not key:
+        logger.error("STRIPE_SECRET_KEY mancante: Stripe non disponibile.")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Servizio pagamenti temporaneamente non disponibile."
+        )
+    return key
+
+
+def _get_stripe_price_id() -> str:
+    """Legge STRIPE_PRICE_ID al momento dell'uso. Lancia HTTPException 503 se mancante."""
+    price_id = os.environ.get("STRIPE_PRICE_ID", "")
+    if not price_id:
+        logger.error("STRIPE_PRICE_ID mancante: Stripe non disponibile.")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Servizio pagamenti temporaneamente non disponibile."
+        )
+    return price_id
+
+
+def _get_stripe_webhook_secret() -> str:
+    """Legge STRIPE_WEBHOOK_SECRET al momento dell'uso. Lancia HTTPException 503 se mancante."""
+    secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+    if not secret:
+        logger.error("STRIPE_WEBHOOK_SECRET mancante: webhook Stripe non disponibile.")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Servizio webhook pagamenti temporaneamente non disponibile."
+        )
+    return secret
+
+
+def _get_base_url() -> str:
+    """Legge FRONTEND_URL con fallback al dominio di produzione."""
+    return os.environ.get("FRONTEND_URL", _FRONTEND_URL_DEFAULT)
 
 
 # ── Router FastAPI ──────────────────────────────────────────────────────────
@@ -55,8 +82,16 @@ def create_checkout_session(user_id: int, email: str) -> str:
     """
     Crea una sessione di checkout Stripe per l'upgrade al piano Pro.
     Ritorna l'URL della pagina di pagamento Stripe.
-    Lancia HTTPException in caso di errore Stripe.
+    Lancia HTTPException in caso di errore Stripe o variabili mancanti.
     """
+    stripe_secret_key = _get_stripe_secret_key()
+    stripe_price_id = _get_stripe_price_id()
+    base_url = _get_base_url()
+    success_url = base_url + "/app?paid=1#home"
+    cancel_url = base_url + "/app#pricing"
+
+    stripe.api_key = stripe_secret_key
+
     try:
         # Recupera o crea il customer Stripe
         user = get_user_by_id(user_id)
@@ -77,13 +112,13 @@ def create_checkout_session(user_id: int, email: str) -> str:
             payment_method_types=["card"],
             line_items=[
                 {
-                    "price": STRIPE_PRICE_ID,
+                    "price": stripe_price_id,
                     "quantity": 1,
                 }
             ],
             mode="subscription",           # Abbonamento ricorrente
-            success_url=SUCCESS_URL + "?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url=CANCEL_URL,
+            success_url=success_url + "?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=cancel_url,
             metadata={"user_id": str(user_id)},
         )
 
@@ -94,6 +129,8 @@ def create_checkout_session(user_id: int, email: str) -> str:
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
             detail=f"Errore pagamento: {str(e.user_message or e)}"
         )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error("Errore imprevisto in create_checkout_session user_id=%s", user_id, exc_info=True)
         raise HTTPException(
@@ -115,9 +152,13 @@ def handle_webhook(payload: bytes, sig_header: str) -> dict:
     danni. Se in futuro si aggiunge logica non idempotente (es. invio email,
     crediti), occorre deduplicare tramite event.id persistito nel DB.
     """
+    stripe_secret_key = _get_stripe_secret_key()
+    webhook_secret = _get_stripe_webhook_secret()
+    stripe.api_key = stripe_secret_key
+
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, STRIPE_WEBHOOK_SECRET
+            payload, sig_header, webhook_secret
         )
     except stripe.error.SignatureVerificationError:
         logger.warning("Firma webhook Stripe non valida - possibile replay attack o config errata.")
@@ -198,7 +239,6 @@ def _revoca_piano(obj: dict) -> None:
     user_id_str = metadata.get("user_id")
 
     if not user_id_str:
-        # Fix (4): fallback customer lookup come in _processa_pagamento
         customer_id = obj.get("customer")
         if customer_id:
             try:
@@ -238,18 +278,27 @@ async def crea_checkout(utente: dict = Depends(get_current_user)):
 @router.get("/checkout-direct")
 async def checkout_diretto(email: str = ""):
     """Crea checkout Stripe. Se email fornita, la pre-compila."""
+    stripe_secret_key = _get_stripe_secret_key()
+    stripe_price_id = _get_stripe_price_id()
+    base_url = _get_base_url()
+    success_url = base_url + "/app?paid=1#home"
+    cancel_url = base_url + "/app#pricing"
+    stripe.api_key = stripe_secret_key
+
     try:
         params = {
             "payment_method_types": ["card"],
-            "line_items": [{"price": STRIPE_PRICE_ID, "quantity": 1}],
+            "line_items": [{"price": stripe_price_id, "quantity": 1}],
             "mode": "subscription",
-            "success_url": SUCCESS_URL,
-            "cancel_url": CANCEL_URL,
+            "success_url": success_url,
+            "cancel_url": cancel_url,
         }
         if email:
             params["customer_email"] = email
         session = stripe.checkout.Session.create(**params)
         return {"checkout_url": session.url}
+    except HTTPException:
+        raise
     except stripe.error.StripeError as e:
         logger.error("checkout_diretto: errore Stripe", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Errore Stripe: {e}")
