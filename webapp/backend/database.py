@@ -1,20 +1,21 @@
-"""
+﻿"""
 database.py - PostgreSQL (Railway)
-Database persistente con connection pooling.
+Database persistente con connection pooling, transazioni sicure,
+migrazioni leggere e vincoli database.
 """
 
 import os
 import logging
 from contextlib import contextmanager
+from datetime import datetime, timezone, timedelta
+
 from dotenv import load_dotenv
-
-# Carica variabili da file .env (se esiste)
-load_dotenv()
-
 import psycopg2
 import psycopg2.extras
 import psycopg2.pool
-from datetime import datetime, timezone, timedelta
+
+# Carica variabili da file .env se presente
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -24,25 +25,36 @@ if not DATABASE_URL:
 
 # Connection pool: min 1, max 10 connessioni
 _pool = None
-
-# Traccia le connessioni prese dal pool per distinguerle dalle standalone
 _pool_connections = set()
 
 
+# ─────────────────────────────────────────────
+# CONNESSIONI / POOL
+# ─────────────────────────────────────────────
+
 def _init_pool():
+    """Inizializza il pool PostgreSQL se non esiste."""
     global _pool
     if _pool is None:
         try:
-            _pool = psycopg2.pool.SimpleConnectionPool(1, 10, DATABASE_URL)
+            _pool = psycopg2.pool.SimpleConnectionPool(
+                minconn=1,
+                maxconn=10,
+                dsn=DATABASE_URL,
+            )
+            logger.info("Pool PostgreSQL inizializzato")
         except Exception as e:
             logger.error(f"Errore inizializzazione pool DB: {e}")
             _pool = None
 
 
 def _get_conn():
+    """Prende una connessione dal pool. Se il pool fallisce, usa una standalone."""
     global _pool
+
     if _pool is None:
         _init_pool()
+
     if _pool:
         try:
             conn = _pool.getconn()
@@ -52,36 +64,42 @@ def _get_conn():
         except Exception as e:
             logger.error(f"Errore _get_conn dal pool: {e}")
             _pool = None
-    # Fallback senza pool: connessione standalone (NON va in putconn)
+
     logger.warning("Pool non disponibile, uso connessione standalone")
     conn = psycopg2.connect(DATABASE_URL)
+    conn.autocommit = False
     return conn
 
 
 def _put_conn(conn):
+    """Restituisce la connessione al pool o chiude la standalone."""
     global _pool
+
     if conn is None:
         return
+
     conn_id = id(conn)
+
     if _pool and conn_id in _pool_connections:
         try:
             _pool_connections.discard(conn_id)
             _pool.putconn(conn)
         except Exception as e:
-            logger.error(f"Errore _put_conn (pool): {e}")
+            logger.error(f"Errore _put_conn pool: {e}")
+            try:
+                conn.close()
+            except Exception:
+                pass
     else:
-        # Connessione standalone: la chiudiamo direttamente
         try:
             conn.close()
         except Exception as e:
             logger.error(f"Errore chiusura connessione standalone: {e}")
 
 
-# ── Step 5: Context manager db_transaction ──
-
 @contextmanager
 def db_transaction():
-    """Context manager che gestisce connessione + commit/rollback automatico."""
+    """Context manager per commit/rollback automatico."""
     conn = _get_conn()
     try:
         yield conn
@@ -96,181 +114,234 @@ def db_transaction():
         _put_conn(conn)
 
 
+# ─────────────────────────────────────────────
+# INIT DATABASE
+# ─────────────────────────────────────────────
+
 def init_db():
+    """Crea tabelle, colonne, indici e poi applica migrazioni/vincoli."""
     conn = _get_conn()
     cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            email TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            piano TEXT DEFAULT 'free',
-            stripe_customer_id TEXT,
-            created_at TEXT NOT NULL
-        )
-    """)
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS api_usage (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
-            endpoint TEXT NOT NULL,
-            timestamp TEXT NOT NULL
-        )
-    """)
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS predictions_tracking (
-            id SERIAL PRIMARY KEY,
-            home TEXT NOT NULL,
-            away TEXT NOT NULL,
-            data_partita TEXT,
-            prob_1 REAL, prob_x REAL, prob_2 REAL,
-            suggerimento TEXT,
-            confidence REAL,
-            confidence_label TEXT,
-            over_25 REAL, goal_si REAL,
-            gol_attesi REAL,
-            bookmaker_live BOOLEAN DEFAULT FALSE,
-            risultato_reale TEXT,
-            gol_home_reale INTEGER,
-            gol_away_reale INTEGER,
-            corretto_1x2 BOOLEAN,
-            corretto_ou BOOLEAN,
-            corretto_goal BOOLEAN,
-            created_at TEXT NOT NULL,
-            verificato BOOLEAN DEFAULT FALSE
-        )
-    """)
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS referrals (
-            id SERIAL PRIMARY KEY,
-            referrer_id INTEGER NOT NULL,
-            referrer_email TEXT NOT NULL,
-            referral_code TEXT UNIQUE NOT NULL,
-            referred_email TEXT,
-            referred_id INTEGER,
-            status TEXT DEFAULT 'pending',
-            reward_applied BOOLEAN DEFAULT FALSE,
-            created_at TEXT NOT NULL,
-            completed_at TEXT
-        )
-    """)
-    # Aggiungi colonna referral_code a users se non esiste
+
     try:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                piano TEXT DEFAULT 'free',
+                stripe_customer_id TEXT,
+                created_at TEXT NOT NULL
+            )
+        """)
+
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS api_usage (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                endpoint TEXT NOT NULL,
+                timestamp TEXT NOT NULL
+            )
+        """)
+
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS predictions_tracking (
+                id SERIAL PRIMARY KEY,
+                home TEXT NOT NULL,
+                away TEXT NOT NULL,
+                data_partita TEXT,
+                prob_1 REAL,
+                prob_x REAL,
+                prob_2 REAL,
+                suggerimento TEXT,
+                confidence REAL,
+                confidence_label TEXT,
+                over_25 REAL,
+                goal_si REAL,
+                gol_attesi REAL,
+                bookmaker_live BOOLEAN DEFAULT FALSE,
+                risultato_reale TEXT,
+                gol_home_reale INTEGER,
+                gol_away_reale INTEGER,
+                corretto_1x2 BOOLEAN,
+                corretto_ou BOOLEAN,
+                corretto_goal BOOLEAN,
+                created_at TEXT NOT NULL,
+                verificato BOOLEAN DEFAULT FALSE
+            )
+        """)
+
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS referrals (
+                id SERIAL PRIMARY KEY,
+                referrer_id INTEGER NOT NULL,
+                referrer_email TEXT NOT NULL,
+                referral_code TEXT UNIQUE NOT NULL,
+                referred_email TEXT,
+                referred_id INTEGER,
+                status TEXT DEFAULT 'pending',
+                reward_applied BOOLEAN DEFAULT FALSE,
+                created_at TEXT NOT NULL,
+                completed_at TEXT
+            )
+        """)
+
         cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code TEXT")
         cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by INTEGER")
+
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS user_predictions (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                league TEXT,
+                home TEXT NOT NULL,
+                away TEXT NOT NULL,
+                pronostico TEXT NOT NULL,
+                prob REAL,
+                confidence TEXT,
+                over_under TEXT,
+                goal TEXT,
+                gol_h_reale INTEGER,
+                gol_a_reale INTEGER,
+                risultato_reale TEXT,
+                corretto BOOLEAN,
+                ou_corretto BOOLEAN,
+                goal_corretto BOOLEAN,
+                verificato BOOLEAN DEFAULT FALSE,
+                created_at TEXT NOT NULL,
+                match_date TEXT
+            )
+        """)
+
+        # Indici principali
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_api_usage_user_time ON api_usage(user_id, timestamp)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_predictions_verificato ON predictions_tracking(verificato)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_user_predictions_user_id ON user_predictions(user_id)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_user_predictions_match_date ON user_predictions(match_date)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_predictions_data_partita ON predictions_tracking(data_partita)")
+
+        conn.commit()
+        logger.info("DB PostgreSQL OK")
+        print("DB PostgreSQL OK")
+
     except Exception as e:
-        logger.warning(f"ALTER TABLE users (colonne referral): {e}")
         conn.rollback()
+        logger.error(f"Errore init_db: {e}")
+        raise
 
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS user_predictions (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
-            league TEXT,
-            home TEXT NOT NULL,
-            away TEXT NOT NULL,
-            pronostico TEXT NOT NULL,
-            prob REAL,
-            confidence TEXT,
-            over_under TEXT,
-            goal TEXT,
-            gol_h_reale INTEGER,
-            gol_a_reale INTEGER,
-            risultato_reale TEXT,
-            corretto BOOLEAN,
-            ou_corretto BOOLEAN,
-            goal_corretto BOOLEAN,
-            verificato BOOLEAN DEFAULT FALSE,
-            created_at TEXT NOT NULL,
-            match_date TEXT
-        )
-    """)
+    finally:
+        try:
+            cur.close()
+        except Exception:
+            pass
+        _put_conn(conn)
 
-    # Indici sulle query più usate
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_api_usage_user_time ON api_usage(user_id, timestamp)")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_predictions_verificato ON predictions_tracking(verificato)")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_user_predictions_user_id ON user_predictions(user_id)")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)")
-
-    conn.commit()
-    cur.close()
-    _put_conn(conn)
-    print("DB PostgreSQL OK")
-
-    # Applica migrazioni colonne e vincoli
+    # Migrazioni/vincoli dopo la creazione base
     _migrate_column_types()
     _add_fk_constraints()
     _add_unique_predictions_tracking()
     _add_check_constraints()
 
 
-# ── Step 1: Migrazione TEXT → TIMESTAMPTZ / DATE ──
+# ─────────────────────────────────────────────
+# MIGRAZIONI TIPI COLONNE
+# ─────────────────────────────────────────────
+
+def _get_column_type(cur, table, column):
+    cur.execute("""
+        SELECT data_type
+        FROM information_schema.columns
+        WHERE table_name = %s
+          AND column_name = %s
+    """, (table, column))
+    row = cur.fetchone()
+    return row[0].lower() if row else None
+
 
 def _migrate_column_types():
     """
-    Migra colonne TEXT verso TIMESTAMPTZ o DATE usando ALTER COLUMN TYPE ... USING cast.
-    Ogni ALTER è in un try/except separato: se fallisce, logga e salta.
+    Migra colonne TEXT verso TIMESTAMPTZ o DATE.
+    Se una migrazione fallisce, logga e continua con le altre.
     """
     migrations = [
-        # (tabella, colonna, nuovo_tipo, cast_expr)
-        ("users",                "created_at",   "TIMESTAMPTZ", "created_at::TIMESTAMPTZ"),
-        ("api_usage",            "timestamp",    "TIMESTAMPTZ", "timestamp::TIMESTAMPTZ"),
-        ("predictions_tracking", "data_partita", "DATE",        "data_partita::DATE"),
-        ("predictions_tracking", "created_at",   "TIMESTAMPTZ", "created_at::TIMESTAMPTZ"),
-        ("referrals",            "created_at",   "TIMESTAMPTZ", "created_at::TIMESTAMPTZ"),
-        ("referrals",            "completed_at", "TIMESTAMPTZ", "completed_at::TIMESTAMPTZ"),
-        ("user_predictions",     "created_at",   "TIMESTAMPTZ", "created_at::TIMESTAMPTZ"),
-        ("user_predictions",     "match_date",   "DATE",        "match_date::DATE"),
+        ("users", "created_at", "TIMESTAMPTZ", "NULLIF(created_at, '')::TIMESTAMPTZ"),
+        ("api_usage", "timestamp", "TIMESTAMPTZ", "NULLIF(timestamp, '')::TIMESTAMPTZ"),
+        ("predictions_tracking", "data_partita", "DATE", "NULLIF(data_partita, '')::DATE"),
+        ("predictions_tracking", "created_at", "TIMESTAMPTZ", "NULLIF(created_at, '')::TIMESTAMPTZ"),
+        ("referrals", "created_at", "TIMESTAMPTZ", "NULLIF(created_at, '')::TIMESTAMPTZ"),
+        ("referrals", "completed_at", "TIMESTAMPTZ", "NULLIF(completed_at, '')::TIMESTAMPTZ"),
+        ("user_predictions", "created_at", "TIMESTAMPTZ", "NULLIF(created_at, '')::TIMESTAMPTZ"),
+        ("user_predictions", "match_date", "DATE", "NULLIF(match_date, '')::DATE"),
     ]
+
     conn = _get_conn()
-    for table, col, new_type, cast_expr in migrations:
-        try:
-            cur = conn.cursor()
-            # Controlla se la colonna è già del tipo corretto
-            cur.execute("""
-                SELECT data_type FROM information_schema.columns
-                WHERE table_name = %s AND column_name = %s
-            """, (table, col))
-            row = cur.fetchone()
-            cur.close()
-            if row is None:
-                logger.warning(f"Colonna {table}.{col} non trovata, salto migrazione")
-                continue
-            current_type = row[0].lower()
-            if new_type.lower().replace("tz", " with time zone") in current_type or current_type in (
-                "timestamp with time zone", "date"
-            ):
-                # Già migrata
-                continue
 
-            cur = conn.cursor()
-            sql = (
-                f"ALTER TABLE {table} "
-                f"ALTER COLUMN {col} TYPE {new_type} "
-                f"USING {cast_expr}"
-            )
-            cur.execute(sql)
-            conn.commit()
-            cur.close()
-            logger.info(f"Migrazione OK: {table}.{col} → {new_type}")
-        except Exception as e:
-            logger.error(f"Migrazione fallita {table}.{col} → {new_type}: {e}")
+    try:
+        for table, col, new_type, cast_expr in migrations:
+            cur = None
             try:
-                conn.rollback()
-            except Exception:
-                pass
-    _put_conn(conn)
+                cur = conn.cursor()
+                current_type = _get_column_type(cur, table, col)
+
+                if current_type is None:
+                    logger.warning(f"Colonna {table}.{col} non trovata, salto migrazione")
+                    cur.close()
+                    continue
+
+                if new_type == "TIMESTAMPTZ" and current_type == "timestamp with time zone":
+                    cur.close()
+                    continue
+
+                if new_type == "DATE" and current_type == "date":
+                    cur.close()
+                    continue
+
+                cur.execute(
+                    f"ALTER TABLE {table} "
+                    f"ALTER COLUMN {col} TYPE {new_type} "
+                    f"USING {cast_expr}"
+                )
+                conn.commit()
+                cur.close()
+                logger.info(f"Migrazione OK: {table}.{col} -> {new_type}")
+
+            except Exception as e:
+                logger.error(f"Migrazione fallita {table}.{col} -> {new_type}: {e}")
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                if cur:
+                    try:
+                        cur.close()
+                    except Exception:
+                        pass
+
+    finally:
+        _put_conn(conn)
 
 
-# ── Step 3: Aggiunta FK con verifica orfani ──
+# ─────────────────────────────────────────────
+# VINCOLI FOREIGN KEY
+# ─────────────────────────────────────────────
+
+def _constraint_exists(cur, table, constraint_name):
+    cur.execute("""
+        SELECT 1
+        FROM information_schema.table_constraints
+        WHERE table_name = %s
+          AND constraint_name = %s
+    """, (table, constraint_name))
+    return cur.fetchone() is not None
+
 
 def _add_fk_constraints():
     """
-    Aggiunge FK solo se non esistono orfani.
-    Se ci sono righe orfane logga e NON aggiunge il vincolo.
+    Aggiunge FK solo se non ci sono righe orfane.
+    Se trova dati sporchi, non blocca l'app: logga e continua.
     """
     fk_specs = [
-        # (nome_fk, tabella_figlio, colonna_figlio, tabella_padre, colonna_padre, query_orfani)
         (
             "fk_api_usage_user_id",
             "api_usage", "user_id",
@@ -302,74 +373,73 @@ def _add_fk_constraints():
             "SELECT COUNT(*) FROM user_predictions up WHERE NOT EXISTS (SELECT 1 FROM users u WHERE u.id = up.user_id)",
         ),
     ]
+
     conn = _get_conn()
-    for fk_name, child_table, child_col, parent_table, parent_col, orphan_query in fk_specs:
-        try:
-            cur = conn.cursor()
-            # Controlla se FK già esiste
-            cur.execute("""
-                SELECT constraint_name FROM information_schema.table_constraints
-                WHERE constraint_type = 'FOREIGN KEY'
-                  AND table_name = %s
-                  AND constraint_name = %s
-            """, (child_table, fk_name))
-            exists = cur.fetchone()
-            if exists:
-                cur.close()
-                continue
 
-            # Verifica orfani
-            cur.execute(orphan_query)
-            orphan_count = cur.fetchone()[0]
-            cur.close()
-            if orphan_count > 0:
-                logger.error(
-                    f"FK {fk_name}: trovati {orphan_count} orfani in {child_table}.{child_col}, FK NON aggiunta"
-                )
-                continue
-
-            # Aggiunge FK
-            cur = conn.cursor()
-            cur.execute(
-                f"ALTER TABLE {child_table} "
-                f"ADD CONSTRAINT {fk_name} "
-                f"FOREIGN KEY ({child_col}) REFERENCES {parent_table}({parent_col})"
-            )
-            conn.commit()
-            cur.close()
-            logger.info(f"FK aggiunta: {fk_name}")
-        except Exception as e:
-            logger.error(f"Errore aggiunta FK {fk_name}: {e}")
+    try:
+        for fk_name, child_table, child_col, parent_table, parent_col, orphan_query in fk_specs:
+            cur = None
             try:
-                conn.rollback()
-            except Exception:
-                pass
-    _put_conn(conn)
+                cur = conn.cursor()
+
+                if _constraint_exists(cur, child_table, fk_name):
+                    cur.close()
+                    continue
+
+                cur.execute(orphan_query)
+                orphan_count = cur.fetchone()[0]
+
+                if orphan_count > 0:
+                    logger.error(
+                        f"FK {fk_name}: trovati {orphan_count} orfani in "
+                        f"{child_table}.{child_col}. FK non aggiunta."
+                    )
+                    cur.close()
+                    continue
+
+                cur.execute(
+                    f"ALTER TABLE {child_table} "
+                    f"ADD CONSTRAINT {fk_name} "
+                    f"FOREIGN KEY ({child_col}) REFERENCES {parent_table}({parent_col})"
+                )
+                conn.commit()
+                cur.close()
+                logger.info(f"FK aggiunta: {fk_name}")
+
+            except Exception as e:
+                logger.error(f"Errore aggiunta FK {fk_name}: {e}")
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                if cur:
+                    try:
+                        cur.close()
+                    except Exception:
+                        pass
+
+    finally:
+        _put_conn(conn)
 
 
-# ── Step 4: UNIQUE(home, away, data_partita) su predictions_tracking ──
+# ─────────────────────────────────────────────
+# UNIQUE PREDICTIONS
+# ─────────────────────────────────────────────
 
 def _add_unique_predictions_tracking():
     """
     Aggiunge UNIQUE(home, away, data_partita) su predictions_tracking.
-    Prima verifica doppioni: se esistono, logga e non aggiunge.
+    Se trova duplicati, non aggiunge il vincolo e logga l'errore.
     """
     conn = _get_conn()
+    cur = None
+
     try:
         cur = conn.cursor()
-        # Controlla se il vincolo già esiste
-        cur.execute("""
-            SELECT constraint_name FROM information_schema.table_constraints
-            WHERE constraint_type = 'UNIQUE'
-              AND table_name = 'predictions_tracking'
-              AND constraint_name = 'uq_predictions_home_away_data'
-        """)
-        if cur.fetchone():
-            cur.close()
-            _put_conn(conn)
+
+        if _constraint_exists(cur, "predictions_tracking", "uq_predictions_home_away_data"):
             return
 
-        # Verifica doppioni
         cur.execute("""
             SELECT home, away, data_partita, COUNT(*) AS cnt
             FROM predictions_tracking
@@ -377,268 +447,394 @@ def _add_unique_predictions_tracking():
             HAVING COUNT(*) > 1
         """)
         duplicates = cur.fetchall()
-        cur.close()
+
         if duplicates:
             logger.error(
-                f"UNIQUE predictions_tracking: trovati {len(duplicates)} gruppi duplicati "
-                f"(es: {duplicates[0]}), vincolo NON aggiunto"
+                f"UNIQUE predictions_tracking non aggiunto: trovati {len(duplicates)} gruppi duplicati. "
+                f"Esempio: {duplicates[0]}"
             )
-            _put_conn(conn)
             return
 
-        cur = conn.cursor()
-        cur.execute(
-            "ALTER TABLE predictions_tracking "
-            "ADD CONSTRAINT uq_predictions_home_away_data UNIQUE (home, away, data_partita)"
-        )
+        cur.execute("""
+            ALTER TABLE predictions_tracking
+            ADD CONSTRAINT uq_predictions_home_away_data
+            UNIQUE (home, away, data_partita)
+        """)
         conn.commit()
-        cur.close()
-        logger.info("UNIQUE uq_predictions_home_away_data aggiunto su predictions_tracking")
+        logger.info("UNIQUE uq_predictions_home_away_data aggiunto")
+
     except Exception as e:
         logger.error(f"Errore aggiunta UNIQUE predictions_tracking: {e}")
         try:
             conn.rollback()
         except Exception:
             pass
+
+    finally:
+        if cur:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        _put_conn(conn)
+
+
+# ─────────────────────────────────────────────
+# CHECK CONSTRAINTS
+# ─────────────────────────────────────────────
+
+def _add_check_constraints():
+    """
+    Aggiunge CHECK constraints controllando prima se esistono.
+    Evita ADD CONSTRAINT IF NOT EXISTS, che può non essere supportato.
+    """
+    constraints = [
+        ("chk_users_piano", "users", "piano IN ('free', 'pro')"),
+        ("chk_predictions_confidence_label", "predictions_tracking", "confidence_label IS NULL OR confidence_label IN ('Bassa', 'Media', 'Alta')"),
+        ("chk_referrals_status", "referrals", "status IN ('pending', 'completed', 'expired')"),
+    ]
+
+    conn = _get_conn()
+
+    try:
+        for name, table, expr in constraints:
+            cur = None
+            try:
+                cur = conn.cursor()
+
+                if _constraint_exists(cur, table, name):
+                    cur.close()
+                    continue
+
+                cur.execute(
+                    f"ALTER TABLE {table} "
+                    f"ADD CONSTRAINT {name} CHECK ({expr})"
+                )
+                conn.commit()
+                cur.close()
+                logger.info(f"CHECK constraint applicato: {name}")
+
+            except Exception as e:
+                logger.warning(f"CHECK constraint {name} non applicato: {e}")
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                if cur:
+                    try:
+                        cur.close()
+                    except Exception:
+                        pass
+
     finally:
         _put_conn(conn)
 
 
-# ── CHECK constraints su valori fissi ──
-
-def _add_check_constraints():
-    """
-    Aggiunge CHECK constraints per colonne con valori fissi.
-    Usa ADD CONSTRAINT IF NOT EXISTS (PostgreSQL 9.5+) in try/except separati
-    per garantire che un errore su un vincolo non blocchi gli altri.
-    """
-    constraints = [
-        # (constraint_name, table, expression)
-        (
-            "chk_users_piano",
-            "users",
-            "piano IN ('free', 'pro')",
-        ),
-        (
-            "chk_predictions_confidence_label",
-            "predictions_tracking",
-            "confidence_label IN ('Bassa', 'Media', 'Alta')",
-        ),
-        (
-            "chk_referrals_status",
-            "referrals",
-            "status IN ('pending', 'completed', 'expired')",
-        ),
-    ]
-    conn = _get_conn()
-    for name, table, expr in constraints:
-        try:
-            cur = conn.cursor()
-            cur.execute(
-                f"ALTER TABLE {table} "
-                f"ADD CONSTRAINT IF NOT EXISTS {name} CHECK ({expr})"
-            )
-            conn.commit()
-            cur.close()
-            logger.info(f"CHECK constraint applicato: {name}")
-        except Exception as e:
-            logger.warning(f"CHECK constraint {name} non applicato (già presente o errore): {e}")
-            try:
-                conn.rollback()
-            except Exception:
-                pass
-    _put_conn(conn)
-
-
-# ── CRUD utenti ──
+# ─────────────────────────────────────────────
+# CRUD UTENTI
+# ─────────────────────────────────────────────
 
 def create_user(email, password_hash):
     with db_transaction() as conn:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         try:
-            cur.execute(
-                "INSERT INTO users (email, password_hash, piano, created_at) VALUES (%s, %s, 'free', %s) RETURNING *",
-                (email.lower().strip(), password_hash, datetime.now(timezone.utc).isoformat())
-            )
-            user = dict(cur.fetchone())
+            cur.execute("""
+                INSERT INTO users (email, password_hash, piano, created_at)
+                VALUES (%s, %s, 'free', %s)
+                RETURNING *
+            """, (
+                email.lower().strip(),
+                password_hash,
+                datetime.now(timezone.utc),
+            ))
+            row = cur.fetchone()
+            return dict(row) if row else None
+        finally:
             cur.close()
-            return user
-        except psycopg2.IntegrityError:
-            cur.close()
-            raise
 
 
 def get_user_by_email(email):
     conn = _get_conn()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT * FROM users WHERE email = %s", (email.lower().strip(),))
-    row = cur.fetchone()
-    cur.close()
-    _put_conn(conn)
-    return dict(row) if row else None
+    try:
+        cur.execute("SELECT * FROM users WHERE email = %s", (email.lower().strip(),))
+        row = cur.fetchone()
+        return dict(row) if row else None
+    finally:
+        cur.close()
+        _put_conn(conn)
 
 
 def get_user_by_id(user_id):
     conn = _get_conn()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
-    row = cur.fetchone()
-    cur.close()
-    _put_conn(conn)
-    return dict(row) if row else None
+    try:
+        cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None
+    finally:
+        cur.close()
+        _put_conn(conn)
 
 
 def update_plan(user_id, plan):
     with db_transaction() as conn:
         cur = conn.cursor()
-        cur.execute("UPDATE users SET piano = %s WHERE id = %s", (plan, user_id))
-        ok = cur.rowcount > 0
-        cur.close()
-        return ok
+        try:
+            cur.execute(
+                "UPDATE users SET piano = %s WHERE id = %s",
+                (plan, user_id),
+            )
+            return cur.rowcount > 0
+        finally:
+            cur.close()
 
 
 def update_stripe_customer(user_id, stripe_customer_id):
     with db_transaction() as conn:
         cur = conn.cursor()
-        cur.execute("UPDATE users SET stripe_customer_id = %s WHERE id = %s", (stripe_customer_id, user_id))
-        cur.close()
+        try:
+            cur.execute(
+                "UPDATE users SET stripe_customer_id = %s WHERE id = %s",
+                (stripe_customer_id, user_id),
+            )
+            return cur.rowcount > 0
+        finally:
+            cur.close()
 
+
+# ─────────────────────────────────────────────
+# USAGE API
+# ─────────────────────────────────────────────
 
 def log_api_call(user_id, endpoint):
     with db_transaction() as conn:
         cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO api_usage (user_id, endpoint, timestamp) VALUES (%s, %s, %s)",
-            (user_id, endpoint, datetime.now(timezone.utc).isoformat())
-        )
-        cur.close()
+        try:
+            cur.execute("""
+                INSERT INTO api_usage (user_id, endpoint, timestamp)
+                VALUES (%s, %s, %s)
+            """, (
+                user_id,
+                endpoint,
+                datetime.now(timezone.utc),
+            ))
+        finally:
+            cur.close()
 
-
-# ── Step 2: count_daily_calls con range timestamp ──
 
 def count_daily_calls(user_id):
-    """Conta le chiamate API di oggi usando range timestamp invece di LIKE."""
+    """Conta le chiamate API di oggi usando range TIMESTAMPTZ."""
     conn = _get_conn()
     cur = conn.cursor()
-    now_utc = datetime.now(timezone.utc)
-    start_of_day = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_of_day = start_of_day + timedelta(days=1)
-    cur.execute(
-        "SELECT COUNT(*) FROM api_usage WHERE user_id = %s AND timestamp >= %s AND timestamp < %s",
-        (user_id, start_of_day.isoformat(), end_of_day.isoformat())
-    )
-    row = cur.fetchone()
-    cur.close()
-    _put_conn(conn)
-    return row[0] if row else 0
+
+    try:
+        now_utc = datetime.now(timezone.utc)
+        start_of_day = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = start_of_day + timedelta(days=1)
+
+        cur.execute("""
+            SELECT COUNT(*)
+            FROM api_usage
+            WHERE user_id = %s
+              AND timestamp >= %s
+              AND timestamp < %s
+        """, (user_id, start_of_day, end_of_day))
+
+        row = cur.fetchone()
+        return row[0] if row else 0
+
+    finally:
+        cur.close()
+        _put_conn(conn)
 
 
-# ── TRACKING PREDIZIONI ──
+# ─────────────────────────────────────────────
+# TRACKING PREDIZIONI
+# ─────────────────────────────────────────────
 
 def save_prediction(home, away, data_partita, pred, bk_live=False):
     """Salva un pronostico nel DB per verifica futura."""
     try:
         with db_transaction() as conn:
             cur = conn.cursor()
-            cur.execute("""
-                INSERT INTO predictions_tracking
-                (home, away, data_partita, prob_1, prob_x, prob_2, suggerimento,
-                 confidence, confidence_label, over_25, goal_si, gol_attesi,
-                 bookmaker_live, created_at)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                ON CONFLICT DO NOTHING
-            """, (
-                home, away, data_partita,
-                pred.get("prob_1"), pred.get("prob_x"), pred.get("prob_2"),
-                pred.get("suggerimento"), pred.get("confidence"),
-                pred.get("confidence_label"),
-                pred.get("over_25"), pred.get("goal_si"),
-                pred.get("gol_attesi"), bk_live,
-                datetime.now(timezone.utc).isoformat()
-            ))
-            cur.close()
+            try:
+                cur.execute("""
+                    INSERT INTO predictions_tracking
+                    (home, away, data_partita, prob_1, prob_x, prob_2, suggerimento,
+                     confidence, confidence_label, over_25, goal_si, gol_attesi,
+                     bookmaker_live, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT ON CONSTRAINT uq_predictions_home_away_data DO NOTHING
+                """, (
+                    home,
+                    away,
+                    data_partita,
+                    pred.get("prob_1"),
+                    pred.get("prob_x"),
+                    pred.get("prob_2"),
+                    pred.get("suggerimento"),
+                    pred.get("confidence"),
+                    pred.get("confidence_label"),
+                    pred.get("over_25"),
+                    pred.get("goal_si"),
+                    pred.get("gol_attesi"),
+                    bk_live,
+                    datetime.now(timezone.utc),
+                ))
+            except psycopg2.errors.UndefinedObject:
+                # Se il vincolo UNIQUE non esiste ancora, fallback sicuro
+                conn.rollback()
+                cur.close()
+                cur = conn.cursor()
+                cur.execute("""
+                    INSERT INTO predictions_tracking
+                    (home, away, data_partita, prob_1, prob_x, prob_2, suggerimento,
+                     confidence, confidence_label, over_25, goal_si, gol_attesi,
+                     bookmaker_live, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT DO NOTHING
+                """, (
+                    home,
+                    away,
+                    data_partita,
+                    pred.get("prob_1"),
+                    pred.get("prob_x"),
+                    pred.get("prob_2"),
+                    pred.get("suggerimento"),
+                    pred.get("confidence"),
+                    pred.get("confidence_label"),
+                    pred.get("over_25"),
+                    pred.get("goal_si"),
+                    pred.get("gol_attesi"),
+                    bk_live,
+                    datetime.now(timezone.utc),
+                ))
+            finally:
+                cur.close()
+
     except Exception as e:
         logger.error(f"Errore save_prediction ({home} vs {away}): {e}")
 
 
 def verify_predictions(risultati_live):
     """Verifica le predizioni passate con i risultati reali."""
+    conn = _get_conn()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
     try:
-        conn = _get_conn()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        # Prendi predizioni non ancora verificate
         cur.execute("SELECT * FROM predictions_tracking WHERE verificato = FALSE")
         rows = cur.fetchall()
 
         verificate = 0
+
         for row in rows:
-            home, away = row["home"], row["away"]
-            # Cerca il risultato reale
+            home = row["home"]
+            away = row["away"]
+
             for ris in risultati_live:
-                if ris["home"] == home and ris["away"] == away and ris.get("status") == "FT":
-                    gol_h = ris["gol_h"]
-                    gol_a = ris["gol_a"]
-                    # Determina risultato
+                if (
+                    ris.get("home") == home
+                    and ris.get("away") == away
+                    and ris.get("status") == "FT"
+                ):
+                    gol_h = ris.get("gol_h")
+                    gol_a = ris.get("gol_a")
+
+                    if gol_h is None or gol_a is None:
+                        continue
+
                     if gol_h > gol_a:
                         ris_reale = "1"
                     elif gol_h == gol_a:
                         ris_reale = "X"
                     else:
                         ris_reale = "2"
-                    # Verifica
+
                     corretto_1x2 = row["suggerimento"] == ris_reale
+
                     gol_tot = gol_h + gol_a
                     pred_over = (row["over_25"] or 50) > 50
                     corretto_ou = (gol_tot > 2.5) == pred_over
+
                     pred_goal = (row["goal_si"] or 50) > 50
                     corretto_goal = (gol_h >= 1 and gol_a >= 1) == pred_goal
 
                     cur.execute("""
-                        UPDATE predictions_tracking SET
-                            risultato_reale=%s, gol_home_reale=%s, gol_away_reale=%s,
-                            corretto_1x2=%s, corretto_ou=%s, corretto_goal=%s,
-                            verificato=TRUE
-                        WHERE id=%s
-                    """, (ris_reale, gol_h, gol_a, corretto_1x2, corretto_ou, corretto_goal, row["id"]))
+                        UPDATE predictions_tracking
+                        SET risultato_reale = %s,
+                            gol_home_reale = %s,
+                            gol_away_reale = %s,
+                            corretto_1x2 = %s,
+                            corretto_ou = %s,
+                            corretto_goal = %s,
+                            verificato = TRUE
+                        WHERE id = %s
+                    """, (
+                        ris_reale,
+                        gol_h,
+                        gol_a,
+                        corretto_1x2,
+                        corretto_ou,
+                        corretto_goal,
+                        row["id"],
+                    ))
+
                     verificate += 1
                     break
 
         conn.commit()
-        cur.close()
-        _put_conn(conn)
+
         if verificate > 0:
             print(f"TRACKING: {verificate} predizioni verificate")
+
     except Exception as e:
+        conn.rollback()
         logger.error(f"Errore verify_predictions: {e}")
+
+    finally:
+        cur.close()
+        _put_conn(conn)
 
 
 def get_tracking_stats():
     """Ritorna le statistiche di accuratezza delle predizioni tracciate."""
+    conn = _get_conn()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
     try:
-        conn = _get_conn()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute("""
             SELECT
-                COUNT(*) as totale,
-                SUM(CASE WHEN corretto_1x2 THEN 1 ELSE 0 END) as ok_1x2,
-                SUM(CASE WHEN corretto_ou THEN 1 ELSE 0 END) as ok_ou,
-                SUM(CASE WHEN corretto_goal THEN 1 ELSE 0 END) as ok_goal,
-                SUM(CASE WHEN corretto_1x2 AND confidence_label='Alta' THEN 1 ELSE 0 END) as ok_alta,
-                SUM(CASE WHEN confidence_label='Alta' THEN 1 ELSE 0 END) as tot_alta
-            FROM predictions_tracking WHERE verificato = TRUE
+                COUNT(*) AS totale,
+                COALESCE(SUM(CASE WHEN corretto_1x2 THEN 1 ELSE 0 END), 0) AS ok_1x2,
+                COALESCE(SUM(CASE WHEN corretto_ou THEN 1 ELSE 0 END), 0) AS ok_ou,
+                COALESCE(SUM(CASE WHEN corretto_goal THEN 1 ELSE 0 END), 0) AS ok_goal,
+                COALESCE(SUM(CASE WHEN corretto_1x2 AND confidence_label = 'Alta' THEN 1 ELSE 0 END), 0) AS ok_alta,
+                COALESCE(SUM(CASE WHEN confidence_label = 'Alta' THEN 1 ELSE 0 END), 0) AS tot_alta
+            FROM predictions_tracking
+            WHERE verificato = TRUE
         """)
+
         row = cur.fetchone()
-        cur.close()
-        _put_conn(conn)
+
         if row and row["totale"] > 0:
+            totale = row["totale"]
+            tot_alta = row["tot_alta"] or 0
+
             return {
-                "totale": row["totale"],
-                "acc_1x2": round(row["ok_1x2"] / row["totale"] * 100, 1),
-                "acc_ou": round(row["ok_ou"] / row["totale"] * 100, 1),
-                "acc_goal": round(row["ok_goal"] / row["totale"] * 100, 1),
-                "acc_alta": round(row["ok_alta"] / row["tot_alta"] * 100, 1) if row["tot_alta"] > 0 else 0,
-                "tot_alta": row["tot_alta"],
+                "totale": totale,
+                "acc_1x2": round((row["ok_1x2"] or 0) / totale * 100, 1),
+                "acc_ou": round((row["ok_ou"] or 0) / totale * 100, 1),
+                "acc_goal": round((row["ok_goal"] or 0) / totale * 100, 1),
+                "acc_alta": round((row["ok_alta"] or 0) / tot_alta * 100, 1) if tot_alta > 0 else 0,
+                "tot_alta": tot_alta,
             }
+
     except Exception as e:
         logger.error(f"Errore get_tracking_stats: {e}")
+
+    finally:
+        cur.close()
+        _put_conn(conn)
+
     return None
