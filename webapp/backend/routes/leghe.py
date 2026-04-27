@@ -213,6 +213,11 @@ async def calendario_league(league: str, request: Request):
                 dates = [p["data"] for p in per_round[r] if p["data"]]
                 return min(dates) if dates else "9999-12-31"
 
+            def round_max_ft_date(r):
+                """Restituisce la data massima tra le partite finite (FT/AET/PEN) del round."""
+                dates = [p["data"] for p in per_round[r] if p["data"] and p["status"] in ("FT", "AET", "PEN")]
+                return max(dates) if dates else ""
+
             from datetime import date as date_cls
             oggi = date_cls.today().isoformat()
 
@@ -227,12 +232,19 @@ async def calendario_league(league: str, request: Request):
 
                 # Una giornata è "completata" se la maggior parte delle partite è finita
                 # E le eventuali partite NS rimanenti sono recuperi posticipati
-                # (la data della giornata è nel passato rispetto a oggi).
-                # Questo gestisce il caso PL G.31 con 1 recupero posticipato da febbraio.
+                # (la data MASSIMA delle partite finite è nel passato rispetto a oggi).
+                # Questo gestisce il caso di giornate con 1-3 recuperi posticipati.
                 data_giornata = round_min_date(rd)
-                giornata_nel_passato = data_giornata < oggi
+                max_ft_date = round_max_ft_date(rd)
+                # Usa la data massima delle partite finite per determinare se la giornata
+                # principale è già avvenuta (evita che una G con recupero futuro venga
+                # classificata come "completata" solo perché la prima partita è nel passato)
+                giornata_nel_passato = (max_ft_date < oggi) if max_ft_date else (data_giornata < oggi)
                 tutte_finite = ns_count == 0 and not ha_live and ft_count > 0
-                quasi_finite = ft_count > 0 and ns_count <= 2 and giornata_nel_passato and not ha_live
+                # quasi_finite: la maggioranza delle partite è conclusa, i NS rimasti sono
+                # recuperi (≤ 30% del totale, max 3), e l'ultima FT è già nel passato
+                quasi_finite = (ft_count > 0 and not ha_live and giornata_nel_passato and
+                                ns_count > 0 and ns_count <= max(3, round(total * 0.3)))
                 ha_da_giocare = ns_count > 0
 
                 if tutte_finite or quasi_finite:
