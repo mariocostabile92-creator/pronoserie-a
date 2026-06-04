@@ -1,7 +1,6 @@
 :root{
   --bg:#07111f;
   --panel:#0e1b2f;
-  --panel-2:#101f36;
   --text:#f5f7fb;
   --muted:#a9b5c8;
   --line:rgba(255,255,255,.12);
@@ -12,14 +11,9 @@
   --shadow:0 24px 80px rgba(0,0,0,.35);
 }
 
-*{
-  box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
-html{
-  min-height:100%;
-  background:var(--bg);
-}
+html{ min-height:100%; background:var(--bg); }
 
 body{
   margin:0;
@@ -32,10 +26,7 @@ body{
     linear-gradient(135deg, #06101e 0%, #0a1425 45%, #07111f 100%);
 }
 
-a{
-  color:inherit;
-  text-decoration:none;
-}
+a{ color:inherit; text-decoration:none; }
 
 .hub-page{
   width:min(1120px, 100%);
@@ -47,10 +38,7 @@ a{
   justify-content:center;
 }
 
-.hero{
-  text-align:center;
-  margin-bottom:30px;
-}
+.hero{ text-align:center; margin-bottom:30px; }
 
 .brand-badge{
   display:inline-flex;
@@ -121,35 +109,58 @@ a{
   box-shadow:0 30px 90px rgba(0,0,0,.48);
 }
 
-.app-card-primary::before{
-  background:linear-gradient(135deg, var(--blue), var(--cyan));
-}
+.app-card-primary::before{ background:linear-gradient(135deg, var(--blue), var(--cyan)); }
+.app-card-dark::before{ background:linear-gradient(135deg, #8b5cf6, var(--blue)); }
+.app-card-gold::before{ background:linear-gradient(135deg, var(--gold), var(--green)); }
 
-.app-card-dark::before{
-  background:linear-gradient(135deg, #8b5cf6, var(--blue));
-}
-
-.app-card-gold::before{
-  background:linear-gradient(135deg, var(--gold), var(--green));
-}
-
-.app-icon{
-  width:64px;
-  height:64px;
-  border-radius:22px;
+.app-logo{
+  position:relative;
+  z-index:2;
+  width:72px;
+  height:72px;
+  border-radius:24px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:30px;
-  background:rgba(255,255,255,.10);
-  border:1px solid rgba(255,255,255,.14);
-  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 16px 38px rgba(0,0,0,.22);
+  overflow:hidden;
 }
 
-.app-content{
-  position:relative;
-  z-index:1;
+.app-logo img{
+  width:58px;
+  height:58px;
+  object-fit:contain;
+  display:block;
 }
+
+.app-logo-clubiq img{
+  width:66px;
+  height:66px;
+  border-radius:18px;
+}
+
+.app-logo-tactical{
+  flex-direction:column;
+  gap:2px;
+}
+
+.app-logo-tactical img{
+  width:44px;
+  height:38px;
+}
+
+.app-logo-tactical span{
+  color:#0b1730;
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.app-content{ position:relative; z-index:1; }
 
 .app-kicker{
   display:block;
@@ -194,51 +205,19 @@ a{
 }
 
 @media (max-width: 900px){
-  .hub-page{
-    justify-content:flex-start;
-    padding-top:34px;
-  }
-
-  .apps-grid{
-    grid-template-columns:1fr;
-  }
-
-  .app-card{
-    min-height:220px;
-    border-radius:24px;
-  }
+  .hub-page{ justify-content:flex-start; padding-top:34px; }
+  .apps-grid{ grid-template-columns:1fr; }
+  .app-card{ min-height:220px; border-radius:24px; }
 }
 
 @media (max-width: 520px){
-  .hub-page{
-    padding:26px 14px 20px;
-  }
-
-  .hero{
-    text-align:left;
-  }
-
-  .brand-badge{
-    font-size:10px;
-  }
-
-  .hero p{
-    margin:0;
-  }
-
-  .app-card{
-    padding:20px;
-    min-height:205px;
-  }
-
-  .app-icon{
-    width:54px;
-    height:54px;
-    border-radius:18px;
-    font-size:26px;
-  }
-
-  .app-content h2{
-    font-size:25px;
-  }
+  .hub-page{ padding:26px 14px 20px; }
+  .hero{ text-align:left; }
+  .brand-badge{ font-size:10px; }
+  .hero p{ margin:0; }
+  .app-card{ padding:20px; min-height:205px; }
+  .app-logo{ width:62px; height:62px; border-radius:20px; }
+  .app-logo img{ width:50px; height:50px; }
+  .app-logo-clubiq img{ width:58px; height:58px; }
+  .app-content h2{ font-size:25px; }
 }
