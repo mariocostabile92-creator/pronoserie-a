@@ -968,6 +968,11 @@ async def serve_links_css():
     return FileResponse(os.path.join(FRONTEND_DIR, "links.css"), media_type="text/css")
 
 
+@app.get("/clubiq-logo.png", include_in_schema=False)
+def clubiq_logo():
+    return FileResponse(os.path.join(FRONTEND_DIR, "clubiq-logo.png"), media_type="image/png")
+
+
 @app.get("/app", include_in_schema=False)
 @app.get("/app/{path:path}", include_in_schema=False)
 async def serve_app(path: str = ""):
