@@ -956,6 +956,18 @@ async def serve_manifest():
 async def serve_sw():
     return FileResponse(os.path.join(FRONTEND_DIR, "sw.js"), media_type="application/javascript")
 
+
+
+@app.get("/links.html", include_in_schema=False)
+async def serve_links_page():
+    return FileResponse(os.path.join(FRONTEND_DIR, "links.html"), media_type="text/html")
+
+
+@app.get("/links.css", include_in_schema=False)
+async def serve_links_css():
+    return FileResponse(os.path.join(FRONTEND_DIR, "links.css"), media_type="text/css")
+
+
 @app.get("/app", include_in_schema=False)
 @app.get("/app/{path:path}", include_in_schema=False)
 async def serve_app(path: str = ""):
