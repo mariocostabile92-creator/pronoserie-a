@@ -221,3 +221,19 @@ a{ color:inherit; text-decoration:none; }
   .app-logo-clubiq img{ width:58px; height:58px; }
   .app-content h2{ font-size:25px; }
 }
+/* Fix logo ClubIQ */
+.app-logo-clubiq{
+  width: 86px;
+  height: 86px;
+  border-radius: 26px;
+  background: #ffffff;
+  padding: 8px;
+}
+
+.app-logo-clubiq img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 18px;
+  filter: none;
+}
