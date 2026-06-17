@@ -973,6 +973,39 @@ def clubiq_logo():
     return FileResponse(os.path.join(FRONTEND_DIR, "clubiq-logo.png"), media_type="image/png")
 
 
+@app.get("/mario-founder.png", include_in_schema=False)
+def mario_founder_image():
+    return FileResponse(os.path.join(FRONTEND_DIR, "mario-founder.png"), media_type="image/png")
+
+
+@app.get("/assets/{file_path:path}", include_in_schema=False)
+def serve_frontend_assets(file_path: str):
+    safe_path = os.path.abspath(os.path.join(FRONTEND_DIR, "assets", file_path))
+    assets_dir = os.path.abspath(os.path.join(FRONTEND_DIR, "assets"))
+
+    if not safe_path.startswith(assets_dir):
+        raise HTTPException(status_code=404, detail="File non trovato")
+
+    if not os.path.exists(safe_path):
+        raise HTTPException(status_code=404, detail="File non trovato")
+
+    return FileResponse(safe_path)
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def serve_favicon():
+    favicon_path = os.path.join(FRONTEND_DIR, "favicon.ico")
+    logo_path = os.path.join(FRONTEND_DIR, "logo.png")
+
+    if os.path.exists(favicon_path):
+        return FileResponse(favicon_path)
+
+    if os.path.exists(logo_path):
+        return FileResponse(logo_path, media_type="image/png")
+
+    raise HTTPException(status_code=404, detail="File non trovato")
+
+
 @app.get("/app", include_in_schema=False)
 @app.get("/app/{path:path}", include_in_schema=False)
 async def serve_app(path: str = ""):
