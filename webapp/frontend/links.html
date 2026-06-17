@@ -3,60 +3,299 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MatchIQ Hub | Le mie app</title>
-  <meta name="description" content="Hub ufficiale per accedere rapidamente alle app MatchIQ, MatchIQ Tactical e ClubIQ." />
-  <link rel="stylesheet" href="./links.css?v=2" />
+
+  <title>MatchIQ | Building the Future of Football Intelligence</title>
+
+  <meta name="description" content="MatchIQ è la piattaforma AI per allenatori, osservatori e società sportive. Analisi tattica, video analysis, scouting intelligence e strumenti coach." />
+
+  <meta property="og:title" content="MatchIQ | Building the Future of Football Intelligence" />
+  <meta property="og:description" content="AI-powered football intelligence for coaches, scouts and clubs." />
+  <meta property="og:image" content="https://matchiq.it.com/assets/matchiq-cover.png" />
+  <meta property="og:url" content="https://matchiq.it.com/links.html" />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="/favicon.ico" />
+
+  <style>
+    :root{
+      --bg:#030814;
+      --card:#071426;
+      --card2:#0b1b33;
+      --blue:#1d9bff;
+      --green:#78ff3f;
+      --text:#f5f8ff;
+      --muted:#9fb3cc;
+      --line:rgba(255,255,255,.12);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter,Arial,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(29,155,255,.22), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(120,255,63,.14), transparent 35%),
+        var(--bg);
+      color:var(--text);
+    }
+
+    .page{
+      min-height:100vh;
+      padding:28px 18px;
+    }
+
+    .wrap{
+      max-width:1080px;
+      margin:0 auto;
+    }
+
+    .hero{
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:54px 28px;
+      background:linear-gradient(135deg, rgba(7,20,38,.96), rgba(3,8,20,.92));
+      box-shadow:0 28px 80px rgba(0,0,0,.45);
+      text-align:center;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:linear-gradient(120deg, transparent, rgba(29,155,255,.16), transparent);
+      pointer-events:none;
+    }
+
+    .logo{
+      font-size:64px;
+      font-weight:900;
+      letter-spacing:-3px;
+      margin:0;
+      position:relative;
+    }
+
+    .logo span:first-child{color:#fff}
+    .logo span:last-child{color:var(--blue)}
+    .logo i{
+      color:var(--green);
+      font-style:normal;
+    }
+
+    .tagline{
+      margin:18px auto 0;
+      font-size:28px;
+      font-weight:800;
+      max-width:760px;
+      line-height:1.15;
+    }
+
+    .sub{
+      margin:18px auto 0;
+      color:var(--muted);
+      font-size:18px;
+      max-width:760px;
+      line-height:1.6;
+    }
+
+    .actions{
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-top:34px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:15px 22px;
+      border-radius:999px;
+      text-decoration:none;
+      font-weight:800;
+      color:#03101f;
+      background:linear-gradient(135deg,var(--green),#d8ff3f);
+      box-shadow:0 10px 28px rgba(120,255,63,.18);
+    }
+
+    .btn.secondary{
+      background:transparent;
+      color:var(--text);
+      border:1px solid var(--line);
+      box-shadow:none;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+      margin-top:24px;
+    }
+
+    .card{
+      background:linear-gradient(180deg,var(--card),var(--card2));
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:22px;
+    }
+
+    .card strong{
+      display:block;
+      font-size:18px;
+      margin-bottom:10px;
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.5;
+      font-size:14px;
+    }
+
+    .section{
+      margin-top:24px;
+    }
+
+    .section-title{
+      font-size:28px;
+      margin:0 0 16px;
+      letter-spacing:-1px;
+    }
+
+    .wide{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .founder{
+      display:flex;
+      gap:18px;
+      align-items:center;
+    }
+
+    .avatar{
+      width:78px;
+      height:78px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--blue),var(--green));
+      flex:none;
+    }
+
+    .list{
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .item{
+      padding:14px;
+      border-radius:16px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--muted);
+    }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      padding:34px 0 10px;
+      font-size:14px;
+    }
+
+    @media(max-width:850px){
+      .logo{font-size:48px}
+      .tagline{font-size:24px}
+      .grid{grid-template-columns:1fr}
+      .wide{grid-template-columns:1fr}
+      .hero{padding:42px 20px}
+    }
+  </style>
 </head>
+
 <body>
-  <main class="hub-page">
-    <section class="hero">
-      <div class="brand-badge">MATCHIQ ECOSYSTEM</div>
-      <h1>Scegli la tua app</h1>
-      <p>Tutti gli strumenti digitali per calcio, analisi tattica e gestione sportiva in un’unica pagina.</p>
-    </section>
+  <main class="page">
+    <div class="wrap">
 
-    <section class="apps-grid" aria-label="Link alle applicazioni">
-      <a class="app-card app-card-primary" href="https://matchiq.it.com/app" target="_blank" rel="noopener noreferrer">
-        <div class="app-logo app-logo-matchiq">
-          <img src="/logo.png" alt="Logo MatchIQ" />
-        </div>
-        <div class="app-content">
-          <span class="app-kicker">Analisi calcio</span>
-          <h2>MatchIQ</h2>
-          <p>Accedi alla piattaforma principale MatchIQ.</p>
-        </div>
-        <span class="app-action">Apri →</span>
-      </a>
+      <section class="hero">
+        <h1 class="logo"><span>Match</span><i>I</i><span>Q</span></h1>
 
-      <a class="app-card app-card-dark" href="https://matchiq-tactical-production.up.railway.app" target="_blank" rel="noopener noreferrer">
-        <div class="app-logo app-logo-tactical">
-          <img src="/logo.png" alt="Logo MatchIQ Tactical" />
-          <span>Tactical</span>
-        </div>
-        <div class="app-content">
-          <span class="app-kicker">Tactical AI</span>
-          <h2>MatchIQ Tactical</h2>
-          <p>Analisi live, scout mode, coach report e strumenti tattici.</p>
-        </div>
-        <span class="app-action">Apri →</span>
-      </a>
+        <h2 class="tagline">Building the Future of Football Intelligence</h2>
 
-      <a class="app-card app-card-gold" href="https://web-production-691ae.up.railway.app" target="_blank" rel="noopener noreferrer">
-        <div class="app-logo app-logo-clubiq">
-          <img src="/clubiq-logo.png" alt="Logo ClubIQ" />
-        </div>
-        <div class="app-content">
-          <span class="app-kicker">Segreteria sportiva</span>
-          <h2>ClubIQ</h2>
-          <p>Gestione società, dashboard, piani e strumenti per club.</p>
-        </div>
-        <span class="app-action">Apri →</span>
-      </a>
-    </section>
+        <p class="sub">
+          MatchIQ è l’ecosistema AI creato per aiutare allenatori, osservatori e società sportive
+          a leggere meglio le partite, valutare giocatori e prendere decisioni più intelligenti.
+        </p>
 
-    <footer class="hub-footer">
-      <p>Creato per società sportive, allenatori, scout e dirigenti.</p>
-    </footer>
+        <div class="actions">
+          <a class="btn" href="https://matchiq.it.com/" target="_blank">🚀 Apri MatchIQ</a>
+          <a class="btn secondary" href="https://www.linkedin.com/in/mario-costabile-1b3124302/" target="_blank">👤 LinkedIn Founder</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">L’ecosistema</h2>
+
+        <div class="grid">
+          <div class="card">
+            <strong>⚽ Tactical Intelligence</strong>
+            <p>Analisi live, lettura tattica, momentum, pressione, caos partita e report automatici.</p>
+          </div>
+
+          <div class="card">
+            <strong>🎥 Video Analysis</strong>
+            <p>Carica un video partita e genera analisi AI con indicazioni tattiche e report PDF.</p>
+          </div>
+
+          <div class="card">
+            <strong>🔍 Scout Intelligence</strong>
+            <p>Supporto agli osservatori per valutare profili, segnali, potenziale e rendimento.</p>
+          </div>
+
+          <div class="card">
+            <strong>📊 Coach Platform</strong>
+            <p>Eventi, pagelle, sintesi WhatsApp, storico e report professionali per staff tecnici.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section wide">
+        <div class="card">
+          <h2 class="section-title">Perché MatchIQ</h2>
+
+          <div class="list">
+            <div class="item">Decisioni più rapide durante e dopo la partita.</div>
+            <div class="item">Report professionali anche per club dilettantistici.</div>
+            <div class="item">Strumenti concreti per allenatori, scout e società.</div>
+            <div class="item">Una piattaforma pensata per portare tecnologia professionale a ogni livello.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="founder">
+            <div class="avatar"></div>
+            <div>
+              <strong>Mario Costabile</strong>
+              <p>Founder & CEO di MatchIQ. Sto costruendo strumenti AI per portare la Football Intelligence dentro ogni società sportiva.</p>
+            </div>
+          </div>
+
+          <div class="actions" style="justify-content:flex-start;margin-top:24px">
+            <a class="btn" href="mailto:mario.costabile92@outlook.it">📩 Contattami</a>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        MatchIQ © 2026 — AI Football Technology
+      </footer>
+
+    </div>
   </main>
 </body>
 </html>
