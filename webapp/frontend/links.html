@@ -37,15 +37,8 @@
       color:var(--text);
     }
 
-    .page{
-      min-height:100vh;
-      padding:28px 18px;
-    }
-
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-    }
+    .page{min-height:100vh;padding:28px 18px}
+    .wrap{max-width:1100px;margin:0 auto}
 
     .hero{
       border:1px solid var(--line);
@@ -58,28 +51,16 @@
       position:relative;
     }
 
-    .hero:before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background:linear-gradient(120deg, transparent, rgba(29,155,255,.16), transparent);
-      pointer-events:none;
-    }
-
     .logo{
       font-size:66px;
       font-weight:900;
       letter-spacing:-3px;
       margin:0;
-      position:relative;
     }
 
     .logo span:first-child{color:#fff}
     .logo span:last-child{color:var(--blue)}
-    .logo i{
-      color:var(--green);
-      font-style:normal;
-    }
+    .logo i{color:var(--green);font-style:normal}
 
     .tagline{
       margin:18px auto 0;
@@ -127,9 +108,12 @@
       box-shadow:none;
     }
 
-    .section{
-      margin-top:28px;
+    .btn.whatsapp{
+      background:linear-gradient(135deg,#25D366,#b8ff6a);
+      color:#03101f;
     }
+
+    .section{margin-top:28px}
 
     .section-title{
       font-size:29px;
@@ -150,9 +134,7 @@
       gap:16px;
     }
 
-    .app-grid{
-      grid-template-columns:repeat(3,1fr);
-    }
+    .app-grid{grid-template-columns:repeat(3,1fr)}
 
     .card{
       background:linear-gradient(180deg,var(--card),var(--card2));
@@ -179,8 +161,6 @@
       text-decoration:none;
       color:var(--text);
       transition:.2s ease;
-      position:relative;
-      overflow:hidden;
     }
 
     .app-card:hover{
@@ -243,17 +223,13 @@
     }
 
     .avatar{
-      width:78px;
-      height:78px;
+      width:88px;
+      height:88px;
       border-radius:50%;
-      background:linear-gradient(135deg,var(--blue),var(--green));
+      object-fit:cover;
       flex:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      color:#03101f;
-      font-size:22px;
+      border:2px solid rgba(120,255,63,.65);
+      box-shadow:0 12px 34px rgba(0,0,0,.35);
     }
 
     footer{
@@ -268,9 +244,7 @@
       .tagline{font-size:24px}
       .grid,
       .app-grid,
-      .wide{
-        grid-template-columns:1fr;
-      }
+      .wide{grid-template-columns:1fr}
       .hero{padding:42px 20px}
       .app-card{min-height:auto}
     }
@@ -294,7 +268,7 @@
 
         <div class="actions">
           <a class="btn" href="#ecosystem">🚀 Entra nell’ecosistema</a>
-          <a class="btn secondary" href="mailto:mario.costabile92@outlook.it">📩 Richiedi informazioni</a>
+          <a class="btn whatsapp" href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20MatchIQ%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank">💬 Scrivimi su WhatsApp</a>
         </div>
       </section>
 
@@ -309,30 +283,21 @@
           <a class="card app-card featured" href="https://matchiq.it.com" target="_blank">
             <span class="badge">MAIN HUB</span>
             <strong>🚀 MatchIQ Ecosystem</strong>
-            <p>
-              La porta principale dell’ecosistema MatchIQ. Da qui puoi scoprire il progetto,
-              la visione e tutti gli strumenti collegati alla Football Intelligence.
-            </p>
+            <p>La porta principale dell’ecosistema MatchIQ, della visione e degli strumenti collegati alla Football Intelligence.</p>
             <span>Apri MatchIQ →</span>
           </a>
 
           <a class="card app-card" href="https://matchiq-tactical-production.up.railway.app" target="_blank">
             <span class="badge">TACTICAL AI</span>
             <strong>⚽ MatchIQ Tactical</strong>
-            <p>
-              Analisi tattica live, Scout Intelligence, Coach Mode, Video Analysis,
-              report PDF e strumenti AI per leggere meglio le partite.
-            </p>
+            <p>Analisi tattica live, Scout Intelligence, Coach Mode, Video Analysis, report PDF e strumenti AI per leggere meglio le partite.</p>
             <span>Apri Tactical →</span>
           </a>
 
           <a class="card app-card" href="https://web-production-691ae.up.railway.app" target="_blank">
             <span class="badge">CLUB MANAGEMENT</span>
             <strong>🏟️ ClubIQ Segreteria</strong>
-            <p>
-              Gestionale per società sportive: atleti, pagamenti, documenti,
-              certificati, comunicazioni e organizzazione operativa del club.
-            </p>
+            <p>Gestionale per società sportive: atleti, pagamenti, documenti, certificati, comunicazioni e organizzazione operativa.</p>
             <span>Apri ClubIQ →</span>
           </a>
         </div>
@@ -378,7 +343,7 @@
 
         <div class="card">
           <div class="founder">
-            <div class="avatar">MC</div>
+            <img class="avatar" src="/assets/mario-founder.png" alt="Mario Costabile Founder MatchIQ">
             <div>
               <strong>Mario Costabile</strong>
               <p>
@@ -389,8 +354,8 @@
           </div>
 
           <div class="actions" style="justify-content:flex-start;margin-top:24px">
-            <a class="btn" href="mailto:mario.costabile92@outlook.it">📩 Contattami</a>
-            <a class="btn secondary" href="https://www.linkedin.com/in/mario-costabile-1b3124302/" target="_blank">👤 LinkedIn</a>
+            <a class="btn whatsapp" href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20MatchIQ%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank">💬 WhatsApp</a>
+            <a class="btn secondary" href="https://www.linkedin.com/in/mariocostabile" target="_blank">👤 LinkedIn</a>
           </div>
         </div>
       </section>
