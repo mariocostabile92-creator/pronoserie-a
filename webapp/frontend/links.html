@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>MatchIQ | AI Ecosystem for Sport, Clubs & Content</title>
+  <title>MatchIQ | AI Operating System for Sport, Clubs & Content</title>
 
-  <meta name="description" content="MatchIQ è l'ecosistema AI creato da Mario Costabile: Football Intelligence, analisi tattica, gestione club e AI Studio per contenuti verticali." />
-  <meta property="og:title" content="MatchIQ | AI Ecosystem for Sport, Clubs & Content" />
-  <meta property="og:description" content="Accedi all'ecosistema MatchIQ: MatchIQ Tactical, ClubIQ Segreteria e MatchIQ Studio Beta." />
+  <meta name="description" content="MatchIQ è l'ecosistema AI creato da Mario Costabile: analisi tattica, scouting, gestione club e AI Studio per contenuti verticali." />
+  <meta property="og:title" content="MatchIQ | AI Operating System for Sport, Clubs & Content" />
+  <meta property="og:description" content="Accedi all'ecosistema MatchIQ: MatchIQ Tactical, MatchIQ Studio e ClubIQ Segreteria." />
   <meta property="og:url" content="https://matchiq.it.com/links.html" />
   <meta property="og:type" content="website" />
 
@@ -18,6 +18,7 @@
       --card:#071426;
       --card2:#0b1b33;
       --blue:#1d9bff;
+      --purple:#9b5cff;
       --green:#78ff3f;
       --text:#f5f8ff;
       --muted:#9fb3cc;
@@ -44,10 +45,10 @@
     .hero{
       border:1px solid var(--line);
       border-radius:34px;
-      padding:62px 28px;
+      padding:68px 28px;
       background:
-        radial-gradient(circle at top, rgba(29,155,255,.13), transparent 36%),
-        linear-gradient(135deg, rgba(7,20,38,.97), rgba(3,8,20,.93));
+        radial-gradient(circle at top, rgba(29,155,255,.16), transparent 36%),
+        linear-gradient(135deg, rgba(7,20,38,.98), rgba(3,8,20,.94));
       box-shadow:var(--shadow);
       text-align:center;
       overflow:hidden;
@@ -56,9 +57,9 @@
     }
 
     .logo{
-      font-size:68px;
+      font-size:78px;
       font-weight:900;
-      letter-spacing:-3px;
+      letter-spacing:-4px;
       margin:0;
     }
 
@@ -66,17 +67,26 @@
     .logo span:last-child{color:var(--blue)}
     .logo i{color:var(--green);font-style:normal}
 
-    .tagline{
-      margin:18px auto 0;
-      font-size:31px;
+    .eyebrow{
+      margin:16px auto 0;
+      color:var(--green);
+      font-size:14px;
       font-weight:900;
-      max-width:850px;
-      line-height:1.12;
-      letter-spacing:-1px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .tagline{
+      margin:14px auto 0;
+      font-size:38px;
+      font-weight:900;
+      max-width:920px;
+      line-height:1.08;
+      letter-spacing:-1.5px;
     }
 
     .sub{
-      margin:18px auto 0;
+      margin:20px auto 0;
       color:var(--muted);
       font-size:18px;
       max-width:820px;
@@ -88,16 +98,16 @@
       justify-content:center;
       gap:12px;
       flex-wrap:wrap;
-      margin-top:26px;
+      margin-top:28px;
     }
 
     .mini-stat{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--muted);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      color:#d8e8ff;
       padding:10px 14px;
       border-radius:999px;
-      font-weight:800;
+      font-weight:900;
       font-size:13px;
     }
 
@@ -106,7 +116,7 @@
       justify-content:center;
       gap:14px;
       flex-wrap:wrap;
-      margin-top:32px;
+      margin-top:34px;
     }
 
     .btn{
@@ -142,7 +152,7 @@
     }
 
     .section{
-      margin-top:30px;
+      margin-top:34px;
       animation:fadeUp .7s ease both;
     }
 
@@ -211,18 +221,32 @@
     }
 
     .app-card.featured{
-      border-color:rgba(120,255,63,.35);
+      border-color:rgba(120,255,63,.42);
       background:
-        radial-gradient(circle at top right, rgba(120,255,63,.15), transparent 34%),
+        radial-gradient(circle at top right, rgba(120,255,63,.17), transparent 34%),
         linear-gradient(180deg,var(--card),var(--card2));
     }
 
-    .app-card.studio{
-      border-color:rgba(120,255,63,.58);
+    .app-card.tactical{
+      border-color:rgba(29,155,255,.55);
       background:
-        radial-gradient(circle at top right, rgba(120,255,63,.22), transparent 36%),
-        radial-gradient(circle at bottom left, rgba(29,155,255,.16), transparent 34%),
-        linear-gradient(180deg,#071a2b,#0b1b33);
+        radial-gradient(circle at top right, rgba(29,155,255,.22), transparent 36%),
+        linear-gradient(180deg,#071426,#0b1b33);
+    }
+
+    .app-card.studio{
+      border-color:rgba(155,92,255,.58);
+      background:
+        radial-gradient(circle at top right, rgba(155,92,255,.24), transparent 36%),
+        radial-gradient(circle at bottom left, rgba(29,155,255,.14), transparent 34%),
+        linear-gradient(180deg,#071426,#0b1b33);
+    }
+
+    .app-card.clubiq{
+      border-color:rgba(120,255,63,.55);
+      background:
+        radial-gradient(circle at top right, rgba(120,255,63,.18), transparent 36%),
+        linear-gradient(180deg,#071426,#0b1b33);
     }
 
     .badge{
@@ -237,10 +261,16 @@
       border:1px solid rgba(120,255,63,.22);
     }
 
-    .badge.beta{
-      background:linear-gradient(135deg,var(--green),#d8ff3f);
-      color:#03101f;
-      border:none;
+    .badge.blue{
+      background:rgba(29,155,255,.12);
+      color:#8fd0ff;
+      border-color:rgba(29,155,255,.28);
+    }
+
+    .badge.purple{
+      background:rgba(155,92,255,.14);
+      color:#c9b0ff;
+      border-color:rgba(155,92,255,.3);
     }
 
     .wide{
@@ -341,14 +371,14 @@
 
     @media(max-width:900px){
       .page{padding:16px 12px}
-      .logo{font-size:48px}
-      .tagline{font-size:24px}
+      .logo{font-size:52px}
+      .tagline{font-size:28px}
       .sub{font-size:16px}
       .grid,
       .app-grid,
       .target-grid,
       .wide{grid-template-columns:1fr}
-      .hero{padding:42px 20px}
+      .hero{padding:44px 20px}
       .app-card{min-height:auto}
       .founder{grid-template-columns:1fr;text-align:center}
       .avatar{margin:0 auto}
@@ -365,11 +395,13 @@
       <section class="hero">
         <h1 class="logo"><span>Match</span><i>I</i><span>Q</span></h1>
 
-        <h2 class="tagline">Building an AI Ecosystem for Sport, Clubs and Content</h2>
+        <div class="eyebrow">One ecosystem. Three AI products.</div>
+
+        <h2 class="tagline">The AI Operating System for Sport, Clubs and Content.</h2>
 
         <p class="sub">
-          MatchIQ nasce come ecosistema AI per il calcio e si sta evolvendo in una piattaforma più ampia:
-          analisi tattica, scouting, gestione società sportive e creazione di contenuti verticali con l’intelligenza artificiale.
+          MatchIQ nasce per trasformare dati, partite, video, processi e idee in strumenti concreti:
+          analisi tattica, scouting, gestione sportiva e creazione di contenuti verticali con l’intelligenza artificiale.
         </p>
 
         <div class="mini-stats">
@@ -400,21 +432,21 @@
             <span class="link">Apri MatchIQ →</span>
           </a>
 
-          <a class="card app-card" href="https://matchiq-tactical-production.up.railway.app" target="_blank" rel="noopener noreferrer">
-            <span class="badge">TACTICAL AI</span>
+          <a class="card app-card tactical" href="https://tactical.matchiq.it.com" target="_blank" rel="noopener noreferrer">
+            <span class="badge blue">TACTICAL AI</span>
             <strong>⚽ MatchIQ Tactical</strong>
             <p>Analisi tattica live, Scout Intelligence, Coach Mode, Video Analysis, report PDF e strumenti AI per leggere meglio le partite.</p>
             <span class="link">Apri Tactical →</span>
           </a>
 
-          <a class="card app-card studio" href="https://web-production-1125d.up.railway.app" target="_blank" rel="noopener noreferrer">
-            <span class="badge beta">BETA LIVE</span>
+          <a class="card app-card studio" href="https://studio.matchiq.it.com" target="_blank" rel="noopener noreferrer">
+            <span class="badge purple">AI STUDIO</span>
             <strong>🎬 MatchIQ Studio</strong>
             <p>AI Creative Studio per creare contenuti verticali: brief, hook, storyboard, scene, media library, voice-over, motion ed export MP4.</p>
-            <span class="link">Apri Studio Beta →</span>
+            <span class="link">Apri Studio →</span>
           </a>
 
-          <a class="card app-card" href="https://web-production-691ae.up.railway.app" target="_blank" rel="noopener noreferrer">
+          <a class="card app-card clubiq" href="https://clubiq.matchiq.it.com" target="_blank" rel="noopener noreferrer">
             <span class="badge">CLUB MANAGEMENT</span>
             <strong>🏟️ ClubIQ Segreteria</strong>
             <p>Gestionale per società sportive: atleti, pagamenti, documenti, certificati, comunicazioni e organizzazione operativa.</p>
@@ -514,9 +546,11 @@
 
       <footer>
         <strong>MatchIQ</strong><br />
-        AI Ecosystem for Sport, Clubs and Content
+        AI Operating System for Sport, Clubs and Content
         <div class="footer-links">
-          <a href="https://web-production-1125d.up.railway.app" target="_blank" rel="noopener noreferrer">MatchIQ Studio Beta</a>
+          <a href="https://tactical.matchiq.it.com" target="_blank" rel="noopener noreferrer">Tactical</a>
+          <a href="https://studio.matchiq.it.com" target="_blank" rel="noopener noreferrer">Studio</a>
+          <a href="https://clubiq.matchiq.it.com" target="_blank" rel="noopener noreferrer">ClubIQ</a>
           <a href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20MatchIQ%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank" rel="noopener noreferrer">WhatsApp</a>
           <a href="https://www.linkedin.com/in/mariocostabile" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://www.instagram.com/matchiq.app?igsh=bmQ2ZHF1aGR6NzUy" target="_blank" rel="noopener noreferrer">Instagram</a>
