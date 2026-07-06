@@ -1,4 +1,4 @@
-const CACHE_NAME = 'matchiq-v2';
+const CACHE_NAME = 'matchiq-v3';
 const ASSETS = ['/app'];
 
 self.addEventListener('install', e => {
@@ -17,7 +17,14 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(e.request).catch(async () => {
+      const cached = await caches.match(e.request);
+      return cached || new Response('Offline', {
+        status: 503,
+        statusText: 'Offline',
+        headers: { 'Content-Type': 'text/plain' }
+      });
+    })
   );
 });
 
