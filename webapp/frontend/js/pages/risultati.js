@@ -27,7 +27,7 @@ function showStoricoRis(){
 }
 
 async function pageRisultati(){
-  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":"Campionato Italiano";
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":currentLeague==="mondiali-2026"?"Mondiali 2026":"Campionato Italiano";
   if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Risultati Live ${leagueLabel}</h2><p style="margin:16px 0">I risultati live e lo storico delle partite sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro - 9.99&euro;/mese</button></div></div>`;
   if(_liveRefreshTimer){clearInterval(_liveRefreshTimer);_liveRefreshTimer=null}
   const data=await fetchAPI("/api"+leagueApiPrefix()+"/risultati", true);
@@ -43,10 +43,13 @@ async function pageRisultati(){
     </div>
   </div>`;
 
-  const completate = data.giornate.filter(g=>!g.live);
   const liveG = data.giornate.filter(g=>g.live);
+  const prossime = data.giornate.filter(g=>g.prossima);
+  const completate = data.giornate.filter(g=>!g.live && !g.prossima);
+  const prossimaG = prossime.length>0 ? prossime[0] : null;
   const ultimaComp = completate.length>0 ? completate[0] : null;
   const storico = completate.slice(1);
+  const roundLabel = g => /^\d+$/.test(String(g)) ? `G.${g}` : g;
 
   window._risultatiStorico = storico;
 
@@ -78,10 +81,18 @@ async function pageRisultati(){
     const lg=liveG[0];
     html+=`<div><div class="card" style="padding:10px;border-color:#e74c3c;border-width:2px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <h3 style="margin:0;font-size:1rem">G.${lg.giornata} <span style="color:var(--muted);font-size:.75rem">${lg.data||""}</span></h3>
+        <h3 style="margin:0;font-size:1rem">${roundLabel(lg.giornata)} <span style="color:var(--muted);font-size:.75rem">${lg.data||""}</span></h3>
         <span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:6px;font-size:.7rem;font-weight:700;animation:pulse 1.5s infinite">LIVE</span>
       </div>
       ${rp(lg.partite)}
+    </div></div>`;
+  } else if(prossimaG){
+    html+=`<div><div class="card" style="padding:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h3 style="margin:0;font-size:1rem">${roundLabel(prossimaG.giornata)} <span style="color:var(--muted);font-size:.75rem">${prossimaG.data||""}</span></h3>
+        <span style="color:var(--accent);font-size:.7rem;font-weight:700">PROSSIME</span>
+      </div>
+      ${rp(prossimaG.partite)}
     </div></div>`;
   } else {
     html+=`<div><div class="card" style="padding:16px;text-align:center">
@@ -93,7 +104,7 @@ async function pageRisultati(){
   html+='<div>';
   if(ultimaComp){
     html+=`<div class="card" style="padding:10px">
-      <h3 style="margin:0 0 6px;font-size:1rem">G.${ultimaComp.giornata} <span style="color:var(--muted);font-size:.75rem">${ultimaComp.data||""}</span> <span style="color:var(--green);font-size:.65rem">COMPLETATA</span></h3>
+      <h3 style="margin:0 0 6px;font-size:1rem">${roundLabel(ultimaComp.giornata)} <span style="color:var(--muted);font-size:.75rem">${ultimaComp.data||""}</span> <span style="color:var(--green);font-size:.65rem">COMPLETATA</span></h3>
       ${rp(ultimaComp.partite)}
     </div>`;
   }
@@ -103,7 +114,7 @@ async function pageRisultati(){
         <h4 style="color:var(--muted);margin:0;font-size:.85rem">Storico</h4>
         <select id="sel-storico-ris" onchange="showStoricoRis()" style="min-height:38px;font-size:.8rem;padding:4px 6px;min-width:110px">
           <option value="">Seleziona...</option>
-          ${storico.map((g,i)=>`<option value="${i}">G.${g.giornata}</option>`).join('')}
+          ${storico.map((g,i)=>`<option value="${i}">${roundLabel(g.giornata)}</option>`).join('')}
         </select>
       </div>
       <div id="storico-ris-content"></div>

@@ -701,12 +701,24 @@ def _fetch_worldcup_data():
                 "home_api": home_api, "away_api": away_api,
                 "home_id": fix.get("teams", {}).get("home", {}).get("id", 0),
                 "away_id": fix.get("teams", {}).get("away", {}).get("id", 0),
+                "fixture_id": fix.get("fixture", {}).get("id"),
                 "data": fix_date[:10],
-                "ora": fix_date[11:16] if "T" in fix_date else "",
+                "ora": _utc_to_rome(fix_date),
                 "round": fix.get("league", {}).get("round", ""),
                 "status": fix.get("fixture", {}).get("status", {}).get("short", "NS"),
+                "status_it": {
+                    "FT": "Terminata", "AET": "Dopo supplementari",
+                    "PEN": "Dopo rigori", "NS": "Da giocare",
+                    "TBD": "Da definire", "1H": "1T", "2H": "2T",
+                    "HT": "Intervallo", "ET": "Supplementari", "P": "Rigori",
+                }.get(fix.get("fixture", {}).get("status", {}).get("short", "NS"), fix.get("fixture", {}).get("status", {}).get("short", "NS")),
+                "minuto": fix.get("fixture", {}).get("status", {}).get("elapsed"),
+                "live": fix.get("fixture", {}).get("status", {}).get("short", "NS") in ("1H", "2H", "HT", "ET", "P"),
                 "gol_h": fix.get("goals", {}).get("home"),
                 "gol_a": fix.get("goals", {}).get("away"),
+                "marcatori": [],
+                "marcatori_home": [],
+                "marcatori_away": [],
             })
 
         WC_FIXTURES_CACHE = sorted(fixtures, key=lambda x: x.get("data", ""))

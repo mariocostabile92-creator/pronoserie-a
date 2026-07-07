@@ -87,7 +87,6 @@ async function loadActiveTeams(){
 const routes = {
   home: pageHome,
   mondiali: pageMondiali,
-  fantacalcio: pageFantacalcio,
   pronostici: pagePronostici,
   calendario: pageCalendario,
   classifica: pageClassifica,

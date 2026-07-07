@@ -184,12 +184,45 @@ async def notizie():
 @router.get("/{league}/risultati")
 async def risultati_league(league: str):
     """Risultati per qualsiasi campionato."""
-    from api_server import LEAGUES, LIVE_RESULTS_CACHE_ML, RISULTATI_STAGIONE_CACHE_ML, LIVE_IN_CORSO_ML, CLASSIFICA_LAST_UPDATE
+    import live_service as live_state
+    from api_server import (
+        LEAGUES, LIVE_RESULTS_CACHE_ML, RISULTATI_STAGIONE_CACHE_ML,
+        LIVE_IN_CORSO_ML, CLASSIFICA_LAST_UPDATE,
+    )
     from fastapi import HTTPException
     from collections import defaultdict
     
     if league not in LEAGUES:
         raise HTTPException(404, "Campionato non trovato")
+
+    if league == "mondiali-2026":
+        if not live_state.WC_FIXTURES_CACHE:
+            live_state._fetch_worldcup_data()
+        fixtures = list(live_state.WC_FIXTURES_CACHE or [])
+        live_now = [p for p in fixtures if p.get("live")]
+        finished = [p for p in fixtures if p.get("status") in ("FT", "AET", "PEN")]
+        upcoming = [p for p in fixtures if p.get("status") not in ("FT", "AET", "PEN") and not p.get("live")]
+        giornate = []
+        if live_now:
+            giornate.append({"giornata": "Live", "data": live_now[0].get("data", ""), "partite": live_now, "live": True})
+        if finished:
+            per_round = defaultdict(list)
+            for p in sorted(finished, key=lambda x: x.get("data", ""), reverse=True):
+                per_round[p.get("round", "Mondiali")].append(p)
+            for rd, partite in per_round.items():
+                giornate.append({"giornata": rd, "data": partite[0].get("data", ""), "partite": partite, "live": False})
+        if upcoming and not live_now:
+            per_round = defaultdict(list)
+            for p in sorted(upcoming, key=lambda x: x.get("data", "")):
+                per_round[p.get("round", "Prossime")].append(p)
+            rd, partite = next(iter(per_round.items()))
+            giornate.insert(0, {"giornata": rd, "data": partite[0].get("data", ""), "partite": partite, "live": False, "prossima": True})
+        return {
+            "giornate": giornate,
+            "live": bool(live_now),
+            "aggiornamento": "Mondiali 2026 live" if live_state.WC_LAST_UPDATE else "In caricamento...",
+        }
+
     giornate = []
     # Live
     live_p = LIVE_RESULTS_CACHE_ML.get(league) or []

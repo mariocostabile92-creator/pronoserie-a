@@ -4,7 +4,7 @@ let _calRefreshTimer = null;
 
 async function pageCalendario(){
   if(_calRefreshTimer){clearInterval(_calRefreshTimer);_calRefreshTimer=null}
-  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":"Campionato Italiano";
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":currentLeague==="mondiali-2026"?"Mondiali 2026":"Campionato Italiano";
   const calUrl = currentLeague==="serie-a" ? "/api/calendario" : "/api/"+currentLeague+"/calendario";
   const cal=await fetchAPI(calUrl, true);
   if(!cal||!cal.giornate||!cal.giornate.length)return `<div class="container">${leagueTabs()}<div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>`;
@@ -131,7 +131,7 @@ async function simulaGiornata(gNum){
   if(!cal)return;
   const g=cal.giornate.find(x=>String(x.giornata)===String(gNum));
   if(!g){det.innerHTML='<div class="card">Giornata non trovata</div>';return}
-  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":"Campionato Italiano";
+  const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":currentLeague==="mondiali-2026"?"Mondiali 2026":"Campionato Italiano";
 
   const giocate = g.partite.filter(p=>p.gol_h!==null && p.gol_h!==undefined && (p.status==="FT"||p.status==="AET"||p.status==="PEN"));
   const daGiocareRaw = g.partite.filter(p=>!(p.gol_h!==null && p.gol_h!==undefined && (p.status==="FT"||p.status==="AET"||p.status==="PEN")));
