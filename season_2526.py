@@ -2,7 +2,7 @@
 season_2526.py
 Dati reali della stagione Serie A 2025-2026.
 Classifica, xG, calendario giornate 31-38.
-Aggiornata alla 30a giornata (marzo 2026).
+Aggiornata a fine campionato 2025-2026.
 """
 
 # 20 squadre partecipanti Serie A 2025-2026
@@ -37,7 +37,7 @@ CLASSIFICA_REALE_30G = [
     {"Squadra": "Pisa",        "Punti": 18, "G": 30, "V": 2,  "N": 12, "P": 16, "GF": 23, "GS": 54, "DR":-31},
 ]
 
-GIORNATA_ATTUALE = 30
+GIORNATA_ATTUALE = 38
 GIORNATE_TOTALI = 38
 GIORNATE_RIMANENTI = GIORNATE_TOTALI - GIORNATA_ATTUALE
 
@@ -379,16 +379,24 @@ def get_xg_media_campionato() -> dict:
 
 
 def get_calendario_rimanente() -> dict:
-    """Ritorna il calendario delle giornate 31-38."""
+    """Ritorna solo le giornate non ancora giocate."""
+    return {
+        giornata: dati
+        for giornata, dati in CALENDARIO_31_38.items()
+        if giornata > GIORNATA_ATTUALE
+    }
+
+
+def get_calendario_finale() -> dict:
+    """Ritorna l'archivio completo delle giornate 31-38."""
     return CALENDARIO_31_38
 
 
 def genera_partite_rimanenti() -> list:
     """Ritorna tutte le partite rimanenti come lista piatta di tuple (home, away)."""
     tutte = []
-    for g in range(31, 39):
-        if g in CALENDARIO_31_38:
-            tutte.extend(CALENDARIO_31_38[g]["partite"])
+    for dati in get_calendario_rimanente().values():
+        tutte.extend(dati["partite"])
     return tutte
 
 

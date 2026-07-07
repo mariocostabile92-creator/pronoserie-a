@@ -81,6 +81,11 @@ async function pageCalendario(){
       </div>`;
     });
     html+=`</div></div>`;
+  } else {
+    html+=`<div class="card" style="padding:16px;text-align:center">
+      <h4 style="color:var(--green);margin:0 0 8px">Campionato concluso</h4>
+      <p style="color:var(--muted);font-size:.85rem;margin:0">Tutte le giornate disponibili sono terminate. Usa il menu principale per consultare risultati, classifica e pronostici.</p>
+    </div>`;
   }
 
   html+='</div></div>';

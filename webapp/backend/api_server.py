@@ -829,6 +829,49 @@ CAL_HARDCODED = {
     38:{"data":"24 maggio 2026","partite":[("Bologna","Inter"),("Cremonese","Como"),("Fiorentina","Atalanta"),("Lazio","Pisa"),("Lecce","Genoa"),("Milan","Cagliari"),("Napoli","Udinese"),("Parma","Sassuolo"),("Torino","Juventus"),("Verona","Roma")]},
 }
 
+CAL_RESULTS_31_38 = {
+    ("Sassuolo", "Cagliari"): (2, 1), ("Verona", "Fiorentina"): (0, 1),
+    ("Lazio", "Parma"): (1, 1), ("Cremonese", "Bologna"): (1, 2),
+    ("Pisa", "Torino"): (0, 1), ("Inter", "Roma"): (5, 2),
+    ("Udinese", "Como"): (0, 0), ("Lecce", "Atalanta"): (0, 3),
+    ("Juventus", "Genoa"): (2, 0), ("Napoli", "Milan"): (1, 0),
+    ("Roma", "Pisa"): (3, 0), ("Cagliari", "Cremonese"): (1, 0),
+    ("Torino", "Verona"): (2, 1), ("Milan", "Udinese"): (0, 3),
+    ("Atalanta", "Juventus"): (0, 1), ("Genoa", "Sassuolo"): (2, 1),
+    ("Parma", "Napoli"): (1, 1), ("Bologna", "Lecce"): (2, 0),
+    ("Como", "Inter"): (3, 4), ("Fiorentina", "Lazio"): (1, 0),
+    ("Sassuolo", "Como"): (2, 1), ("Inter", "Cagliari"): (3, 0),
+    ("Udinese", "Parma"): (0, 1), ("Napoli", "Lazio"): (0, 2),
+    ("Roma", "Atalanta"): (1, 1), ("Cremonese", "Torino"): (0, 0),
+    ("Verona", "Milan"): (0, 1), ("Pisa", "Genoa"): (1, 2),
+    ("Juventus", "Bologna"): (2, 0), ("Lecce", "Fiorentina"): (1, 1),
+    ("Napoli", "Cremonese"): (4, 0), ("Parma", "Pisa"): (1, 0),
+    ("Bologna", "Roma"): (0, 2), ("Verona", "Lecce"): (0, 0),
+    ("Fiorentina", "Sassuolo"): (0, 0), ("Genoa", "Como"): (0, 2),
+    ("Torino", "Inter"): (2, 2), ("Milan", "Juventus"): (0, 0),
+    ("Cagliari", "Atalanta"): (3, 2), ("Lazio", "Udinese"): (3, 3),
+    ("Atalanta", "Genoa"): (0, 0), ("Bologna", "Cagliari"): (0, 0),
+    ("Como", "Napoli"): (0, 0), ("Cremonese", "Lazio"): (1, 2),
+    ("Inter", "Parma"): (2, 0), ("Juventus", "Verona"): (1, 1),
+    ("Pisa", "Lecce"): (1, 2), ("Roma", "Fiorentina"): (4, 0),
+    ("Sassuolo", "Milan"): (2, 0), ("Udinese", "Torino"): (2, 0),
+    ("Cagliari", "Udinese"): (0, 2), ("Cremonese", "Pisa"): (3, 0),
+    ("Fiorentina", "Genoa"): (0, 0), ("Lazio", "Inter"): (0, 3),
+    ("Lecce", "Juventus"): (0, 1), ("Milan", "Atalanta"): (2, 3),
+    ("Napoli", "Bologna"): (2, 3), ("Parma", "Roma"): (2, 3),
+    ("Torino", "Sassuolo"): (2, 1), ("Verona", "Como"): (0, 1),
+    ("Atalanta", "Bologna"): (0, 1), ("Cagliari", "Torino"): (2, 1),
+    ("Como", "Parma"): (1, 0), ("Genoa", "Milan"): (1, 2),
+    ("Inter", "Verona"): (1, 1), ("Juventus", "Fiorentina"): (0, 2),
+    ("Pisa", "Napoli"): (0, 3), ("Roma", "Lazio"): (2, 0),
+    ("Sassuolo", "Lecce"): (2, 3), ("Udinese", "Cremonese"): (0, 1),
+    ("Bologna", "Inter"): (3, 3), ("Cremonese", "Como"): (1, 4),
+    ("Fiorentina", "Atalanta"): (1, 1), ("Lazio", "Pisa"): (2, 1),
+    ("Lecce", "Genoa"): (1, 0), ("Milan", "Cagliari"): (1, 2),
+    ("Napoli", "Udinese"): (1, 0), ("Parma", "Sassuolo"): (1, 0),
+    ("Torino", "Juventus"): (2, 2), ("Verona", "Roma"): (0, 2),
+}
+
 # ─────────────────────────────
 # FANTACALCIO
 # ─────────────────────────────
@@ -911,6 +954,9 @@ async def calendario():
         ha_da_giocare = False
         for h, a in info["partite"]:
             match_data = {"home": h, "away": a, "gol_h": None, "gol_a": None, "status": "NS", "status_it": "Da giocare", "minuto": None, "live": False, "fixture_id": None}
+            if (h, a) in CAL_RESULTS_31_38:
+                gh, ga = CAL_RESULTS_31_38[(h, a)]
+                match_data.update({"gol_h": gh, "gol_a": ga, "status": "FT", "status_it": "Terminata"})
             if LIVE_RESULTS_CACHE:
                 for p in LIVE_RESULTS_CACHE:
                     if p["home"] == h and p["away"] == a:
