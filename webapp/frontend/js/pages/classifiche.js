@@ -1,12 +1,14 @@
 // ── classifiche.js - Pagina classifiche e marcatori ──
 
 async function pageClassifica(){
+  if(currentLeague==="mondiali-2026") currentLeague="serie-a";
+  const classificaTabs = leagueTabs().replace(/<button(?=[^>]*mondiali-2026)[\s\S]*?<\/button>/,"");
   const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":"Campionato Italiano";
-  if(userPlan!=="pro") return `<div class="container">${leagueTabs()}<div class="lock-msg card"><h2>Classifica ${leagueLabel}</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
+  if(userPlan!=="pro") return `<div class="container">${classificaTabs}<div class="lock-msg card"><h2>Classifica ${leagueLabel}</h2><p style="margin:16px 0">La classifica completa e la classifica marcatori sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   const data=await fetchAPI("/api"+leagueApiPrefix()+"/classifica", true);
-  if(!data||!data.classifica||data.classifica.length===0)return `<div class="container">${leagueTabs()}<div class="card" style="text-align:center;padding:32px"><h2>Classifica ${leagueLabel}</h2><p style="color:var(--muted);margin:16px 0">Dati in caricamento... Riprova tra qualche secondo.</p><button class="btn btn-blue" onclick="navigate()">Ricarica</button></div></div>`;
+  if(!data||!data.classifica||data.classifica.length===0)return `<div class="container">${classificaTabs}<div class="card" style="text-align:center;padding:32px"><h2>Classifica ${leagueLabel}</h2><p style="color:var(--muted);margin:16px 0">Dati in caricamento... Riprova tra qualche secondo.</p><button class="btn btn-blue" onclick="navigate()">Ricarica</button></div></div>`;
   const aggLive = data.live ? `<span style="color:var(--green);font-size:.85rem">Aggiornamento automatico: ${data.aggiornamento||""}</span>` : '<span style="color:var(--muted);font-size:.85rem">Dati base</span>';
-  let html='<div class="container">'+leagueTabs()+'<h1>Classifica '+leagueLabel+'</h1><p class="sub">'+aggLive+'</p>';
+  let html='<div class="container">'+classificaTabs+'<h1>Classifica '+leagueLabel+'</h1><p class="sub">'+aggLive+'</p>';
   html+='<div class="grid-cal">';
   html+='<div class="card" style="overflow-x:auto;padding:8px"><h2 style="margin-bottom:8px;font-size:1.1rem">Classifica</h2>';
   html+=`<div style="display:flex;padding:4px 4px 6px;border-bottom:2px solid #1f3460;color:var(--muted);font-size:.65rem;font-weight:700"><span style="width:22px">#</span><span style="flex:1">Squadra</span><span style="width:22px">PG</span><span style="width:22px">V</span><span style="width:22px">N</span><span style="width:22px">P</span><span style="width:30px">DR</span><span style="width:28px;text-align:right">PT</span></div>`;
