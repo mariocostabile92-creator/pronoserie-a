@@ -320,16 +320,16 @@ async def squadre_attive(league: str, request: Request):
 @limiter.limit("20/minute")
 async def worldcup_gironi(request: Request):
     """Restituisce gironi e partite del Mondiale 2026."""
-    from api_server import WC_GIRONI_CACHE, WC_FIXTURES_CACHE, _fetch_worldcup_data
-    if not WC_GIRONI_CACHE:
-        _fetch_worldcup_data()
+    import live_service as live_state
+    if not live_state.WC_GIRONI_CACHE and not live_state.WC_FIXTURES_CACHE:
+        live_state._fetch_worldcup_data()
 
     # Raggruppa fixtures per girone
     fixtures_per_girone = {}
-    for f in WC_FIXTURES_CACHE:
+    for f in live_state.WC_FIXTURES_CACHE:
         rd = f.get("round", "")
         if "Group" in rd:
-            for g_letter, squadre in WC_GIRONI_CACHE.items():
+            for g_letter, squadre in live_state.WC_GIRONI_CACHE.items():
                 nomi_girone = [s["squadra"] for s in squadre]
                 if f["home"] in nomi_girone or f["away"] in nomi_girone:
                     if g_letter not in fixtures_per_girone:
@@ -339,7 +339,12 @@ async def worldcup_gironi(request: Request):
 
     # Fixtures fasi finali (non girone)
     fasi = {}
-    for f in WC_FIXTURES_CACHE:
+    fixtures_per_day = {}
+    for f in live_state.WC_FIXTURES_CACHE:
+        day = f.get("data") or "Da definire"
+        if day not in fixtures_per_day:
+            fixtures_per_day[day] = []
+        fixtures_per_day[day].append(f)
         rd = f.get("round", "")
         if "Group" not in rd and rd:
             if rd not in fasi:
@@ -347,10 +352,12 @@ async def worldcup_gironi(request: Request):
             fasi[rd].append(f)
 
     return {
-        "gironi": WC_GIRONI_CACHE,
+        "gironi": live_state.WC_GIRONI_CACHE,
         "partite_gironi": fixtures_per_girone,
+        "partite_giornate": fixtures_per_day,
         "fasi_finale": fasi,
-        "totale_partite": len(WC_FIXTURES_CACHE),
+        "totale_partite": len(live_state.WC_FIXTURES_CACHE),
+        "aggiornamento": "Live API-Football" if live_state.WC_LAST_UPDATE else "In attesa dati live",
     }
 
 
@@ -358,9 +365,9 @@ async def worldcup_gironi(request: Request):
 @limiter.limit("20/minute")
 async def worldcup_standings(girone: str, request: Request):
     """Classifica di un girone del Mondiale 2026."""
-    from api_server import WC_GIRONI_CACHE, _fetch_worldcup_data
-    if not WC_GIRONI_CACHE:
-        _fetch_worldcup_data()
+    import live_service as live_state
+    if not live_state.WC_GIRONI_CACHE:
+        live_state._fetch_worldcup_data()
     g = girone.upper()
-    standings = WC_GIRONI_CACHE.get(g, [])
+    standings = live_state.WC_GIRONI_CACHE.get(g, [])
     return {"girone": g, "classifica": standings}

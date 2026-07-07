@@ -2043,21 +2043,39 @@ async function pageMondiali(){
 
   const gironi = data.gironi;
   const partite_g = data.partite_gironi || {};
+  const partite_giornate = data.partite_giornate || {};
   const fasi = data.fasi_finale || {};
   const letters = Object.keys(gironi).sort();
+  const giorni = Object.keys(partite_giornate).sort();
 
   let html='<div class="container">';
   html+='<h1 style="text-align:center">&#127942; FIFA World Cup 2026</h1>';
   html+='<p class="sub" style="text-align:center">USA - Canada - Messico | 11 giugno - 19 luglio 2026</p>';
   html+=`<p style="text-align:center;color:var(--green);font-weight:700;margin-bottom:16px">${data.totale_partite || 72} partite | 48 squadre | 12 gironi</p>`;
+  html+=`<p style="text-align:center;color:var(--muted);font-size:.75rem;margin-bottom:16px">${data.aggiornamento || "Dati live API-Football"}</p>`;
+
+  function renderPartita(p, accent){
+    const score = p.gol_h !== null && p.gol_h !== undefined ? `${p.gol_h} - ${p.gol_a}` : 'vs';
+    const statusLabel = p.live ? `<span style="color:#e74c3c;font-size:.7rem;font-weight:800">${p.minuto||""}' LIVE</span>` :
+                       p.status === 'FT' ? '<span style="color:#2ecc71;font-size:.7rem">FT</span>' :
+                       `<span style="color:var(--muted);font-size:.7rem">${p.data||""} ${p.ora||p.status_it||""}</span>`;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0d1b2a;cursor:pointer" onclick="switchLeague('mondiali-2026');navigate('pronostici')">
+      <span style="flex:1;text-align:right;font-size:.85rem;font-weight:600">${p.home}</span>
+      <span style="min-width:60px;text-align:center;font-weight:800;font-size:.9rem;color:${accent||'var(--green)'}">${score}</span>
+      <span style="flex:1;text-align:left;font-size:.85rem;font-weight:600">${p.away}</span>
+      ${statusLabel}
+    </div>`;
+  }
 
   // Tab gironi
-  html+='<div style="display:flex;flex-wrap:wrap;gap:2px;margin-bottom:16px;justify-content:center">';
-  letters.forEach((g,i)=>{
-    const active = i===0;
-    html+=`<button class="wc-tab" data-girone="${g}" style="padding:6px 10px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;border-radius:6px;${active?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="showWCGirone('${g}')">${g}</button>`;
-  });
-  html+='</div>';
+  if(letters.length > 0){
+    html+='<div style="display:flex;flex-wrap:wrap;gap:2px;margin-bottom:16px;justify-content:center">';
+    letters.forEach((g,i)=>{
+      const active = i===0;
+      html+=`<button class="wc-tab" data-girone="${g}" style="padding:6px 10px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;border-radius:6px;${active?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="showWCGirone('${g}')">${g}</button>`;
+    });
+    html+='</div>';
+  }
 
   // Contenuto gironi
   letters.forEach((g,i)=>{
@@ -2097,22 +2115,28 @@ async function pageMondiali(){
       html+=`<div class="card" style="padding:12px;margin-bottom:10px">`;
       html+=`<h4 style="color:var(--accent);margin-bottom:8px">Partite Girone ${g}</h4>`;
       partite.forEach(p=>{
-        const score = p.gol_h !== null ? `${p.gol_h} - ${p.gol_a}` : 'vs';
-        const statusLabel = p.status === 'FT' ? '<span style="color:#2ecc71;font-size:.7rem"> FT</span>' :
-                           p.status === 'NS' ? `<span style="color:var(--muted);font-size:.7rem"> ${p.data} ${p.ora}</span>` :
-                           `<span style="color:#e74c3c;font-size:.7rem"> LIVE</span>`;
-        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0d1b2a;cursor:pointer" onclick="switchLeague('mondiali-2026');navigate('pronostici')">
-          <span style="flex:1;text-align:right;font-size:.85rem;font-weight:600">${p.home}</span>
-          <span style="min-width:60px;text-align:center;font-weight:800;font-size:.9rem;color:var(--green)">${score}</span>
-          <span style="flex:1;text-align:left;font-size:.85rem;font-weight:600">${p.away}</span>
-          ${statusLabel}
-        </div>`;
+        html+=renderPartita(p, 'var(--green)');
       });
       html+='</div>';
     }
 
     html+='</div>';
   });
+
+  if(giorni.length > 0){
+    html+=`<div class="card" style="padding:12px;margin-top:16px;border-left:3px solid var(--green)">`;
+    html+=`<h3 style="color:var(--green);margin-bottom:10px">Calendario partite</h3>`;
+    giorni.forEach(giorno=>{
+      html+=`<h4 style="color:var(--accent);margin:12px 0 6px">${giorno}</h4>`;
+      partite_giornate[giorno].forEach(p=>{ html+=renderPartita(p, 'var(--green)'); });
+    });
+    html+='</div>';
+  } else if(letters.length === 0){
+    html+=`<div class="card" style="padding:20px;text-align:center">
+      <h3 style="color:var(--accent)">Dati Mondiali in caricamento</h3>
+      <p style="color:var(--muted);font-size:.85rem">L'API live non ha ancora restituito gironi o calendario. Riprova tra poco.</p>
+    </div>`;
+  }
 
   // Fasi finali (se disponibili)
   const fasiKeys = Object.keys(fasi);
@@ -2122,13 +2146,7 @@ async function pageMondiali(){
     fasiKeys.forEach(fase=>{
       html+=`<h4 style="color:var(--yellow);margin:10px 0 6px">${fase}</h4>`;
       fasi[fase].forEach(p=>{
-        const score = p.gol_h !== null ? `${p.gol_h} - ${p.gol_a}` : 'vs';
-        html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0d1b2a">
-          <span style="flex:1;text-align:right;font-size:.85rem;font-weight:600">${p.home}</span>
-          <span style="min-width:60px;text-align:center;font-weight:800;font-size:.9rem;color:var(--accent)">${score}</span>
-          <span style="flex:1;text-align:left;font-size:.85rem;font-weight:600">${p.away}</span>
-          <span style="color:var(--muted);font-size:.7rem">${p.data}</span>
-        </div>`;
+        html+=renderPartita(p, 'var(--accent)');
       });
     });
     html+='</div>';
