@@ -28,13 +28,13 @@ FOOTBALL_API_HOST = "v3.football.api-sports.io"
 # ─────────────────────────────
 LEAGUES = {
     "serie-a":          {"id": 135, "season": 2026, "name": "Serie A",          "country": "Italy"},
-    "premier-league":   {"id": 39,  "season": 2025, "name": "Premier League",   "country": "England"},
-    "la-liga":          {"id": 140, "season": 2025, "name": "La Liga",           "country": "Spain"},
+    "premier-league":   {"id": 39,  "season": 2026, "name": "Premier League",   "country": "England"},
+    "la-liga":          {"id": 140, "season": 2026, "name": "La Liga",           "country": "Spain"},
     "champions-league": {"id": 2,   "season": 2025, "name": "Champions League", "country": "Europe"},
     "europa-league":    {"id": 3,   "season": 2025, "name": "Europa League",     "country": "Europe"},
     "conference-league":{"id": 848, "season": 2025, "name": "Conference League","country": "Europe"},
-    "bundesliga":       {"id": 78,  "season": 2025, "name": "Bundesliga",        "country": "Germany"},
-    "ligue-1":          {"id": 61,  "season": 2025, "name": "Ligue 1",           "country": "France"},
+    "bundesliga":       {"id": 78,  "season": 2026, "name": "Bundesliga",        "country": "Germany"},
+    "ligue-1":          {"id": 61,  "season": 2026, "name": "Ligue 1",           "country": "France"},
     "mondiali-2026":    {"id": 1,   "season": 2026, "name": "FIFA World Cup 2026","country": "World", "type": "tournament"},
 }
 

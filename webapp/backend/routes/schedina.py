@@ -107,13 +107,15 @@ async def schedina_del_giorno(request: Request):
 async def schedina_pl(request: Request):
     """Schedina del giorno Premier League - prossima giornata."""
     from api_server import (CLASSIFICA_CACHE, FOOTBALL_API_KEY, FOOTBALL_API_HOST,
-                             _fetch_league_data, _get_nome_map, genera_pronostico)
+                             LEAGUES, _fetch_league_data, _get_nome_map,
+                             genera_pronostico)
     try:
         if not CLASSIFICA_CACHE.get("premier-league"):
             _fetch_league_data("premier-league")
 
+        season = LEAGUES["premier-league"]["season"]
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=39&season=2025&next=10",
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=39&season={season}&next=10",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -165,13 +167,15 @@ async def schedina_pl(request: Request):
 async def schedina_ll(request: Request):
     """Schedina del giorno La Liga - prossima giornata."""
     from api_server import (CLASSIFICA_CACHE, FOOTBALL_API_KEY, FOOTBALL_API_HOST,
-                             _fetch_league_data, _get_nome_map, genera_pronostico)
+                             LEAGUES, _fetch_league_data, _get_nome_map,
+                             genera_pronostico)
     try:
         if not CLASSIFICA_CACHE.get("la-liga"):
             _fetch_league_data("la-liga")
 
+        season = LEAGUES["la-liga"]["season"]
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=140&season=2025&next=10",
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=140&season={season}&next=10",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -222,14 +226,15 @@ async def schedina_ll(request: Request):
 async def schedina_bl(request: Request):
     """Schedina del giorno Bundesliga."""
     from api_server import (CLASSIFICA_CACHE, FOOTBALL_API_KEY, FOOTBALL_API_HOST,
-                             _fetch_league_data, _get_nome_map, genera_pronostico,
+                             LEAGUES, _fetch_league_data, _get_nome_map, genera_pronostico,
                              _df_bl, get_team_stats, get_prediction)
     try:
         if not CLASSIFICA_CACHE.get("bundesliga"):
             _fetch_league_data("bundesliga")
 
+        season = LEAGUES["bundesliga"]["season"]
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=78&season=2025&next=10",
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=78&season={season}&next=10",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -292,14 +297,15 @@ async def schedina_bl(request: Request):
 async def schedina_l1(request: Request):
     """Schedina del giorno Ligue 1."""
     from api_server import (CLASSIFICA_CACHE, FOOTBALL_API_KEY, FOOTBALL_API_HOST,
-                             _fetch_league_data, _get_nome_map, genera_pronostico,
+                             LEAGUES, _fetch_league_data, _get_nome_map, genera_pronostico,
                              _df_l1, get_team_stats, get_prediction)
     try:
         if not CLASSIFICA_CACHE.get("ligue-1"):
             _fetch_league_data("ligue-1")
 
+        season = LEAGUES["ligue-1"]["season"]
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=61&season=2025&next=10",
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=61&season={season}&next=10",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as r:
