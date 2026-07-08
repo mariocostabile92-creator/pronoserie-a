@@ -121,7 +121,7 @@ async function loadPartiteOggi(){
   const el=$("partite-oggi-home");
   if(!el)return;
   try{
-    const cal=await fetchAPI("/api/calendario");
+    const cal=await fetchAPI("/api/serie-a/calendario");
     if(!cal||!cal.giornate)return;
     const gc=cal.giornata_corrente;
     const g=cal.giornate.find(x=>x.giornata===gc);

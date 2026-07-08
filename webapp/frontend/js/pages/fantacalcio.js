@@ -20,7 +20,7 @@ async function pageFantacalcio(){
 
   let gc = 32;
   try {
-    const calUrl = currentLeague==="serie-a" ? "/api/calendario" : "/api/"+currentLeague+"/calendario";
+    const calUrl = currentLeague==="serie-a" ? "/api/serie-a/calendario" : "/api/"+currentLeague+"/calendario";
     const cal = await fetchAPI(calUrl);
     if(cal) gc = cal.giornata_corrente || 32;
   } catch(e){}

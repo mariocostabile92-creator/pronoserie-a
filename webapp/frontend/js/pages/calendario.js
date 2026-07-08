@@ -5,7 +5,7 @@ let _calRefreshTimer = null;
 async function pageCalendario(){
   if(_calRefreshTimer){clearInterval(_calRefreshTimer);_calRefreshTimer=null}
   const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":currentLeague==="champions-league"?"Champions League":currentLeague==="europa-league"?"Europa League":currentLeague==="conference-league"?"Conference League":currentLeague==="mondiali-2026"?"Mondiali 2026":"Campionato Italiano";
-  const calUrl = currentLeague==="serie-a" ? "/api/calendario" : "/api/"+currentLeague+"/calendario";
+  const calUrl = currentLeague==="serie-a" ? "/api/serie-a/calendario" : "/api"+leagueApiPrefix()+"/calendario";
   const cal=await fetchAPI(calUrl, true);
   if(!cal||!cal.giornate||!cal.giornate.length)return `<div class="container">${leagueTabs()}<div class="card" style="color:var(--red)">Errore caricamento calendario.</div></div>`;
 
@@ -126,7 +126,7 @@ async function simulaGiornata(gNum){
   const det=$("sim-result-main");
   if(!det)return;
   det.innerHTML='<div class="spinner"></div>';
-  const calUrl = currentLeague==="serie-a" ? "/api/calendario" : "/api/"+currentLeague+"/calendario";
+  const calUrl = currentLeague==="serie-a" ? "/api/serie-a/calendario" : "/api"+leagueApiPrefix()+"/calendario";
   const cal=await fetchAPI(calUrl);
   if(!cal)return;
   const g=cal.giornate.find(x=>String(x.giornata)===String(gNum));

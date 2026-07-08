@@ -464,9 +464,10 @@ def _get_injuries_ondemand(team_name):
     team_id = _TEAM_IDS.get(team_name) or PL_TEAM_IDS.get(team_name) or LL_TEAM_IDS.get(team_name) or BL_TEAM_IDS.get(team_name) or L1_TEAM_IDS.get(team_name) or _ALL_EURO_IDS.get(team_name)
     if not team_id:
         return []
+    season = LEAGUES["serie-a"]["season"]
     try:
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/injuries?team={team_id}&season=2025",
+            f"https://{FOOTBALL_API_HOST}/injuries?team={team_id}&season={season}",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=10) as r:
@@ -940,46 +941,10 @@ async def push_subscribe(data: dict, user: Optional[dict] = Depends(get_optional
 # CALENDARIO ENDPOINT
 # ─────────────────────────────
 @app.get("/api/calendario")
-async def calendario():
-    """Calendario con risultati live integrati."""
-    giornate = []
-    giornata_corrente = None
-    for num in range(31, 39):
-        info = CAL_HARDCODED.get(num)
-        if not info:
-            continue
-        partite = []
-        tutte_finite = True
-        ha_live = False
-        ha_da_giocare = False
-        for h, a in info["partite"]:
-            match_data = {"home": h, "away": a, "gol_h": None, "gol_a": None, "status": "NS", "status_it": "Da giocare", "minuto": None, "live": False, "fixture_id": None}
-            if (h, a) in CAL_RESULTS_31_38:
-                gh, ga = CAL_RESULTS_31_38[(h, a)]
-                match_data.update({"gol_h": gh, "gol_a": ga, "status": "FT", "status_it": "Terminata"})
-            if LIVE_RESULTS_CACHE:
-                for p in LIVE_RESULTS_CACHE:
-                    if p["home"] == h and p["away"] == a:
-                        match_data.update({"gol_h": p["gol_h"], "gol_a": p["gol_a"], "status": p["status"], "status_it": p.get("status_it", p["status"]), "minuto": p.get("minuto"), "live": p.get("live", False), "fixture_id": p.get("fixture_id"), "marcatori": p.get("marcatori", [])})
-                        break
-            if match_data["status"] == "NS":
-                tutte_finite = False
-                ha_da_giocare = True
-            elif match_data["live"]:
-                tutte_finite = False
-                ha_live = True
-            partite.append(match_data)
-        if tutte_finite:
-            stato = "completata"
-        elif ha_live:
-            stato = "live"
-            giornata_corrente = str(num)
-        else:
-            stato = "prossima"
-            if giornata_corrente is None and ha_da_giocare:
-                giornata_corrente = str(num)
-        giornate.append({"giornata": str(num), "data": info["data"], "partite": partite, "stato": stato, "live": ha_live})
-    return {"giornate": giornate, "giornata_corrente": giornata_corrente or "38", "live": any(g.get("live") for g in giornate)}
+async def calendario(request: Request):
+    """Compat: calendario Serie A live da API-Football."""
+    from routes.leghe import calendario_league
+    return await calendario_league("serie-a", request)
 
 # ─────────────────────────────
 # FRONTEND

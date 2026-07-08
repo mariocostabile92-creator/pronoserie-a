@@ -27,7 +27,7 @@ FOOTBALL_API_HOST = "v3.football.api-sports.io"
 # LEAGUES config (import circolare-safe: definita qui, usata anche in api_server)
 # ─────────────────────────────
 LEAGUES = {
-    "serie-a":          {"id": 135, "season": 2025, "name": "Serie A",          "country": "Italy"},
+    "serie-a":          {"id": 135, "season": 2026, "name": "Serie A",          "country": "Italy"},
     "premier-league":   {"id": 39,  "season": 2025, "name": "Premier League",   "country": "England"},
     "la-liga":          {"id": 140, "season": 2025, "name": "La Liga",           "country": "Spain"},
     "champions-league": {"id": 2,   "season": 2025, "name": "Champions League", "country": "Europe"},
@@ -116,9 +116,10 @@ def _fetch_live_results():
     """Scarica risultati live dalla API Football (ultimi 30 + oggi)."""
     global LIVE_RESULTS_CACHE, LIVE_RESULTS_TIME, LIVE_IN_CORSO
     from league_mappings import FOOTBALL_NOME_MAP
+    season = LEAGUES["serie-a"]["season"]
     try:
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season=2025&last=30",
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season={season}&last=30",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -237,7 +238,7 @@ def _fetch_live_results():
         try:
             oggi = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             req2 = urllib.request.Request(
-                f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season=2025&date={oggi}",
+                f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season={season}&date={oggi}",
                 headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
             )
             with urllib.request.urlopen(req2, timeout=15) as r2:
@@ -301,9 +302,10 @@ def _fetch_live_results():
 def _fetch_classifica_live():
     """Scarica classifica Serie A aggiornata da API Football."""
     from league_mappings import FOOTBALL_NOME_MAP
+    season = LEAGUES["serie-a"]["season"]
     try:
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/standings?league=135&season=2025",
+            f"https://{FOOTBALL_API_HOST}/standings?league=135&season={season}",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -345,9 +347,10 @@ def _fetch_classifica_live():
 def _fetch_marcatori_live():
     """Scarica classifica marcatori Serie A da API Football."""
     from league_mappings import FOOTBALL_NOME_MAP
+    season = LEAGUES["serie-a"]["season"]
     try:
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/players/topscorers?league=135&season=2025",
+            f"https://{FOOTBALL_API_HOST}/players/topscorers?league=135&season={season}",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -385,9 +388,10 @@ def _fetch_infortunati_live():
     """Scarica infortunati ATTUALI da API Football (solo quelli non recuperati)."""
     global INFORTUNATI_LIVE
     from league_mappings import FOOTBALL_NOME_MAP
+    season = LEAGUES["serie-a"]["season"]
     try:
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/injuries?league=135&season=2025",
+            f"https://{FOOTBALL_API_HOST}/injuries?league=135&season={season}",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -505,9 +509,10 @@ def _fetch_risultati_stagione():
     """Scarica TUTTI i risultati della stagione da API Football."""
     global RISULTATI_STAGIONE_CACHE, RISULTATI_STAGIONE_TIME
     from league_mappings import FOOTBALL_NOME_MAP
+    season = LEAGUES["serie-a"]["season"]
     try:
         req = urllib.request.Request(
-            f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season=2025&status=FT-AET-PEN",
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season={season}&status=FT-AET-PEN",
             headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=20) as r:
@@ -577,13 +582,14 @@ def _fetch_player_stats(league_key):
     lid = LEAGUES.get(league_key, {}).get("id")
     if not lid:
         return
+    season = LEAGUES.get(league_key, {}).get("season", 2025)
     stats = {}
     pos_map = {"Goalkeeper": "P", "Defender": "D", "Midfielder": "C", "Attacker": "A"}
 
     for endpoint in ["topscorers", "topassists"]:
         try:
             req = urllib.request.Request(
-                f"https://{FOOTBALL_API_HOST}/players/{endpoint}?league={lid}&season=2025",
+                f"https://{FOOTBALL_API_HOST}/players/{endpoint}?league={lid}&season={season}",
                 headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
             )
             with urllib.request.urlopen(req, timeout=15) as r:

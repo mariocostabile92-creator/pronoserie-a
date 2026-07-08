@@ -42,57 +42,60 @@ def _build_schedina(giocate_raw, giornata_num="", data_str=""):
 @limiter.limit("10/minute")
 async def schedina_del_giorno(request: Request):
     """L'IA seleziona le 3-5 giocate piu' sicure della prossima giornata Serie A."""
-    from api_server import CAL_HARDCODED, LIVE_RESULTS_CACHE, genera_pronostico
+    from api_server import (CLASSIFICA_CACHE, FOOTBALL_API_KEY, FOOTBALL_API_HOST,
+                             LEAGUES, _fetch_league_data, _get_nome_map,
+                             genera_pronostico)
+    try:
+        if not CLASSIFICA_CACHE.get("serie-a"):
+            _fetch_league_data("serie-a")
 
-    # Trova la prossima giornata da giocare automaticamente
-    prossima_g = None
-    for g_num in range(31, 39):
-        cal = CAL_HARDCODED.get(g_num)
-        if not cal:
-            continue
-        tutte_giocate = True
-        if LIVE_RESULTS_CACHE:
-            for h, a in cal["partite"]:
-                trovata = False
-                for p in LIVE_RESULTS_CACHE:
-                    if (p["home"] == h and p["away"] == a) or (p["home"] == a and p["away"] == h):
-                        if p.get("status") in ("FT", "AET", "PEN"):
-                            trovata = True
-                            break
-                if not trovata:
-                    tutte_giocate = False
-                    break
-        else:
-            tutte_giocate = False
-        if not tutte_giocate:
-            prossima_g = g_num
-            break
+        season = LEAGUES["serie-a"]["season"]
+        req = urllib.request.Request(
+            f"https://{FOOTBALL_API_HOST}/fixtures?league=135&season={season}&next=10",
+            headers={"x-apisports-key": FOOTBALL_API_KEY, "User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode())
 
-    if prossima_g is None:
-        prossima_g = 38
+        if not data.get("response"):
+            return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": "Nessuna partita Serie A 2026-2027 disponibile"}
 
-    cal = CAL_HARDCODED.get(prossima_g, {})
-    partite = cal.get("partite", [])
-    giocate = []
+        nome_map = _get_nome_map("serie-a")
+        giornata_num = ""
+        data_str = ""
+        giocate = []
 
-    for home, away in partite:
-        try:
-            raw = genera_pronostico(home, away)
-            if raw.get("sicura"):
-                giocate.append({
-                    "home": home, "away": away,
-                    "tip": raw["suggerimento"],
-                    "tip_label": raw["sugg_label"],
-                    "prob": max(raw["prob_1"], raw["prob_x"], raw["prob_2"]),
-                    "quota": raw.get(f"quota_{raw['suggerimento'].lower()}", 0),
-                    "confidence": raw["confidence"],
-                    "over_under": ("Over 2.5 " + str(raw.get("over_25", 50)) + "%") if raw.get("over_25", 0) > 50 else ("Under 2.5 " + str(raw.get("under_25", 50)) + "%"),
-                    "goal": ("Goal Si " + str(raw.get("goal_si", 50)) + "%") if raw.get("goal_si", 0) > 50 else ("Goal No " + str(raw.get("goal_no", 50)) + "%"),
-                })
-        except Exception:
-            continue
+        for fix in data["response"][:10]:
+            teams = fix.get("teams", {})
+            lg = fix.get("league", {})
+            fixture = fix.get("fixture", {})
+            home = nome_map.get(teams.get("home", {}).get("name", "?"), teams.get("home", {}).get("name", "?"))
+            away = nome_map.get(teams.get("away", {}).get("name", "?"), teams.get("away", {}).get("name", "?"))
+            if not giornata_num:
+                giornata_num = lg.get("round", "").split(" - ")[-1] if " - " in lg.get("round", "") else "?"
+            if not data_str:
+                data_str = fixture.get("date", "")[:10]
+            try:
+                raw = genera_pronostico(home, away)
+                mp = max(raw.get("prob_1", 0), raw.get("prob_x", 0), raw.get("prob_2", 0))
+                conf = raw.get("confidence", 0)
+                if conf >= 0.30 or mp > 35:
+                    giocate.append({
+                        "home": home, "away": away,
+                        "tip": raw.get("suggerimento", "?"),
+                        "tip_label": raw.get("sugg_label", ""),
+                        "prob": mp,
+                        "quota": raw.get(f"quota_{raw.get('suggerimento','1').lower()}", 1.5),
+                        "confidence": conf,
+                        "over_under": ("Over 2.5 " + str(raw.get("over_25", 50)) + "%") if raw.get("over_25", 0) > 50 else ("Under 2.5 " + str(raw.get("under_25", 50)) + "%"),
+                        "goal": ("Goal Si " + str(raw.get("goal_si", 50)) + "%") if raw.get("goal_si", 0) > 50 else ("Goal No " + str(raw.get("goal_no", 50)) + "%"),
+                    })
+            except Exception:
+                continue
 
-    return _build_schedina(giocate, prossima_g, cal.get("data", ""))
+        return _build_schedina(giocate, giornata_num, data_str)
+    except Exception as e:
+        return {"giornata": "?", "giocate": [], "n_giocate": 0, "quota_totale": 0, "tipo": f"Errore: {e}"}
 
 
 # ─────────────────────────────
