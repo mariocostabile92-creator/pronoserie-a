@@ -413,6 +413,39 @@
       to{opacity:1;transform:translateY(0)}
     }
 
+
+    .support-banner{
+      margin:0 0 30px;
+      border:1px solid rgba(120,255,63,.38);
+      border-radius:30px;
+      padding:28px;
+      background:
+        radial-gradient(circle at top left, rgba(120,255,63,.18), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(29,155,255,.15), transparent 34%),
+        linear-gradient(135deg, rgba(7,20,38,.98), rgba(3,8,20,.96));
+      box-shadow:0 24px 70px rgba(0,0,0,.42);
+      animation:fadeUp .7s ease both;
+    }
+    .support-banner-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;align-items:center}
+    .support-kicker{display:inline-flex;width:fit-content;padding:7px 11px;border-radius:999px;background:rgba(120,255,63,.12);color:var(--green);font-size:12px;font-weight:900;border:1px solid rgba(120,255,63,.25);margin-bottom:14px}
+    .support-title{margin:0 0 12px;font-size:34px;line-height:1.05;letter-spacing:-1px}
+    .support-text{color:var(--muted);line-height:1.65;font-size:16px;margin:0}
+    .support-side{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:24px;padding:18px;text-align:center}
+    .support-side strong{display:block;font-size:18px;margin-bottom:8px}
+    .support-side p{margin:0 0 16px;color:var(--muted);line-height:1.5;font-size:14px}
+    .support-modal-toggle{display:none}
+    .support-modal{position:fixed;inset:0;z-index:9999;display:none;place-items:center;padding:20px;background:rgba(0,0,0,.76);backdrop-filter:blur(10px)}
+    .support-modal-toggle:checked + .support-modal{display:grid}
+    .support-modal-card{width:min(100%,760px);max-height:92vh;overflow:auto;border:1px solid rgba(120,255,63,.34);border-radius:30px;background:radial-gradient(circle at top left, rgba(120,255,63,.18), transparent 34%),linear-gradient(180deg,#071426,#030814);box-shadow:0 30px 90px rgba(0,0,0,.65);padding:28px;position:relative}
+    .modal-close{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:999px;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--text);background:rgba(255,255,255,.06);font-weight:900}
+    .qr-support{display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;align-items:center;margin-top:18px}
+    .qr-box{padding:14px;border-radius:24px;border:1px solid rgba(120,255,63,.36);background:rgba(255,255,255,.05);box-shadow:0 0 42px rgba(120,255,63,.12)}
+    .qr-box img{width:100%;display:block;border-radius:18px}
+    .support-actions-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+    .support-note{margin-top:16px;padding:14px;border-radius:16px;border:1px solid rgba(120,255,63,.20);background:rgba(120,255,63,.08);color:#d9ffe8;font-size:14px;line-height:1.55}
+    label.btn{cursor:pointer}
+    @media(max-width:900px){.support-banner-inner,.qr-support{grid-template-columns:1fr}.support-title{font-size:28px}.support-banner{padding:22px}.support-modal-card{padding:22px}}
+
     @media(max-width:1050px){
       .app-grid{grid-template-columns:repeat(2,1fr)}
     }
@@ -440,6 +473,50 @@
   <main class="page">
     <div class="wrap">
 
+      <input class="support-modal-toggle" type="checkbox" id="support-modal" />
+      <div class="support-modal">
+        <div class="support-modal-card">
+          <label class="modal-close" for="support-modal">×</label>
+          <span class="support-kicker">SOSTIENI MATCHIQ</span>
+          <h2 class="support-title">Aiuta MatchIQ a continuare a crescere.</h2>
+          <p class="support-text">
+            MatchIQ è un progetto indipendente che sto costruendo da zero. Ogni contributo, piccolo o grande,
+            verrà reinvestito nello sviluppo dell’ecosistema: infrastruttura, servizi, dati sportivi,
+            strumenti AI e nuove funzionalità.
+          </p>
+          <div class="qr-support">
+            <div class="qr-box"><img src="qr-revolut.jpeg" alt="QR Revolut MatchIQ"></div>
+            <div>
+              <strong style="font-size:22px;display:block;margin-bottom:10px">Scansiona il QR Revolut</strong>
+              <p class="support-text">Puoi sostenere il progetto direttamente tramite Revolut. Non esiste un importo minimo: conta il gesto, la fiducia e la volontà di contribuire alla crescita di MatchIQ.</p>
+              <div class="support-note">Se sei un’azienda, un professionista o una realtà sportiva, puoi anche scrivermi per valutare una collaborazione come partner o sponsor.</div>
+              <div class="support-actions-row">
+                <a class="btn whatsapp" href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20vorrei%20sostenere%20MatchIQ%20o%20parlare%20di%20una%20collaborazione." target="_blank" rel="noopener noreferrer">💬 Scrivimi su WhatsApp</a>
+                <a class="btn secondary" href="mailto:mario.costabile92@outlook.it?subject=Supporto%20o%20partnership%20MatchIQ">📩 Email</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <section class="support-banner">
+        <div class="support-banner-inner">
+          <div>
+            <span class="support-kicker">BUILD MATCHIQ TOGETHER</span>
+            <h2 class="support-title">Sostieni la crescita di MatchIQ.</h2>
+            <p class="support-text">Sto costruendo MatchIQ da zero, giorno dopo giorno. Se credi nel progetto e vuoi aiutarmi a mantenerlo attivo, migliorarlo e portarlo avanti, puoi sostenere l’ecosistema o diventare partner.</p>
+          </div>
+          <div class="support-side">
+            <strong>Vuoi far parte dell’inizio?</strong>
+            <p>Apri il QR Revolut oppure scrivimi per una collaborazione come sponsor o partner.</p>
+            <div class="actions" style="margin-top:0">
+              <label class="btn" for="support-modal">❤️ Sostieni il progetto</label>
+              <a class="btn secondary" href="mailto:mario.costabile92@outlook.it?subject=Partnership%20MatchIQ">🤝 Diventa Partner</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       <section class="hero">
         <img class="brand-logo" src="logo.png?v=2" alt="MatchIQ logo" />
         <h1 class="logo-text"><span>Match</span><i>I</i><span>Q</span></h1>
@@ -463,6 +540,7 @@
 
         <div class="actions">
           <a class="btn" href="#ecosystem">🚀 Entra nell’ecosistema</a>
+          <label class="btn secondary" for="support-modal">❤️ Sostieni il progetto</label>
           <a class="btn whatsapp" href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20MatchIQ%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank" rel="noopener noreferrer">💬 Scrivimi su WhatsApp</a>
         </div>
       </section>
@@ -629,7 +707,7 @@
               <div class="founder-title">FOUNDER & CEO</div>
               <strong>Mario Costabile</strong>
               <p>
-                Founder di MatchIQ. Negli ultimi anni ho progettato e sviluppato un ecosistema software dedicato al calcio,
+                Founder di MatchIQ. Negli ultimi mesi ho progettato e sviluppato un ecosistema software dedicato al calcio,
                 composto da piattaforme per l’analisi tattica, la gestione delle società sportive e la creazione di contenuti
                 tramite intelligenza artificiale.
               </p>
@@ -697,6 +775,7 @@
           <a href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20MatchIQ%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank" rel="noopener noreferrer">WhatsApp</a>
           <a href="https://www.linkedin.com/in/mariocostabile" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://www.instagram.com/matchiq.app?igsh=bmQ2ZHF1aGR6NzUy" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <label for="support-modal" style="color:var(--text);text-decoration:none;border:1px solid var(--line);padding:9px 13px;border-radius:999px;font-weight:800;cursor:pointer">Sostieni</label>
           <a href="mailto:mario.costabile92@outlook.it">Email</a>
         </div>
         <br />
