@@ -42,20 +42,50 @@ async function postAPI(ep, body) {
 function $(id){return document.getElementById(id)}
 
 // Carica configurazione dinamica (team IDs, leghe) dal backend
+function replaceArray(target, values){
+  if(Array.isArray(values) && values.length) target.splice(0, target.length, ...values);
+}
+
+function replaceObject(target, values){
+  if(values && typeof values === "object"){
+    Object.keys(target).forEach(k => delete target[k]);
+    Object.assign(target, values);
+  }
+}
+
+function refreshPronosticiSelects(){
+  const selH = $("sel-home");
+  const selA = $("sel-away");
+  if(!selH || !selA) return;
+  const prevH = selH.value;
+  const prevA = selA.value;
+  const html = opts();
+  selH.innerHTML = html;
+  selA.innerHTML = html;
+  if([...selH.options].some(o => o.value === prevH)) selH.value = prevH;
+  if([...selA.options].some(o => o.value === prevA)) selA.value = prevA;
+}
+
+function applyLeagueConfig(lg){
+  if(!lg || !lg.key) return;
+  if(lg.key === "serie-a")        { replaceArray(SQ, lg.teams);    replaceObject(TEAM_IDS, lg.team_ids); }
+  if(lg.key === "premier-league") { replaceArray(SQ_PL, lg.teams); replaceObject(TEAM_IDS_PL, lg.team_ids); }
+  if(lg.key === "la-liga")        { replaceArray(SQ_LL, lg.teams); replaceObject(TEAM_IDS_LL, lg.team_ids); }
+  if(lg.key === "bundesliga")     { replaceArray(SQ_BL, lg.teams); replaceObject(TEAM_IDS_BL, lg.team_ids); }
+  if(lg.key === "ligue-1")        { replaceArray(SQ_L1, lg.teams); replaceObject(TEAM_IDS_L1, lg.team_ids); }
+  if(lg.key === "mondiali-2026")  { replaceArray(SQ_WC, lg.teams); replaceObject(TEAM_IDS_WC, lg.team_ids); }
+}
+
 async function loadConfig(){
   try {
     const cfg = await fetchAPI("/api/config");
     if(!cfg) return;
     // Aggiorna le costanti globali con i dati del backend
-    if(cfg.serie_a_team_ids) Object.assign(TEAM_IDS, cfg.serie_a_team_ids);
+    if(cfg.serie_a_teams) replaceArray(SQ, cfg.serie_a_teams);
+    if(cfg.serie_a_team_ids) replaceObject(TEAM_IDS, cfg.serie_a_team_ids);
     if(cfg.leagues){
-      cfg.leagues.forEach(lg => {
-        if(lg.key === "premier-league" && lg.team_ids) Object.assign(TEAM_IDS_PL, lg.team_ids);
-        if(lg.key === "la-liga"        && lg.team_ids) Object.assign(TEAM_IDS_LL, lg.team_ids);
-        if(lg.key === "bundesliga"     && lg.team_ids) Object.assign(TEAM_IDS_BL, lg.team_ids);
-        if(lg.key === "ligue-1"        && lg.team_ids) Object.assign(TEAM_IDS_L1, lg.team_ids);
-        if(lg.key === "mondiali-2026"  && lg.team_ids) Object.assign(TEAM_IDS_WC, lg.team_ids);
-      });
+      cfg.leagues.forEach(applyLeagueConfig);
     }
+    refreshPronosticiSelects();
   } catch(e) { console.warn("loadConfig:", e); }
 }

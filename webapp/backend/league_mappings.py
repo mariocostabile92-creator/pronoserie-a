@@ -19,13 +19,17 @@ PL_NOME_MAP = {
     "Brentford": "Brentford", "Burnley": "Burnley",
     "Leeds United": "Leeds", "Leeds": "Leeds",
     "Sunderland": "Sunderland",
+    "Coventry City": "Coventry", "Coventry": "Coventry",
+    "Hull City": "Hull City",
+    "Ipswich Town": "Ipswich", "Ipswich": "Ipswich",
 }
 
 PL_TEAM_IDS = {
-    "Arsenal":42,"Aston Villa":66,"Bournemouth":35,"Brentford":55,"Brighton":51,
-    "Burnley":44,"Chelsea":49,"Crystal Palace":52,"Everton":45,"Fulham":36,
-    "Leeds":63,"Liverpool":40,"Man City":50,"Man United":33,"Newcastle":34,
-    "Nott. Forest":65,"Sunderland":746,"Tottenham":47,"West Ham":48,"Wolves":39,
+    "Arsenal":42,"Coventry":1346,"Hull City":64,"Man United":33,
+    "Everton":45,"Crystal Palace":52,"Ipswich":57,"Sunderland":746,
+    "Nott. Forest":65,"Leeds":63,"Brentford":55,"Tottenham":47,
+    "Man City":50,"Bournemouth":35,"Brighton":51,"Aston Villa":66,
+    "Newcastle":34,"Liverpool":40,"Fulham":36,"Chelsea":49,
 }
 
 LL_NOME_MAP = {
@@ -49,14 +53,17 @@ LL_NOME_MAP = {
     "Levante UD": "Levante", "Levante": "Levante",
     "Real Oviedo": "Oviedo", "Oviedo": "Oviedo",
     "Elche CF": "Elche", "Elche": "Elche",
+    "Malaga CF": "Malaga", "Malaga": "Malaga",
+    "Deportivo La Coruna": "Deportivo La Coruna", "Deportivo La CoruÃ±a": "Deportivo La Coruna",
+    "Racing Santander": "Racing Santander", "Racing de Santander": "Racing Santander",
 }
 
 LL_TEAM_IDS = {
-    "Alaves":542,"Athletic Club":531,"Atletico Madrid":530,"Barcelona":529,
-    "Celta Vigo":538,"Elche":797,"Espanyol":540,"Getafe":546,"Girona":547,
-    "Levante":539,"Mallorca":798,"Osasuna":727,"Oviedo":718,
-    "Rayo Vallecano":728,"Real Betis":543,"Real Madrid":541,
-    "Real Sociedad":548,"Sevilla":536,"Valencia":532,"Villarreal":533,
+    "Barcelona":529,"Athletic Club":531,"Atletico Madrid":530,"Malaga":535,
+    "Valencia":532,"Real Betis":543,"Sevilla":536,"Rayo Vallecano":728,
+    "Celta Vigo":538,"Osasuna":727,"Espanyol":540,"Levante":539,
+    "Real Madrid":541,"Real Sociedad":548,"Alaves":542,"Getafe":546,
+    "Deportivo La Coruna":544,"Elche":797,"Racing Santander":545,"Villarreal":533,
 }
 
 BL_NOME_MAP = {
@@ -73,15 +80,18 @@ BL_NOME_MAP = {
     "Eintracht Frankfurt": "Eintracht Frankfurt", "RB Leipzig": "RB Leipzig",
     "Union Berlin": "Union Berlin", "Werder Bremen": "Werder Bremen",
     "Hamburger SV": "Hamburger SV",
+    "SC Paderborn 07": "SC Paderborn 07", "SC Paderborn": "SC Paderborn 07",
+    "FC Schalke 04": "FC Schalke 04", "Schalke 04": "FC Schalke 04", "Schalke": "FC Schalke 04",
+    "SV Elversberg": "SV Elversberg", "Elversberg": "SV Elversberg",
 }
 
 BL_TEAM_IDS = {
-    "Heidenheim":180,"1. FC Koln":192,"Hoffenheim":167,
-    "Bayer Leverkusen":168,"Bayern Munich":157,"Borussia Dortmund":165,
-    "Monchengladbach":163,"Eintracht Frankfurt":169,"Augsburg":170,
-    "St Pauli":186,"Mainz":164,"Hamburger SV":175,"RB Leipzig":173,
-    "Freiburg":160,"Union Berlin":182,"Stuttgart":172,"Wolfsburg":161,
-    "Werder Bremen":162,
+    "Bayern Munich":157,"Stuttgart":172,"Freiburg":160,"Werder Bremen":162,
+    "Mainz":164,"SC Paderborn 07":185,"Borussia Dortmund":165,
+    "Hamburger SV":175,"Augsburg":170,"FC Schalke 04":174,
+    "RB Leipzig":173,"Monchengladbach":163,"Union Berlin":182,
+    "Eintracht Frankfurt":169,"1. FC Koln":192,"Hoffenheim":167,
+    "SV Elversberg":1854,"Bayer Leverkusen":168,
 }
 
 L1_NOME_MAP = {
@@ -103,27 +113,29 @@ L1_NOME_MAP = {
     "FC Lorient": "Lorient", "Lorient": "Lorient",
     "FC Metz": "Metz", "Metz": "Metz",
     "Paris FC": "Paris FC",
+    "ESTAC Troyes": "Estac Troyes", "Estac Troyes": "Estac Troyes", "Troyes": "Estac Troyes",
+    "Le Mans": "Le Mans", "Le Mans FC": "Le Mans",
 }
 
 L1_TEAM_IDS = {
-    "Paris Saint Germain": 85,
-    "Marseille": 81,
-    "Lyon": 80,
-    "Monaco": 91,
-    "Lille": 79,
-    "Rennes": 94,
-    "Lens": 116,
-    "Nice": 84,
-    "Nantes": 83,
-    "Stade Brestois 29": 130,
-    "Strasbourg": 95,
-    "Toulouse": 96,
-    "Le Havre": 1074,
-    "Auxerre": 110,
     "Angers": 76,
+    "Lille": 79,
+    "Marseille": 81,
+    "Strasbourg": 95,
+    "Nice": 84,
     "Lorient": 82,
-    "Metz": 112,
+    "Paris Saint Germain": 85,
+    "Rennes": 94,
+    "Toulouse": 96,
+    "Lyon": 80,
+    "Estac Troyes": 98,
     "Paris FC": 111,
+    "Le Havre": 1074,
+    "Monaco": 91,
+    "Lens": 116,
+    "Auxerre": 110,
+    "Le Mans": 109,
+    "Stade Brestois 29": 130,
 }
 
 WC_NOME_MAP = {
