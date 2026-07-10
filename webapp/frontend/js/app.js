@@ -83,21 +83,23 @@ function leagueTabs(){
 
 function switchLeague(l){currentLeague=l;navigate()}
 
-// Carica squadre attive live per competizioni europee
+// Carica squadre attive live per competizioni a eliminazione o torneo in corso
 async function loadActiveTeams(){
-  if(!["champions-league","europa-league","conference-league"].includes(currentLeague)) return;
+  if(!["champions-league","europa-league","conference-league","mondiali-2026"].includes(currentLeague)) return;
   try{
     const d = await fetchAPI("/api/"+currentLeague+"/squadre-attive");
     if(d && d.squadre && d.squadre.length>0){
       if(currentLeague==="champions-league") window._SQ_UCL_LIVE = d.squadre;
       else if(currentLeague==="europa-league") window._SQ_UEL_LIVE = d.squadre;
-      else window._SQ_UECL_LIVE = d.squadre;
+      else if(currentLeague==="conference-league") window._SQ_UECL_LIVE = d.squadre;
+      else if(currentLeague==="mondiali-2026") SQ_WC.splice(0, SQ_WC.length, ...d.squadre);
       const selH = document.getElementById("sel-home");
       const selA = document.getElementById("sel-away");
       if(selH && selA){
         const opts = d.squadre.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
         selH.innerHTML = opts;
         selA.innerHTML = opts;
+        if(d.squadre.length > 1) selA.value = d.squadre[1];
       }
     }
   }catch(e){}
@@ -136,7 +138,7 @@ async function navigate(){
   }catch(e){app.innerHTML='<div class="container card" style="color:var(--red)">Errore: '+e.message+'</div>'}
   const ft = $("app-footer"); if(ft) ft.style.display = "block";
   if(hash==="squadre" && userPlan==="pro") setTimeout(()=>loadSq(getSQ()[0]),200);
-  if(hash==="pronostici" && ["champions-league","europa-league","conference-league"].includes(currentLeague)) setTimeout(()=>loadActiveTeams(),500);
+  if(hash==="pronostici" && ["champions-league","europa-league","conference-league","mondiali-2026"].includes(currentLeague)) setTimeout(()=>loadActiveTeams(),500);
   if(hash==="home"){
     setTimeout(()=>loadPartiteOggi(),500);
     setTimeout(()=>loadPartiteEuro(),1500);

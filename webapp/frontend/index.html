@@ -140,15 +140,16 @@ let currentLeague = "serie-a";
 function refreshPronosticiSelects(){const selH=document.getElementById("sel-home");const selA=document.getElementById("sel-away");if(!selH||!selA)return;const prevH=selH.value;const prevA=selA.value;const html=opts();selH.innerHTML=html;selA.innerHTML=html;if([...selH.options].some(o=>o.value===prevH))selH.value=prevH;if([...selA.options].some(o=>o.value===prevA))selA.value=prevA}
 function badge(name,size){size=size||20;const all={...TEAM_IDS,...TEAM_IDS_PL,...TEAM_IDS_LL,...TEAM_IDS_BL,...TEAM_IDS_L1,...TEAM_IDS_UCL,...TEAM_IDS_UEL,...TEAM_IDS_UECL,...TEAM_IDS_WC,...EXTRA_TEAM_IDS};const id=all[name]||all[TEAM_ALIASES[name]];if(!id){const initials=String(name||'?').split(/\s+/).filter(Boolean).map(w=>w[0]).join('').slice(0,3).toUpperCase();return `<span title="${name}" style="display:inline-flex;width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px;border-radius:50%;align-items:center;justify-content:center;background:#1f3460;border:1px solid #2f5c9d;color:#e8eaf6;font-size:${Math.max(8,Math.round(size*.42))}px;font-weight:800;line-height:1">${initials}</span>`}return `<img src="https://media.api-sports.io/football/teams/${id}.png" alt="${name}" style="width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px">`}
 function getSQ(){return currentLeague==="premier-league"?SQ_PL:currentLeague==="la-liga"?SQ_LL:currentLeague==="bundesliga"?SQ_BL:currentLeague==="ligue-1"?SQ_L1:currentLeague==="champions-league"?SQ_UCL:currentLeague==="europa-league"?SQ_UEL:currentLeague==="conference-league"?SQ_UECL:currentLeague==="mondiali-2026"?SQ_WC:SQ}
-// Carica squadre attive live per competizioni europee
+// Carica squadre attive live per competizioni a eliminazione o torneo in corso
 async function loadActiveTeams(){
-  if(!["champions-league","europa-league","conference-league"].includes(currentLeague)) return;
+  if(!["champions-league","europa-league","conference-league","mondiali-2026"].includes(currentLeague)) return;
   try{
     const d = await fetchAPI("/api/"+currentLeague+"/squadre-attive");
     if(d && d.squadre && d.squadre.length>0){
       if(currentLeague==="champions-league") window._SQ_UCL_LIVE = d.squadre;
       else if(currentLeague==="europa-league") window._SQ_UEL_LIVE = d.squadre;
-      else window._SQ_UECL_LIVE = d.squadre;
+      else if(currentLeague==="conference-league") window._SQ_UECL_LIVE = d.squadre;
+      else if(currentLeague==="mondiali-2026") SQ_WC = d.squadre;
       // Aggiorna i dropdown
       const selH = document.getElementById("sel-home");
       const selA = document.getElementById("sel-away");
@@ -156,6 +157,7 @@ async function loadActiveTeams(){
         const opts = d.squadre.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
         selH.innerHTML = opts;
         selA.innerHTML = opts;
+        if(d.squadre.length > 1) selA.value = d.squadre[1];
       }
     }
   }catch(e){}
@@ -2324,7 +2326,7 @@ async function navigate(){
   const ft=$("app-footer");if(ft)ft.style.display="block";
   if(hash==="squadre"&&userPlan==="pro")setTimeout(()=>loadSq(getSQ()[0]),200);
   // Carica squadre attive per competizioni europee
-  if(hash==="pronostici"&&["champions-league","europa-league","conference-league"].includes(currentLeague))setTimeout(()=>loadActiveTeams(),500);
+  if(hash==="pronostici"&&["champions-league","europa-league","conference-league","mondiali-2026"].includes(currentLeague))setTimeout(()=>loadActiveTeams(),500);
   if(hash==="home"){
     setTimeout(()=>loadPartiteOggi(),500);
     setTimeout(()=>loadPartiteEuro(),1500);
