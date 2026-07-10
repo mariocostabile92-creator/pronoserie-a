@@ -18,6 +18,17 @@ from api_auth import get_optional_user
 router = APIRouter(prefix="/api", tags=["tracking"])
 limiter = Limiter(key_func=get_remote_address)
 
+ACCURACY_BASELINE_2526 = {
+    "partite": 299,
+    "ok_1x2": 164,
+    "ok_ou": 0,
+    "ok_goal": 0,
+    "tot_alta": 49,
+    "ok_alta": 33,
+    "acc_ou": 0,
+    "acc_goal": 0,
+}
+
 
 # ─────────────────────────────
 # ACCURATEZZA GLOBALE SISTEMA
@@ -153,16 +164,25 @@ async def accuratezza(request: Request):
     ok_g_all = sum(r["ok_goal"] for r in risultati)
     ok_alta_all = sum(r["ok_alta"] for r in risultati)
     tot_alta_all = sum(r["tot_alta"] for r in risultati)
+    base = ACCURACY_BASELINE_2526
+    combined_partite = base["partite"] + tot_all
+    combined_ok_1x2 = base["ok_1x2"] + ok_all
+    combined_tot_alta = base["tot_alta"] + tot_alta_all
+    combined_ok_alta = base["ok_alta"] + ok_alta_all
 
     return {
         "giornate": risultati,
         "totale": {
-            "partite": tot_all,
-            "acc_1x2": round(ok_all / tot_all * 100, 1) if tot_all > 0 else 0,
-            "acc_ou": round(ok_ou_all / tot_all * 100, 1) if tot_all > 0 else 0,
-            "acc_goal": round(ok_g_all / tot_all * 100, 1) if tot_all > 0 else 0,
-            "acc_alta": round(ok_alta_all / tot_alta_all * 100, 1) if tot_alta_all > 0 else 0,
-            "tot_alta": tot_alta_all,
+            "partite": combined_partite,
+            "partite_storiche": base["partite"],
+            "partite_nuove": tot_all,
+            "acc_1x2": round(combined_ok_1x2 / combined_partite * 100, 1) if combined_partite > 0 else 0,
+            "acc_ou": round(ok_ou_all / tot_all * 100, 1) if tot_all > 0 else base["acc_ou"],
+            "acc_goal": round(ok_g_all / tot_all * 100, 1) if tot_all > 0 else base["acc_goal"],
+            "acc_alta": round(combined_ok_alta / combined_tot_alta * 100, 1) if combined_tot_alta > 0 else 0,
+            "tot_alta": combined_tot_alta,
+            "tot_alta_nuove": tot_alta_all,
+            "fonte": "storico_2025_2026_piu_2026_2027",
         },
     }
 
@@ -433,8 +453,13 @@ async def stats_summary(request: Request):
                         all_ok_alta += 1
                 all_tot += 1
 
-    acc_1x2 = round(all_ok_1x2 / all_tot * 100, 1) if all_tot > 0 else 54.8
-    acc_alta = round(all_ok_alta / all_tot_alta * 100, 1) if all_tot_alta > 0 else 67.3
+    base = ACCURACY_BASELINE_2526
+    combined_tot = base["partite"] + all_tot
+    combined_ok = base["ok_1x2"] + all_ok_1x2
+    combined_tot_alta = base["tot_alta"] + all_tot_alta
+    combined_ok_alta = base["ok_alta"] + all_ok_alta
+    acc_1x2 = round(combined_ok / combined_tot * 100, 1) if combined_tot > 0 else 54.8
+    acc_alta = round(combined_ok_alta / combined_tot_alta * 100, 1) if combined_tot_alta > 0 else 67.3
 
     # ── Conta fonti dati attive ──
     from scraping_service import ODDS_CACHE, LIVE_FORMAZIONI
@@ -453,13 +478,15 @@ async def stats_summary(request: Request):
         "partite_stagione": total_stagione,
         "partite_csv": total_csv,
         "accuratezza_1x2": acc_1x2,
-        "partite_verificate": all_tot,
+        "partite_verificate": combined_tot,
+        "partite_verificate_2026_2027": all_tot,
         "accuratezza_alta_confidenza": acc_alta,
-        "pronostici_alta_tot": all_tot_alta,
+        "pronostici_alta_tot": combined_tot_alta,
+        "pronostici_alta_2026_2027": all_tot_alta,
         "fonti_dati": fonti,
         "competizioni_coperte": competizioni_coperte,
         "ultimo_aggiornamento": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC"),
         # Metadati per trasparenza
-        "fonte": "calcolato_live" if all_tot > 0 else "fallback_storico",
-        "note": "Accuratezza calcolata sulle ultime 3 giornate per campionato. Totale partite include storico CSV + stagione corrente." if all_tot > 0 else "Dati in caricamento. Valori calcolati automaticamente alla prossima chiamata.",
+        "fonte": "storico_2025_2026_piu_live" if all_tot > 0 else "storico_2025_2026",
+        "note": "Accuratezza cumulata: storico 2025/2026 piu risultati 2026/2027 verificati." if all_tot > 0 else "Baseline storica 2025/2026. I dati 2026/2027 si sommeranno quando iniziera la stagione.",
     }

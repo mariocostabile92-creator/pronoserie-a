@@ -5,7 +5,7 @@ async function pageAccuratezza(){
   if(!data || !data.giornate) return '<div class="container"><div class="card" style="text-align:center;padding:32px"><div class="spinner"></div><p style="color:var(--muted);margin-top:12px">Calcolo accuratezza in corso... Potrebbe richiedere qualche secondo.</p></div></div>';
   const t = data.totale || {};
   let html = '<div class="container">';
-  html += '<h1>Dashboard Accuratezza</h1><p class="sub">Pronostici IA vs Risultati Reali - Aggiornamento automatico</p>';
+  html += '<h1>Dashboard Accuratezza</h1><p class="sub">Pronostici IA vs Risultati Reali - storico 2025/2026 + nuova stagione</p>';
 
   html += `<div class="grid3" style="margin-bottom:16px">
     <div class="card" style="text-align:center;padding:16px;border-color:var(--green)">
@@ -55,7 +55,7 @@ async function pageAccuratezza(){
   });
 
   html += `<div class="card" style="text-align:center;padding:16px;background:linear-gradient(135deg,#0d3b1e,#162447);border-color:var(--green)">
-    <p style="color:var(--text);font-size:.9rem">Questi risultati sono <strong>calcolati in tempo reale</strong> confrontando i pronostici dell'IA con i risultati effettivi delle partite.</p>
+    <p style="color:var(--text);font-size:.9rem">Questi risultati conservano lo <strong>storico 2025/2026</strong> e si aggiorneranno sommando le partite verificate della stagione 2026/2027.</p>
     <a href="#pronostici" class="btn btn-green" style="margin-top:12px">Calcola il prossimo pronostico</a>
   </div>`;
 
