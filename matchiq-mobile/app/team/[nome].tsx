@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Image } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ThemedText } from '../../components/ThemedText';
@@ -7,6 +7,7 @@ import { PlayerRow } from '../../components/PlayerRow';
 import { PitchView } from '../../components/PitchView';
 import { Colors, Spacing, BorderRadius } from '../../constants/theme';
 import { getSquadra } from '../../services/api';
+import { getTeamBadgeUrl } from '../../constants/teamIds';
 
 // ─── Tipi ────────────────────────────────────────────────────────────────────
 
@@ -90,6 +91,7 @@ export default function TeamScreen() {
   const nomiTitolari = new Set(
     (dati?.formazione?.titolari ?? []).map((n) => n.toLowerCase())
   );
+  const badgeUrl = dati ? getTeamBadgeUrl(dati.nome || (nome as string)) : null;
 
   if (loading) {
     return (
@@ -119,6 +121,9 @@ export default function TeamScreen() {
     >
       {/* Intestazione squadra */}
       <ThemedView style={styles.header}>
+        {badgeUrl ? (
+          <Image source={{ uri: badgeUrl }} style={styles.teamBadge} resizeMode="contain" />
+        ) : null}
         <ThemedText type="h1" style={styles.nomeSquadra}>{dati.nome}</ThemedText>
         <View style={styles.allenatoreBadge}>
           <ThemedText type="small" color="muted">Allenatore:</ThemedText>
@@ -305,9 +310,16 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     paddingTop: Spacing.xl,
     gap: Spacing.xs,
+    alignItems: 'center',
+  },
+  teamBadge: {
+    width: 72,
+    height: 72,
+    marginBottom: Spacing.sm,
   },
   nomeSquadra: {
     color: Colors.text,
+    textAlign: 'center',
   },
   allenatoreBadge: {
     flexDirection: 'row',

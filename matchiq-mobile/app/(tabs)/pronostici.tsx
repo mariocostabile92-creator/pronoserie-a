@@ -20,47 +20,59 @@ import { WebBtn } from '../../components/WebBtn';
 import { Colors } from '../../constants/theme';
 import { useAuth } from '../../contexts/AuthContext';
 import { getPrediction, savePrediction } from '../../services/api';
-import { getTeamBadgeUrl } from '../../constants/teamIds';
+import { getTeamBadgeUrl, LEAGUE_TEAM_NAMES } from '../../constants/teamIds';
 
 // ===== Dati squadre per lega =====
 const LEAGUES: { key: string; label: string; color: string; teams: string[] }[] = [
   {
     key: 'serie-a', label: 'ITA', color: Colors.green,
-    teams: ['Inter','Milan','Napoli','Como','Juventus','Roma','Atalanta','Lazio','Bologna','Sassuolo','Udinese','Parma','Genoa','Torino','Cagliari','Fiorentina','Cremonese','Lecce','Verona','Pisa'],
+    teams: LEAGUE_TEAM_NAMES['serie-a'],
   },
   {
     key: 'premier-league', label: 'ENG', color: Colors.accent,
-    teams: ['Arsenal','Aston Villa','Bournemouth','Brentford','Brighton','Burnley','Chelsea','Crystal Palace','Everton','Fulham','Leeds','Liverpool','Man City','Man United','Newcastle','Nott. Forest','Sunderland','Tottenham','West Ham','Wolves'],
+    teams: LEAGUE_TEAM_NAMES['premier-league'],
   },
   {
     key: 'la-liga', label: 'ESP', color: Colors.yellow,
-    teams: ['Alaves','Athletic Club','Atletico Madrid','Barcelona','Celta Vigo','Espanyol','Getafe','Girona','Mallorca','Osasuna','Rayo Vallecano','Real Betis','Real Madrid','Real Sociedad','Sevilla','Valencia','Villarreal'],
+    teams: LEAGUE_TEAM_NAMES['la-liga'],
   },
   {
     key: 'bundesliga', label: 'GER', color: '#d50000',
-    teams: ['Augsburg','Bayern Munich','Bayer Leverkusen','Borussia Dortmund','Eintracht Frankfurt','Freiburg','Heidenheim','Hoffenheim','Mainz','Monchengladbach','RB Leipzig','Stuttgart','Union Berlin','Werder Bremen','Wolfsburg'],
+    teams: LEAGUE_TEAM_NAMES.bundesliga,
   },
   {
     key: 'ligue-1', label: 'FRA', color: '#003189',
-    teams: ['Angers','Auxerre','Le Havre','Lens','Lille','Lyon','Marseille','Monaco','Nantes','Nice','Paris Saint Germain','Rennes','Stade Brestois 29','Strasbourg','Toulouse'],
+    teams: LEAGUE_TEAM_NAMES['ligue-1'],
   },
   {
     key: 'champions-league', label: 'UCL', color: '#1a237e',
-    teams: ['Ajax','Arsenal','Atalanta','Barcelona','Bayer Leverkusen','Bayern Munchen','Benfica','Borussia Dortmund','Chelsea','Inter','Juventus','Liverpool','Manchester City','Napoli','Newcastle','PSV Eindhoven','Paris Saint Germain','Real Madrid','Sporting CP','Tottenham','Villarreal'],
+    teams: LEAGUE_TEAM_NAMES['champions-league'],
   },
   {
     key: 'europa-league', label: 'UEL', color: '#ff6f00',
-    teams: ['AS Roma','Aston Villa','Bologna','Celtic','FC Porto','Fenerbahce','Feyenoord','Lille','Lyon','Nice','Nottingham Forest','Real Betis','Rangers','VfB Stuttgart'],
+    teams: LEAGUE_TEAM_NAMES['europa-league'],
   },
   {
     key: 'conference-league', label: 'UECL', color: '#4caf50',
-    teams: ['AZ Alkmaar','Crystal Palace','Fiorentina','Jagiellonia','Lech Poznan','Rapid Vienna','Slovan Bratislava','Sparta Praha'],
+    teams: LEAGUE_TEAM_NAMES['conference-league'],
   },
   {
-    key: 'mondiali-2026', label: '🏆WC', color: Colors.yellow,
-    teams: ['USA','Messico','Canada','Brasile','Argentina','Uruguay','Colombia','Francia','Inghilterra','Germania','Spagna','Portogallo','Olanda','Belgio','Croazia','Giappone','Corea del Sud','Marocco','Senegal','Tunisia'],
+    key: 'mondiali-2026', label: 'WC', color: Colors.yellow,
+    teams: LEAGUE_TEAM_NAMES['mondiali-2026'],
   },
 ];
+
+function toPercent(value: any): number {
+  const n = Number(value || 0);
+  if (!Number.isFinite(n)) return 0;
+  return Math.round(n <= 1 ? n * 100 : n);
+}
+
+function bestPick(result: any, p1: number, px: number, p2: number): '1' | 'X' | '2' {
+  const pick = result?.suggerimento || result?.result?.['1x2'];
+  if (pick === '1' || pick === 'X' || pick === '2') return pick;
+  return p1 >= px && p1 >= p2 ? '1' : px >= p1 && px >= p2 ? 'X' : '2';
+}
 
 export default function PronosticiScreen() {
   const { user, token } = useAuth();
@@ -104,11 +116,11 @@ export default function PronosticiScreen() {
         league: league.key,
         home: teams[homeIdx],
         away: teams[awayIdx],
-        pronostico: result.result?.['1x2'] || '',
-        prob: result.prob_1,
+        pronostico: best,
+        prob: Math.max(prob1, probX, prob2),
         confidence: result.confidence_label,
-        over_under: result.result?.over,
-        goal: result.result?.goal,
+        over_under: overUnderText,
+        goal: goalText,
       });
       setSaved(true);
       Alert.alert('Salvato', 'Pronostico salvato nel tuo profilo!');
@@ -117,12 +129,18 @@ export default function PronosticiScreen() {
     }
   };
 
-  const prob1 = result ? Math.round((result.prob_1 || 0) * 100) : 0;
-  const probX = result ? Math.round((result.prob_x || 0) * 100) : 0;
-  const prob2 = result ? Math.round((result.prob_2 || 0) * 100) : 0;
-  const best = prob1 >= probX && prob1 >= prob2 ? '1' : probX >= prob1 && probX >= prob2 ? 'X' : '2';
+  const prob1 = result ? toPercent(result.prob_1) : 0;
+  const probX = result ? toPercent(result.prob_x) : 0;
+  const prob2 = result ? toPercent(result.prob_2) : 0;
+  const best = result ? bestPick(result, prob1, probX, prob2) : '1';
   const confLabel = result?.confidence_label;
   const confColor = confLabel === 'Alta' ? Colors.green : confLabel === 'Media' ? Colors.yellow : Colors.muted;
+  const overUnderText = result
+    ? result.result?.over || (toPercent(result.over_25) >= toPercent(result.under_25) ? 'Over 2.5' : 'Under 2.5')
+    : '';
+  const goalText = result
+    ? result.result?.goal || (toPercent(result.goal_si) >= toPercent(result.goal_no) ? 'Goal Si' : 'Goal No')
+    : '';
 
   return (
     <View style={styles.container}>
@@ -236,9 +254,9 @@ export default function PronosticiScreen() {
               {/* BOX 1 X 2 */}
               <View style={styles.box1x2Row}>
                 {[
-                  { label: '1', prob: prob1, win: result.result?.['1x2'] === '1' },
-                  { label: 'X', prob: probX, win: result.result?.['1x2'] === 'X' },
-                  { label: '2', prob: prob2, win: result.result?.['1x2'] === '2' },
+                  { label: '1', prob: prob1, win: best === '1' },
+                  { label: 'X', prob: probX, win: best === 'X' },
+                  { label: '2', prob: prob2, win: best === '2' },
                 ].map(({ label, prob, win }) => (
                   <View key={label} style={[styles.box1x2, win && styles.box1x2Best]}>
                     <Text style={styles.box1x2Label}>{label}</Text>
@@ -262,22 +280,22 @@ export default function PronosticiScreen() {
                 <View style={styles.dettagliPro}>
                   <View style={styles.dettaglioRow}>
                     <Text style={styles.dettaglioLabel}>Over/Under 2.5</Text>
-                    <Text style={styles.dettaglioValore}>{result.result?.over || '—'}</Text>
+                    <Text style={styles.dettaglioValore}>{overUnderText || '-'}</Text>
                   </View>
                   <View style={styles.dettaglioRow}>
                     <Text style={styles.dettaglioLabel}>Goal/NoGoal</Text>
-                    <Text style={styles.dettaglioValore}>{result.result?.goal || '—'}</Text>
+                    <Text style={styles.dettaglioValore}>{goalText || '-'}</Text>
                   </View>
                   {result.over_25 !== undefined && (
                     <View style={styles.dettaglioRow}>
                       <Text style={styles.dettaglioLabel}>P(Over 2.5)</Text>
-                      <Text style={styles.dettaglioValore}>{Math.round(result.over_25 * 100)}%</Text>
+                      <Text style={styles.dettaglioValore}>{toPercent(result.over_25)}%</Text>
                     </View>
                   )}
                   {result.goal_si !== undefined && (
                     <View style={styles.dettaglioRow}>
-                      <Text style={styles.dettaglioLabel}>P(Goal Sì)</Text>
-                      <Text style={styles.dettaglioValore}>{Math.round(result.goal_si * 100)}%</Text>
+                      <Text style={styles.dettaglioLabel}>P(Goal Si)</Text>
+                      <Text style={styles.dettaglioValore}>{toPercent(result.goal_si)}%</Text>
                     </View>
                   )}
                   {result.suggerimento && (

@@ -96,6 +96,46 @@ export const TEAM_IDS_WC: Record<string, number> = {
   Curacao: 2382,
 };
 
+export const LEAGUE_TEAM_NAMES: Record<string, string[]> = {
+  'serie-a': Object.keys(TEAM_IDS),
+  'premier-league': Object.keys(TEAM_IDS_PL),
+  'la-liga': Object.keys(TEAM_IDS_LL),
+  'bundesliga': Object.keys(TEAM_IDS_BL),
+  'ligue-1': Object.keys(TEAM_IDS_L1),
+  'champions-league': Object.keys(TEAM_IDS_UCL),
+  'europa-league': Object.keys(TEAM_IDS_UEL),
+  'conference-league': Object.keys(TEAM_IDS_UECL),
+  'mondiali-2026': Object.keys(TEAM_IDS_WC),
+};
+
+const TEAM_ALIASES: Record<string, string> = {
+  'AS Roma': 'Roma',
+  'Bayern Munchen': 'Bayern Munich',
+  'Manchester City': 'Man City',
+  'Manchester United': 'Man United',
+  'Nottingham Forest': 'Nott. Forest',
+  'Paris SG': 'Paris Saint Germain',
+  PSG: 'Paris Saint Germain',
+};
+
+function normalizeTeamName(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function getTeamId(name: string): number | null {
+  const clean = normalizeTeamName(name);
+  const alias = TEAM_ALIASES[clean] || clean;
+  if (ALL_TEAM_IDS[alias]) return ALL_TEAM_IDS[alias];
+
+  const lower = alias.toLowerCase();
+  const match = Object.entries(ALL_TEAM_IDS).find(([team]) => normalizeTeamName(team).toLowerCase() === lower);
+  return match ? match[1] : null;
+}
+
 /**
  * Mappa unificata di TUTTI i TEAM_IDS (come nella webapp).
  * Identica alla funzione badge() di index.html:
@@ -120,7 +160,7 @@ export const ALL_TEAM_IDS: Record<string, number> = {
  * Restituisce null se la squadra non è nei TEAM_IDS.
  */
 export function getTeamBadgeUrl(name: string): string | null {
-  const id = ALL_TEAM_IDS[name];
+  const id = getTeamId(name);
   if (!id) return null;
   return `https://media.api-sports.io/football/teams/${id}.png`;
 }
