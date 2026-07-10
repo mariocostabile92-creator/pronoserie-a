@@ -4,12 +4,15 @@ async function pageSquadre(){
   if(currentLeague==="champions-league"||currentLeague==="europa-league"||currentLeague==="conference-league") currentLeague="serie-a";
   const leagueLabel = currentLeague==="premier-league"?"Campionato Inglese":currentLeague==="la-liga"?"Campionato Spagnolo":currentLeague==="bundesliga"?"Bundesliga":currentLeague==="ligue-1"?"Campionato Francese":"Campionato Italiano";
   const squadreTabs = `<div style="display:flex;gap:0;margin-bottom:16px"><button style="flex:1;padding:8px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;border-radius:10px 0 0 10px;${currentLeague==='serie-a'?'background:var(--green);color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('serie-a')">ITA</button><button style="flex:1;padding:8px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;${currentLeague==='premier-league'?'background:var(--accent);color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('premier-league')">ENG</button><button style="flex:1;padding:8px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;${currentLeague==='la-liga'?'background:#f39c12;color:#000':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('la-liga')">ESP</button><button style="flex:1;padding:8px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;${currentLeague==='bundesliga'?'background:#d50000;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('bundesliga')">GER</button><button style="flex:1;padding:8px;border:none;cursor:pointer;font-weight:700;font-size:.75rem;border-radius:0 10px 10px 0;${currentLeague==='ligue-1'?'background:#003189;color:#fff':'background:#1f3460;color:var(--muted)'}" onclick="switchLeague('ligue-1')">FRA</button></div>`;
-  if(userPlan!=="pro") return `<div class="container">${squadreTabs}<div class="lock-msg card"><h2>Squadre ${leagueLabel}</h2><p style="margin:16px 0">Rose complete, probabili formazioni e infortunati live sono disponibili per gli utenti Pro</p><button class="btn btn-green" onclick="abbonarPro()">Abbonati a Pro  -  9.99&euro;/mese</button></div></div>`;
   return `<div class="container">
     ${squadreTabs}
-    <h1>Squadre ${leagueLabel}</h1><p class="sub">Rose, formazioni e infortunati live</p>
-    <select id="sel-sq" onchange="loadSq(this.value)" style="margin-bottom:16px">${opts()}</select>
-    <div id="sq-det"><div class="spinner"></div></div>
+    <div class="card" style="text-align:center;padding:40px 24px">
+      <div style="font-size:2.4rem;margin-bottom:10px">&#9203;</div>
+      <h1>Squadre ${leagueLabel}</h1>
+      <h2 style="color:var(--yellow);margin:10px 0">Coming soon</h2>
+      <p class="sub" style="max-width:620px;margin:0 auto 18px">Il calciomercato e' ancora in corso: rose, formazioni e indisponibili saranno riattivati quando gli organici saranno definiti.</p>
+      <a href="#pronostici" class="btn btn-green">Vai ai Pronostici</a>
+    </div>
   </div>`;
 }
 

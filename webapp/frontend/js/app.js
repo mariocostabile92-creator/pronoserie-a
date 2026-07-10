@@ -19,6 +19,21 @@ const SQ_UECL = ["AEK Athens FC","AEK Larnaca","AZ Alkmaar","Aberdeen","BK Hacke
 const TEAM_IDS_UECL = {"AEK Athens FC":575,"AEK Larnaca":614,"AZ Alkmaar":201,Aberdeen:252,"BK Hacken":367,Breidablik:276,Celje:4360,"Crystal Palace":52,Drita:14281,"Dynamo Kyiv":572,"FC Noah":3684,"FSV Mainz 05":164,Fiorentina:502,"HNK Rijeka":561,Jagiellonia:336,KuPS:1165,"Lech Poznan":347,"Legia Warszawa":339,"Omonia Nicosia":3402,"Rapid Vienna":781,"Rayo Vallecano":728,"Shakhtar Donetsk":550,"Shamrock Rovers":652,"Slovan Bratislava":656,"Sparta Praha":628,Strasbourg:95};
 const SQ_WC = ["USA","Messico","Canada","Brasile","Argentina","Uruguay","Colombia","Ecuador","Paraguay","Francia","Inghilterra","Germania","Spagna","Portogallo","Olanda","Belgio","Croazia","Svizzera","Svezia","Austria","Norvegia","Scozia","Rep. Ceca","Turchia","Bosnia","Giappone","Corea del Sud","Australia","Arabia Saudita","Qatar","Iran","Iraq","Giordania","Uzbekistan","Nuova Zelanda","Marocco","Senegal","Tunisia","Costa d'Avorio","Ghana","Egitto","Algeria","Sudafrica","Capo Verde","Congo DR","Haiti","Panama","Curacao"];
 const TEAM_IDS_WC = {"USA":2384,"Messico":16,"Canada":1997,"Brasile":6,"Argentina":26,"Uruguay":27,"Colombia":1560,"Ecuador":2285,"Paraguay":28,"Francia":2,"Inghilterra":10,"Germania":25,"Spagna":9,"Portogallo":27,"Olanda":1118,"Belgio":1,"Croazia":3,"Svizzera":15,"Svezia":22,"Austria":775,"Norvegia":1090,"Scozia":1569,"Rep. Ceca":770,"Turchia":3589,"Bosnia":764,"Giappone":2232,"Corea del Sud":17,"Australia":20,"Arabia Saudita":23,"Qatar":1569,"Iran":22,"Iraq":2378,"Giordania":99,"Uzbekistan":2385,"Nuova Zelanda":1530,"Marocco":31,"Senegal":34,"Tunisia":28,"Costa d'Avorio":2282,"Ghana":867,"Egitto":3568,"Algeria":1538,"Sudafrica":1530,"Capo Verde":1535,"Congo DR":2286,"Haiti":2380,"Panama":2381,"Curacao":2382};
+const EXTRA_TEAM_IDS = {
+  Frosinone:512, Venezia:517, Monza:1579, Empoli:511, Salernitana:514, Spezia:515,
+  Leicester:46, Ipswich:57, Southampton:41, Luton:1359, "Sheffield United":62,
+  Leganes:537, Valladolid:720, "Las Palmas":534, Granada:715,
+  "Holstein Kiel":191, Bochum:176, Darmstadt:181, Schalke:174,
+  "Saint-Etienne":106, "St Etienne":106, Clermont:99, Lorient:82
+};
+const TEAM_ALIASES = {
+  "Nott'm Forest":"Nott. Forest",
+  "Nottingham Forest":"Nott. Forest",
+  "Man City":"Manchester City",
+  "Man United":"Manchester United",
+  "Paris SG":"Paris Saint Germain",
+  PSG:"Paris Saint Germain"
+};
 
 // ── STATE ──
 let currentLeague = "serie-a";
@@ -26,8 +41,8 @@ let currentLeague = "serie-a";
 // ── HELPER FUNCTIONS ──
 function badge(name, size){
   size = size || 20;
-  const all = {...TEAM_IDS,...TEAM_IDS_PL,...TEAM_IDS_LL,...TEAM_IDS_BL,...TEAM_IDS_L1,...TEAM_IDS_UCL,...TEAM_IDS_UEL,...TEAM_IDS_UECL,...TEAM_IDS_WC};
-  const id = all[name];
+  const all = {...TEAM_IDS,...TEAM_IDS_PL,...TEAM_IDS_LL,...TEAM_IDS_BL,...TEAM_IDS_L1,...TEAM_IDS_UCL,...TEAM_IDS_UEL,...TEAM_IDS_UECL,...TEAM_IDS_WC,...EXTRA_TEAM_IDS};
+  const id = all[name] || all[TEAM_ALIASES[name]];
   if(!id) return '';
   return `<img src="https://media.api-sports.io/football/teams/${id}.png" alt="${name}" style="width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px">`;
 }
