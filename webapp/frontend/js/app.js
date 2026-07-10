@@ -21,16 +21,18 @@ const SQ_WC = ["USA","Messico","Canada","Brasile","Argentina","Uruguay","Colombi
 const TEAM_IDS_WC = {"USA":2384,"Messico":16,"Canada":1997,"Brasile":6,"Argentina":26,"Uruguay":27,"Colombia":1560,"Ecuador":2285,"Paraguay":28,"Francia":2,"Inghilterra":10,"Germania":25,"Spagna":9,"Portogallo":27,"Olanda":1118,"Belgio":1,"Croazia":3,"Svizzera":15,"Svezia":22,"Austria":775,"Norvegia":1090,"Scozia":1569,"Rep. Ceca":770,"Turchia":3589,"Bosnia":764,"Giappone":2232,"Corea del Sud":17,"Australia":20,"Arabia Saudita":23,"Qatar":1569,"Iran":22,"Iraq":2378,"Giordania":99,"Uzbekistan":2385,"Nuova Zelanda":1530,"Marocco":31,"Senegal":34,"Tunisia":28,"Costa d'Avorio":2282,"Ghana":867,"Egitto":3568,"Algeria":1538,"Sudafrica":1530,"Capo Verde":1535,"Congo DR":2286,"Haiti":2380,"Panama":2381,"Curacao":2382};
 const EXTRA_TEAM_IDS = {
   Frosinone:512, Venezia:517, Monza:1579, Empoli:511, Salernitana:514, Spezia:515,
-  Leicester:46, Ipswich:57, Southampton:41, Luton:1359, "Sheffield United":62,
-  Leganes:537, Valladolid:720, "Las Palmas":534, Granada:715,
-  "Holstein Kiel":191, Bochum:176, Darmstadt:181, Schalke:174,
-  "Saint-Etienne":106, "St Etienne":106, Clermont:99, Lorient:82
+  Leicester:46, Ipswich:57, Southampton:41, Luton:1359, "Sheffield United":62, Coventry:1346, "Coventry City":1346, "Hull City":64,
+  Leganes:537, Valladolid:720, "Las Palmas":534, Granada:715, Malaga:535, "Deportivo La Coruna":544, "La Coruna":544, "Racing Santander":545,
+  "Holstein Kiel":191, Bochum:176, Darmstadt:181, Schalke:174, "SC Paderborn 07":185, Paderborn:185, "SV Elversberg":1854, Elversberg:1854,
+  "Saint-Etienne":106, "St Etienne":106, Clermont:99, Lorient:82, "Estac Troyes":98, Troyes:98, "Le Mans":109
 };
 const TEAM_ALIASES = {
   "Nott'm Forest":"Nott. Forest",
   "Nottingham Forest":"Nott. Forest",
   "Man City":"Manchester City",
   "Man United":"Manchester United",
+  "SC Paderborn":"SC Paderborn 07",
+  "FC Schalke 04":"Schalke",
   "Paris SG":"Paris Saint Germain",
   PSG:"Paris Saint Germain"
 };
@@ -43,7 +45,10 @@ function badge(name, size){
   size = size || 20;
   const all = {...TEAM_IDS,...TEAM_IDS_PL,...TEAM_IDS_LL,...TEAM_IDS_BL,...TEAM_IDS_L1,...TEAM_IDS_UCL,...TEAM_IDS_UEL,...TEAM_IDS_UECL,...TEAM_IDS_WC,...EXTRA_TEAM_IDS};
   const id = all[name] || all[TEAM_ALIASES[name]];
-  if(!id) return '';
+  if(!id){
+    const initials = String(name || '?').split(/\s+/).filter(Boolean).map(w => w[0]).join('').slice(0, 3).toUpperCase();
+    return `<span title="${name}" style="display:inline-flex;width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px;border-radius:50%;align-items:center;justify-content:center;background:#1f3460;border:1px solid #2f5c9d;color:#e8eaf6;font-size:${Math.max(8, Math.round(size * .42))}px;font-weight:800;line-height:1">${initials}</span>`;
+  }
   return `<img src="https://media.api-sports.io/football/teams/${id}.png" alt="${name}" style="width:${size}px;height:${size}px;vertical-align:middle;margin:0 4px">`;
 }
 
