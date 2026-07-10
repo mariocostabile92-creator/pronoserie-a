@@ -265,18 +265,7 @@ CLASS_FALLBACK = [
     {"Squadra":"Pisa","Punti":18,"G":30,"V":2,"N":12,"P":16,"GF":23,"GS":54,"DR":-31},
 ]
 
-MARC_FALLBACK = [
-    {"pos":1,"giocatore":"Lautaro Martinez","squadra":"Inter","gol":14},
-    {"pos":2,"giocatore":"Tasos Douvikas","squadra":"Como","gol":11},
-    {"pos":3,"giocatore":"Keinan Davis","squadra":"Udinese","gol":10},
-    {"pos":4,"giocatore":"Rasmus Hojlund","squadra":"Napoli","gol":10},
-    {"pos":5,"giocatore":"Kenan Yildiz","squadra":"Juventus","gol":10},
-    {"pos":6,"giocatore":"Nico Paz","squadra":"Como","gol":10},
-    {"pos":7,"giocatore":"Rafael Leao","squadra":"Milan","gol":9},
-    {"pos":8,"giocatore":"Hakan Calhanoglu","squadra":"Inter","gol":8},
-    {"pos":9,"giocatore":"Giovanni Simeone","squadra":"Torino","gol":8},
-    {"pos":10,"giocatore":"Christian Pulisic","squadra":"Milan","gol":8},
-]
+MARC_FALLBACK = []
 
 ALLENATORI = {
     "Inter":"Cristian Chivu","Milan":"Massimiliano Allegri","Napoli":"Antonio Conte",
@@ -288,28 +277,7 @@ ALLENATORI = {
     "Verona":"Paolo Sammarco","Pisa":"Oscar Hiljemark",
 }
 
-TOP_SCORER = {
-    "Inter":["Lautaro Martinez (14 gol)","Hakan Calhanoglu (8)","Marcus Thuram (7)"],
-    "Milan":["Rafael Leao (9)","Christian Pulisic (8)","Santiago Gimenez (5)"],
-    "Napoli":["Rasmus Hojlund (10)","Scott McTominay (7)","Matteo Politano (5)"],
-    "Como":["Tasos Douvikas (11)","Nico Paz (10)","Nicolas Kuhn (4)"],
-    "Juventus":["Kenan Yildiz (10)","Dusan Vlahovic (6)","Francisco Conceicao (5)"],
-    "Roma":["Donyell Malen (7)","Paulo Dybala (5)","Matias Soule (4)"],
-    "Atalanta":["Gianluca Scamacca (8)","Nikola Krstovic (8)","Charles De Ketelaere (6)"],
-    "Lazio":["Daniel Maldini (6)","Boulaye Dia (5)","Mattia Zaccagni (4)"],
-    "Bologna":["Santiago Castro (6)","Riccardo Orsolini (5)","Federico Bernardeschi (4)"],
-    "Sassuolo":["Domenico Berardi (7)","Andrea Pinamonti (7)","Armand Lauriente (4)"],
-    "Udinese":["Keinan Davis (10)","Nicolo Zaniolo (5)","Adam Buksa (3)"],
-    "Parma":["Mateo Pellegrino (8)","Gabriel Strefezza (4)","Adrian Bernabe (3)"],
-    "Genoa":["Vitinha (5)","Lorenzo Colombo (4)","Junior Messias (3)"],
-    "Torino":["Giovanni Simeone (8)","Nikola Vlasic (7)","Che Adams (5)"],
-    "Cagliari":["Sebastiano Esposito (5)","Semih Kilicsoy (4)","Gianluca Gaetano (3)"],
-    "Fiorentina":["Moise Kean (8)","Albert Gudmundsson (5)","Lucas Beltran (3)"],
-    "Cremonese":["Jamie Vardy (5)","Antonio Sanabria (4)","Milan Djuric (3)"],
-    "Lecce":["Walid Cheddira (4)","Lameck Banda (3)","Santiago Pierotti (2)"],
-    "Verona":["Casper Tengstedt (5)","Thomas Henry (4)","Tomas Suslov (3)"],
-    "Pisa":["Henrik Meister (5)","Matteo Tramoni (4)","Samuel Iling-Junior (3)"],
-}
+TOP_SCORER = {}
 
 FORMAZIONI = {
     "Inter":{"modulo":"3-5-2","titolari":["Sommer","Bastoni","Akanji","Bisseck","Dimarco","Barella","Calhanoglu","Sucic","Dumfries","Thuram","Bonny"]},

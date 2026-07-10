@@ -30,9 +30,14 @@ async function pageClassifica(){
   html+='</div>';
   html+='<div>';
   html+='<div class="card" style="padding:10px"><h3 style="margin-bottom:6px;font-size:1rem">Top 10 Marcatori</h3>';
-  (data.marcatori||[]).slice(0,10).forEach(m=>{
-    html+=`<div style="display:flex;align-items:center;padding:5px 4px;border-bottom:1px solid #1f3460"><span style="width:20px;font-weight:700;color:${m.pos<=3?"var(--green)":"var(--muted)"};font-size:.8rem">${m.pos}</span><span style="flex:1"><strong style="font-size:.85rem">${m.giocatore}</strong> <span style="color:var(--muted);font-size:.7rem">${badge(m.squadra,14)}${m.squadra}</span></span><span style="font-weight:800;color:var(--green);font-size:.9rem">${m.gol}</span></div>`;
-  });
+  const marcatori = (data.marcatori||[]).slice(0,10);
+  if(marcatori.length){
+    marcatori.forEach(m=>{
+      html+=`<div style="display:flex;align-items:center;padding:5px 4px;border-bottom:1px solid #1f3460"><span style="width:20px;font-weight:700;color:${m.pos<=3?"var(--green)":"var(--muted)"};font-size:.8rem">${m.pos}</span><span style="flex:1"><strong style="font-size:.85rem">${m.giocatore}</strong> <span style="color:var(--muted);font-size:.7rem">${badge(m.squadra,14)}${m.squadra}</span></span><span style="font-weight:800;color:var(--green);font-size:.9rem">${m.gol}</span></div>`;
+    });
+  }else{
+    html+='<div style="padding:18px 8px;text-align:center;color:var(--muted);font-size:.85rem">Classifica marcatori in attesa dell\\\'inizio della stagione 2026/2027.</div>';
+  }
   html+='</div>';
   if(data.stats_squadre){
     const s=data.stats_squadre;

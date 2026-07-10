@@ -48,6 +48,7 @@ async def classifica(request: Request):
 @limiter.limit("30/minute")
 async def marcatori(request: Request):
     """Marcatori Serie A."""
+    return []
     try:
         from season_2526 import get_marcatori as _get_marc
         return _get_marc()

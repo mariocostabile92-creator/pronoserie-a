@@ -1,4 +1,4 @@
-const CACHE_NAME = 'matchiq-v11';
+const CACHE_NAME = 'matchiq-v12';
 const ASSETS = ['/app'];
 
 self.addEventListener('install', e => {
