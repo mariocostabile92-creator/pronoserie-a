@@ -367,7 +367,7 @@
       min-height: 86px;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 20px;
+      gap: 12px;
       margin-bottom: 48px;
     }
 
@@ -380,8 +380,8 @@
     }
 
     .product-logo {
-      width: clamp(104px, 24vw, 132px);
-      height: 88px;
+      width: 116px;
+      height: 96px;
       display: block;
       flex: none;
       border: 1px solid var(--line-strong);
@@ -473,6 +473,108 @@
       margin-top: 8px;
       color: var(--muted);
       font-size: 0.72rem;
+    }
+
+    .experience-heading {
+      max-width: 940px;
+      margin-bottom: 28px;
+    }
+
+    .experience-heading .section-kicker {
+      margin-bottom: 14px;
+    }
+
+    .experience-title {
+      max-width: 940px;
+    }
+
+    .experience-title span {
+      display: block;
+    }
+
+    .experience-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .experience-card {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      min-height: 330px;
+      flex-direction: column;
+      padding: clamp(24px, 5vw, 40px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: linear-gradient(150deg, var(--surface-strong), var(--surface));
+    }
+
+    .experience-card::before {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 1px;
+      content: "";
+    }
+
+    .experience-card.operations-experience {
+      border-color: rgba(157, 252, 75, 0.16);
+      background:
+        radial-gradient(circle at 100% 100%, rgba(157, 252, 75, 0.08), transparent 38%),
+        linear-gradient(150deg, var(--surface-strong), var(--surface));
+    }
+
+    .experience-card.operations-experience::before {
+      background: linear-gradient(90deg, var(--lime), transparent 72%);
+    }
+
+    .experience-card.football-experience {
+      border-color: rgba(53, 168, 255, 0.18);
+      background:
+        radial-gradient(circle at 100% 100%, rgba(53, 168, 255, 0.1), transparent 38%),
+        linear-gradient(150deg, var(--surface-strong), var(--surface));
+    }
+
+    .experience-card.football-experience::before {
+      background: linear-gradient(90deg, var(--cyan), transparent 72%);
+    }
+
+    .experience-eyebrow {
+      margin-bottom: 22px;
+      color: var(--lime);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .football-experience .experience-eyebrow {
+      color: var(--cyan);
+    }
+
+    .experience-card h3 {
+      max-width: 470px;
+      margin-bottom: 18px;
+      font-size: clamp(1.55rem, 3.4vw, 2.15rem);
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+    }
+
+    .experience-copy {
+      max-width: 520px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      line-height: 1.72;
+    }
+
+    .experience-outcome {
+      margin: auto 0 0;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.5;
     }
 
     .founder-card {
@@ -805,6 +907,15 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .product-logo {
+        width: 140px;
+        height: 100px;
+      }
+
+      .experience-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .founder-card {
         grid-template-columns: minmax(300px, 0.82fr) minmax(0, 1.18fr);
       }
@@ -836,6 +947,15 @@
       .product-card {
         min-height: 560px;
       }
+
+      .product-logo {
+        width: 148px;
+        height: 104px;
+      }
+
+      .operations-product-logo {
+        width: 176px;
+      }
     }
 
     @media (max-width: 430px) {
@@ -854,6 +974,7 @@
       }
 
       .product-card,
+      .experience-card,
       .founder-card,
       .support-banner,
       .partnership {
@@ -957,7 +1078,7 @@
           <article class="product-card operations">
             <div class="product-topline">
               <span class="product-index">01 / Operations</span>
-              <img class="product-logo" src="operations-engine-logo.png" alt="Logo ufficiale Operations Engine" width="132" height="88" />
+              <img class="product-logo operations-product-logo" src="operations-engine-logo.png" alt="Logo ufficiale Operations Engine" width="132" height="88" />
             </div>
             <h3>Operations Engine</h3>
             <p class="positioning">Operating Intelligence for Last-Mile Operations</p>
@@ -977,7 +1098,7 @@
           <article class="product-card tactical">
             <div class="product-topline">
               <span class="product-index">02 / Football</span>
-              <img class="product-logo" src="matchiq-tactical-logo.png" alt="Logo ufficiale MatchIQ Tactical" width="132" height="88" />
+              <img class="product-logo tactical-product-logo" src="matchiq-tactical-logo.png" alt="Logo ufficiale MatchIQ Tactical" width="132" height="88" />
             </div>
             <h3>MatchIQ Tactical</h3>
             <p class="positioning">Football Intelligence Platform</p>
@@ -991,6 +1112,32 @@
             <div class="product-footer">
               <a class="text-link" href="https://tactical.matchiq.it.com" target="_blank" rel="noopener noreferrer">Apri MatchIQ Tactical</a>
             </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="experience" aria-labelledby="experience-title">
+        <div class="experience-heading">
+          <p class="section-kicker">Esperienza &rarr; Prodotto</p>
+          <h2 class="section-title experience-title" id="experience-title">
+            <span>Prima affrontavo questi problemi sul campo.</span>
+            <span>Oggi costruisco tecnologia per risolverli.</span>
+          </h2>
+        </div>
+
+        <div class="experience-grid">
+          <article class="experience-card operations-experience">
+            <p class="experience-eyebrow">Operations</p>
+            <h3>8 anni dentro le operations last-mile.</h3>
+            <p class="experience-copy">Planning, workforce, fleet, capacità, imprevisti e gestione quotidiana. Operations Engine nasce dall'esperienza diretta di questi processi e dai problemi incontrati sul campo.</p>
+            <p class="experience-outcome">&rarr; Da questa esperienza nasce Operations Engine.</p>
+          </article>
+
+          <article class="experience-card football-experience">
+            <p class="experience-eyebrow">Football</p>
+            <h3>Tecnologia costruita anche dal campo.</h3>
+            <p class="experience-copy">Esperienza nello staff tecnico e nell'osservazione calcistica, trasformata in strumenti per analisi, scouting e lavoro quotidiano dello staff.</p>
+            <p class="experience-outcome">&rarr; Da questa esperienza nasce MatchIQ Tactical.</p>
           </article>
         </div>
       </section>
