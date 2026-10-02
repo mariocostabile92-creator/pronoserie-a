@@ -4,789 +4,1058 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>MatchIQ | AI Software Ecosystem for Football</title>
-
-  <meta name="description" content="MatchIQ è un ecosistema software AI per il calcio: MatchIQ Tactical, ClubIQ, MatchIQ Studio e piattaforme professionali per club, staff tecnici, osservatori e creator." />
-  <meta property="og:title" content="MatchIQ | AI Software Ecosystem for Football" />
-  <meta property="og:description" content="Quattro piattaforme professionali per calcio, club, staff tecnici e contenuti AI." />
+  <title>Mario Costabile | Operations Engine &amp; MatchIQ Tactical</title>
+  <meta name="description" content="I prodotti costruiti da Mario Costabile: Operations Engine per le operations last-mile e MatchIQ Tactical per coaching, scouting e analisi calcistica." />
+  <meta property="og:title" content="Mario Costabile | Product Portfolio" />
+  <meta property="og:description" content="Operations Engine e MatchIQ Tactical: software costruito a partire da problemi reali nelle operations e nel calcio." />
   <meta property="og:url" content="https://matchiq.it.com/links.html" />
   <meta property="og:type" content="website" />
 
   <style>
-    :root{
-      --bg:#030814;
-      --card:#071426;
-      --card2:#0b1b33;
-      --blue:#1d9bff;
-      --purple:#9b5cff;
-      --green:#78ff3f;
-      --text:#f5f8ff;
-      --muted:#9fb3cc;
-      --line:rgba(255,255,255,.12);
-      --shadow:0 28px 80px rgba(0,0,0,.48);
+    :root {
+      color-scheme: dark;
+      --bg: #05070b;
+      --surface: #0b1018;
+      --surface-strong: #101824;
+      --surface-soft: rgba(255, 255, 255, 0.035);
+      --text: #f7f9fc;
+      --muted: #9aa8ba;
+      --muted-strong: #c4ceda;
+      --line: rgba(255, 255, 255, 0.1);
+      --line-strong: rgba(255, 255, 255, 0.18);
+      --lime: #9dfc4b;
+      --lime-soft: rgba(157, 252, 75, 0.12);
+      --cyan: #35a8ff;
+      --cyan-soft: rgba(53, 168, 255, 0.13);
+      --max-width: 1120px;
+      --radius-lg: 32px;
+      --radius-md: 24px;
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
     }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    * {
+      box-sizing: border-box;
+    }
 
-    body{
-      margin:0;
-      font-family:Inter,Arial,sans-serif;
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 280px;
+      overflow-x: hidden;
       background:
-        radial-gradient(circle at top left, rgba(29,155,255,.24), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(120,255,63,.14), transparent 36%),
+        radial-gradient(circle at 10% -5%, rgba(53, 168, 255, 0.15), transparent 28rem),
+        radial-gradient(circle at 92% 24%, rgba(157, 252, 75, 0.08), transparent 26rem),
         var(--bg);
-      color:var(--text);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .page{min-height:100vh;padding:28px 18px}
-    .wrap{max-width:1120px;margin:0 auto}
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 64px 64px;
+      content: "";
+      mask-image: linear-gradient(to bottom, black, transparent 72%);
+      pointer-events: none;
+    }
 
-    .hero{
-      border:1px solid var(--line);
-      border-radius:34px;
-      padding:58px 28px;
+    a,
+    label {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a:focus-visible,
+    label:focus-visible {
+      outline: 3px solid rgba(157, 252, 75, 0.55);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 10000;
+      padding: 10px 14px;
+      transform: translateY(-160%);
+      border-radius: 12px;
+      background: var(--text);
+      color: var(--bg);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .page {
+      width: 100%;
+      padding: 18px 12px 28px;
+    }
+
+    .wrap {
+      width: min(100%, var(--max-width));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 2px 18px;
+    }
+
+    .identity {
+      color: var(--text);
+      font-size: 0.84rem;
+      font-weight: 850;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .topbar-link {
+      color: var(--muted-strong);
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .topbar-link:hover {
+      color: var(--text);
+    }
+
+    .hero {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 560px;
+      display: grid;
+      align-items: end;
+      padding: clamp(36px, 7vw, 78px) clamp(22px, 7vw, 78px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
       background:
-        radial-gradient(circle at top, rgba(29,155,255,.16), transparent 36%),
-        linear-gradient(135deg, rgba(7,20,38,.98), rgba(3,8,20,.94));
-      box-shadow:var(--shadow);
-      text-align:center;
-      overflow:hidden;
-      position:relative;
-      animation:fadeUp .7s ease both;
+        linear-gradient(120deg, rgba(13, 20, 31, 0.97), rgba(6, 9, 14, 0.94)),
+        var(--surface);
+      box-shadow: var(--shadow);
+      animation: reveal 0.7s ease both;
     }
 
-    .brand-logo{
-      width:150px;
-      height:150px;
-      object-fit:contain;
-      border-radius:34px;
-      margin:0 auto 14px;
-      display:block;
-      filter:drop-shadow(0 20px 45px rgba(0,0,0,.35));
+    .hero::before {
+      position: absolute;
+      top: -36%;
+      right: -12%;
+      z-index: -1;
+      width: min(66vw, 720px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(53, 168, 255, 0.22);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(53, 168, 255, 0.16), transparent 66%);
+      content: "";
     }
 
-    .logo-text{
-      font-size:52px;
-      font-weight:900;
-      letter-spacing:-3px;
-      margin:0;
-      display:none;
+    .hero::after {
+      position: absolute;
+      right: 8%;
+      bottom: 14%;
+      z-index: -1;
+      width: 140px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--lime));
+      box-shadow: 0 0 24px rgba(157, 252, 75, 0.4);
+      content: "";
+      transform: rotate(-34deg);
     }
 
-    .logo-text span:first-child{color:#fff}
-    .logo-text span:last-child{color:var(--blue)}
-    .logo-text i{color:var(--green);font-style:normal}
-
-    .eyebrow{
-      margin:12px auto 0;
-      color:var(--green);
-      font-size:14px;
-      font-weight:900;
-      letter-spacing:.13em;
-      text-transform:uppercase;
+    .hero-content {
+      max-width: 880px;
     }
 
-    .tagline{
-      margin:16px auto 0;
-      font-size:44px;
-      font-weight:900;
-      max-width:920px;
-      line-height:1.05;
-      letter-spacing:-1.7px;
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 22px;
+      color: var(--lime);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
     }
 
-    .sub{
-      margin:20px auto 0;
-      color:var(--muted);
-      font-size:18px;
-      max-width:850px;
-      line-height:1.62;
+    .eyebrow::before {
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+      content: "";
     }
 
-    .mini-stats{
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:28px;
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
     }
 
-    .mini-stat{
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.06);
-      color:#d8e8ff;
-      padding:10px 14px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:13px;
+    .hero h1 {
+      max-width: 860px;
+      margin-bottom: 22px;
+      font-size: clamp(2.6rem, 8vw, 5.8rem);
+      font-weight: 780;
+      letter-spacing: -0.065em;
+      line-height: 0.96;
+      text-wrap: balance;
     }
 
-    .actions{
-      display:flex;
-      justify-content:center;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-top:34px;
+    .hero-line {
+      margin-bottom: 12px;
+      color: var(--text);
+      font-size: clamp(1.08rem, 2.2vw, 1.4rem);
+      font-weight: 720;
+      letter-spacing: -0.02em;
     }
 
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      padding:15px 22px;
-      border-radius:999px;
-      text-decoration:none;
-      font-weight:900;
-      color:#03101f;
-      background:linear-gradient(135deg,var(--green),#d8ff3f);
-      box-shadow:0 10px 28px rgba(120,255,63,.18);
-      transition:.2s ease;
-      border:0;
+    .hero-copy {
+      max-width: 650px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: clamp(0.98rem, 1.7vw, 1.08rem);
+      line-height: 1.7;
     }
 
-    .btn:hover{
-      transform:translateY(-2px);
-      box-shadow:0 18px 42px rgba(120,255,63,.22);
+    .hero-actions,
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
     }
 
-    .btn.secondary{
-      background:transparent;
-      color:var(--text);
-      border:1px solid var(--line);
-      box-shadow:none;
+    .button,
+    .text-link {
+      min-height: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-weight: 820;
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
     }
 
-    .btn.whatsapp{
-      background:linear-gradient(135deg,#25D366,#b8ff6a);
-      color:#03101f;
+    .button {
+      padding: 13px 20px;
+      background: var(--text);
+      color: #070a0e;
     }
 
-    .section{
-      margin-top:34px;
-      animation:fadeUp .7s ease both;
+    .button:hover,
+    .text-link:hover {
+      transform: translateY(-2px);
     }
 
-    .section-title{
-      font-size:30px;
-      margin:0 0 16px;
-      letter-spacing:-1px;
+    .button.secondary {
+      border-color: var(--line-strong);
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--text);
     }
 
-    .section-sub{
-      color:var(--muted);
-      margin:-8px 0 18px;
-      line-height:1.6;
-      max-width:850px;
+    .button.accent {
+      background: var(--lime);
+      color: #071005;
+      box-shadow: 0 12px 30px rgba(157, 252, 75, 0.14);
     }
 
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:16px;
+    .section {
+      margin-top: clamp(70px, 10vw, 118px);
+      scroll-margin-top: 24px;
     }
 
-    .app-grid{grid-template-columns:repeat(4,1fr)}
-    .target-grid{grid-template-columns:repeat(4,1fr)}
-
-    .card{
-      background:linear-gradient(180deg,var(--card),var(--card2));
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:24px;
-      transition:.22s ease;
+    .section-heading {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 26px;
     }
 
-    .card:hover{
-      transform:translateY(-4px) scale(1.01);
-      border-color:rgba(120,255,63,.42);
-      box-shadow:0 18px 45px rgba(0,0,0,.36);
+    .section-kicker {
+      margin: 0;
+      color: var(--lime);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
     }
 
-    .card strong{
-      display:block;
-      font-size:18px;
-      margin-bottom:8px;
+    .section-title {
+      max-width: 760px;
+      margin-bottom: 0;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      letter-spacing: -0.052em;
+      line-height: 1.02;
+      text-wrap: balance;
     }
 
-    .card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.5;
-      font-size:14px;
+    .section-intro {
+      max-width: 620px;
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.7;
     }
 
-    .app-card{
-      min-height:285px;
-      text-decoration:none;
-      color:var(--text);
-      position:relative;
-      overflow:hidden;
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
     }
 
-    .app-card .category{
-      display:block;
-      color:#d8e8ff;
-      font-weight:900;
-      margin-bottom:12px;
-      font-size:14px;
+    .product-card {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      min-height: 510px;
+      flex-direction: column;
+      padding: clamp(24px, 5vw, 42px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: linear-gradient(150deg, var(--surface-strong), var(--surface));
+      box-shadow: 0 20px 54px rgba(0, 0, 0, 0.22);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
-    .feature-list{
-      margin:14px 0 0;
-      padding:0;
-      list-style:none;
-      display:grid;
-      gap:8px;
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--line-strong);
+      box-shadow: 0 28px 68px rgba(0, 0, 0, 0.32);
     }
 
-    .feature-list li{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.35;
+    .product-card.operations::after,
+    .product-card.tactical::after {
+      position: absolute;
+      right: -70px;
+      bottom: -95px;
+      width: 290px;
+      height: 290px;
+      border-radius: 50%;
+      content: "";
+      pointer-events: none;
     }
 
-    .feature-list li::before{
-      content:"✓";
-      color:var(--green);
-      font-weight:900;
-      margin-right:7px;
+    .product-card.operations::after {
+      background: radial-gradient(circle, rgba(157, 252, 75, 0.13), transparent 68%);
     }
 
-    .app-card span.link{
-      display:block;
-      margin-top:22px;
-      color:var(--green);
-      font-weight:900;
+    .product-card.tactical::after {
+      background: radial-gradient(circle, rgba(53, 168, 255, 0.18), transparent 68%);
     }
 
-    .app-card.featured{
-      border-color:rgba(120,255,63,.42);
+    .product-topline {
+      display: flex;
+      min-height: 86px;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .product-index {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .product-logo {
+      width: clamp(104px, 24vw, 132px);
+      height: 88px;
+      display: block;
+      flex: none;
+      border: 1px solid var(--line-strong);
+      border-radius: 22px;
+      object-fit: contain;
+      background: #070b11;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+    }
+
+    .product-card h3 {
+      margin-bottom: 10px;
+      font-size: clamp(1.8rem, 4vw, 2.55rem);
+      letter-spacing: -0.045em;
+      line-height: 1.04;
+    }
+
+    .positioning {
+      margin-bottom: 20px;
+      color: var(--muted-strong);
+      font-size: 0.8rem;
+      font-weight: 850;
+      letter-spacing: 0.085em;
+      line-height: 1.45;
+      text-transform: uppercase;
+    }
+
+    .product-description {
+      max-width: 500px;
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .capabilities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 30px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .capabilities li {
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--muted-strong);
+      font-size: 0.76rem;
+      font-weight: 760;
+    }
+
+    .product-footer {
+      position: relative;
+      z-index: 1;
+      margin-top: auto;
+    }
+
+    .text-link {
+      justify-content: flex-start;
+      color: var(--text);
+    }
+
+    .text-link::after {
+      width: 24px;
+      height: 1px;
+      background: currentColor;
+      content: "";
+      transition: width 0.2s ease;
+    }
+
+    .text-link:hover::after {
+      width: 38px;
+    }
+
+    .text-link.disabled {
+      color: var(--muted-strong);
+      cursor: default;
+      opacity: 0.72;
+    }
+
+    .text-link.disabled:hover {
+      transform: none;
+    }
+
+    .availability-note {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .founder-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+    }
+
+    .founder-photo-wrap {
+      position: relative;
+      min-height: 360px;
+      overflow: hidden;
+      background: #111722;
+    }
+
+    .founder-photo {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      display: block;
+      object-fit: cover;
+      object-position: center 28%;
+    }
+
+    .founder-photo-wrap::after {
+      position: absolute;
+      inset: 45% 0 0;
+      background: linear-gradient(to top, rgba(5, 7, 11, 0.66), transparent);
+      content: "";
+    }
+
+    .founder-copy {
+      padding: clamp(26px, 6vw, 56px);
+    }
+
+    .founder-copy h2 {
+      margin: 8px 0 4px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      letter-spacing: -0.052em;
+      line-height: 1;
+    }
+
+    .founder-role {
+      margin-bottom: 26px;
+      color: var(--muted-strong);
+      font-weight: 760;
+    }
+
+    .founder-description {
+      max-width: 600px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 28px;
+    }
+
+    .contact-links a {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 760;
+      text-decoration: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .contact-links a:hover {
+      border-color: var(--line-strong);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .support-banner {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 26px;
+      padding: clamp(26px, 6vw, 52px);
+      border: 1px solid rgba(157, 252, 75, 0.22);
+      border-radius: var(--radius-lg);
       background:
-        radial-gradient(circle at top right, rgba(120,255,63,.17), transparent 34%),
-        linear-gradient(180deg,var(--card),var(--card2));
+        radial-gradient(circle at 100% 0, rgba(157, 252, 75, 0.1), transparent 34%),
+        linear-gradient(135deg, #0d1518, #091015);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
     }
 
-    .app-card.tactical{
-      border-color:rgba(29,155,255,.55);
+    .support-banner h2,
+    .partnership h2 {
+      margin: 8px 0 16px;
+      font-size: clamp(2rem, 5vw, 3.3rem);
+      letter-spacing: -0.05em;
+      line-height: 1.02;
+    }
+
+    .support-banner p,
+    .partnership p {
+      max-width: 670px;
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.72;
+    }
+
+    .support-side {
+      align-self: center;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .support-side strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .support-side p {
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .support-side .button {
+      width: 100%;
+      margin-top: 18px;
+      cursor: pointer;
+    }
+
+    .partnership {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 7vw, 64px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(140deg, var(--surface-strong), #090d13);
+    }
+
+    .partnership::after {
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 330px;
+      height: 330px;
+      border: 1px solid rgba(53, 168, 255, 0.18);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(53, 168, 255, 0.12), transparent 68%);
+      content: "";
+      pointer-events: none;
+    }
+
+    .partnership .button {
+      position: relative;
+      z-index: 1;
+      margin-top: 28px;
+    }
+
+    footer {
+      display: grid;
+      gap: 22px;
+      margin-top: 72px;
+      padding: 32px 2px 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .footer-heading {
+      margin-bottom: 4px;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 820;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+    }
+
+    .footer-links a,
+    .footer-links label,
+    .footer-links span {
+      color: var(--muted-strong);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover,
+    .footer-links label:hover {
+      color: var(--text);
+    }
+
+    .footer-links label {
+      cursor: pointer;
+    }
+
+    .support-modal-toggle {
+      position: fixed;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .support-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      place-items: center;
+      padding: 14px;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(12px);
+    }
+
+    .support-modal-toggle:checked + .support-modal {
+      display: grid;
+    }
+
+    .support-modal-card {
+      position: relative;
+      width: min(100%, 760px);
+      max-height: 92vh;
+      overflow: auto;
+      padding: clamp(24px, 6vw, 46px);
+      border: 1px solid rgba(157, 252, 75, 0.28);
+      border-radius: 28px;
       background:
-        radial-gradient(circle at top right, rgba(29,155,255,.22), transparent 36%),
-        linear-gradient(180deg,#071426,#0b1b33);
+        radial-gradient(circle at 100% 0, rgba(157, 252, 75, 0.1), transparent 36%),
+        #0b1118;
+      box-shadow: 0 34px 100px rgba(0, 0, 0, 0.7);
     }
 
-    .app-card.studio{
-      border-color:rgba(155,92,255,.58);
-      background:
-        radial-gradient(circle at top right, rgba(155,92,255,.24), transparent 36%),
-        radial-gradient(circle at bottom left, rgba(29,155,255,.14), transparent 34%),
-        linear-gradient(180deg,#071426,#0b1b33);
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.35rem;
+      line-height: 1;
     }
 
-    .app-card.clubiq{
-      border-color:rgba(120,255,63,.55);
-      background:
-        radial-gradient(circle at top right, rgba(120,255,63,.18), transparent 36%),
-        linear-gradient(180deg,#071426,#0b1b33);
+    .support-modal-card h2 {
+      max-width: 600px;
+      margin: 10px 48px 16px 0;
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      letter-spacing: -0.055em;
+      line-height: 1;
     }
 
-    .badge{
-      display:inline-flex;
-      margin-bottom:16px;
-      padding:7px 11px;
-      border-radius:999px;
-      background:rgba(120,255,63,.1);
-      color:var(--green);
-      font-size:12px;
-      font-weight:900;
-      border:1px solid rgba(120,255,63,.22);
+    .modal-copy {
+      max-width: 620px;
+      color: var(--muted);
+      line-height: 1.72;
     }
 
-    .badge.blue{
-      background:rgba(29,155,255,.12);
-      color:#8fd0ff;
-      border-color:rgba(29,155,255,.28);
+    .support-options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 26px;
     }
 
-    .badge.purple{
-      background:rgba(155,92,255,.14);
-      color:#c9b0ff;
-      border-color:rgba(155,92,255,.3);
+    .support-option {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
     }
 
-    .wide{
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:18px;
-      align-items:stretch;
+    .support-option strong {
+      display: block;
+      margin-bottom: 6px;
     }
 
-    .list{
-      display:grid;
-      gap:12px;
-      margin-top:10px;
+    .support-option p {
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
     }
 
-    .item{
-      padding:14px;
-      border-radius:16px;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      color:var(--muted);
+    .support-option .button {
+      width: 100%;
     }
 
-    .founder-card{
-      background:
-        radial-gradient(circle at top left, rgba(29,155,255,.18), transparent 30%),
-        linear-gradient(180deg,var(--card),var(--card2));
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .founder{
-      display:grid;
-      grid-template-columns:96px 1fr;
-      gap:18px;
-      align-items:center;
+    @media (min-width: 700px) {
+      .page {
+        padding: 28px 24px 40px;
+      }
+
+      .section-heading {
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.62fr);
+        align-items: end;
+      }
+
+      .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .founder-card {
+        grid-template-columns: minmax(300px, 0.82fr) minmax(0, 1.18fr);
+      }
+
+      .founder-photo-wrap {
+        min-height: 620px;
+      }
+
+      .support-banner {
+        grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.6fr);
+        align-items: center;
+      }
+
+      .support-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      footer {
+        grid-template-columns: auto 1fr;
+        align-items: end;
+      }
+
+      .footer-links {
+        justify-content: flex-end;
+      }
     }
 
-    .avatar{
-      width:96px;
-      height:96px;
-      border-radius:50%;
-      object-fit:cover;
-      flex:none;
-      border:2px solid rgba(120,255,63,.65);
-      box-shadow:0 12px 34px rgba(0,0,0,.35);
+    @media (min-width: 1000px) {
+      .product-card {
+        min-height: 560px;
+      }
     }
 
-    .founder-title{
-      color:var(--green);
-      font-weight:900;
-      font-size:13px;
-      margin-bottom:6px;
+    @media (max-width: 430px) {
+      .topbar-link {
+        display: none;
+      }
+
+      .hero {
+        min-height: 520px;
+        border-radius: 26px;
+      }
+
+      .hero-actions .button,
+      .actions .button {
+        width: 100%;
+      }
+
+      .product-card,
+      .founder-card,
+      .support-banner,
+      .partnership {
+        border-radius: 22px;
+      }
+
+      .product-card {
+        min-height: 470px;
+      }
+
+      .product-topline {
+        margin-bottom: 38px;
+      }
+
+      .contact-links a {
+        flex: 1 1 calc(50% - 9px);
+        justify-content: center;
+      }
+
+      .support-modal-card {
+        border-radius: 22px;
+      }
     }
 
-    .quote{
-      margin-top:18px;
-      padding:16px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--muted);
-      line-height:1.55;
-      font-size:14px;
-    }
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
 
-    .partnership-card{
-      border-color:rgba(255,255,255,.2);
-      background:
-        radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 30%),
-        linear-gradient(180deg,#071426,#050b17);
-    }
-
-    footer{
-      margin-top:30px;
-      text-align:center;
-      color:var(--muted);
-      padding:34px 0 10px;
-      font-size:14px;
-    }
-
-    .footer-links{
-      display:flex;
-      justify-content:center;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:16px;
-    }
-
-    .footer-links a{
-      color:var(--text);
-      text-decoration:none;
-      border:1px solid var(--line);
-      padding:9px 13px;
-      border-radius:999px;
-      font-weight:800;
-    }
-
-    @keyframes fadeUp{
-      from{opacity:0;transform:translateY(18px)}
-      to{opacity:1;transform:translateY(0)}
-    }
-
-
-    .support-banner{
-      margin:0 0 30px;
-      border:1px solid rgba(120,255,63,.38);
-      border-radius:30px;
-      padding:28px;
-      background:
-        radial-gradient(circle at top left, rgba(120,255,63,.18), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(29,155,255,.15), transparent 34%),
-        linear-gradient(135deg, rgba(7,20,38,.98), rgba(3,8,20,.96));
-      box-shadow:0 24px 70px rgba(0,0,0,.42);
-      animation:fadeUp .7s ease both;
-    }
-    .support-banner-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;align-items:center}
-    .support-kicker{display:inline-flex;width:fit-content;padding:7px 11px;border-radius:999px;background:rgba(120,255,63,.12);color:var(--green);font-size:12px;font-weight:900;border:1px solid rgba(120,255,63,.25);margin-bottom:14px}
-    .support-title{margin:0 0 12px;font-size:34px;line-height:1.05;letter-spacing:-1px}
-    .support-text{color:var(--muted);line-height:1.65;font-size:16px;margin:0}
-    .support-side{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:24px;padding:18px;text-align:center}
-    .support-side strong{display:block;font-size:18px;margin-bottom:8px}
-    .support-side p{margin:0 0 16px;color:var(--muted);line-height:1.5;font-size:14px}
-    .support-modal-toggle{display:none}
-    .support-modal{position:fixed;inset:0;z-index:9999;display:none;place-items:center;padding:20px;background:rgba(0,0,0,.76);backdrop-filter:blur(10px)}
-    .support-modal-toggle:checked + .support-modal{display:grid}
-    .support-modal-card{width:min(100%,760px);max-height:92vh;overflow:auto;border:1px solid rgba(120,255,63,.34);border-radius:30px;background:radial-gradient(circle at top left, rgba(120,255,63,.18), transparent 34%),linear-gradient(180deg,#071426,#030814);box-shadow:0 30px 90px rgba(0,0,0,.65);padding:28px;position:relative}
-    .modal-close{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:999px;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--text);background:rgba(255,255,255,.06);font-weight:900}
-    .qr-support{display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;align-items:center;margin-top:18px}
-    .qr-box{padding:14px;border-radius:24px;border:1px solid rgba(120,255,63,.36);background:rgba(255,255,255,.05);box-shadow:0 0 42px rgba(120,255,63,.12)}
-    .qr-box img{width:100%;display:block;border-radius:18px}
-    .support-actions-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
-    .support-note{margin-top:16px;padding:14px;border-radius:16px;border:1px solid rgba(120,255,63,.20);background:rgba(120,255,63,.08);color:#d9ffe8;font-size:14px;line-height:1.55}
-    label.btn{cursor:pointer}
-    @media(max-width:900px){.support-banner-inner,.qr-support{grid-template-columns:1fr}.support-title{font-size:28px}.support-banner{padding:22px}.support-modal-card{padding:22px}}
-
-    @media(max-width:1050px){
-      .app-grid{grid-template-columns:repeat(2,1fr)}
-    }
-
-    @media(max-width:900px){
-      .page{padding:16px 12px}
-      .brand-logo{width:112px;height:112px}
-      .tagline{font-size:30px}
-      .sub{font-size:16px}
-      .grid,
-      .app-grid,
-      .target-grid,
-      .wide{grid-template-columns:1fr}
-      .hero{padding:40px 20px}
-      .app-card{min-height:auto}
-      .founder{grid-template-columns:1fr;text-align:center}
-      .avatar{margin:0 auto}
-      .actions{justify-content:center}
-      .section-title{font-size:25px}
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
 
 <body>
-  <main class="page">
-    <div class="wrap">
+  <a class="skip-link" href="#content">Vai al contenuto</a>
 
-      <input class="support-modal-toggle" type="checkbox" id="support-modal" />
-      <div class="support-modal">
-        <div class="support-modal-card">
-          <label class="modal-close" for="support-modal">×</label>
-          <span class="support-kicker">SOSTIENI MATCHIQ</span>
-          <h2 class="support-title">Aiuta MatchIQ a continuare a crescere.</h2>
-          <p class="support-text">
-            MatchIQ è un progetto indipendente che sto costruendo da zero. Ogni contributo, piccolo o grande,
-            verrà reinvestito nello sviluppo dell’ecosistema: infrastruttura, servizi, dati sportivi,
-            strumenti AI e nuove funzionalità.
-          </p>
-          <div class="qr-support">
-            <div class="qr-box" style="display:flex;align-items:center;justify-content:center;min-height:220px;">
-<a class="btn" href="https://revolut.me/m_costabile92" target="_blank"
-style="font-size:20px;padding:18px 28px;text-align:center;text-decoration:none;">
-❤️ Sostieni MatchIQ<br>con Revolut
-</a>
-</div>
-            <div>
-              <strong style="font-size:22px;display:block;margin-bottom:10px">Sostieni MatchIQ con Revolut</strong>
-              <p class="support-text">Cliccando sul pulsante verrai reindirizzato direttamente alla mia pagina Revolut. Puoi scegliere liberamente l'importo con cui sostenere il progetto.</p>
-              <div class="support-note">Se sei un’azienda, un professionista o una realtà sportiva, puoi anche scrivermi per valutare una collaborazione come partner o sponsor.</div>
-              <div class="support-actions-row">
-                <a class="btn whatsapp" href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20vorrei%20sostenere%20MatchIQ%20o%20parlare%20di%20una%20collaborazione." target="_blank" rel="noopener noreferrer">💬 Scrivimi su WhatsApp</a>
-                <a class="btn secondary" href="mailto:mario.costabile92@outlook.it?subject=Supporto%20o%20partnership%20MatchIQ">📩 Email</a>
-              </div>
-            </div>
-          </div>
+  <input class="support-modal-toggle" type="checkbox" id="support-modal" />
+  <div class="support-modal" role="dialog" aria-modal="true" aria-labelledby="support-title">
+    <div class="support-modal-card">
+      <label class="modal-close" for="support-modal" tabindex="0" aria-label="Chiudi">&times;</label>
+      <p class="section-kicker">Sostieni lo sviluppo</p>
+      <h2 id="support-title">Aiuta due prodotti indipendenti a crescere.</h2>
+      <p class="modal-copy">
+        Operations Engine e MatchIQ Tactical nascono da esperienza diretta, sviluppo continuo e lavoro sul prodotto.
+        Un contributo sostiene infrastruttura, ricerca e nuove funzionalità. Per partnership o sponsorship puoi anche contattarmi direttamente.
+      </p>
+
+      <div class="support-options">
+        <div class="support-option">
+          <strong>Supporto diretto</strong>
+          <p>Scegli liberamente se e quanto contribuire tramite la pagina Revolut.</p>
+          <a class="button accent" href="https://revolut.me/m_costabile92" target="_blank" rel="noopener noreferrer">Apri Revolut &rarr;</a>
+        </div>
+        <div class="support-option">
+          <strong>Partnership e sponsorship</strong>
+          <p>Parliamo di collaborazioni, integrazioni e opportunità per entrambi i prodotti.</p>
+          <a class="button secondary" href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20vorrei%20parlare%20di%20una%20partnership%20o%20sponsorship%20per%20i%20tuoi%20prodotti." target="_blank" rel="noopener noreferrer">Scrivimi su WhatsApp</a>
+          <a class="text-link" href="mailto:mario.costabile92@outlook.it?subject=Partnership%20o%20sponsorship%20prodotti">Oppure via email</a>
         </div>
       </div>
-      <section class="support-banner">
-        <div class="support-banner-inner">
+    </div>
+  </div>
+
+  <main class="page" id="content">
+    <div class="wrap">
+      <header class="topbar" aria-label="Intestazione">
+        <div class="identity">Mario Costabile</div>
+        <a class="topbar-link" href="mailto:mario.costabile92@outlook.it">Contatti &rarr;</a>
+      </header>
+
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-content">
+          <p class="eyebrow">Built by Mario</p>
+          <h1 id="hero-title">Costruisco tecnologia partendo da problemi reali.</h1>
+          <p class="hero-line">Operations. Football. Software.</p>
+          <p class="hero-copy">Due prodotti, due contesti reali, un solo approccio: software costruito per rendere le decisioni più semplici.</p>
+          <div class="hero-actions">
+            <a class="button accent" href="#products">Esplora i prodotti &rarr;</a>
+            <a class="button secondary" href="#founder">Chi li costruisce</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="products" aria-labelledby="products-title">
+        <div class="section-heading">
           <div>
-            <span class="support-kicker">BUILD MATCHIQ TOGETHER</span>
-            <h2 class="support-title">Sostieni la crescita di MatchIQ.</h2>
-            <p class="support-text">Sto costruendo MatchIQ da zero, giorno dopo giorno. Se credi nel progetto e vuoi aiutarmi a mantenerlo attivo, migliorarlo e portarlo avanti, puoi sostenere l’ecosistema o diventare partner.</p>
+            <p class="section-kicker">Product portfolio</p>
+            <h2 class="section-title" id="products-title">Due prodotti. Un approccio concreto.</h2>
+          </div>
+          <p class="section-intro">Strumenti professionali progettati attorno al lavoro quotidiano, ai suoi vincoli e alle decisioni che contano.</p>
+        </div>
+
+        <div class="product-grid">
+          <article class="product-card operations">
+            <div class="product-topline">
+              <span class="product-index">01 / Operations</span>
+              <img class="product-logo" src="operations-engine-logo.png" alt="Logo ufficiale Operations Engine" width="132" height="88" />
+            </div>
+            <h3>Operations Engine</h3>
+            <p class="positioning">Operating Intelligence for Last-Mile Operations</p>
+            <p class="product-description">Un sistema operativo per trasformare planning, workforce e flotta in decisioni quotidiane più chiare, coordinate e misurabili.</p>
+            <ul class="capabilities" aria-label="Funzionalità Operations Engine">
+              <li>Planning</li>
+              <li>Workforce</li>
+              <li>Fleet</li>
+              <li>Daily Operations</li>
+              <li>Decision Intelligence</li>
+            </ul>
+            <div class="product-footer">
+              <a class="text-link" href="https://web-production-2a2e5.up.railway.app/" target="_blank" rel="noopener noreferrer">Scopri Operations Engine</a>
+            </div>
+          </article>
+
+          <article class="product-card tactical">
+            <div class="product-topline">
+              <span class="product-index">02 / Football</span>
+              <img class="product-logo" src="matchiq-tactical-logo.png" alt="Logo ufficiale MatchIQ Tactical" width="132" height="88" />
+            </div>
+            <h3>MatchIQ Tactical</h3>
+            <p class="positioning">Football Intelligence Platform</p>
+            <p class="product-description">Una piattaforma per integrare coaching, scouting, analisi tattica e video analysis in un unico workflow di lavoro.</p>
+            <ul class="capabilities" aria-label="Funzionalità MatchIQ Tactical">
+              <li>Coaching</li>
+              <li>Scouting</li>
+              <li>Tactical Analysis</li>
+              <li>Video Analysis</li>
+            </ul>
+            <div class="product-footer">
+              <a class="text-link" href="https://tactical.matchiq.it.com" target="_blank" rel="noopener noreferrer">Apri MatchIQ Tactical</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="founder" aria-labelledby="founder-title">
+        <div class="founder-card">
+          <div class="founder-photo-wrap">
+            <img class="founder-photo" src="mario-founder.png" alt="Mario Costabile" loading="lazy" />
+          </div>
+          <div class="founder-copy">
+            <p class="section-kicker">Founder &amp; Builder</p>
+            <h2 id="founder-title">Mario Costabile</h2>
+            <p class="founder-role">Esperienza sul campo, trasformata in prodotto.</p>
+            <p class="founder-description">
+              Ho trasformato l’esperienza diretta nelle operations last-mile in Operations Engine e il lavoro nel calcio in MatchIQ Tactical.
+              Il filo comune è lo sviluppo di software: strumenti essenziali, costruiti intorno a processi reali e decisioni quotidiane.
+            </p>
+            <div class="contact-links" aria-label="Contatti di Mario Costabile">
+              <a href="https://www.linkedin.com/in/mariocostabile" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              <a href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20la%20tua%20pagina%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a href="mailto:mario.costabile92@outlook.it">Email</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="support-banner-title">
+        <div class="support-banner">
+          <div>
+            <p class="section-kicker">Sviluppo indipendente</p>
+            <h2 id="support-banner-title">Sostieni lo sviluppo.</h2>
+            <p>Operations Engine e MatchIQ Tactical crescono attraverso sviluppo continuo, ricerca e confronto con chi lavora davvero nei due settori.</p>
           </div>
           <div class="support-side">
-            <strong>Vuoi far parte dell’inizio?</strong>
-            <p>Apri il QR Revolut oppure scrivimi per una collaborazione come sponsor o partner.</p>
-            <div class="actions" style="margin-top:0">
-              <label class="btn" for="support-modal">❤️ Sostieni il progetto</label>
-              <a class="btn secondary" href="mailto:mario.costabile92@outlook.it?subject=Partnership%20MatchIQ">🤝 Diventa Partner</a>
-            </div>
+            <strong>Vuoi contribuire o collaborare?</strong>
+            <p>Supporta i progetti tramite Revolut oppure proponi una partnership o sponsorship.</p>
+            <label class="button accent" for="support-modal" tabindex="0">Scopri come sostenere &rarr;</label>
           </div>
         </div>
       </section>
 
-
-      <section class="hero">
-        <img class="brand-logo" src="logo.png?v=2" alt="MatchIQ logo" />
-        <h1 class="logo-text"><span>Match</span><i>I</i><span>Q</span></h1>
-
-        <div class="eyebrow">ONE ECOSYSTEM • FOUR PROFESSIONAL PLATFORMS</div>
-
-        <h2 class="tagline">The AI Software Ecosystem for Football.</h2>
-
-        <p class="sub">
-          MatchIQ è un ecosistema software composto da quattro piattaforme professionali dedicate a società sportive,
-          staff tecnici, osservatori e creator. Ogni piattaforma può essere utilizzata singolarmente oppure come parte
-          di un ecosistema completamente integrato.
-        </p>
-
-        <div class="mini-stats">
-          <div class="mini-stat">4 Professional Platforms</div>
-          <div class="mini-stat">Cloud Ready</div>
-          <div class="mini-stat">AI Powered</div>
-          <div class="mini-stat">Desktop + Mobile PWA</div>
-        </div>
-
-        <div class="actions">
-          <a class="btn" href="#ecosystem">🚀 Entra nell’ecosistema</a>
-          <label class="btn secondary" for="support-modal">❤️ Sostieni il progetto</label>
-          <a class="btn whatsapp" href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20MatchIQ%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank" rel="noopener noreferrer">💬 Scrivimi su WhatsApp</a>
-        </div>
-      </section>
-
-      <section class="section" id="ecosystem">
-        <h2 class="section-title">Entra nell’ecosistema MatchIQ</h2>
-        <p class="section-sub">
-          Quattro piattaforme software pensate per trasformare dati, partite, processi e contenuti in strumenti concreti
-          per il calcio moderno.
-        </p>
-
-        <div class="grid app-grid">
-          <a class="card app-card featured" href="https://matchiq.it.com" target="_blank" rel="noopener noreferrer">
-            <span class="badge">TECHNOLOGY HUB</span>
-            <strong>🚀 MatchIQ Ecosystem</strong>
-            <span class="category">Technology Hub</span>
-            <ul class="feature-list">
-              <li>Single Vision</li>
-              <li>Connected Platforms</li>
-              <li>Football Intelligence</li>
-              <li>AI Infrastructure</li>
-            </ul>
-            <span class="link">Apri MatchIQ →</span>
-          </a>
-
-          <a class="card app-card tactical" href="https://tactical.matchiq.it.com" target="_blank" rel="noopener noreferrer">
-            <span class="badge blue">TACTICAL AI</span>
-            <strong>⚽ MatchIQ Tactical</strong>
-            <span class="category">AI Tactical Platform</span>
-            <ul class="feature-list">
-              <li>Coach Workspace</li>
-              <li>Scout Workspace</li>
-              <li>Live Tactical Intelligence</li>
-              <li>Video Analysis AI</li>
-            </ul>
-            <span class="link">Apri Tactical →</span>
-          </a>
-
-          <a class="card app-card studio" href="https://studio.matchiq.it.com" target="_blank" rel="noopener noreferrer">
-            <span class="badge purple">AI STUDIO</span>
-            <strong>🎬 MatchIQ Studio</strong>
-            <span class="category">AI Content Platform</span>
-            <ul class="feature-list">
-              <li>Storyboard AI</li>
-              <li>Voice AI</li>
-              <li>Video AI</li>
-              <li>Social Content</li>
-            </ul>
-            <span class="link">Apri Studio →</span>
-          </a>
-
-          <a class="card app-card clubiq" href="https://clubiq.matchiq.it.com" target="_blank" rel="noopener noreferrer">
-            <span class="badge">CLUB MANAGEMENT</span>
-            <strong>🏟️ ClubIQ Segreteria</strong>
-            <span class="category">Club Management Platform</span>
-            <ul class="feature-list">
-              <li>Segreteria</li>
-              <li>Atleti</li>
-              <li>Pagamenti</li>
-              <li>Documenti</li>
-            </ul>
-            <span class="link">Apri ClubIQ →</span>
-          </a>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2 class="section-title">Per chi è MatchIQ?</h2>
-
-        <div class="grid target-grid">
-          <div class="card">
-            <strong>👔 Società sportive</strong>
-            <p>Per organizzare meglio attività, dati, documenti, pagamenti e comunicazioni.</p>
-          </div>
-
-          <div class="card">
-            <strong>👨‍🏫 Allenatori</strong>
-            <p>Per leggere meglio le partite, creare report e prendere decisioni più rapide.</p>
-          </div>
-
-          <div class="card">
-            <strong>🔍 Osservatori</strong>
-            <p>Per valutare giocatori, segnali, rendimento e potenziale con strumenti più intelligenti.</p>
-          </div>
-
-          <div class="card">
-            <strong>🎥 Creator e brand</strong>
-            <p>Per trasformare idee, brief e contenuti sportivi in reel verticali più professionali.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2 class="section-title">Cosa offre MatchIQ</h2>
-
-        <div class="grid">
-          <div class="card">
-            <strong>⚽ Tactical Intelligence</strong>
-            <p>Analisi live, momentum, pressione, caos partita, lettura tattica e report automatici.</p>
-          </div>
-
-          <div class="card">
-            <strong>🎥 Video Analysis</strong>
-            <p>Carica un video partita e genera analisi AI con indicazioni tattiche e report PDF.</p>
-          </div>
-
-          <div class="card">
-            <strong>🔍 Scout Intelligence</strong>
-            <p>Supporto agli osservatori per valutare profili, segnali, potenziale e rendimento.</p>
-          </div>
-
-          <div class="card">
-            <strong>🎬 AI Content Studio</strong>
-            <p>Brief, hook, storyboard, scene, media library, voice-over, motion ed export MP4.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2 class="section-title">Perché scegliere MatchIQ</h2>
-        <p class="section-sub">
-          Non quattro prodotti scollegati, ma un ecosistema modulare progettato per lavorare insieme.
-        </p>
-
-        <div class="grid">
-          <div class="card">
-            <strong>🧩 Un ecosistema</strong>
-            <p>Quattro piattaforme progettate per lavorare insieme e coprire più bisogni del calcio moderno.</p>
-          </div>
-
-          <div class="card">
-            <strong>⚙️ Modulare</strong>
-            <p>Ogni software funziona anche in modo indipendente, senza obbligare l’utente a usare tutto.</p>
-          </div>
-
-          <div class="card">
-            <strong>🤖 AI Native</strong>
-            <p>L’intelligenza artificiale è integrata nei workflow: analisi, contenuti, scouting e report.</p>
-          </div>
-
-          <div class="card">
-            <strong>☁️ Cloud Ready</strong>
-            <p>Desktop, mobile e PWA per usare gli strumenti ovunque, senza installazioni complesse.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section wide">
-        <div class="card">
-          <h2 class="section-title">Perché nasce MatchIQ</h2>
-
-          <div class="list">
-            <div class="item">Per aiutare allenatori e società a prendere decisioni più intelligenti.</div>
-            <div class="item">Per portare strumenti professionali anche nel calcio dilettantistico.</div>
-            <div class="item">Per trasformare dati, video, eventi e idee in output utili e immediati.</div>
-            <div class="item">Per costruire un ecosistema AI concreto, accessibile e in continua evoluzione.</div>
-          </div>
-        </div>
-
-        <div class="card founder-card">
-          <div class="founder">
-            <img class="avatar" src="mario-founder.png" alt="Mario Costabile Founder MatchIQ">
-            <div>
-              <div class="founder-title">FOUNDER & CEO</div>
-              <strong>Mario Costabile</strong>
-              <p>
-                Founder di MatchIQ. Negli ultimi mesi ho progettato e sviluppato un ecosistema software dedicato al calcio,
-                composto da piattaforme per l’analisi tattica, la gestione delle società sportive e la creazione di contenuti
-                tramite intelligenza artificiale.
-              </p>
-            </div>
-          </div>
-
-          <div class="quote">
-            L’obiettivo è costruire strumenti professionali che aiutino club, allenatori e organizzazioni sportive a lavorare meglio.
-          </div>
-
-          <div class="actions" style="justify-content:flex-start;margin-top:24px">
-            <a class="btn whatsapp" href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20MatchIQ%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
-            <a class="btn secondary" href="https://www.linkedin.com/in/mariocostabile" target="_blank" rel="noopener noreferrer">👤 LinkedIn</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="card partnership-card">
-          <span class="badge blue">ENTERPRISE</span>
-          <h2 class="section-title">Technology Partnerships</h2>
-          <p class="section-sub">
-            MatchIQ è aperta a partnership commerciali, integrazioni software, white-label e valutazioni strategiche
-            con aziende del settore sport-tech.
-          </p>
-
-          <div class="grid">
-            <div class="card">
-              <strong>🤝 Partnership</strong>
-              <p>Collaborazioni commerciali e distribuzione verso club, academy e società sportive.</p>
-            </div>
-
-            <div class="card">
-              <strong>🏷️ White Label</strong>
-              <p>Possibilità di adattare uno o più moduli a brand e piattaforme esistenti.</p>
-            </div>
-
-            <div class="card">
-              <strong>🔗 Software Integration</strong>
-              <p>Integrazione dei moduli MatchIQ in ecosistemi già operativi.</p>
-            </div>
-
-            <div class="card">
-              <strong>🚀 Strategic Acquisition</strong>
-              <p>Valutazione di opportunità strategiche su tecnologia, prodotto o progetto.</p>
-            </div>
-          </div>
-
-          <div class="actions" style="justify-content:flex-start;margin-top:24px">
-            <a class="btn" href="mailto:mario.costabile92@outlook.it?subject=MatchIQ%20-%20Partnership%20o%20Demo">Let’s Talk →</a>
-          </div>
+      <section class="section" id="partnership" aria-labelledby="partnership-title">
+        <div class="partnership">
+          <p class="section-kicker">Partnership &amp; collaborazioni</p>
+          <h2 id="partnership-title">Costruiamo qualcosa di utile.</h2>
+          <p>Aziende, operatori last-mile, club, organizzazioni sportive, partner tecnologici e investitori: sono aperto a collaborazioni concrete intorno a prodotto, dati e distribuzione.</p>
+          <a class="button" href="mailto:mario.costabile92@outlook.it?subject=Partnership%20-%20Operations%20Engine%20e%20MatchIQ%20Tactical">Parliamone &rarr;</a>
         </div>
       </section>
 
       <footer>
-        <strong>MatchIQ</strong><br />
-        AI Software Ecosystem for Football
-        <div style="margin-top:10px;color:#d8e8ff;font-weight:800">
-          Partnership • Technology Licensing • White Label • Strategic Acquisition
+        <div>
+          <div class="footer-heading">Mario Costabile</div>
+          <span>&copy; 2026 &middot; Founder &amp; Builder</span>
         </div>
-        <div class="footer-links">
-          <a href="https://tactical.matchiq.it.com" target="_blank" rel="noopener noreferrer">Tactical</a>
-          <a href="https://studio.matchiq.it.com" target="_blank" rel="noopener noreferrer">Studio</a>
-          <a href="https://clubiq.matchiq.it.com" target="_blank" rel="noopener noreferrer">ClubIQ</a>
-          <a href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20MatchIQ%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <nav class="footer-links" aria-label="Link nel footer">
+          <a href="https://web-production-2a2e5.up.railway.app/" target="_blank" rel="noopener noreferrer">Operations Engine</a>
+          <a href="https://tactical.matchiq.it.com" target="_blank" rel="noopener noreferrer">MatchIQ Tactical</a>
           <a href="https://www.linkedin.com/in/mariocostabile" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a href="https://www.instagram.com/matchiq.app?igsh=bmQ2ZHF1aGR6NzUy" target="_blank" rel="noopener noreferrer">Instagram</a>
-          <label for="support-modal" style="color:var(--text);text-decoration:none;border:1px solid var(--line);padding:9px 13px;border-radius:999px;font-weight:800;cursor:pointer">Sostieni</label>
+          <a href="https://wa.me/393479013298?text=Ciao%20Mario%2C%20ho%20visto%20la%20tua%20pagina%20e%20vorrei%20avere%20maggiori%20informazioni." target="_blank" rel="noopener noreferrer">WhatsApp</a>
           <a href="mailto:mario.costabile92@outlook.it">Email</a>
-        </div>
-        <br />
-        © 2026 MatchIQ — AI Technology Ecosystem
+          <label for="support-modal" tabindex="0">Sostieni</label>
+        </nav>
       </footer>
-
     </div>
   </main>
 </body>
