@@ -957,6 +957,16 @@ def mario_founder_image():
     return FileResponse(os.path.join(FRONTEND_DIR, "mario-founder.png"), media_type="image/png")
 
 
+@app.get("/operations-engine-logo.png", include_in_schema=False)
+def operations_engine_logo():
+    return FileResponse(os.path.join(FRONTEND_DIR, "operations-engine-logo.png"), media_type="image/png")
+
+
+@app.get("/matchiq-tactical-logo.png", include_in_schema=False)
+def matchiq_tactical_logo():
+    return FileResponse(os.path.join(FRONTEND_DIR, "matchiq-tactical-logo.png"), media_type="image/png")
+
+
 @app.get("/assets/{file_path:path}", include_in_schema=False)
 def serve_frontend_assets(file_path: str):
     safe_path = os.path.abspath(os.path.join(FRONTEND_DIR, "assets", file_path))
